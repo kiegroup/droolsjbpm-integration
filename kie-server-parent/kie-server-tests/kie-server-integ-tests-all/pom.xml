@@ -173,8 +173,18 @@
               <org.kie.executor.jms>true</org.kie.executor.jms>
               <!-- For including complete stack trace in the response -->
               <org.kie.server.stacktrace.included>true</org.kie.server.stacktrace.included>
+              <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly23x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
             </systemProperties>
           </container>
+<!--          <configuration>-->
+<!--            <properties>-->
+<!--              <cargo.start.jvmargs>-->
+<!--                -Xdebug-->
+<!--                -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8787-->
+<!--                -Xnoagent-->
+<!--              </cargo.start.jvmargs>-->
+<!--            </properties>-->
+<!--          </configuration>-->
         </configuration>
       </plugin>
     </plugins>

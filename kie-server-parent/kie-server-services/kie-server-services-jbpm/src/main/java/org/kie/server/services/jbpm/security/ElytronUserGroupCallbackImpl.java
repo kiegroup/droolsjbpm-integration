@@ -17,8 +17,9 @@ package org.kie.server.services.jbpm.security;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 
 import org.jbpm.services.task.identity.AbstractUserGroupInfo;
 import org.kie.api.task.UserGroupCallback;
@@ -27,10 +28,8 @@ import org.slf4j.LoggerFactory;
 import org.wildfly.security.auth.principal.NamePrincipal;
 import org.wildfly.security.auth.realm.FileSystemSecurityRealm;
 import org.wildfly.security.auth.server.ModifiableRealmIdentity;
-import org.wildfly.security.auth.server.ModifiableRealmIdentityIterator;
 import org.wildfly.security.auth.server.NameRewriter;
 import org.wildfly.security.auth.server.RealmUnavailableException;
-import org.wildfly.security.authz.Attributes;
 
 public class ElytronUserGroupCallbackImpl
         extends AbstractUserGroupInfo
@@ -76,32 +75,35 @@ public class ElytronUserGroupCallbackImpl
     }
 
     public boolean existsUser(String userId) {
-        FileSystemSecurityRealm realm = getRealm();
-        ModifiableRealmIdentity identity = realm.getRealmIdentityForUpdate(new NamePrincipal(userId));
-        return identity != null;
+        return true;
+//        FileSystemSecurityRealm realm = getRealm();
+//        ModifiableRealmIdentity identity = realm.getRealmIdentityForUpdate(new NamePrincipal(userId));
+//        return identity != null;
     }
 
     public boolean existsGroup(String groupId) {
-        try {
-            final ModifiableRealmIdentityIterator realmIdentityIterator = getRealm().getRealmIdentityIterator();
-            while (realmIdentityIterator.hasNext()) {
-                final ModifiableRealmIdentity identity = realmIdentityIterator.next();
-                final Attributes attributes = identity.getAttributes();
-                final Attributes.Entry roles = attributes.get("role");
-                for (String role : roles) {
-                    if (Objects.equals(groupId, role)) {
-                        return true;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Could not retrieve a list of existing groups for an user.", this);
-        }
-        return false;
+        return true;
+//        try {
+//            final ModifiableRealmIdentityIterator realmIdentityIterator = getRealm().getRealmIdentityIterator();
+//            while (realmIdentityIterator.hasNext()) {
+//                final ModifiableRealmIdentity identity = realmIdentityIterator.next();
+//                final Attributes attributes = identity.getAttributes();
+//                final Attributes.Entry roles = attributes.get("role");
+//                for (String role : roles) {
+//                    if (Objects.equals(groupId, role)) {
+//
+//                        return true;
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//            logger.error("Could not retrieve a list of existing groups for an user.", this);
+//        }
+//        return false;
     }
 
     public List<String> getGroupsForUser(String userId) {
-        List<String> result = new ArrayList<>();
+        Set<String> result = new HashSet<>();
 
         try {
             FileSystemSecurityRealm realm = getRealm();
@@ -111,10 +113,10 @@ public class ElytronUserGroupCallbackImpl
                 result.add(role);
             }
         } catch (RealmUnavailableException e) {
-            logger.error("Could not retrieve the File System Security Realm.", this);
+            logger.error("Could not retrieve the File System Security Realm from: " + folderPath, this);
         }
 
-        return result;
+        return new ArrayList<>(result);
     }
 
     private FileSystemSecurityRealm getRealm() {
