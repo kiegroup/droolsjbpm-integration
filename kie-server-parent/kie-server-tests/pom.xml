@@ -307,6 +307,7 @@
               <properties>
                 <cargo.wildfly.script.cli.embedded>${project.parent.basedir}/script/setup.cli</cargo.wildfly.script.cli.embedded>
                 <cargo.servlet.port>${container.port}</cargo.servlet.port>
+                <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly23x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
               </properties>
             </configuration>
           </configuration>
