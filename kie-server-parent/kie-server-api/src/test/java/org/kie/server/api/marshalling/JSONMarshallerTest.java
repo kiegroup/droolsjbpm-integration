@@ -45,6 +45,7 @@ import org.kie.server.api.marshalling.json.JSONMarshaller;
 import org.kie.server.api.marshalling.objects.DateObject;
 import org.kie.server.api.marshalling.objects.DateObjectUnannotated;
 import org.kie.server.api.model.definition.QueryParam;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -52,6 +53,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.skyscreamer.jsonassert.JSONCompareMode.STRICT;
 
 public class JSONMarshallerTest {
 
@@ -258,9 +260,10 @@ public class JSONMarshallerTest {
 
         Order order = new Order("all");
         String converted = marshaller.marshall(order);
-        assertEquals("{\n"
-                + "  \"ORDER_ID\" : \"all\"\n"
-                + "}", converted);
+        String expectedMarshalled = "{\"ORDER_ID\" : \"all\"}";
+
+        JSONAssert.assertEquals(expectedMarshalled, converted, STRICT);
+        
         Order unconverted = marshaller.unmarshall(converted, Order.class);
         assertEquals("all", unconverted.getORDER_ID());
     }
@@ -271,9 +274,10 @@ public class JSONMarshallerTest {
 
         Order order = new Order("all");
         String converted = marshaller.marshall(order);
-        assertEquals("{\n"
-                + "  \"order_ID\" : \"all\"\n"
-                + "}", converted);
+        String expectedMarshalled = "{\"order_ID\" : \"all\"}";
+
+        JSONAssert.assertEquals(expectedMarshalled, converted, STRICT);
+        
         Order unconverted = marshaller.unmarshall(converted, Order.class);
         assertEquals("all", unconverted.getORDER_ID());
     }
@@ -285,22 +289,13 @@ public class JSONMarshallerTest {
         BatchExecutionCommandImpl batch = new BatchExecutionCommandImpl();
         batch.addCommand(new InsertObjectCommand(new Order("all")));
 
-        
         String converted = marshaller.marshall(batch);
-        assertEquals("{\n"
-                + "  \"lookup\" : null,\n"
-                + "  \"commands\" : [ {\n"
-                + "    \"insert\" : {\n"
-                + "      \"object\" : {\"org.kie.server.api.marshalling.JSONMarshallerTest$Order\":{\n"
-                + "  \"ORDER_ID\" : \"all\"\n"
-                + "}},\n"
-                + "      \"out-identifier\" : null,\n"
-                + "      \"return-object\" : true,\n"
-                + "      \"entry-point\" : \"DEFAULT\",\n"
-                + "      \"disconnected\" : false\n"
-                + "    }\n"
-                + "  } ]\n"
-                + "}", converted);
+        String expectedMarshalled = "{ \"lookup\" : null, \"commands\" : [ { \"insert\" : " +
+                                    "{ \"object\" : {\"org.kie.server.api.marshalling.JSONMarshallerTest$Order\":{ \"ORDER_ID\" : \"all\" }}, " +
+                                    "\"out-identifier\" : null, \"return-object\" : true, \"entry-point\" : \"DEFAULT\", \"disconnected\" : false } } ] }";
+        
+        JSONAssert.assertEquals(expectedMarshalled, converted, STRICT);
+
         BatchExecutionCommandImpl unconverted = marshaller.unmarshall(converted, BatchExecutionCommandImpl.class);
         assertEquals("all", ((Order) ((InsertObjectCommand) unconverted.getCommands().get(0)).getObject()).getORDER_ID());
     }
@@ -312,22 +307,13 @@ public class JSONMarshallerTest {
         BatchExecutionCommandImpl batch = new BatchExecutionCommandImpl();
         batch.addCommand(new InsertObjectCommand(new Order("all")));
 
-        
         String converted = marshaller.marshall(batch);
-        assertEquals("{\n"
-                + "  \"lookup\" : null,\n"
-                + "  \"commands\" : [ {\n"
-                + "    \"insert\" : {\n"
-                + "      \"object\" : {\"org.kie.server.api.marshalling.JSONMarshallerTest$Order\":{\n"
-                + "  \"order_ID\" : \"all\"\n"
-                + "}},\n"
-                + "      \"out-identifier\" : null,\n"
-                + "      \"return-object\" : true,\n"
-                + "      \"entry-point\" : \"DEFAULT\",\n"
-                + "      \"disconnected\" : false\n"
-                + "    }\n"
-                + "  } ]\n"
-                + "}", converted);
+        String expectedMarshalled = "{ \"lookup\" : null, \"commands\" : [ { \"insert\" : " +
+                "{ \"object\" : {\"org.kie.server.api.marshalling.JSONMarshallerTest$Order\":{ \"order_ID\" : \"all\" }}, " +
+                "\"out-identifier\" : null, \"return-object\" : true, \"entry-point\" : \"DEFAULT\", \"disconnected\" : false } } ] }";
+
+        JSONAssert.assertEquals(expectedMarshalled, converted, STRICT);
+
         BatchExecutionCommandImpl unconverted = marshaller.unmarshall(converted, BatchExecutionCommandImpl.class);
         assertEquals("all", ((Order) ((InsertObjectCommand) unconverted.getCommands().get(0)).getObject()).getORDER_ID());
     }

@@ -24,8 +24,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.server.api.KieServerConstants;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 import static org.junit.Assert.assertEquals;
+import static org.skyscreamer.jsonassert.JSONCompareMode.STRICT;
 
 public class JSONMarshallerWithSystemPropertyTest {
 
@@ -49,20 +51,13 @@ public class JSONMarshallerWithSystemPropertyTest {
 
         
         String converted = marshaller.marshall(batch);
-        assertEquals("{\n"
-                + "  \"lookup\" : null,\n"
-                + "  \"commands\" : [ {\n"
-                + "    \"insert\" : {\n"
-                + "      \"object\" : {\"org.kie.server.api.marshalling.JSONMarshallerWithSystemPropertyTest$Order\":{\n"
-                + "  \"ORDER_ID\" : \"all\"\n"
-                + "}},\n"
-                + "      \"out-identifier\" : null,\n"
-                + "      \"return-object\" : true,\n"
-                + "      \"entry-point\" : \"DEFAULT\",\n"
-                + "      \"disconnected\" : false\n"
-                + "    }\n"
-                + "  } ]\n"
-                + "}", converted);
+
+        String expectedMarshalled = "{ \"lookup\" : null, \"commands\" : [ { \"insert\" : " +
+                "{ \"object\" : {\"org.kie.server.api.marshalling.JSONMarshallerWithSystemPropertyTest$Order\":{ \"ORDER_ID\" : \"all\" }}, " +
+                "\"out-identifier\" : null, \"return-object\" : true, \"entry-point\" : \"DEFAULT\", \"disconnected\" : false } } ] }";
+
+        JSONAssert.assertEquals(expectedMarshalled, converted, STRICT);
+
         BatchExecutionCommandImpl unconverted = marshaller.unmarshall(converted, BatchExecutionCommandImpl.class);
         assertEquals("all", ((Order) ((InsertObjectCommand) unconverted.getCommands().get(0)).getObject()).getORDER_ID());
     }
