@@ -19,9 +19,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.jbpm.services.task.identity.AbstractUserGroupInfo;
+import org.jbpm.services.task.identity.adapter.UserGroupAdapter;
 import org.kie.api.task.UserGroupCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,6 +103,22 @@ public class ElytronUserGroupCallbackImpl
 //        }
 //        return false;
     }
+    private ServiceLoader<UserGroupAdapter> ugAdapterServiceLoader = ServiceLoader.load(UserGroupAdapter.class);
+
+    private static final ThreadLocal<UserGroupAdapter> externalUserGroupAdapterLocal = new ThreadLocal<UserGroupAdapter>();
+
+    public static void addExternalUserGroupAdapter(UserGroupAdapter externalUserGroupAdapter) {
+        if( externalUserGroupAdapterLocal.get() != null ) {
+            UserGroupAdapter adapter = externalUserGroupAdapterLocal.get();
+            throw new IllegalStateException("The external UserGroupAdapter has already been set! "
+                                                    + "(" + adapter.getClass().getName() + ")");
+        }
+        externalUserGroupAdapterLocal.set(externalUserGroupAdapter);
+    }
+
+    public static void clearExternalUserGroupAdapter() {
+        externalUserGroupAdapterLocal.set(null);
+    }
 
     public List<String> getGroupsForUser(String userId) {
         Set<String> result = new HashSet<>();
@@ -108,12 +126,28 @@ public class ElytronUserGroupCallbackImpl
         try {
             FileSystemSecurityRealm realm = getRealm();
             ModifiableRealmIdentity identity = realm.getRealmIdentityForUpdate(new NamePrincipal(userId));
-
             for (String role : identity.getAttributes().get("role")) {
                 result.add(role);
             }
+
         } catch (RealmUnavailableException e) {
-            logger.error("Could not retrieve the File System Security Realm from: " + folderPath, this);
+            // use adapters
+            for (UserGroupAdapter adapter : ugAdapterServiceLoader) {
+                logger.debug("Adding roles from UserGroupAdapter service ({})", adapter.getClass().getSimpleName());
+                List<String> userRoles = adapter.getGroupsForUser(userId);
+                if (userRoles != null) {
+                    result.addAll(userRoles);
+                }
+            }
+        }
+
+        UserGroupAdapter adapter = externalUserGroupAdapterLocal.get();
+        if( adapter != null ) {
+            logger.debug("Adding roles from external UserGroupAdapter ({})", adapter.getClass().getSimpleName());
+            List<String> userRoles = adapter.getGroupsForUser(userId);
+            if (userRoles != null) {
+                result.addAll(userRoles);
+            }
         }
 
         return new ArrayList<>(result);

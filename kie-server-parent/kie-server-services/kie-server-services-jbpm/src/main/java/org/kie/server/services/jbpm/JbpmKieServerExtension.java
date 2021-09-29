@@ -226,6 +226,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
         if (callbackConfig == null || callbackConfig.isEmpty()) {
             System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "custom");
             String name = ElytronUserGroupCallbackImpl.class.getName();
+            ElytronUserGroupCallbackImpl.addExternalUserGroupAdapter(new JMSUserGroupAdapter());
             System.setProperty(KieServerConstants.CFG_HT_CALLBACK_CLASS, name);
         }
 

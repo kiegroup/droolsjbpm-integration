@@ -17,6 +17,7 @@ package org.kie.server.services.impl.security;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.kie.server.api.security.SecurityAdapter;
 import org.wildfly.security.auth.server.SecurityDomain;
@@ -37,7 +38,7 @@ public class ElytronIdentityProvider
             return contextUsers.peek();
         }
         final SecurityIdentity identity = getCurrentSecurityIdentity();
-        if (identity != null && identity.getPrincipal() != null) {
+        if (identity != null && identity.getPrincipal() != null && !Objects.equals("anonymous", identity.getPrincipal().getName())) {
             return identity.getPrincipal().getName();
         }
 
