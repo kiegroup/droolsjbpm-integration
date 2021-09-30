@@ -18,6 +18,7 @@ package org.kie.server.services.impl.security;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.kie.server.api.security.SecurityAdapter;
 import org.wildfly.security.auth.server.SecurityDomain;
@@ -37,9 +38,11 @@ public class ElytronIdentityProvider
         if (!contextUsers.isEmpty()) {
             return contextUsers.peek();
         }
-        final SecurityIdentity identity = getCurrentSecurityIdentity();
-        if (identity != null && identity.getPrincipal() != null && !Objects.equals("anonymous", identity.getPrincipal().getName())) {
-            return identity.getPrincipal().getName();
+        final Optional<SecurityIdentity> identity = getCurrentSecurityIdentity();
+        if (identity.isPresent()) {
+            if (identity != null && identity.get().getPrincipal() != null && !Objects.equals("anonymous", identity.get().getPrincipal().getName())) {
+                return identity.get().getPrincipal().getName();
+            }
         }
 
         return getNameFromAdapter();
@@ -76,16 +79,22 @@ public class ElytronIdentityProvider
 
     private List<String> getRolesFromSecurityIdentity() {
         final List<String> result = new ArrayList<String>();
-        final SecurityIdentity identity = getCurrentSecurityIdentity();
-        for (String role : identity.getRoles()) {
-            result.add(role);
+        final Optional<SecurityIdentity> identity = getCurrentSecurityIdentity();
+        if (identity.isPresent()) {
+            for (String role : identity.get().getRoles()) {
+                result.add(role);
+            }
         }
 
         return result;
     }
 
-    private SecurityIdentity getCurrentSecurityIdentity() {
+    private Optional<SecurityIdentity> getCurrentSecurityIdentity() {
         SecurityDomain securityDomain = SecurityDomain.getCurrent();
-        return securityDomain.getCurrentSecurityIdentity();
+        if (securityDomain == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(securityDomain.getCurrentSecurityIdentity());
+        }
     }
 }
