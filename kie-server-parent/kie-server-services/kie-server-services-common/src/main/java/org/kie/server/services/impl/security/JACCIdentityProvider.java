@@ -32,10 +32,6 @@ import static java.util.Collections.emptyList;
 public class JACCIdentityProvider
         extends BaseIdentityProvider {
 
-    public static boolean available() {
-        return getSubjectFromContainer() != null;
-    }
-
     @Override
     public String getName() {
         if (!contextUsers.isEmpty()) {

@@ -154,7 +154,7 @@ public class KieServerImpl implements KieServer {
         this.context = new KieServerRegistryImpl();
         if (ElytronIdentityProvider.available()) {
             this.context.registerIdentityProvider(new ElytronIdentityProvider());
-        } else if (JACCIdentityProvider.available()) {
+        } else {
             this.context.registerIdentityProvider(new JACCIdentityProvider());
         }
         this.context.registerStateRepository(repository);
