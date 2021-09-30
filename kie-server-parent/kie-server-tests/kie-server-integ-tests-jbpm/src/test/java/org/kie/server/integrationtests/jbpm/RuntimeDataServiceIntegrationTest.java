@@ -1462,13 +1462,12 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
                     .type(TaskEvent.TaskEventType.ADDED.toString())
                     .processInstanceId(processInstanceId)
                     .taskId(taskInstance.getId())
-                    .assignedOwner("pepe")
-                    .user(PROCESS_ID_USERTASK)      // is this really correct to set process id as user for added task
+                    .assignedOwner(USER_YODA)
+                    .user(TestConfig.getUsername())
                     .build();
 
             TaskEventInstance event = events.get(0);
             assertTaskEventInstance(expectedTaskEventInstance, event);
-            //assertEquals(PROCESS_ID_USERTASK, event.getUserId());   // is this really correct to set process id as user for added task
 
             // now let's start it
             taskClient.startTask(CONTAINER_ID, taskInstance.getId(), USER_YODA);
@@ -1493,7 +1492,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
             event = getTaskEventInstanceFromListByType(events, TaskEvent.TaskEventType.ADDED.toString());
             expectedTaskEventInstance.setType(TaskEvent.TaskEventType.ADDED.toString());
-            expectedTaskEventInstance.setUserId(PROCESS_ID_USERTASK);  // is this really correct to set process id as user for added task
+            expectedTaskEventInstance.setUserId(USER_YODA);
             assertTaskEventInstance(expectedTaskEventInstance, event);
 
             event = getTaskEventInstanceFromListByType(events, TaskEvent.TaskEventType.STARTED.toString());

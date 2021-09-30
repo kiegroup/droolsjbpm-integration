@@ -1346,7 +1346,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
                     .type(TaskEvent.TaskEventType.ADDED.toString())
                     .processInstanceId(processInstanceId)
                     .taskId(taskInstance.getId())
-                    .user(PROCESS_ID_USERTASK)
+                    .user(TestConfig.getUsername())
                     .build();
 
             List<TaskEventInstance> events = taskClient.findTaskEvents(CONTAINER_ID, taskInstance.getId(), 0, 10);
