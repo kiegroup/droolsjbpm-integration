@@ -161,6 +161,7 @@
               <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
               <kie-pmml-implementation>legacy</kie-pmml-implementation>
               <org.kie.server.json.fallbackClassLoader.enabled>true</org.kie.server.json.fallbackClassLoader.enabled>
+              <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly23x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
             </systemProperties>
           </container>
         </configuration>

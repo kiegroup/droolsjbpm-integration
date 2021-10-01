@@ -178,6 +178,7 @@
               <!-- router based configuration -->
               <org.kie.server.router>${kie.server.router.url}</org.kie.server.router>
               <org.kie.server.location>${kie.server.base.http.url}</org.kie.server.location>
+              <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly23x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
             </systemProperties>
           </container>
         </configuration>
