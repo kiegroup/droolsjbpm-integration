@@ -21,6 +21,7 @@ import java.util.List;
 import org.jbpm.process.audit.AbstractAuditLoggerAdapter;
 import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
+import org.kie.api.event.process.ProcessAsyncNodeScheduledEvent;
 import org.kie.api.event.process.ProcessCompletedEvent;
 import org.kie.api.event.process.ProcessNodeLeftEvent;
 import org.kie.api.event.process.ProcessNodeTriggeredEvent;
@@ -32,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.NODE_ENTER_EVENT_TYPE;
 import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.NODE_LEFT_EVENT_TYPE;
+import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.NODE_SCHEDULED_EVENT_TYPE;
 import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.NODE_SLA_VIOLATED;
 import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.PROCESS_COMPLETED_EVENT_TYPE;
 import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.PROCESS_SLA_VIOLATED;
@@ -111,6 +113,14 @@ public class AuditDataReplicationProcessEventProducer extends AbstractAuditLogge
         NodeInstanceLog log = (NodeInstanceLog) getNodeInstanceMetadata(event.getNodeInstance(), METADATA_NODEINSTANCE_LOG);
         if (log != null) {
             jmsSender.sendMessage(log, NODE_SLA_VIOLATED);
+        }
+    }
+
+    @Override
+    protected void nodeScheduled(ProcessAsyncNodeScheduledEvent event) {
+        NodeInstanceLog log = (NodeInstanceLog) getNodeInstanceMetadata(event.getNodeInstance(), METADATA_NODEINSTANCE_LOG);
+        if (log != null) {
+            jmsSender.sendMessage(log, NODE_SCHEDULED_EVENT_TYPE);
         }
     }
 
