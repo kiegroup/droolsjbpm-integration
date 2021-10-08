@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import static org.drools.core.util.IoUtils.readBytesFromInputStream;
+import org.kie.memorycompiler.resources.KiePath;
 
 public class DiskResourceStore implements ResourceStore {
     private final File root;
@@ -33,13 +34,13 @@ public class DiskResourceStore implements ResourceStore {
     }
 
     @Override
-    public void write(String pResourceName, byte[] pResourceData) {
-        write(pResourceName, pResourceData, false);
+    public void write(KiePath resourcePath, byte[] pResourceData) {
+        write(resourcePath, pResourceData, false);
     }
 
     @Override
-    public void write(String pResourceName, byte[] pResourceData, boolean createFolder) {
-        File file = new File(getFilePath(pResourceName));
+    public void write(KiePath pResourceName, byte[] pResourceData, boolean createFolder) {
+        File file = new File(getFilePath(pResourceName.asString()));
         if (createFolder) {
             File dir = file.getParentFile();
             if (!dir.exists()) {
@@ -65,10 +66,10 @@ public class DiskResourceStore implements ResourceStore {
     }
 
     @Override
-    public byte[] read(String pResourceName) {
+    public byte[] read(KiePath pResourceName) {
         FileInputStream fis = null;
         try {
-            fis = new FileInputStream(getFilePath(pResourceName));
+            fis = new FileInputStream(getFilePath(pResourceName.asString()));
             return readBytesFromInputStream(fis);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
@@ -84,8 +85,8 @@ public class DiskResourceStore implements ResourceStore {
     }
 
     @Override
-    public void remove(String pResourceName) {
-        File file = new File(getFilePath(pResourceName));
+    public void remove(KiePath pResourceName) {
+        File file = new File(getFilePath(pResourceName.asString()));
         if (file.exists()) {
             file.delete();
         }
