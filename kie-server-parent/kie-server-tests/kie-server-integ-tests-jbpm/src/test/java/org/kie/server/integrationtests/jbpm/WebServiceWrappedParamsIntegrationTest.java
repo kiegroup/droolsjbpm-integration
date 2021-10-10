@@ -20,17 +20,13 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.kie.api.KieServices;
-import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.integrationtests.category.JEEOnly;
+import org.kie.server.integrationtests.category.WildflyOnly;
 import org.kie.server.integrationtests.config.TestConfig;
-import org.kie.server.integrationtests.shared.KieServerDeployer;
 
-@Category({JEEOnly.class})
+@Category({JEEOnly.class, WildflyOnly.class})
 public class WebServiceWrappedParamsIntegrationTest extends WebServiceBase {
 
     protected static final String PROCESS_ID_WRAPPED_WS = "org.specialtripsagency.travelAgencyWrappedParamsProcess";
