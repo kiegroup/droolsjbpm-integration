@@ -20,9 +20,10 @@ import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.integrationtests.category.JEEOnly;
+import org.kie.server.integrationtests.category.WildflyOnly;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
-@Category({JEEOnly.class})
+@Category({JEEOnly.class, WildflyOnly.class})
 public class WebServiceBase extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "webservice-project", "1.0.0.Final");

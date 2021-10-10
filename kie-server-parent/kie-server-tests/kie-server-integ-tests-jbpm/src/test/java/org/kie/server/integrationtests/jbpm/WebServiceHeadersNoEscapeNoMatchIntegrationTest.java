@@ -15,7 +15,6 @@
 
 package org.kie.server.integrationtests.jbpm;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
@@ -24,9 +23,10 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.server.integrationtests.category.JEEOnly;
+import org.kie.server.integrationtests.category.WildflyOnly;
 import org.kie.server.integrationtests.config.TestConfig;
 
-@Category({JEEOnly.class})
+@Category({JEEOnly.class, WildflyOnly.class})
 public class WebServiceHeadersNoEscapeNoMatchIntegrationTest extends WebServiceBase {
 
     @Test

@@ -25,9 +25,10 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.integrationtests.category.JEEOnly;
+import org.kie.server.integrationtests.category.WildflyOnly;
 import org.kie.server.integrationtests.config.TestConfig;
 
-@Category({JEEOnly.class})
+@Category({JEEOnly.class, WildflyOnly.class})
 public class WebServiceIntegrationTest extends WebServiceBase {
 
     protected static final String PROCESS_ID_WS = "org.specialtripsagency.specialtripsagencyprocess";
