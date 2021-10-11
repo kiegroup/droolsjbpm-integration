@@ -245,6 +245,7 @@
               <!-- UserInfo properties for UserTaskEscalationIntegrationTest -->
               <org.jbpm.ht.userinfo>props</org.jbpm.ht.userinfo>
               <jbpm.user.info.properties>file://${project.build.testOutputDirectory}/userinfo.properties</jbpm.user.info.properties>
+              <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly23x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
             </systemProperties>
           </container>
         </configuration>

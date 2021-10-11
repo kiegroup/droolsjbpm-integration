@@ -164,6 +164,7 @@
               <!-- policy based configuration -->
               <org.kie.server.policy.activate>KeepLatestOnly</org.kie.server.policy.activate>
               <policy.klo.interval>5000</policy.klo.interval>
+              <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly23x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
             </systemProperties>
           </container>
         </configuration>

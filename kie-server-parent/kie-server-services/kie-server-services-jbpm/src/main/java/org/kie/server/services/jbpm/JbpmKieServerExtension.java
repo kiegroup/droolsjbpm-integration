@@ -127,6 +127,7 @@ import org.kie.server.services.jbpm.admin.UserTaskAdminServiceBase;
 import org.kie.server.services.jbpm.jpa.PersistenceUnitExtensionsLoader;
 import org.kie.server.services.jbpm.jpa.PersistenceUnitInfoImpl;
 import org.kie.server.services.jbpm.jpa.PersistenceUnitInfoLoader;
+import org.kie.server.services.jbpm.security.ElytronUserGroupCallbackImpl;
 import org.kie.server.services.jbpm.security.JMSUserGroupAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -223,8 +224,10 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
         // if no other callback set, use jaas by default
         if (callbackConfig == null || callbackConfig.isEmpty()) {
-            System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "jaas");
-            JAASUserGroupCallbackImpl.addExternalUserGroupAdapter(new JMSUserGroupAdapter());
+            System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "custom");
+            String name = ElytronUserGroupCallbackImpl.class.getName();
+            ElytronUserGroupCallbackImpl.addExternalUserGroupAdapter(new JMSUserGroupAdapter());
+            System.setProperty(KieServerConstants.CFG_HT_CALLBACK_CLASS, name);
         }
 
         this.isExecutorAvailable = isExecutorOnClasspath();

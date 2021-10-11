@@ -73,6 +73,7 @@ import org.kie.server.services.api.StartupStrategy;
 import org.kie.server.services.impl.controller.DefaultRestControllerImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.policy.PolicyManager;
+import org.kie.server.services.impl.security.ElytronIdentityProvider;
 import org.kie.server.services.impl.security.JACCIdentityProvider;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
@@ -151,7 +152,11 @@ public class KieServerImpl implements KieServer {
         logger.info("Configured '{}' server state repository", this.repository.getClass().getSimpleName());
         
         this.context = new KieServerRegistryImpl();
-        this.context.registerIdentityProvider(new JACCIdentityProvider());
+        if (ElytronIdentityProvider.available()) {
+            this.context.registerIdentityProvider(new ElytronIdentityProvider());
+        } else {
+            this.context.registerIdentityProvider(new JACCIdentityProvider());
+        }
         this.context.registerStateRepository(repository);
         // load available container locators
         ContainerLocatorProvider.get();
