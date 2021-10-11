@@ -122,6 +122,7 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.impl.security.ElytronIdentityProvider;
 import org.kie.server.services.jbpm.admin.ProcessAdminServiceBase;
 import org.kie.server.services.jbpm.admin.UserTaskAdminServiceBase;
 import org.kie.server.services.jbpm.jpa.PersistenceUnitExtensionsLoader;
@@ -222,12 +223,17 @@ public class JbpmKieServerExtension implements KieServerExtension {
         // loaded from system property as callback info isn't stored as configuration in kie server repository
         String callbackConfig = System.getProperty(KieServerConstants.CFG_HT_CALLBACK);
 
-        // if no other callback set, use jaas by default
+        // if no other callback set, use Elytron or jaas by default
         if (callbackConfig == null || callbackConfig.isEmpty()) {
-            System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "custom");
-            String name = ElytronUserGroupCallbackImpl.class.getName();
-            ElytronUserGroupCallbackImpl.addExternalUserGroupAdapter(new JMSUserGroupAdapter());
-            System.setProperty(KieServerConstants.CFG_HT_CALLBACK_CLASS, name);
+            if (ElytronIdentityProvider.available()) {
+                System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "custom");
+                String name = ElytronUserGroupCallbackImpl.class.getName();
+                ElytronUserGroupCallbackImpl.addExternalUserGroupAdapter(new JMSUserGroupAdapter());
+                System.setProperty(KieServerConstants.CFG_HT_CALLBACK_CLASS, name);
+            } else {
+                System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "jaas");
+                JAASUserGroupCallbackImpl.addExternalUserGroupAdapter(new JMSUserGroupAdapter());
+            }
         }
 
         this.isExecutorAvailable = isExecutorOnClasspath();
