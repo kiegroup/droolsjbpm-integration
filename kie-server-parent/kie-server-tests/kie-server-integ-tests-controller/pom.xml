@@ -139,6 +139,7 @@
                 <org.kie.server.user>yoda</org.kie.server.user>
                 <org.kie.server.pwd>usetheforce123@</org.kie.server.pwd>
                 <org.kie.controller.ping.alive.timeout>1000</org.kie.controller.ping.alive.timeout>
+                <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly23x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
               </systemProperties>
             </container>
             <deployables combine.children="append">

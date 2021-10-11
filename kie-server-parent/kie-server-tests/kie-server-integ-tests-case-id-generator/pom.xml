@@ -172,6 +172,7 @@
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.jbpm.case.server.ext.disabled>${org.jbpm.case.server.ext.disabled}</org.jbpm.case.server.ext.disabled>
               <org.kie.server.cases.generator>CUSTOM_NUMBER_PREFIX</org.kie.server.cases.generator>
+              <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly23x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
             </systemProperties>
           </container>
           <deployables>
