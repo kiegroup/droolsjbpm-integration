@@ -162,6 +162,10 @@
               com.thoughtworks.xstream;resolution:=optional,
               org.xmlpull;resolution:=optional,
               javax.security.jacc;resolution:=optional,
+              org.wildfly.security.auth.server;resolution:=optional,
+              org.wildfly.security.credential;resolution:=optional,
+              org.wildfly.security.password;resolution:=optional,
+              org.wildfly.security.password.interfaces;resolution:=optional,
               *
             </Import-Package>
           </instructions>
