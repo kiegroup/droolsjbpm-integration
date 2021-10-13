@@ -126,7 +126,7 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         }
     }
 
-    @Test
+    @Test(timeout = 60 * 1000)
     public void testRegisterKieServerAfterStartup() throws Exception {
         // Turn off embedded kie server.
         server.stopKieServer();
@@ -156,7 +156,7 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         assertEquals(reply.getResult().getServerId(), deployedServerInstance.getId());
     }
 
-    @Test
+    @Test(timeout = 60 * 1000)
     public void testTurnOffKieServerAfterShutdown() throws Exception {
         // Register kie server in controller.
         ServiceResponse<KieServerInfo> kieServerInfo = client.getServerInfo();
@@ -181,7 +181,7 @@ public class WebSocketKieControllerStartupIntegrationTest extends KieControllerM
         assertEquals(kieServerInfo.getResult().getServerId(), instanceList.getServerTemplates()[0].getId()); //maybe change to avoid next -> null
     }
 
-    @Test
+    @Test(timeout = 60 * 1000)
     public void testContainerCreatedAfterStartup() throws Exception {
         // Getting info from currently started kie server.
         ServiceResponse<KieServerInfo> kieServerInfo = client.getServerInfo();
