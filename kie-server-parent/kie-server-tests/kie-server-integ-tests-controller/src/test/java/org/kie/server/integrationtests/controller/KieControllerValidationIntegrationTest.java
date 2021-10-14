@@ -19,6 +19,7 @@ import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.model.KieServerConfig;
@@ -31,6 +32,7 @@ import org.kie.server.controller.api.model.runtime.ServerInstanceKeyList;
 import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
+import org.kie.server.integrationtests.category.UnstableOnJenkinsPrBuilder;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.services.api.KieControllerNotConnectedException;
 import org.kie.server.services.api.KieServerRegistry;
@@ -85,6 +87,8 @@ public class KieControllerValidationIntegrationTest extends KieControllerManagem
     }
 
     @Test
+    //Added to UnstableOnJenkinsPrBuilder to avoid random failures/timeouts on Jenkins builds
+    @Category({UnstableOnJenkinsPrBuilder.class})
     public void testBadRegistered() throws Exception {
         final String SERVER_TEMPLATE_ID = "test.mode.bad";
         final String SERVER_NAME = "server-name";
@@ -120,6 +124,8 @@ public class KieControllerValidationIntegrationTest extends KieControllerManagem
     }
 
     @Test
+    //Added to UnstableOnJenkinsPrBuilder to avoid random failures/timeouts on Jenkins builds
+    @Category({UnstableOnJenkinsPrBuilder.class})
     public void testGoodRegistered() throws Exception {
         final String SERVER_TEMPLATE_ID = "test.mode.ok";
         final String SERVER_NAME = "server-name";
