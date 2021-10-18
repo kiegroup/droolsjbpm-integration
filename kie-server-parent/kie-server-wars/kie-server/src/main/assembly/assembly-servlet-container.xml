@@ -82,7 +82,6 @@
         <include>org.hibernate:hibernate-core</include>
         <include>org.hibernate:hibernate-validator</include>
         <include>org.dom4j:dom4j</include>
-        <include>xerces:xercesImpl</include>
 
         <include>jakarta.jms:jakarta.jms-api</include>
 

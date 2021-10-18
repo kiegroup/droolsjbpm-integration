@@ -25,7 +25,6 @@
            removed in future. EAP also generates warning(s) during the deployment if
            the WAR depends on private modules. -->
       <!-- Keep the alphabetical order! -->
-      <module name="org.apache.xerces"/>
       <!-- required jdk dependencies for batik/svg transformation -->
       <system export="true">
         <paths>
