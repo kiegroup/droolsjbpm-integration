@@ -65,11 +65,11 @@ public class KieBlueprintjBPMPersistenceKarafIntegrationTest extends AbstractKar
     private static final String PROCESS_ID = "orderApproval";
 
     @Inject
-    @Filter("(osgi.jndi.service.name=kiesession/sessionWithoutEnv)")
+    @Filter(value = "(osgi.jndi.service.name=kiesession/sessionWithoutEnv)", timeout = 60000L)
     private KieSession processWithPersistenceNoEnv;
 
     @Inject
-    @Filter("(osgi.jndi.service.name=kiesession/sessionWithEnv)")
+    @Filter(value = "(osgi.jndi.service.name=kiesession/sessionWithEnv)", timeout = 60000L)
     private KieSession processWithPersistenceEnv;
 
     @Test
@@ -122,6 +122,7 @@ public class KieBlueprintjBPMPersistenceKarafIntegrationTest extends AbstractKar
                                                "javax.sql," +
                                                "org.apache.commons.dbcp2.managed," +
                                                "org.h2")
+                .set(Constants.DYNAMICIMPORT_PACKAGE, "*")
                 .build()).start());
 
         // Create a bundle with META-INF/blueprint/kie-beans-?.xml - this should be processed automatically by Blueprint
