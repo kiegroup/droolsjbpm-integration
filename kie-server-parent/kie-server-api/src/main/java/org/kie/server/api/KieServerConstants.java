@@ -18,6 +18,7 @@ package org.kie.server.api;
 
 public class KieServerConstants {
 
+    public static final String KIE_JBPM_SERVER_CLIENT_FAILED_ENDPOINT_INTERVAL_CHECK = "org.kie.server.client.loadbalancer.failedEndpointIntervalCheck";
     public static final String IS_DISPOSE_CONTAINER_PARAM = "jBPMExtensionIsDisposeContainer";
     public static final String LOCATION_HEADER = "Location";
 
