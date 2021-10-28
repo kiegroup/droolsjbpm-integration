@@ -20,10 +20,16 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
+import org.kie.server.api.KieServerConstants;
+import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.balancer.impl.RandomBalancerStrategy;
 import org.kie.server.client.balancer.impl.RoundRobinBalancerStrategy;
 import org.kie.server.common.rest.KieServerHttpRequest;
@@ -34,16 +40,42 @@ import org.slf4j.LoggerFactory;
 
 public class LoadBalancer {
 
+    public interface EndpointListener {
+        default void markAsActive(String endpoint) {
+            // do nothing
+        };
+
+        default void markAsFailed(String endpoint) {
+            // do nothing
+        };
+    };
+
+    public static final Long FAILED_ENDPOINT_INTERVAL_CHECK = Long.getLong(KieServerConstants.KIE_JBPM_SERVER_CLIENT_FAILED_ENDPOINT_INTERVAL_CHECK, 5000);
     private static final Logger logger = LoggerFactory.getLogger(LoadBalancer.class);
 
     private static final String URL_SEP = "\\|";
 
-    private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(4);
 
     private final BalancerStrategy balancerStrategy;
-    private CopyOnWriteArraySet<String> failedEndpoints = new CopyOnWriteArraySet<String>();
+    private CopyOnWriteArraySet<String> failedEndpoints = new CopyOnWriteArraySet<>();
+    private final List<EndpointListener> endpointListeners = new ArrayList<>();
 
-    protected LoadBalancer(BalancerStrategy balancerStrategy) {
+    private String userName;
+    private String password;
+
+    private volatile boolean backgroundCheck = false;
+
+    private boolean checkFailedEndpoint;
+
+    public void addListener(EndpointListener listener) {
+        synchronized (endpointListeners) {
+            this.endpointListeners.add(listener);
+        }
+    }
+
+    public LoadBalancer(BalancerStrategy balancerStrategy) {
+        this.checkFailedEndpoint = true;
         this.balancerStrategy = balancerStrategy;
     }
 
@@ -63,7 +95,11 @@ public class LoadBalancer {
         String baseUrl = balancerStrategy.markAsOffline(url);
         failedEndpoints.add(baseUrl);
         logger.debug("Url '{}' is marked as failed and will be considered offline by {}", url, balancerStrategy);
-        
+        List<EndpointListener> threadSafeListeners = new ArrayList<>();
+        synchronized (endpointListeners) {
+            threadSafeListeners.addAll(endpointListeners);
+        }
+        threadSafeListeners.forEach(e -> e.markAsFailed(baseUrl));
         return baseUrl;
     }
 
@@ -72,6 +108,11 @@ public class LoadBalancer {
         String baseUrl = balancerStrategy.markAsOnline(url);
         failedEndpoints.remove(baseUrl);
         logger.debug("Url '{}' is marked as activated and will be considered online by {}", url, balancerStrategy);
+        List<EndpointListener> threadSafeListeners = new ArrayList<>();
+        synchronized (endpointListeners) {
+            threadSafeListeners.addAll(endpointListeners);
+        }
+        threadSafeListeners.forEach(e -> e.markAsActive(baseUrl));
     }
 
     public void close() {
@@ -93,8 +134,63 @@ public class LoadBalancer {
     /*
      *  background operations for checking failed endpoints
      */
-    public Future<?> checkFailedEndpoints() {
-        return executorService.submit(new CheckFailedEndpoints());
+    public synchronized Future<?> checkFailedEndpoints() {
+        if (!checkFailedEndpoint) {
+            return null;
+        }
+
+        CountDownLatch latch = new CountDownLatch (1);
+        EndpointListener lst = new EndpointListener() {
+            @Override
+            public void markAsActive(String endpoint) {
+                synchronized (endpointListeners) {
+                    endpointListeners.remove(this);
+                }
+                latch.countDown();
+            }
+        };
+        endpointListeners.add(lst);
+        // create a bridge between the latch and the latch
+        Future<Object> futureBridge = new Future<Object> () {
+
+            @Override
+            public boolean cancel(boolean mayInterruptIfRunning) {
+                return false;
+            }
+
+            @Override
+            public boolean isCancelled() {
+                return false;
+            }
+
+            @Override
+            public boolean isDone() {
+                return latch.getCount() == 0;
+            }
+
+            @Override
+            public Object get() throws InterruptedException, ExecutionException {
+                latch.await();
+                return null;
+            }
+
+            @Override
+            public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+                if(!latch.await(timeout, unit)) {
+                    logger.debug("Load balancer await for termination expired");
+                }
+                return null;
+            }
+            
+        };
+
+        if(backgroundCheck) {
+            return futureBridge;
+        }
+
+        executorService.scheduleWithFixedDelay(new CheckFailedEndpoints(), 0, FAILED_ENDPOINT_INTERVAL_CHECK, TimeUnit.MILLISECONDS);
+        backgroundCheck = true;
+        return futureBridge;
     }
 
     /*
@@ -146,25 +242,35 @@ public class LoadBalancer {
             if (failedEndpoints == null || failedEndpoints.isEmpty()) {
                 return;
             }
-            logger.debug("Starting to scan if any of the failed endpoints is back online");
-            Iterator<String> iterator = failedEndpoints.iterator();
+
+            List<String> endpoints = new ArrayList<>(failedEndpoints);
+            logger.debug("Starting to scan if any of the failed endpoints is back online. Endpoints about to check: {}", endpoints);
+            Iterator<String> iterator = endpoints.iterator();
 
             while(iterator.hasNext()) {
                 String failedEndpoint = iterator.next();
                 try {
-                    KieServerHttpRequest httpRequest =
-                            KieServerHttpRequest.newRequest(failedEndpoint).followRedirects(true).timeout(1000);
+                    KieServerHttpRequest httpRequest = KieServerHttpRequest.newRequest(failedEndpoint, userName, password).followRedirects(true).timeout(1000);
                     httpRequest.get();
 
                     logger.debug("Url '{}' is back online, adding it to load balancer", failedEndpoint);
-                    // first remove
-//                    iterator.remove();
+
                     // then activate to avoid concurrent modifications on the failedEndpoints
                     activate(failedEndpoint);
                 } catch (Exception e) {
                     logger.debug("Url '{}' is still offline due to {}", failedEndpoint, (e.getCause() == null ? e.getMessage() : e.getCause().getMessage()));
                 }
             }
+
+            logger.debug("Ending scan if any of the failed endpoints is back online");
         }
+    }
+
+    public void setCheckFailedEndpoint(boolean checkFailedEndpoint) {
+        this.checkFailedEndpoint = checkFailedEndpoint;
+    }
+
+    public boolean isCheckFailedEndpoint() {
+        return checkFailedEndpoint;
     }
 }
