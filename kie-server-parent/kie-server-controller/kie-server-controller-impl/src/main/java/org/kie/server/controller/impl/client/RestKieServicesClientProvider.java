@@ -33,7 +33,7 @@ public class RestKieServicesClientProvider implements KieServicesClientProvider 
     @Override
     public KieServicesClient get(String url) {
         KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(url, getUser(), getPassword());
-        configuration.setTimeout(60000);
+        configuration.setTimeout(getTimeout());
 
         configuration.setMarshallingFormat(MarshallingFormat.JSON);
 
@@ -58,6 +58,14 @@ public class RestKieServicesClientProvider implements KieServicesClientProvider 
 
     protected String getToken() {
         return System.getProperty(KieServerConstants.CFG_KIE_TOKEN);
+    }
+
+    protected Long getTimeout()  {
+        try {
+           return Long.parseLong(System.getProperty(KieServerConstants.CFG_KIE_CONTROLLER_TIMEOUT, "60000"));
+        } catch (NumberFormatException ex) {
+           throw new RuntimeException("An invalid value is specified for system property "+KieServerConstants.CFG_KIE_CONTROLLER_TIMEOUT, ex);
+        }
     }
 
     @Override
