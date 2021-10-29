@@ -17,24 +17,14 @@ package org.kie.maven.plugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -42,17 +32,14 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import org.drools.ancompiler.CompiledNetworkSource;
+import org.drools.ancompiler.CompiledNetworkSources;
 import org.drools.ancompiler.ObjectTypeNodeCompiler;
-import org.drools.compiler.compiler.io.memory.MemoryFile;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.modelcompiler.CanonicalKieModule;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.memorycompiler.JavaCompilerSettings;
-import org.kie.memorycompiler.JavaConfiguration;
-import org.kie.memorycompiler.KieMemoryCompiler;
 
 import static org.kie.maven.plugin.ExecModelMode.ancEnabled;
 import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
@@ -121,11 +108,11 @@ public class GenerateANCMojo extends AbstractDMNValidationAwareMojo {
             for (String kbase : kieContainer.getKieBaseNames()) {
                 InternalKnowledgeBase kieBase = (InternalKnowledgeBase) kieContainer.getKieBase(kbase);
 
-                List<CompiledNetworkSource> ancSourceFiles = ObjectTypeNodeCompiler.compiledNetworkSources(kieBase.getRete());
+                List<CompiledNetworkSources> ancSourceFiles = ObjectTypeNodeCompiler.compiledNetworkSources(kieBase.getRete());
 
                 getLog().info(String.format("Found %d generated files in Knowledge Base %s", ancSourceFiles.size(), kbase));
 
-                for (CompiledNetworkSource generatedFile : ancSourceFiles) {
+                for (CompiledNetworkSources generatedFile : ancSourceFiles) {
                     String className = toClassName(generatedFile.getSourceName());
                     classNameSourceMap.put(className, generatedFile.getSource());
                     getLog().info("Generated Alpha Network class: " + className);
