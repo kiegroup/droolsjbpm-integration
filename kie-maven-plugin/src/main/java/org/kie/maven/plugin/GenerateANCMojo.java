@@ -42,7 +42,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import org.drools.ancompiler.CompiledNetworkSource;
+import org.drools.ancompiler.CompiledNetworkSources;
 import org.drools.ancompiler.ObjectTypeNodeCompiler;
 import org.drools.compiler.compiler.io.memory.MemoryFile;
 import org.drools.compiler.kproject.ReleaseIdImpl;
@@ -121,11 +121,11 @@ public class GenerateANCMojo extends AbstractDMNValidationAwareMojo {
             for (String kbase : kieContainer.getKieBaseNames()) {
                 InternalKnowledgeBase kieBase = (InternalKnowledgeBase) kieContainer.getKieBase(kbase);
 
-                List<CompiledNetworkSource> ancSourceFiles = ObjectTypeNodeCompiler.compiledNetworkSources(kieBase.getRete());
+                List<CompiledNetworkSources> ancSourceFiles = ObjectTypeNodeCompiler.compiledNetworkSources(kieBase.getRete());
 
                 getLog().info(String.format("Found %d generated files in Knowledge Base %s", ancSourceFiles.size(), kbase));
 
-                for (CompiledNetworkSource generatedFile : ancSourceFiles) {
+                for (CompiledNetworkSources generatedFile : ancSourceFiles) {
                     String className = toClassName(generatedFile.getSourceName());
                     classNameSourceMap.put(className, generatedFile.getSource());
                     getLog().info("Generated Alpha Network class: " + className);
