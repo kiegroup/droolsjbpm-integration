@@ -305,7 +305,6 @@
                 </user>
               </users>
               <properties>
-                <cargo.wildfly.script.cli.embedded>${project.parent.basedir}/script/setup.cli</cargo.wildfly.script.cli.embedded>
                 <cargo.servlet.port>${container.port}</cargo.servlet.port>
                 <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly23x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
               </properties>
@@ -783,7 +782,10 @@
                   </dependencies>
                 </container>
                 <configuration>
+                  <!-- Elytron file-based users will be created instead of the properties-based users. -->
+                  <users combine.self="override"/>
                   <properties>
+                    <cargo.wildfly.script.cli.embedded>${project.parent.basedir}/script/setup.cli</cargo.wildfly.script.cli.embedded>
                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
                     <cargo.jvmargs>-Xmx2048m</cargo.jvmargs>
                     <cargo.resource.resource.mail>
@@ -962,7 +964,10 @@
                   </systemProperties>
                 </container>
                 <configuration>
+                  <!-- Elytron file-based users will be created instead of the properties-based users. -->
+                  <users combine.self="override"/>
                   <properties>
+                    <cargo.wildfly.script.cli.embedded>${project.parent.basedir}/script/setup.cli</cargo.wildfly.script.cli.embedded>
                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
                     <cargo.jvmargs>-Xmx2048m</cargo.jvmargs>
                     <cargo.resource.resource.mail>
