@@ -29,16 +29,31 @@ public class PrometheusKieServerEventListener implements KieServerEventListener 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PrometheusKieServerEventListener.class);
 
-    protected static final Counter numberOfContainersStarted = Counter.build()
-            .name("kie_server_container_started_total")
-            .help("Kie Server Started Containers")
+    protected static final Counter numberOfContainersStartedSinceBoot = Counter.build()
+            .name("kie_server_container_started_since_boot")
+            .help("Kie Server Started Containers since startup")
+            .register();
+
+    protected static final Gauge numberOfContainersStartedByContainerId = Gauge.build()
+            .name("kie_server_container_started")
+            .help("Kie Server Started Containers by ID")
             .labelNames("container_id")
             .register();
 
-    protected static final Gauge runningContainers = Gauge.build()
-            .name("kie_server_container_running_total")
-            .help("Kie Server Running Containers")
+    protected static final Gauge numberOfContainersStartedTotal = Gauge.build()
+            .name("kie_server_container_started_total")
+            .help("Total of Kie Server Started Containers")
+            .register();
+
+    protected static final Gauge runningContainersByContainerId = Gauge.build()
+            .name("kie_server_container_running")
+            .help("Total of Running Kie Containers by Container ID")
             .labelNames("container_id")
+            .register();
+
+    protected static final Gauge runningContainersTotal = Gauge.build()
+            .name("kie_server_container_running_total")
+            .help("Total of Running Kie Containers")
             .register();
 
     protected static final Gauge kieServerStartTime = Gauge.build()
@@ -76,18 +91,29 @@ public class PrometheusKieServerEventListener implements KieServerEventListener 
     @Override
     public void afterContainerStarted(KieServer kieServer, KieContainerInstance containerInstance) {
         LOGGER.debug("After container started: {}", containerInstance);
-        numberOfContainersStarted.labels(containerInstance.getContainerId()).inc();
-        runningContainers.labels(containerInstance.getContainerId()).inc();
+        numberOfContainersStartedByContainerId.labels(containerInstance.getContainerId()).inc();
+        numberOfContainersStartedTotal.inc();
+
+        runningContainersByContainerId.labels(containerInstance.getContainerId()).inc();
+        runningContainersTotal.inc();
+
+        numberOfContainersStartedSinceBoot.inc();
     }
 
     @Override
     public void beforeContainerStopped(KieServer kieServer, KieContainerInstance containerInstance) {
+
+
     }
 
     @Override
     public void afterContainerStopped(KieServer kieServer, KieContainerInstance containerInstance) {
         LOGGER.debug("After container stopped: {}", containerInstance);
-        runningContainers.labels(containerInstance.getContainerId()).dec();
+        numberOfContainersStartedByContainerId.labels(containerInstance.getContainerId()).dec();
+        numberOfContainersStartedTotal.dec();
+
+        runningContainersByContainerId.labels(containerInstance.getContainerId()).dec();
+        runningContainersTotal.dec();
     }
 
     @Override
@@ -96,10 +122,16 @@ public class PrometheusKieServerEventListener implements KieServerEventListener 
 
     @Override
     public void afterContainerActivated(KieServer kieServer, KieContainerInstance containerInstance) {
+        LOGGER.debug("After container activated: {}", containerInstance);
+        runningContainersByContainerId.labels(containerInstance.getContainerId()).inc();
+        runningContainersTotal.inc();
     }
 
     @Override
     public void beforeContainerDeactivated(KieServer kieServer, KieContainerInstance containerInstance) {
+        LOGGER.debug("After container deactivated: {}", containerInstance);
+        runningContainersByContainerId.labels(containerInstance.getContainerId()).dec();
+        runningContainersTotal.dec();
     }
 
     @Override
