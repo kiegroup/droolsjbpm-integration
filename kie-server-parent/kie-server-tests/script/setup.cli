@@ -18,6 +18,9 @@
 /core-service=management/security-realm=KieRealm:add()
 /core-service=management/security-realm=KieRealm/server-identity=ssl:add(keystore-relative-to=jboss.server.config.dir, keystore-password=password)
 
+# Use Elytron for JMS
+/subsystem=messaging-activemq/server=default:undefine-attribute(name=security-domain)
+/subsystem=messaging-activemq/server=default:write-attribute(name=elytron-domain, value=ApplicationDomain)
 
 /subsystem=elytron/filesystem-realm=KieRealm:add-identity(identity=yoda)
 /subsystem=elytron/filesystem-realm=KieRealm:set-password(identity=yoda, clear={password="usetheforce123@"})
