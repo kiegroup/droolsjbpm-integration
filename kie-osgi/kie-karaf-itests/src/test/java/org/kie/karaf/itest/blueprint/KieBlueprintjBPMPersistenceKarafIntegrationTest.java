@@ -122,6 +122,7 @@ public class KieBlueprintjBPMPersistenceKarafIntegrationTest extends AbstractKar
                                                "javax.sql," +
                                                "org.apache.commons.dbcp2.managed," +
                                                "org.h2")
+                .set(Constants.DYNAMICIMPORT_PACKAGE, "*")
                 .build()).start());
 
         // Create a bundle with META-INF/blueprint/kie-beans-?.xml - this should be processed automatically by Blueprint
