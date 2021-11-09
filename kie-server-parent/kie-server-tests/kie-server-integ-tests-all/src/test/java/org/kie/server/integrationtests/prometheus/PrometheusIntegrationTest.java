@@ -120,8 +120,7 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
                 "kie_server_container_running{container_id=\"prometheus\",} 1.0",
                 "kie_server_container_started{container_id=\"prometheus\",} 1.0",
                 "kie_server_container_started_total 2.0",
-                "kie_server_container_running_total 2",
-                "kie_server_container_started_since_boot 2"
+                "kie_server_container_running_total 2"
         );
     }
 
