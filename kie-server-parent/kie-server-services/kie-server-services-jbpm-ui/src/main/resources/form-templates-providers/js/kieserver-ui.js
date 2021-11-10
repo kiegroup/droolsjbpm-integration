@@ -324,30 +324,25 @@ function validate(start) {
 
 var fileData = new Map();
 
-
 function encodeImageFileAsURL(input) {
-
 	var filesSelected = input.files;
 	if (filesSelected.length > 0) {
 		var fileToLoad = filesSelected[0];
-		
 		var fileInfo = {
-				'name' : fileToLoad.name,
-				'size' : fileToLoad.size,
-				'data' : null
+			'name': fileToLoad.name,
+			'size': fileToLoad.size,
+			'data': null
 		};
 		fileData.set(input.id, fileInfo);
-		
+
 		var fileReader = new FileReader();
 
-		fileReader.onload = function(fileLoadedEvent) {
-			var local = fileLoadedEvent.target.result; // <--- data: base64
-			var srcData = local.replace(/^data:.*\/.*;base64,/, "");
-
-			fileData.get(input.id).data = srcData;
-			
-			console.log("Converted Base64 version is " + srcData);
-		}
+		fileReader.onload = function (event) {
+			if (event.target.readyState == FileReader.DONE) {
+				var b64 = event.target.result.replace(/^data:.+;base64,/, '');
+				fileData.get(input.id).data = b64;
+			}
+		};
 		fileReader.readAsDataURL(fileToLoad);
 	} else {
 		alert("Please select a file");
@@ -355,7 +350,6 @@ function encodeImageFileAsURL(input) {
 }
 
 function getDocumentData(inputId) {
-
 	if (fileData.has(inputId)) {
 		var fileInfo = fileData.get(inputId);
 		var document = {
