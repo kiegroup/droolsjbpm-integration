@@ -31,12 +31,19 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
 import javax.security.sasl.RealmCallback;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.security.SecurityAdapter;
+import org.kie.server.services.impl.security.ElytronIdentityProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wildfly.security.auth.server.RealmUnavailableException;
+import org.wildfly.security.auth.server.SecurityDomain;
+import org.wildfly.security.auth.server.SecurityIdentity;
+import org.wildfly.security.evidence.Evidence;
+import org.wildfly.security.evidence.PasswordGuessEvidence;
 
 public class JMSSecurityAdapter implements SecurityAdapter {
     private static final Logger logger = LoggerFactory.getLogger(JMSSecurityAdapter.class);
@@ -80,44 +87,71 @@ public class JMSSecurityAdapter implements SecurityAdapter {
         }
         logger.debug("About to login as {} with pass {}", user, pass.length());
         try {
-            CallbackHandler handler = new UserPassCallbackHandler(user, pass);
-            final String domain = System.getProperty(KieServerConstants.KIE_SERVER_JAAS_DOMAIN, "kie-jms-login-context");
-            LoginContext lc = new LoginContext( domain, handler);
-            lc.login();
-            Subject subject = lc.getSubject();
-            logger.debug("Login successful and subject is {}", subject);
-            UserDetails userDetails = new UserDetails();
-            userDetails.setName(user);
-            List<String> roles = new ArrayList<String>();
-            if (subject != null) {
-                Set<Principal> principals = subject.getPrincipals();
 
-                if (principals != null) {
-
-                    roles = new ArrayList<String>();
-                    for (Principal principal : principals) {
-                        if (principal instanceof Group) {
-                            Enumeration<? extends Principal> groups = ((Group) principal).members();
-
-                            while (groups.hasMoreElements()) {
-                                Principal groupPrincipal = (Principal) groups.nextElement();
-                                roles.add(groupPrincipal.getName());
-                            }
-                            break;
-                        }
-                    }
-                }
-                roles.addAll(getRolesFromAdapter(subject));
-            }
-
-
-            userDetails.setRoles(roles);
+            UserDetails userDetails = getUserDetails(user, pass);
             logger.debug("setting user details as {}", userDetails);
             currentUser.set(userDetails);
 
         } catch( Exception e ) {
             logger.debug( "Unable to login via JAAS with message supplied user and password", e);
         }
+    }
+    private static UserDetails getUserDetails(final String user, final String pass) throws LoginException, RealmUnavailableException {
+
+        if (ElytronIdentityProvider.available()) {
+            return getElytronUserDetails(user, pass);
+        } else {
+            return getJAASUserDetails(user, pass);
+        }
+    }
+
+    private static UserDetails getElytronUserDetails(final String user, final String password) throws RealmUnavailableException {
+        final UserDetails userDetails = new UserDetails();
+        final List<String> roles = new ArrayList<>();
+
+        final SecurityIdentity identity = SecurityDomain.getCurrent().authenticate(user, new PasswordGuessEvidence(password.toCharArray()));
+        userDetails.setName(identity.getPrincipal().getName());
+        for (String role : identity.getRoles()) {
+            roles.add(role);
+        }
+
+        userDetails.setRoles(roles);
+        return userDetails;
+    }
+
+    private static UserDetails getJAASUserDetails(final String user, final String pass) throws LoginException {
+        CallbackHandler handler = new UserPassCallbackHandler(user, pass);
+        final String domain = System.getProperty(KieServerConstants.KIE_SERVER_JAAS_DOMAIN, "kie-jms-login-context");
+        LoginContext lc = new LoginContext( domain, handler);
+        lc.login();
+        Subject subject = lc.getSubject();
+        logger.debug("Login successfull and subject is {}", subject);
+        UserDetails userDetails = new UserDetails();
+        userDetails.setName(user);
+        List<String> roles = new ArrayList<>();
+        if (subject != null) {
+            Set<Principal> principals = subject.getPrincipals();
+
+            if (principals != null) {
+
+                roles = new ArrayList<String>();
+                for (Principal principal : principals) {
+                    if (principal instanceof Group) {
+                        Enumeration<? extends Principal> groups = ((Group) principal).members();
+
+                        while (groups.hasMoreElements()) {
+                            Principal groupPrincipal = (Principal) groups.nextElement();
+                            roles.add(groupPrincipal.getName());
+                        }
+                        break;
+                    }
+                }
+            }
+            roles.addAll(getRolesFromAdapter(subject));
+        }
+
+        userDetails.setRoles(roles);
+        return userDetails;
     }
 
     public static void logout() {
