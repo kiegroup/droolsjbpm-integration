@@ -22,11 +22,10 @@
       }
     }
   },
-
   "ignores": {
     "revapi": {
-    "_comment": "Changes between 7.48.0.Final and the current branch. These changes are desired and thus ignored.",
-    "ignore": [
+      "_comment": "Changes between 7.52.0.Final and the current branch. These changes are desired and thus ignored.",
+      "ignore": [
         {
           "code": "java.method.numberOfParametersChanged",
           "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessInstanceImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String, java.lang.String)",
@@ -66,6 +65,48 @@
           "methodName": "getTaskForm",
           "elementKind": "method",
           "justification": "[JBPM-9610] Fix typos in successful call messages"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",
+          "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessInstanceImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String, ===java.lang.String===)",
+          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessInstanceImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String, ===java.lang.String===, boolean, java.lang.String)",
+          "annotationType": "io.swagger.annotations.ApiParam",
+          "annotation": "@io.swagger.annotations.ApiParam(value = \"svg active node border color\", required = false, example = \"#1e90ff\")",
+          "attribute": "example",
+          "oldValue": "\"#FF0000\"",
+          "newValue": "\"#1e90ff\"",
+          "package": "org.kie.server.remote.rest.jbpm.ui",
+          "classSimpleName": "ImageResource",
+          "methodName": "getProcessInstanceImage",
+          "parameterIndex": "5",
+          "elementKind": "parameter",
+          "justification": "JBPM-9979 Mark async active nodes and change default active node border color"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",
+          "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessInstanceImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String, ===java.lang.String===)",
+          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessInstanceImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String, ===java.lang.String===, boolean, java.lang.String)",
+          "annotationType": "javax.ws.rs.DefaultValue",
+          "annotation": "@javax.ws.rs.DefaultValue(\"#1e90ff\")",
+          "attribute": "value",
+          "oldValue": "\"#FF0000\"",
+          "newValue": "\"#1e90ff\"",
+          "package": "org.kie.server.remote.rest.jbpm.ui",
+          "classSimpleName": "ImageResource",
+          "methodName": "getProcessInstanceImage",
+          "parameterIndex": "5",
+          "elementKind": "parameter",
+          "justification": "JBPM-9979 Mark async active nodes and change default active node border color"
+        },
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessInstanceImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String, java.lang.String)",
+          "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessInstanceImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String)",
+          "package": "org.kie.server.remote.rest.jbpm.ui",
+          "classSimpleName": "ImageResource",
+          "methodName": "getProcessInstanceImage",
+          "elementKind": "method",
+          "justification": "JBPM-9979 Mark async active nodes and change default active node border color"
         }]
     }
   }

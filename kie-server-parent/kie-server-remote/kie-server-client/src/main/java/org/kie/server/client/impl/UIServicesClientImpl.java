@@ -236,7 +236,7 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
         }
     }
 
-    protected String createColorURLParams(String completeNodeColor, String completeNodeBorderColor, String activeNodeBorderColor) {
+    protected String createColorURLParams(String completeNodeColor, String completeNodeBorderColor, String activeNodeBorderColor, String activeAsyncNodeBorderColor) {
         List<String> params = new ArrayList<>();
         if(completeNodeColor != null && !completeNodeColor.isEmpty()) {
             params.add(RestURI.SVG_NODE_COMPLETED_COLOR + "=" + encode(completeNodeColor));
@@ -248,18 +248,21 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             params.add(RestURI.SVG_NODE_ACTIVE_COLOR + "=" + encode(activeNodeBorderColor));
         }
 
+        if (activeAsyncNodeBorderColor != null && !activeAsyncNodeBorderColor.isEmpty()) {
+            params.add(SVG_NODE_ACTIVE_ASYNC_BORDER_COLOR + "=" + encode(activeAsyncNodeBorderColor));
+        }
         return String.join("&", params);
     }
 
     @Override
     public String getProcessInstanceImageCustomColor(String containerId, Long processInstanceId, String completeNodeColor,
-                                                     String completeNodeBorderColor, String activeNodeBorderColor) {
+                                                     String completeNodeBorderColor, String activeNodeBorderColor, String activeAsyncNodeBorderColor) {
         if (config.isRest()) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(RestURI.CONTAINER_ID, containerId);
             valuesMap.put(RestURI.PROCESS_INST_ID, processInstanceId);
 
-            String colorURLParams = createColorURLParams(completeNodeColor, completeNodeBorderColor, activeNodeBorderColor);
+            String colorURLParams = createColorURLParams(completeNodeColor, completeNodeBorderColor, activeNodeBorderColor, activeAsyncNodeBorderColor);
 
             Map<String, String> headers = new HashMap<String, String>();
             headers.put("Accept", MediaType.APPLICATION_SVG_XML);

@@ -15,6 +15,9 @@
 
 package org.kie.server.services.jbpm.ui;
 
+import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_ASYNC_BORDER_COLOR;
+import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_BORDER_COLOR;
+import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_BORDER_COLOR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -27,9 +30,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -146,7 +147,6 @@ public class ImageServiceBaseTest {
         return svgDocument;
     }
 
-
     @Test
     public void testLoopSubProcess() throws Exception {
         String containerId = "test-container";
@@ -202,6 +202,73 @@ public class ImageServiceBaseTest {
     }
 
     @Test
+    public void testSvgNodesBorderColoring() throws Exception {
+        String containerId = "test-container";
+        String processId = "test-processId";
+        long processInstanceId = 10;
+        String humanTaskOne = "_C8E8A0C7-ECC6-4C28-B1FE-D6DE5999239E";
+        String oneScriptNode = "_BA99E908-87C6-46C9-99ED-901DFCD1A2AA";
+        String twoScriptNode = "_1C98770B-2C62-41F1-AFBF-7B138EE5270E";
+        String threeScriptNode = "_D7C7D018-DC2D-4B97-BEFF-55B50F201103";
+        byte[] byteArray = getInputStreamAsByteArray(ImageServiceBaseTest.class.getResourceAsStream("/testProcess.svg"));
+
+        when(dataService.getProcessesByDeploymentIdProcessId(containerId, processId)).thenReturn(mock(ProcessDefinition.class));
+        when(imageReference.getImageContent(anyString(), anyString())).thenReturn(byteArray);
+        when(kieServerRegistry.getConfig()).thenReturn(config);
+        when(config.getConfigItemValue(anyString(), anyString())).thenReturn("");
+
+        NodeInstanceDesc nodeInstanceDescActive = new org.jbpm.kie.services.impl.model.NodeInstanceDesc("1", humanTaskOne, "", "HumanTask", "", 1L, null,
+                                                                                                        "", 0, 1L, 3L, "", null, 1);
+
+        NodeInstanceDesc nodeInstanceDescCompleted1 = new org.jbpm.kie.services.impl.model.NodeInstanceDesc("2", oneScriptNode, "", "ScriptNode", "", 1L, null,
+                                                                                                            "", 0, 1L, 1L, "", null, 1);
+
+        NodeInstanceDesc nodeInstanceDescCompleted2 = new org.jbpm.kie.services.impl.model.NodeInstanceDesc("3", twoScriptNode, "", "ScriptNode", "", 1L, null,
+                                                                                                            "", 0, 1L, 4L, "", null, 1);
+
+        NodeInstanceDesc nodeInstanceDescError = new org.jbpm.kie.services.impl.model.NodeInstanceDesc("4", threeScriptNode, "", "ScriptNode", "", 1L, null,
+                                                                                                       "", 6, 1L, 1L, "", null, 1);
+
+        List<NodeInstanceDesc> activeNodes = Arrays.asList(nodeInstanceDescActive);
+        List<NodeInstanceDesc> completedNodes = Arrays.asList(nodeInstanceDescCompleted1, nodeInstanceDescCompleted2);
+        List<NodeInstanceDesc> fullLogs = Arrays.asList(nodeInstanceDescActive, nodeInstanceDescCompleted1, nodeInstanceDescCompleted2, nodeInstanceDescError);
+        when(dataService.getProcessInstanceHistoryCompleted(anyLong(), any())).thenReturn(completedNodes);
+        when(dataService.getProcessInstanceHistoryActive(anyLong(), any())).thenReturn(activeNodes);
+        when(dataService.getProcessInstanceFullHistory(anyLong(), any())).thenReturn(fullLogs);
+        Map<String, ImageReference> imageReferenceMap = new HashMap<>();
+        imageReferenceMap.put(containerId, imageReference);
+
+        ProcessInstanceDesc processInstanceDesc = new org.jbpm.kie.services.impl.model.ProcessInstanceDesc(processInstanceId, processId, "", "", 1, containerId, null
+                , "", "", "");
+
+        when(dataService.getProcessInstanceById(processInstanceId)).thenReturn(processInstanceDesc);
+
+        ImageServiceBase imageServiceBase = new ImageServiceBase(dataService, imageReferenceMap, kieServerRegistry);
+        String processImageStr = imageServiceBase.getActiveProcessImage(containerId, processInstanceId);
+
+        Document svgDocument = readSVG(processImageStr);
+
+        checkStrokeAttributeAtNode(svgDocument, humanTaskOne, ACTIVE_BORDER_COLOR);
+        checkStrokeAttributeAtNode(svgDocument, oneScriptNode, COMPLETED_BORDER_COLOR);
+        checkStrokeAttributeAtNode(svgDocument, twoScriptNode, COMPLETED_BORDER_COLOR);
+        checkStrokeAttributeAtNode(svgDocument, threeScriptNode, ACTIVE_ASYNC_BORDER_COLOR);
+
+        String completedNodeColor = "black";
+        String completedNodeBorderColor = "grey";
+        String activeNodeBorderColor = "blue";
+        String activeAsyncNodeBorderColor = "red";
+        processImageStr = imageServiceBase.getActiveProcessImage(containerId, processInstanceId, completedNodeColor,
+                                                                 completedNodeBorderColor, activeNodeBorderColor, false,
+                                                                 activeAsyncNodeBorderColor);
+        svgDocument = readSVG(processImageStr);
+
+        checkStrokeAttributeAtNode(svgDocument, humanTaskOne, activeNodeBorderColor);
+        checkStrokeAttributeAtNode(svgDocument, oneScriptNode, completedNodeBorderColor);
+        checkStrokeAttributeAtNode(svgDocument, twoScriptNode, completedNodeBorderColor);
+        checkStrokeAttributeAtNode(svgDocument, threeScriptNode, activeAsyncNodeBorderColor);
+    }
+
+    @Test
     public void testSignalEventSubProcess() throws Exception {
         String containerId = "test-container";
         String processId = "test-processId";
@@ -246,5 +313,126 @@ public class ImageServiceBaseTest {
         String style = subprocessPlusIcon.getAttribute("style");
         assertNotNull(style);
         assertEquals("cursor: pointer;", style);
+    }
+
+    @Test
+    public void testSvgAsyncNodesBorderColoring() throws Exception {
+        String containerId = "test-container";
+        String processId = "test-processId";
+        long processInstanceId = 10;
+
+        String node_start = "_ED165B85-E65D-42A6-B0EF-8A160356271E";
+        String node_self_evaluation = "_D3E17247-1D94-47D8-93AD-D645E317B736";
+        String node_asyncOk = "_9C7235D4-C26C-4EB8-9724-9AAC5C02CCE5";
+        String node_split = "_930D6071-9D06-42C3-946F-BA46C09EF157";
+        String node_hr_evaluation = "_AB431E82-86BC-460F-9D8B-7A7617565B36";
+        String node_pm_evaluation = "_E35438DF-03AF-4D7B-9DCB-30BC70E7E92E";
+        String node_async_failing = "_502513E3-41BD-40AC-8C41-F32566D9FA2B";
+
+        byte[] byteArray = getInputStreamAsByteArray(ImageServiceBaseTest.class.getResourceAsStream("/evaluation_async.svg"));
+
+        when(dataService.getProcessesByDeploymentIdProcessId(containerId, processId)).thenReturn(mock(ProcessDefinition.class));
+        when(imageReference.getImageContent(anyString(), anyString())).thenReturn(byteArray);
+        when(kieServerRegistry.getConfig()).thenReturn(config);
+        when(config.getConfigItemValue(anyString(), anyString())).thenReturn("");
+
+        //async triggered again
+        NodeInstanceDesc nodeInstance8_2 = new org.jbpm.kie.services.impl.model.NodeInstanceDesc
+                ("8", node_async_failing, "", "AsyncEventNode", "evaluation_1.0.0-SNAPSHOT", processInstanceId, null,
+                 "", 6, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
+        NodeInstanceDesc nodeInstance8 = new org.jbpm.kie.services.impl.model.NodeInstanceDesc
+                ("8", node_async_failing, "", "AsyncEventNode", "evaluation_1.0.0-SNAPSHOT", processInstanceId, null,
+                 "", 6, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
+        NodeInstanceDesc nodeInstance6_end = new org.jbpm.kie.services.impl.model.NodeInstanceDesc
+                ("6", node_pm_evaluation, "PM_evaluation", "HumanTaskNode", "evaluation_1.0.0-SNAPSHOT",
+                 processInstanceId, null, "", 1, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
+        NodeInstanceDesc nodeInstance6_start = new org.jbpm.kie.services.impl.model.NodeInstanceDesc
+                ("6", node_pm_evaluation, "PM_evaluation", "HumanTaskNode", "evaluation_1.0.0-SNAPSHOT",
+                 processInstanceId, null, "", 0, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
+        NodeInstanceDesc nodeInstance5_end = new org.jbpm.kie.services.impl.model.NodeInstanceDesc
+                ("5", node_split, "", "Split", "evaluation_1.0.0-SNAPSHOT", processInstanceId, null,
+                 "", 1, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
+        NodeInstanceDesc nodeInstance7_start = new org.jbpm.kie.services.impl.model.NodeInstanceDesc
+                ("7", node_hr_evaluation, "HR Evaluation", "HumanTaskNode", "evaluation_1.0.0-SNAPSHOT",
+                 processInstanceId, null, "", 0, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
+        NodeInstanceDesc nodeInstance5_start = new org.jbpm.kie.services.impl.model.NodeInstanceDesc
+                ("5", node_split, "", "Split", "evaluation_1.0.0-SNAPSHOT", processInstanceId, null,
+                 "", 0, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
+        NodeInstanceDesc nodeInstance5_end2 = new org.jbpm.kie.services.impl.model.NodeInstanceDesc
+                ("5", node_split, "", "Split", "evaluation_1.0.0-SNAPSHOT", processInstanceId, null,
+                 "", 1, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
+        NodeInstanceDesc nodeInstance3_end = new org.jbpm.kie.services.impl.model.NodeInstanceDesc
+                ("3", node_asyncOk, "AsyncOK", "ActionNode", "evaluation_1.0.0-SNAPSHOT", processInstanceId, null,
+                 "", 1, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
+        NodeInstanceDesc nodeInstance3_start = new org.jbpm.kie.services.impl.model.NodeInstanceDesc
+                ("3", node_asyncOk, "AsyncOK", "ActionNode", "evaluation_1.0.0-SNAPSHOT", processInstanceId, null,
+                 "", 0, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
+        NodeInstanceDesc nodeInstance2 = new org.jbpm.kie.services.impl.model.NodeInstanceDesc
+                ("2", node_asyncOk, "", "AsyncEventNode", "evaluation_1.0.0-SNAPSHOT", processInstanceId, null,
+                 "", 6, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
+        NodeInstanceDesc nodeInstance1_end = new org.jbpm.kie.services.impl.model.NodeInstanceDesc
+                ("1", node_self_evaluation, "Self Evaluation", "HumanTaskNode", "evaluation_1.0.0-SNAPSHOT",
+                 processInstanceId, null, "", 1, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
+        NodeInstanceDesc nodeInstance1_start = new org.jbpm.kie.services.impl.model.NodeInstanceDesc
+                ("1", node_self_evaluation, "Self Evaluation", "HumanTaskNode", "evaluation_1.0.0-SNAPSHOT",
+                 processInstanceId, null, "", 0, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
+        NodeInstanceDesc nodeInstance0_end = new org.jbpm.kie.services.impl.model.NodeInstanceDesc
+                ("0", node_start, "", "StartNode", "evaluation_1.0.0-SNAPSHOT", processInstanceId, null,
+                 "", 1, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
+        NodeInstanceDesc nodeInstance0_start = new org.jbpm.kie.services.impl.model.NodeInstanceDesc
+                ("0", node_start, "", "StartNode", "evaluation_1.0.0-SNAPSHOT", processInstanceId, null,
+                 "", 0, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
+
+        List<NodeInstanceDesc> activeNodes = Arrays.asList(nodeInstance7_start);
+        List<NodeInstanceDesc> completedNodes = Arrays.asList(nodeInstance0_end, nodeInstance1_end, nodeInstance3_end,
+                                                              nodeInstance5_end, nodeInstance5_end2, nodeInstance6_end);
+        List<NodeInstanceDesc> fullLogs = Arrays.asList(nodeInstance0_end, nodeInstance0_start, nodeInstance1_start,
+                                                        nodeInstance1_end, nodeInstance2, nodeInstance3_end,
+                                                        nodeInstance3_start, nodeInstance5_end, nodeInstance5_end2,
+                                                        nodeInstance5_start, nodeInstance6_end, nodeInstance6_start,
+                                                        nodeInstance7_start, nodeInstance8, nodeInstance8_2);
+        when(dataService.getProcessInstanceHistoryCompleted(anyLong(), any())).thenReturn(completedNodes);
+        when(dataService.getProcessInstanceHistoryActive(anyLong(), any())).thenReturn(activeNodes);
+        when(dataService.getProcessInstanceFullHistory(anyLong(), any())).thenReturn(fullLogs);
+        Map<String, ImageReference> imageReferenceMap = new HashMap<>();
+        imageReferenceMap.put(containerId, imageReference);
+
+        ProcessInstanceDesc processInstanceDesc = new org.jbpm.kie.services.impl.model.ProcessInstanceDesc(processInstanceId, processId, "", "", 1, containerId, null
+                , "", "", "");
+
+        when(dataService.getProcessInstanceById(processInstanceId)).thenReturn(processInstanceDesc);
+
+        ImageServiceBase imageServiceBase = new ImageServiceBase(dataService, imageReferenceMap, kieServerRegistry);
+        String processImageStr = imageServiceBase.getActiveProcessImage(containerId, processInstanceId);
+
+        Document svgDocument = readSVG(processImageStr);
+
+        checkStrokeAttributeAtNode(svgDocument, node_hr_evaluation, ACTIVE_BORDER_COLOR);
+        checkStrokeAttributeAtNode(svgDocument, node_self_evaluation, COMPLETED_BORDER_COLOR);
+        checkStrokeAttributeAtNode(svgDocument, node_pm_evaluation, COMPLETED_BORDER_COLOR);
+        checkStrokeAttributeAtNode(svgDocument, node_async_failing, ACTIVE_ASYNC_BORDER_COLOR);
+        checkStrokeAttributeAtNode(svgDocument, node_asyncOk, COMPLETED_BORDER_COLOR);
+
+        String completedNodeColor = "black";
+        String completedNodeBorderColor = "grey";
+        String activeNodeBorderColor = "blue";
+        String activeAsyncNodeBorderColor = "red";
+        processImageStr = imageServiceBase.getActiveProcessImage(containerId, processInstanceId, completedNodeColor,
+                                                                 completedNodeBorderColor, activeNodeBorderColor, false,
+                                                                 activeAsyncNodeBorderColor);
+        svgDocument = readSVG(processImageStr);
+
+        checkStrokeAttributeAtNode(svgDocument, node_hr_evaluation, activeNodeBorderColor);
+        checkStrokeAttributeAtNode(svgDocument, node_self_evaluation, completedNodeBorderColor);
+        checkStrokeAttributeAtNode(svgDocument, node_pm_evaluation, completedNodeBorderColor);
+        checkStrokeAttributeAtNode(svgDocument, node_asyncOk, completedNodeBorderColor);
+        checkStrokeAttributeAtNode(svgDocument, node_async_failing, activeAsyncNodeBorderColor);
+    }
+
+    private void checkStrokeAttributeAtNode(Document svgDocument, String nodeId, String expectedStrokeValue) {
+        Element humanTaskBorderElement = svgDocument.getElementById(nodeId + "?shapeType=BORDER&renderType=STROKE");
+        String stroke = humanTaskBorderElement.getAttribute("stroke");
+        assertNotNull(stroke);
+        assertEquals(expectedStrokeValue, stroke);
     }
 }

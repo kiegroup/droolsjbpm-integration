@@ -41,12 +41,12 @@ public class StunnerSVGProcessor extends AbstractSVGProcessor {
     }
 
     @Override
-    public void defaultCompletedTransformation(String nodeId ,String completedNodeColor, String completeBorderColor) {
+    public void defaultCompletedTransformation(String nodeId, String completedNodeColor, String completedNodeBorderColor) {
         transform((summary) -> {
             Optional.ofNullable(summary.getNode(nodeId)).ifPresent(node -> {
                 Optional.ofNullable(node.getBackground()).ifPresent(background -> {
                     background.setAttribute("fill", completedNodeColor);
-                    setNodeBorderColor(node.getRenderType(), node.getBorder(), completeBorderColor);
+                    setNodeBorderColor(node.getRenderType(), node.getBorder(), completedNodeBorderColor);
                 });
             });
         });
@@ -54,10 +54,19 @@ public class StunnerSVGProcessor extends AbstractSVGProcessor {
 
     @Override
     public void defaultActiveTransformation(String nodeId, String activeNodeBorderColor) {
+        defaultBorderTransformation(nodeId, activeNodeBorderColor);
+    }
+
+    @Override
+    public void defaultActiveAsyncTransformation(String nodeId, String activeAsyncNodeBorderColor) {
+        defaultBorderTransformation(nodeId, activeAsyncNodeBorderColor);
+    }
+
+    public void defaultBorderTransformation(String nodeId, String nodeBorderColor) {
         transform((summary) -> {
             Optional.ofNullable(summary.getNode(nodeId)).ifPresent(node -> {
                 Optional.ofNullable(node.getBorder()).ifPresent(border -> {
-                    setNodeBorderColor(node.getRenderType(), border, activeNodeBorderColor);
+                    setNodeBorderColor(node.getRenderType(), border, nodeBorderColor);
                 });
             });
         });
