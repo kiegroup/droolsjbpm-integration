@@ -69,6 +69,22 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "startDate_",
+				"typeInfo": {
+					"type": "BASE",
+					"className": "java.time.LocalDateTime",
+					"multiple": false
+				},
+				"metaData": {
+					"entries": [
+						{
+							"name": "field-readOnly",
+							"value": false
+						}
+					]
+				}
 			}
 		],
 		"formModelType": "org.kie.workbench.common.forms.jbpm.model.authoring.task.TaskFormModel"
@@ -137,7 +153,8 @@
 			"readOnly": false,
 			"validateOnChange": true,
 			"helpMessage": "",
-			"standaloneClassName": "java.util.Date",
+			"binding": "startDate_", 
+			"standaloneClassName": "java.time.LocalDateTime",
 			"code": "DatePicker",
 			"serializedFieldClassName": "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.datePicker.definition.DatePickerFieldDefinition"
 		},
