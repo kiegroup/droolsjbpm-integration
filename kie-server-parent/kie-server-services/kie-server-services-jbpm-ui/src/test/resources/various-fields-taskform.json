@@ -69,22 +69,6 @@
 						}
 					]
 				}
-			},
-			{
-				"name": "startDate_",
-				"typeInfo": {
-					"type": "BASE",
-					"className": "java.time.LocalDateTime",
-					"multiple": false
-				},
-				"metaData": {
-					"entries": [
-						{
-							"name": "field-readOnly",
-							"value": false
-						}
-					]
-				}
 			}
 		],
 		"formModelType": "org.kie.workbench.common.forms.jbpm.model.authoring.task.TaskFormModel"
@@ -147,15 +131,60 @@
 			"placeHolder": "DatePicker",
 			"showTime": true,
 			"id": "field_07004",
-			"name": "mydate",
-			"label": "DatePicker",
+			"name": "myLocalDateTime",
+			"label": "LocalDatetime",
 			"required": false,
 			"readOnly": false,
 			"validateOnChange": true,
 			"helpMessage": "",
-			"binding": "startDate_", 
+			"binding": "localDateTime_", 
 			"standaloneClassName": "java.time.LocalDateTime",
 			"code": "DatePicker",
+			"serializedFieldClassName": "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.datePicker.definition.DatePickerFieldDefinition"
+		},
+		{
+			"placeHolder": "DatePicker",
+			"showTime": true,
+			"id": "field_07005",
+			"name": "myLocalDate",
+			"label": "LocalDate",
+			"required": false,
+			"readOnly": false,
+			"validateOnChange": true,
+			"helpMessage": "",
+			"binding": "localDate_", 
+			"standaloneClassName": "java.time.LocalDate",
+			"code": "DatePicker",
+			"serializedFieldClassName": "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.datePicker.definition.DatePickerFieldDefinition"
+		},
+		{
+			"placeHolder": "DatePicker",
+			"showTime": true,
+			"id": "field_07006",
+			"name": "myDate",
+			"label": "Date",
+			"required": false,
+			"readOnly": false,
+			"validateOnChange": true,
+			"helpMessage": "",
+			"binding": "date_", 
+			"standaloneClassName": "java.util.Date",
+			"code": "DatePicker",
+			"serializedFieldClassName": "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.datePicker.definition.DatePickerFieldDefinition"
+		},
+		{
+			"placeHolder": "DatePicker",
+			"showTime": true,
+			"id": "field_07007",
+			"label": "Time",
+			"name": "myTime",
+			"required": false,
+			"readOnly": false,
+			"validateOnChange": true,
+			"helpMessage": "",
+			"binding": "time_",
+			"code": "DatePicker", 
+			"standaloneClassName": "java.time.LocalTime",
 			"serializedFieldClassName": "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.datePicker.definition.DatePickerFieldDefinition"
 		},
 		{
@@ -330,6 +359,81 @@
 								"dragTypeName": "org.kie.workbench.common.forms.editor.client.editor.rendering.EditorFieldLayoutComponent",
 								"properties": {
 									"field_id": "field_07004",
+									"form_id": "6feb5a08-3144-488e-9afa-17d52b899a7b"
+								}
+							}
+						]
+					}
+				]
+			},
+			{
+				"height": "12",
+				"properties": {
+					
+				},
+				"layoutColumns": [
+					{
+						"span": "12",
+						"height": "12",
+						"properties": {
+							
+						},
+						"rows": [],
+						"layoutComponents": [
+							{
+								"dragTypeName": "org.kie.workbench.common.forms.editor.client.editor.rendering.EditorFieldLayoutComponent",
+								"properties": {
+									"field_id": "field_07005",
+									"form_id": "6feb5a08-3144-488e-9afa-17d52b899a7b"
+								}
+							}
+						]
+					}
+				]
+			},
+			{
+				"height": "12",
+				"properties": {
+					
+				},
+				"layoutColumns": [
+					{
+						"span": "12",
+						"height": "12",
+						"properties": {
+							
+						},
+						"rows": [],
+						"layoutComponents": [
+							{
+								"dragTypeName": "org.kie.workbench.common.forms.editor.client.editor.rendering.EditorFieldLayoutComponent",
+								"properties": {
+									"field_id": "field_07006",
+									"form_id": "6feb5a08-3144-488e-9afa-17d52b899a7b"
+								}
+							}
+						]
+					}
+				]
+			},
+			{
+				"height": "12",
+				"properties": {
+					
+				},
+				"layoutColumns": [
+					{
+						"span": "12",
+						"height": "12",
+						"properties": {
+							
+						},
+						"rows": [],
+						"layoutComponents": [
+							{
+								"dragTypeName": "org.kie.workbench.common.forms.editor.client.editor.rendering.EditorFieldLayoutComponent",
+								"properties": {
+									"field_id": "field_07007",
 									"form_id": "6feb5a08-3144-488e-9afa-17d52b899a7b"
 								}
 							}
