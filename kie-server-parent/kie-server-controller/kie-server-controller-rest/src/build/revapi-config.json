@@ -24,7 +24,56 @@
   "ignores": {
     "revapi": {
       "_comment": "Changes between 7.52.0.Final and the current branch. These changes are desired and thus ignored.",
-      "ignore": []
+      "ignore": [
+        {
+          "code": "java.annotation.added",
+          "old": "method javax.ws.rs.core.Response org.kie.server.controller.rest.RestSpecManagementServiceImpl::saveContainerSpec(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, javax.ws.rs.core.UriInfo)",
+          "new": "method javax.ws.rs.core.Response org.kie.server.controller.rest.RestSpecManagementServiceImpl::saveContainerSpec(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, javax.ws.rs.core.UriInfo)",
+          "annotationType": "javax.ws.rs.POST",
+          "annotation": "@javax.ws.rs.POST",
+          "package": "org.kie.server.controller.rest",
+          "classSimpleName": "RestSpecManagementServiceImpl",
+          "methodName": "saveContainerSpec",
+          "elementKind": "method",
+          "justification": "https://issues.redhat.com/browse/RHPAM-3535"
+        },
+        {
+          "code": "java.annotation.removed",
+          "old": "method javax.ws.rs.core.Response org.kie.server.controller.rest.RestSpecManagementServiceImpl::saveContainerSpec(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, javax.ws.rs.core.UriInfo)",
+          "new": "method javax.ws.rs.core.Response org.kie.server.controller.rest.RestSpecManagementServiceImpl::saveContainerSpec(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, javax.ws.rs.core.UriInfo)",
+          "annotationType": "javax.ws.rs.PUT",
+          "annotation": "@javax.ws.rs.PUT",
+          "package": "org.kie.server.controller.rest",
+          "classSimpleName": "RestSpecManagementServiceImpl",
+          "methodName": "saveContainerSpec",
+          "elementKind": "method",
+          "justification": "https://issues.redhat.com/browse/RHPAM-3535"
+        },
+        {
+          "code": "java.annotation.removed",
+          "old": "method javax.ws.rs.core.Response org.kie.server.controller.rest.RestSpecManagementServiceImpl::updateContainerSpec(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, boolean)",
+          "new": "method javax.ws.rs.core.Response org.kie.server.controller.rest.RestSpecManagementServiceImpl::updateContainerSpec(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, boolean)",
+          "annotationType": "javax.ws.rs.POST",
+          "annotation": "@javax.ws.rs.POST",
+          "package": "org.kie.server.controller.rest",
+          "classSimpleName": "RestSpecManagementServiceImpl",
+          "methodName": "updateContainerSpec",
+          "elementKind": "method",
+          "justification": "https://issues.redhat.com/browse/RHPAM-3535"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "method javax.ws.rs.core.Response org.kie.server.controller.rest.RestSpecManagementServiceImpl::updateContainerSpec(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, boolean)",
+          "new": "method javax.ws.rs.core.Response org.kie.server.controller.rest.RestSpecManagementServiceImpl::updateContainerSpec(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, boolean)",
+          "annotationType": "javax.ws.rs.PUT",
+          "annotation": "@javax.ws.rs.PUT",
+          "package": "org.kie.server.controller.rest",
+          "classSimpleName": "RestSpecManagementServiceImpl",
+          "methodName": "updateContainerSpec",
+          "elementKind": "method",
+          "justification": "https://issues.redhat.com/browse/RHPAM-3535"
+        }
+      ]
     }
   }
 }

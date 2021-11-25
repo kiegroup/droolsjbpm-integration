@@ -50,7 +50,7 @@ public class RestSpecManagementServiceImpl {
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
-    @PUT
+    @POST
     @Path("servers/{serverTemplateId}/containers/{containerId}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response saveContainerSpec(@Context HttpHeaders headers,
@@ -90,7 +90,7 @@ public class RestSpecManagementServiceImpl {
             @ApiResponse(code = 400, message = "Controller exception"),
             @ApiResponse(code = 500, message = "Unexpected error")
     })
-    @POST
+    @PUT
     @Path("servers/{serverTemplateId}/containers/{containerId}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response updateContainerSpec(@Context HttpHeaders headers,
