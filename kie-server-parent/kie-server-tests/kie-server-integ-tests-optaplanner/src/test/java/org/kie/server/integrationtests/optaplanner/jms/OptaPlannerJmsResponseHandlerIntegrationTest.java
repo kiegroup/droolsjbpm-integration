@@ -70,7 +70,7 @@ public class OptaPlannerJmsResponseHandlerIntegrationTest extends OptaplannerKie
 
     private static final long EXTENDED_TIMEOUT = 300_000L;
 
-    @Parameterized.Parameters(name = "{index}: {0}")
+    @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         KieServicesConfiguration jmsConfiguration = createKieServicesJmsConfiguration();
 

@@ -56,22 +56,26 @@ public class JmsTransactionsIntegrationTest extends JbpmKieServerBaseIntegration
 
     private static final ReleaseId RELEASE_ID = new ReleaseId("org.kie.server.testing", "definition-project", "1.0.0.Final");
 
-    @Parameterized.Parameters(name = "{index}: {0}")
+    @Parameterized.Parameters(name = "{0} {3}")
     public static Collection<Object[]> data() {
         KieServicesConfiguration jmsConfiguration = createKieServicesJmsConfiguration();
 
         return new ArrayList<>(Arrays.asList(new Object[][]{
-                {MarshallingFormat.JAXB, jmsConfiguration, new FireAndForgetResponseHandler()},
-                {MarshallingFormat.JAXB, jmsConfiguration, new AsyncResponseHandler(new BlockingResponseCallback(null))},
-                {MarshallingFormat.JSON, jmsConfiguration, new FireAndForgetResponseHandler()},
-                {MarshallingFormat.JSON, jmsConfiguration, new AsyncResponseHandler(new BlockingResponseCallback(null))},
-                {MarshallingFormat.XSTREAM, jmsConfiguration, new FireAndForgetResponseHandler()},
-                {MarshallingFormat.XSTREAM, jmsConfiguration, new AsyncResponseHandler(new BlockingResponseCallback(null))}
+                {MarshallingFormat.JAXB, jmsConfiguration, new FireAndForgetResponseHandler(), "FireAndForgetResponseHandler"},
+                {MarshallingFormat.JAXB, jmsConfiguration, new AsyncResponseHandler(new BlockingResponseCallback(null)), "AsyncResponseHandler"},
+                {MarshallingFormat.JSON, jmsConfiguration, new FireAndForgetResponseHandler(), "FireAndForgetResponseHandler"},
+                {MarshallingFormat.JSON, jmsConfiguration, new AsyncResponseHandler(new BlockingResponseCallback(null)), "AsyncResponseHandler"},
+                {MarshallingFormat.XSTREAM, jmsConfiguration, new FireAndForgetResponseHandler(), "FireAndForgetResponseHandler"},
+                {MarshallingFormat.XSTREAM, jmsConfiguration, new AsyncResponseHandler(new BlockingResponseCallback(null)), "AsyncResponseHandler"}
         }));
     }
 
     @Parameterized.Parameter(2)
     public ResponseHandler responseHandler;
+
+    // Needed for logging purposes to identify distinct parameterized runs
+    @Parameterized.Parameter(3)
+    public String responseHandlerName;
 
     private ConnectionFactoryProxy connectionFactory;
     private UserTransaction transaction;

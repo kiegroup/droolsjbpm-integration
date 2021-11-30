@@ -70,7 +70,7 @@ public class RenderFormServiceIntegrationTest extends KieServerBaseIntegrationTe
     @ClassRule
     public static ExternalResource StaticResource = new DBExternalResource();
     
-    @Parameterized.Parameters(name = "{index}: {0}")
+    @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         KieServicesConfiguration restConfiguration = createKieServicesRestConfiguration();
 
