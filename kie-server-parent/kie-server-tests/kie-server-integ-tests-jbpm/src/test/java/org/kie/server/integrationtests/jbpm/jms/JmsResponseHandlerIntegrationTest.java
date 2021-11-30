@@ -66,7 +66,7 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
 
     private static final ReleaseId RELEASE_ID = new ReleaseId("org.kie.server.testing", "definition-project", "1.0.0.Final");
 
-    @Parameterized.Parameters(name = "{index}: {0}")
+    @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         KieServicesConfiguration jmsConfiguration = createKieServicesJmsConfiguration();
         Collection<Object[]> parameterData = new ArrayList<>(Arrays.asList(new Object[][]{
