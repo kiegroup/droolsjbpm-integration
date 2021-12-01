@@ -29,10 +29,10 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.LinkedHashMap;
-import java.util.Optional;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -383,10 +383,10 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                         }
                         
                         // handle regular fields in the form 
-                        String fieldType = inputTypes.get(field.getCode());
+                        String fieldType = getFieldType(field);
                         if (fieldType != null) {
                                                     
-                            String jsType = getFieldType(field.getType());
+                            String jsType = getJSFieldType(field.getType());
                             
                             item.setId(field.getId());
                             item.setName(nonNull(field.getName()));
@@ -492,7 +492,31 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                 .append(",");
         }        
     }
-    
+
+    private String getFieldType(FormField field) {
+        String type = inputTypes.get(field.getCode());
+        switch (type) {
+            case "documentCollection":
+            case "multipleSelector":
+            case "multipleInput":
+                return type;
+             default: 
+                 switch (field.getType()) {
+                     case "java.time.LocalDateTime":
+                     case "java.util.Date":
+                     case "java.sql.Date":
+                     case "java.sql.Timestamp":
+                         return "datetime-local";
+                     case "java.time.LocalTime":
+                         return "time";
+                     case "java.time.OffsetDateTime":
+                         return "datetime";
+                     default: 
+                         return type;
+                 }
+        }
+    }
+
     protected void handleSubForm(FormInstance topLevelForm, 
             FormField field, 
             Map<String, Object> inputs, 
@@ -552,7 +576,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         for (TableInfo tableInfo : field.getTableInfo()) {
         
             FormField nestedField = nestedForm.getFieldByBinding(tableInfo.getProperty());
-            String jsType = getFieldType(nestedField.getType());
+            String jsType = getJSFieldType(nestedField.getType());
             tableInfo.setType(jsType);
         }
                                     
@@ -670,14 +694,14 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         jsonTemplate.append("'")
                     .append(name)
                     .append("' : ")
-                    .append(getFieldType(type))
+                    .append(getJSFieldType(type))
                     .append(appendExtractionExpression(type, name, id, jsType))
                     .append(wrapEndFieldType(type))
                     .append(",");
 
     }
 
-    protected String getFieldType(String type) {
+    protected String getJSFieldType(String type) {
 
         if (type.contains("Integer") || type.contains("Double") || type.contains("Float")) {
             return "Number(";
