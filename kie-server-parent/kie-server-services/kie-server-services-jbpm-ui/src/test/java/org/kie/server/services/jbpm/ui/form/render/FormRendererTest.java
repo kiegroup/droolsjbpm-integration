@@ -22,9 +22,15 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -228,29 +234,87 @@ public class FormRendererTest {
         assertThat(renderedForm).isNotNull();
         writeToFile("testRenderOfBasicFormWithSelectRadioGroup.html", renderedForm);
     }
-    
+
+    private static class TestPojo {
+
+        private String selection;
+        private String radio;
+        private float decimal;
+        private String hwSpec_;
+        private Date date_;
+        private LocalDate localDate_;
+        private LocalDateTime localDateTime_;
+        private LocalTime time_;
+
+        public TestPojo(String selection, String radio, float decimal, String hwSpec_, Date date_, LocalDate localDate_, LocalDateTime localDateTime_, LocalTime time_) {
+            this.selection = selection;
+            this.radio = radio;
+            this.decimal = decimal;
+            this.hwSpec_ = hwSpec_;
+            this.date_ = date_;
+            this.localDate_ = localDate_;
+            this.localDateTime_ = localDateTime_;
+            this.time_ = time_;
+        }
+
+        public String getSelection() {
+            return selection;
+        }
+
+        public String getRadio() {
+            return radio;
+        }
+
+        public float getDecimal() {
+            return decimal;
+        }
+
+        public String getHwSpec_() {
+            return hwSpec_;
+        }
+
+        public LocalDate getLocalDate_() {
+            return localDate_;
+        }
+
+        public LocalDateTime getLocalDateTime_() {
+            return localDateTime_;
+        }
+
+        public Date getDate_() {
+            return date_;
+        }
+
+        public LocalTime getTime_() {
+            return time_;
+        }
+    }
+
     @Test
     public void testRenderOfBasicTaskFormWithSelectRadioGroupAndData() {
-        
+
+        TestPojo pojo = new TestPojo("another", "radio2", 123.5f, "name####123####111####id", new GregorianCalendar(2020, 11, 1).getTime(),
+                                     LocalDate.of(2020, 12, 1), LocalDateTime.of(LocalDate.of(2020, 12, 1), LocalTime.of(23, 11)), LocalTime.of(12, 1));
         FormReader reader = new FormReader();
-        
+
         FormInstance form = reader.readFromStream(this.getClass().getResourceAsStream("/various-fields-taskform.json"));
         assertThat(form).isNotNull();
-        
-        Map<String, Object> inputs = new HashMap<>();
-        inputs.put("selection", "another");
-        inputs.put("radio", "radio2");
-        inputs.put("decimal", 123.5);
-        inputs.put("hwSpec_", "name####123####111####id");
-        Map<String, Object> outputs = new HashMap<>();
-        
+
+        Map<String, Object> inputs = reader.extractValues(pojo);
+        Map<String, Object> outputs = Collections.emptyMap();
+
         Task task = newTask(0L, "Ready");
-        
+
         String renderedForm = renderer.renderTask("", task, form, inputs, outputs);
-        assertThat(renderedForm).isNotNull();
+        assertThat(renderedForm).isNotNull()
+                                .containsIgnoringCase("value=\"2020-12-01T23:11:00\"")
+                                .containsIgnoringCase("value=\"2020-12-01\"")
+                                .containsIgnoringCase("value=\"2020-12-01T00:00:00.000\"")
+                                .containsIgnoringCase("value=\"12:01:00\"");
+
         writeToFile("testRenderOfBasicTaskFormWithSelectRadioGroupAndData.html", renderedForm);
     }
-    
+
     @Test
     public void testRenderOfMultiSubFormNoData() {
                         
