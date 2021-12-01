@@ -36,7 +36,7 @@ import org.kie.server.integrationtests.config.TestConfig;
 @RunWith(Parameterized.class)
 public abstract class RestOnlyBaseIntegrationTest extends KieServerBaseIntegrationTest {
 
-    @Parameterized.Parameters(name = "{index}: {0} {1}")
+    @Parameterized.Parameters(name = "{0} {1}")
     public static Collection<Object[]> data() {
         KieServicesConfiguration restConfiguration = createKieServicesRestConfiguration();
 

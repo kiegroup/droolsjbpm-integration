@@ -105,7 +105,7 @@ public class KieServerContainerListFilteringIntegrationTest extends RestJmsShare
         client.createContainer(CONTAINER_ID_3, new KieContainerResource(CONTAINER_ID_3, releaseId3));
     }
 
-    @Parameterized.Parameters(name = "{index}: {0} {1} {2} {3} {4}")
+    @Parameterized.Parameters(name = "{0} {1} {2} {3} {4}")
     public static Collection<Object[]> data() {
 
         Collection<Object[]> testData = new ArrayList<Object[]>(Arrays.asList(new Object[][]

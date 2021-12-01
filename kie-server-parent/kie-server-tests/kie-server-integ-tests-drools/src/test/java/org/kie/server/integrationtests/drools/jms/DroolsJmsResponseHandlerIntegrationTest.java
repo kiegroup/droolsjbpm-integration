@@ -61,7 +61,7 @@ public class DroolsJmsResponseHandlerIntegrationTest extends DroolsKieServerBase
     private static final String LIST_NAME = "list";
     private static final String LIST_OUTPUT_NAME = "output-list";
 
-    @Parameterized.Parameters(name = "{index}: {0}")
+    @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         KieServicesConfiguration jmsConfiguration = createKieServicesJmsConfiguration();
 

@@ -56,7 +56,7 @@ public class JsonTypeInfoUpdateIntegrationTest extends DroolsKieServerBaseIntegr
 
     private static ClassLoader kjarClassLoader;
 
-    @Parameterized.Parameters(name = "{index}: {0} {1}")
+    @Parameterized.Parameters(name = "{0} {1}")
     public static Collection<Object[]> data() {
         KieServicesConfiguration restConfiguration = createKieServicesRestConfiguration();
 

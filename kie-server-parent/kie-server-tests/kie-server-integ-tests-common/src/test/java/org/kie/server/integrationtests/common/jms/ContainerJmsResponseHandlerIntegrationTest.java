@@ -53,7 +53,7 @@ public class ContainerJmsResponseHandlerIntegrationTest extends RestJmsSharedBas
     private static final ReleaseId RELEASE_ID_1 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.0.GA");
     private static final ReleaseId RELEASE_ID_2 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.1.GA");
 
-    @Parameterized.Parameters(name = "{index}: {0}")
+    @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         KieServicesConfiguration jmsConfiguration = createKieServicesJmsConfiguration();
 
