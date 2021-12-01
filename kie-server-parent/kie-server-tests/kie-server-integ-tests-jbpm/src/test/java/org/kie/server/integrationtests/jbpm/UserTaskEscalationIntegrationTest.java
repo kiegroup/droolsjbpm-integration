@@ -87,7 +87,7 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
 
     private Wiser wiser;
 
-    @Parameterized.Parameters(name = "{index}: {0} {1}")
+    @Parameterized.Parameters(name = "{0} {1}")
     public static Collection<Object[]> data() {
         KieServicesConfiguration configuration = createKieServicesRestConfiguration();
 

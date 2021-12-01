@@ -40,7 +40,7 @@ public class TimerIntegrationTest extends JbpmKieServerBaseIntegrationTest {
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "timer-project",
             "1.0.0.Final");
 
-    @Parameterized.Parameters(name = "{index}: {0} {1} {2}")
+    @Parameterized.Parameters(name = "{0} {1} {2}")
     public static Collection<Object[]> data() {
         KieServicesConfiguration configuration = createKieServicesRestConfiguration();
 
