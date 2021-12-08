@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.kie.server.integrationtests.config.TestConfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thoughtworks.xstream.core.util.Base64Encoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -65,7 +66,7 @@ public class KieControllerSwaggerIntegrationTest extends KieControllerManagement
     
     protected String invokeGet(String docsUri) {
         WebTarget clientRequest = httpClient.target(docsUri);
-        Response response = clientRequest.request().get();
+        Response response = clientRequest.request().header("Authorization", "Basic " + new Base64Encoder().encode((TestConfig.getUsername() + ":" + TestConfig.getPassword()).getBytes())).get();
 
         assertEquals(200, response.getStatus());
         assertNotNull(response.getEntity());
