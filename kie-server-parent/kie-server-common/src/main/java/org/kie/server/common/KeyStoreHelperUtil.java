@@ -22,6 +22,8 @@ public class KeyStoreHelperUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(KeyStoreHelperUtil.class);
 
+    private static KeyStoreHelper keyStoreHelper;
+
     private static Set<String> invocationCache = new HashSet<>();
 
     public static String loadServerPassword() {
@@ -39,7 +41,7 @@ public class KeyStoreHelperUtil {
 
     public static String loadPasswordKey(String pwdKeyAliasProperty, String pwdKeyPasswordProperty, String defaultPassword) {
         String passwordKey;
-        KeyStoreHelper keyStoreHelper = new KeyStoreHelper();
+        KeyStoreHelper keyStoreHelper = getKeyStoreHelper();
         try {
             String pwdKeyAlias = System.getProperty(pwdKeyAliasProperty, "");
             String pwdKeyPassword = System.getProperty(pwdKeyPasswordProperty, "");
@@ -52,6 +54,13 @@ public class KeyStoreHelperUtil {
             }
         }
         return passwordKey;
+    }
+
+    private static KeyStoreHelper getKeyStoreHelper() {
+        if (keyStoreHelper == null) {
+            keyStoreHelper = new KeyStoreHelper();
+        }
+        return keyStoreHelper;
     }
 
     private static boolean hasNotBeenInvoked(String pwdKeyAliasProperty, String pwdKeyPasswordProperty, String passwordKey) {
