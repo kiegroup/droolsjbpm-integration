@@ -33,8 +33,6 @@ import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.common.rest.NoEndpointFoundException;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -71,24 +69,14 @@ public class KieServiceImplTest extends KieServiceImpl {
     public void testKieServerClients() throws InterruptedException {
         KieServiceImpl kieService = new KieServiceImplTest();
         Mockito.when(KieServicesFactory.newRestConfiguration(Mockito.anyString(), Mockito.any(CredentialsProvider.class)))
-            .thenAnswer(new Answer<KieServicesConfiguration>() {
-                private int count = 0;
-
-                @Override
-                public KieServicesConfiguration answer(InvocationOnMock invocation) {
-                    if (count++ == 1) {
-                        return getKieServicesConfig();
-                    }
-                    throw new NoEndpointFoundException("Mock error");
-                }
-            });
+                .thenCallRealMethod()
+                .thenThrow(new NoEndpointFoundException("Mock error"));
         Mockito.when(KieServicesFactory.newKieServicesClient(Mockito.any(KieServicesConfiguration.class)))
-            .thenReturn(Mockito.mock(KieServicesClient.class));
+                .thenReturn(Mockito.mock(KieServicesClient.class));
 
         countDownLatch = new CountDownLatch(1);
         kieService.loadConfigs();
         countDownLatch.await();
-
 
         PowerMockito.verifyStatic(KieServicesFactory.class, times(2));
         KieServicesFactory.newRestConfiguration(Mockito.anyString(), Mockito.any(CredentialsProvider.class));
@@ -99,10 +87,6 @@ public class KieServiceImplTest extends KieServiceImpl {
         Assert.assertEquals(1, configs.size());
         KieServerConfig config = configs.iterator().next();
         Assert.assertNotNull(config.getClient());
-    }
-
-    private KieServicesConfiguration getKieServicesConfig() {
-        return Mockito.mock(KieServicesConfiguration.class);
     }
 
     @Override

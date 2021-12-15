@@ -21,8 +21,8 @@ package org.kie.server.client;
  */
 public interface CredentialsProvider {
 
-    public static final String BASIC_AUTH_PREFIX = "Basic ";
-    public static final String TOKEN_AUTH_PREFIX = "Bearer ";
+    String BASIC_AUTH_PREFIX = "Basic ";
+    String TOKEN_AUTH_PREFIX = "Bearer ";
 
     /**
      * Returns name of the HTTP header to be set with given authorization

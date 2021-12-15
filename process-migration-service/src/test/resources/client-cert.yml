@@ -1,0 +1,17 @@
+kieservers:
+  - host: https://kieserver1.example.com:8443/kie-server/services/rest/server
+    # This KIE Server Client Certificate Authentication (2Way-SSL)
+    client-cert:
+      cert-name: cert0
+      cert-password: certPwd0
+      keystore: /path/to/mykeystore0.jks
+      keystore-password: secret0
+  # This KIE Server requires client certificate and basic authentication
+  - host: https://kieserver2.example.com:8443/kie-server/services/rest/server
+    username: admin
+    password: admin123
+    client-cert:
+      cert-name: cert1
+      cert-password: certPwd1
+      keystore: /path/to/mykeystore1.jks
+      keystore-password: secret1

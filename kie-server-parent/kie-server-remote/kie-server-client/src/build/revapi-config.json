@@ -149,6 +149,42 @@
                "methodName": "migrateProcessInstanceWithSubprocess",
                "elementKind": "method",
                "justification": "[JBPM-9583] Enhance migration service to check parent/sub-process relations"
+             },
+             {
+                "code": "java.method.addedToInterface",
+                "new": "method org.kie.server.common.rest.ClientCertificate org.kie.server.client.KieServicesConfiguration::getClientCertificate()",
+                "package": "org.kie.server.client",
+                "classSimpleName": "KieServicesConfiguration",
+                "methodName": "getClientCertificate",
+                "elementKind": "method",
+                "justification": "[RHPAM-4038] Certificate based authentication"
+             },
+             {
+                "code": "java.method.addedToInterface",
+                "new": "method org.kie.server.client.KieServicesConfiguration org.kie.server.client.KieServicesConfiguration::setClientCertificate(org.kie.server.common.rest.ClientCertificate)",
+                "package": "org.kie.server.client",
+                "classSimpleName": "KieServicesConfiguration",
+                "methodName": "setClientCertificate",
+                "elementKind": "method",
+                "justification": "[RHPAM-4038] Certificate based authentication"
+             },
+             {
+                "code": "java.method.removed",
+                "old": "method boolean org.kie.server.client.KieServicesConfiguration::getUseUssl()",
+                "package": "org.kie.server.client",
+                "classSimpleName": "KieServicesConfiguration",
+                "methodName": "getUseUssl",
+                "elementKind": "method",
+                "justification": "Fixed typo in method signature"
+             },
+             {
+                "code": "java.method.addedToInterface",
+                "new": "method boolean org.kie.server.client.KieServicesConfiguration::getUseSsl()",
+                "package": "org.kie.server.client",
+                "classSimpleName": "KieServicesConfiguration",
+                "methodName": "getUseSsl",
+                "elementKind": "method",
+                "justification": "Fixed typo in method signature"
              }
             ]
         }

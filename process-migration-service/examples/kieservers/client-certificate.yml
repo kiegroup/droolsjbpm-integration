@@ -1,0 +1,10 @@
+kieservers:
+  - host: https://localhost:18443/kie-server/services/rest/server
+    # This KIE Server requires Client Certificate Authentication (2Way-SSL)
+    client-cert:
+      cert-name: pim
+      cert-password: password
+      keystore-path: ./examples/kieservers/keystore.jks
+      keystore-password: password
+      truststore-path: ./examples/kieservers/truststore.jks
+      truststore-password: password

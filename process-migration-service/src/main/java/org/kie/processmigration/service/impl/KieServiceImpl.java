@@ -50,7 +50,6 @@ import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.instance.ProcessInstance;
-import org.kie.server.client.CredentialsProvider;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
@@ -59,6 +58,7 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.UIServicesClient;
 import org.kie.server.client.admin.ProcessAdminServicesClient;
 import org.kie.server.client.credentials.EnteredCredentialsProvider;
+import org.kie.server.common.rest.ClientCertificate;
 import org.kie.server.common.rest.NoEndpointFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +73,15 @@ public class KieServiceImpl implements KieService {
     private static final String HOST = "host";
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
+
+    private static final String CLIENT_CERT = "client-cert";
+    private static final String CERT_NAME = "cert-name";
+    private static final String CERT_PASSWORD = "cert-password";
+    private static final String KEYSTORE_PATH = "keystore-path";
+    private static final String KEYSTORE_PASSWORD = "keystore-password";
+    private static final String TRUSTSTORE_PATH = "truststore-path";
+    private static final String TRUSTSTORE_PASSWORD = "truststore-password";
+
     private static final long CONFIGURATION_TIMEOUT = 60000;
     private static final Integer DEFAULT_PAGE_SIZE = 100;
     private static final long AWAIT_EXECUTOR = 5;
@@ -90,7 +99,7 @@ public class KieServiceImpl implements KieService {
     public void loadConfigs() {
         if (configView.hasKeyOrSubkeys(kieServersKey)) {
             @SuppressWarnings("unchecked")
-            List<Map<String, String>> value = configView.resolve(kieServersKey).as(List.class).getValue();
+            List<Map<String, Object>> value = configView.resolve(kieServersKey).as(List.class).getValue();
             value.stream().forEach(this::loadConfig);
         }
     }
@@ -115,14 +124,14 @@ public class KieServiceImpl implements KieService {
     @Override
     public boolean hasKieServer(String kieServerId) {
         return configs
-            .values()
-            .stream()
-            .anyMatch(config -> config.getId() != null && config.getId().equals(kieServerId));
+                .values()
+                .stream()
+                .anyMatch(config -> config.getId() != null && config.getId().equals(kieServerId));
     }
 
     @Override
     public ProcessAdminServicesClient getProcessAdminServicesClient(String kieServerId) throws
-        InvalidKieServerException {
+            InvalidKieServerException {
         return getClient(kieServerId).getServicesClient(ProcessAdminServicesClient.class);
     }
 
@@ -133,7 +142,7 @@ public class KieServiceImpl implements KieService {
 
     @Override
     public List<RunningInstance> getRunningInstances(String kieServerId, String containerId, Integer page, Integer
-        pageSize) throws InvalidKieServerException {
+            pageSize) throws InvalidKieServerException {
         ProcessServicesClient processServicesClient = getProcessServicesClient(kieServerId);
         List<ProcessInstance> instanceList = processServicesClient.findProcessInstances(containerId, page, pageSize);
 
@@ -171,14 +180,14 @@ public class KieServiceImpl implements KieService {
 
     @Override
     public boolean existsProcessDefinition(String kieServerId, ProcessRef processRef) throws
-        InvalidKieServerException {
+            InvalidKieServerException {
         QueryServicesClient queryService = getQueryServicesClient(kieServerId);
         return queryService.findProcessByContainerIdProcessId(processRef.getContainerId(), processRef.getProcessId()) != null;
     }
 
     @Override
     public ProcessInfo getDefinition(String kieServerId, ProcessRef processRef) throws
-        ProcessDefinitionNotFoundException, InvalidKieServerException {
+            ProcessDefinitionNotFoundException, InvalidKieServerException {
         ProcessInfo processInfo = new ProcessInfo();
 
         //get SVG file
@@ -206,9 +215,9 @@ public class KieServiceImpl implements KieService {
         List<BpmNode> nodes = new ArrayList<>();
         if (pd.getNodes() != null) {
             nodes = pd.getNodes()
-                .stream()
-                .map(n -> new BpmNode().setId(n.getUniqueId()).setName(n.getName()).setType(n.getType()))
-                .collect(Collectors.toCollection(ArrayList::new));
+                    .stream()
+                    .map(n -> new BpmNode().setId(n.getUniqueId()).setName(n.getName()).setType(n.getType()))
+                    .collect(Collectors.toCollection(ArrayList::new));
         }
         processInfo.setNodes(nodes);
         processInfo.setContainerId(processRef.getContainerId());
@@ -216,11 +225,20 @@ public class KieServiceImpl implements KieService {
         return processInfo;
     }
 
-    private void loadConfig(Map<String, String> config) {
-        CredentialsProvider credentialsProvider = new EnteredCredentialsProvider(config.get(USERNAME), config.get(PASSWORD));
-        KieServerConfig kieConfig = new KieServerConfig();
-        kieConfig.setHost(config.get(HOST))
-            .setCredentialsProvider(credentialsProvider);
+    private void loadConfig(Map<String, Object> config) {
+        KieServerConfig kieConfig = new KieServerConfig().setHost((String) config.get(HOST));
+        if (config.containsKey(USERNAME) && config.containsKey(PASSWORD)) {
+            kieConfig.setCredentialsProvider(new EnteredCredentialsProvider((String) config.get(USERNAME), (String) config.get(PASSWORD)));
+        }
+        if (config.containsKey(CLIENT_CERT)) {
+            Map<String, String> clientCertProps = (Map<String, String>) config.get(CLIENT_CERT);
+            kieConfig.setClientCertificate(new ClientCertificate().setCertName(clientCertProps.get(CERT_NAME))
+                    .setCertPassword(clientCertProps.get(CERT_PASSWORD))
+                    .setKeystore(clientCertProps.get(KEYSTORE_PATH))
+                    .setKeystorePassword(clientCertProps.get(KEYSTORE_PASSWORD))
+                    .setTruststore(clientCertProps.get(TRUSTSTORE_PATH))
+                    .setTruststorePassword(clientCertProps.get(TRUSTSTORE_PASSWORD)));
+        }
         try {
             kieConfig.setClient(createKieServicesClient(kieConfig));
             logger.info("Loaded kie server configuration: {}", kieConfig);
@@ -233,19 +251,21 @@ public class KieServiceImpl implements KieService {
     }
 
     private KieServicesClient createKieServicesClient(KieServerConfig config) {
-        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(config.getHost(), config.getCredentialsProvider());
-        configuration.setTimeout(CONFIGURATION_TIMEOUT);
-        configuration.setMarshallingFormat(MarshallingFormat.JSON);
+        KieServicesConfiguration configuration = KieServicesFactory
+                .newRestConfiguration(config.getHost(), config.getCredentialsProvider())
+                .setClientCertificate(config.getClientCertificate())
+                .setTimeout(CONFIGURATION_TIMEOUT)
+                .setMarshallingFormat(MarshallingFormat.JSON);
         return KieServicesFactory.newKieServicesClient(configuration);
     }
 
     private KieServicesClient getClient(String kieServerId) throws InvalidKieServerException {
         return configs.values()
-            .stream()
-            .filter(config -> kieServerId.equals(config.getId()))
-            .findFirst()
-            .orElseThrow(() -> new InvalidKieServerException(kieServerId))
-            .getClient();
+                .stream()
+                .filter(config -> kieServerId.equals(config.getId()))
+                .findFirst()
+                .orElseThrow(() -> new InvalidKieServerException(kieServerId))
+                .getClient();
     }
 
     private UIServicesClient getUIServicesClient(String kieServerId) throws InvalidKieServerException {

@@ -21,10 +21,12 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.CredentialsProvider;
 import org.kie.server.client.KieServicesClient;
+import org.kie.server.common.rest.ClientCertificate;
 
 public class KieServerConfig {
 
     private static final String UNKNOWN_STATUS = "UNKNOWN";
+
     private String id;
 
     private String host;
@@ -34,6 +36,9 @@ public class KieServerConfig {
 
     @JsonIgnore
     private KieServicesClient client;
+
+    @JsonIgnore
+    private ClientCertificate clientCertificate;
 
     public String getId() {
         if (client == null) {
@@ -91,6 +96,15 @@ public class KieServerConfig {
         } catch (Exception e) {
             return UNKNOWN_STATUS;
         }
+    }
+
+    public ClientCertificate getClientCertificate() {
+        return clientCertificate;
+    }
+
+    public KieServerConfig setClientCertificate(ClientCertificate clientCertificate) {
+        this.clientCertificate = clientCertificate;
+        return this;
     }
 
     @Override

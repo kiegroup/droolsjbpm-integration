@@ -15,23 +15,25 @@
 
 package org.kie.server.client.impl;
 
-import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.client.CredentialsProvider;
-import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.api.exception.KieServicesException;
-import org.kie.server.client.balancer.LoadBalancer;
-import org.kie.server.client.credentials.EnteredCredentialsProvider;
-import org.kie.server.client.jms.RequestReplyResponseHandler;
-import org.kie.server.client.jms.ResponseHandler;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import org.kie.server.api.exception.KieServicesException;
+import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.client.CredentialsProvider;
+import org.kie.server.client.KieServicesConfiguration;
+import org.kie.server.client.balancer.LoadBalancer;
+import org.kie.server.client.credentials.EnteredCredentialsProvider;
+import org.kie.server.client.jms.RequestReplyResponseHandler;
+import org.kie.server.client.jms.ResponseHandler;
+import org.kie.server.common.rest.ClientCertificate;
 
 /**
  * In order to protect the Remote (Java) API, this class may not be extended nor may its constructor be made public.
@@ -53,6 +55,7 @@ public final class KieServicesConfigurationImpl
     private String userName;
     private String password;
     private String serverUrl;
+    private ClientCertificate clientCertificate;
 
     private List<String> capabilities;
 
@@ -259,6 +262,11 @@ public final class KieServicesConfigurationImpl
     }
 
     @Override
+    public ClientCertificate getClientCertificate() {
+        return clientCertificate;
+    }
+
+    @Override
     public ConnectionFactory getConnectionFactory() {
         return connectionFactory;
     }
@@ -300,7 +308,7 @@ public final class KieServicesConfigurationImpl
     }
 
     @Override
-    public boolean getUseUssl() {
+    public boolean getUseSsl() {
         return useSsl;
     }
 
@@ -333,6 +341,12 @@ public final class KieServicesConfigurationImpl
         if (credentialsProvider instanceof EnteredCredentialsProvider) {
             ((EnteredCredentialsProvider) credentialsProvider).setPassword(password);
         }
+        return this;
+    }
+
+    @Override
+    public KieServicesConfigurationImpl setClientCertificate(ClientCertificate clientCertificate) {
+        this.clientCertificate = clientCertificate;
         return this;
     }
 
@@ -449,6 +463,7 @@ public final class KieServicesConfigurationImpl
         this.responseHandler = config.responseHandler;
         this.jmsTransactional = config.jmsTransactional;
         this.headers = config.headers;
+        this.clientCertificate = config.clientCertificate;
     }
 
     @Override
