@@ -117,8 +117,10 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertThat(getMetrics()).contains(
                 "kie_server_start_time{name=\"" + serverName + "\",",
                 "kie_server_deployments_active_total{deployment_id=\"prometheus\",} 1.0",
-                "kie_server_container_started_total{container_id=\"prometheus\",} 1.0",
-                "kie_server_container_running_total{container_id=\"prometheus\",} 1.0"
+                "kie_server_container_running{container_id=\"prometheus\",} 1.0",
+                "kie_server_container_started{container_id=\"prometheus\",} 1.0",
+                "kie_server_container_started_total 2.0",
+                "kie_server_container_running_total 2"
         );
     }
 
