@@ -56,6 +56,7 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.FileInputStream;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,6 +76,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.security.AccessController;
 import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.security.PrivilegedAction;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
@@ -91,11 +93,13 @@ import java.util.zip.GZIPInputStream;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.core.MediaType;
+
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.SSLContexts;
 
 /**
  * This class is only meant to be used internally by the kie-server code! For interacting with the
@@ -122,6 +126,7 @@ public class KieServerHttpRequest {
     public static final String HEADER_SERVER = "Server";
     public static final String PARAM_CHARSET = "charset";
     private static final String[] EMPTY_STRINGS = new String[0];
+    private static final String IDENTITY_KEYSTORE_TYPE = "jks";
 
     // Request information
 
@@ -149,6 +154,7 @@ public class KieServerHttpRequest {
 
         String user;
         String password;
+        ClientCertificate clientCertificate;
 
         Integer timeoutInMilliSecs = DEFAULT_TIMEOUT_SECS * 1000;
 
@@ -238,6 +244,7 @@ public class KieServerHttpRequest {
             clone.requestUrl = requestUrl;
             clone.timeoutInMilliSecs = timeoutInMilliSecs;
             clone.user = user;
+            clone.clientCertificate = clientCertificate;
             return clone;
         }
     }
@@ -862,6 +869,28 @@ public class KieServerHttpRequest {
                         return false;
                     }
                 });
+                if (getRequestInfo().clientCertificate != null) {
+                    ClientCertificate clientCertificate = getRequestInfo().clientCertificate;
+                    try {
+                        final KeyStore identityKeyStore = KeyStore.getInstance(IDENTITY_KEYSTORE_TYPE);
+                        identityKeyStore.load(new FileInputStream(clientCertificate.getKeystore()),
+                                clientCertificate.getKeystorePassword().toCharArray());
+                        SSLContextBuilder contextBuilder = SSLContexts.custom()
+                                .loadKeyMaterial(identityKeyStore,
+                                        clientCertificate.getCertPassword().toCharArray(),
+                                        (map, socket) -> clientCertificate.getCertName());
+                        if (clientCertificate.getTruststore() != null) {
+                            final KeyStore trustStore = KeyStore.getInstance(IDENTITY_KEYSTORE_TYPE);
+                            trustStore.load(new FileInputStream(clientCertificate.getTruststore()),
+                                    clientCertificate.getTruststorePassword().toCharArray());
+                            contextBuilder.loadTrustMaterial(trustStore, null);
+                        }
+                        SSLSocketFactory socketFactory = contextBuilder.build().getSocketFactory();
+                        ((HttpsURLConnection) connection).setSSLSocketFactory(socketFactory);
+                    } catch (GeneralSecurityException | IOException e) {
+                        throw new RuntimeException("Unable to create SSLSocketFactory", e);
+                    }
+                }
             }
 
             connection.setRequestMethod(getRequestInfo().requestMethod);
@@ -1050,6 +1079,11 @@ public class KieServerHttpRequest {
      */
     public KieServerHttpRequest tokenAuthorization(final String token ) {
         return header(AUTHORIZATION, "Bearer " + token);
+    }
+
+    public KieServerHttpRequest clientCertificate(final ClientCertificate clientCertificate) {
+        getRequestInfo().clientCertificate = clientCertificate;
+        return this;
     }
 
     /**
@@ -1602,12 +1636,7 @@ public class KieServerHttpRequest {
 
     private static HostnameVerifier getTrustedVerifier() {
         if( TRUSTED_VERIFIER == null )
-            TRUSTED_VERIFIER = new HostnameVerifier() {
-
-                public boolean verify( String hostname, SSLSession session ) {
-                    return true;
-                }
-            };
+            TRUSTED_VERIFIER = (hostname, session) -> true;
 
         return TRUSTED_VERIFIER;
     }

@@ -11,24 +11,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.client;
 
-import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.client.balancer.LoadBalancer;
-import org.kie.server.client.jms.ResponseHandler;
-
-import javax.jms.ConnectionFactory;
-import javax.jms.Queue;
-import javax.naming.InitialContext;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jms.ConnectionFactory;
+import javax.jms.Queue;
+import javax.naming.InitialContext;
+
+import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.client.balancer.LoadBalancer;
+import org.kie.server.client.jms.ResponseHandler;
+import org.kie.server.common.rest.ClientCertificate;
+
 public interface KieServicesConfiguration {
-    public static enum Transport {
+
+    enum Transport {
         REST, JMS;
     }
 
@@ -43,6 +45,10 @@ public interface KieServicesConfiguration {
     String getPassword();
 
     KieServicesConfiguration setPassword(String password);
+
+    ClientCertificate getClientCertificate();
+
+    KieServicesConfiguration setClientCertificate(ClientCertificate clientCertificate);
 
     MarshallingFormat getMarshallingFormat();
 
@@ -66,7 +72,7 @@ public interface KieServicesConfiguration {
 
     KieServicesConfiguration setTimeout(long timeout);
 
-    boolean getUseUssl();
+    boolean getUseSsl();
 
     KieServicesConfiguration setUseSsl(boolean useSsl);
 

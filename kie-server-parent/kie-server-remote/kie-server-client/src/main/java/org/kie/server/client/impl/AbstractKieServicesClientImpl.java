@@ -474,7 +474,6 @@ public abstract class AbstractKieServicesClientImpl {
                 KieServerHttpRequest.newRequest( uri ).followRedirects( true ).timeout( config.getTimeout() );
         httpRequest.accept( getMediaType( config.getMarshallingFormat() ) );
         httpRequest.header(KieServerConstants.KIE_CONTENT_TYPE_HEADER, config.getMarshallingFormat().toString());
-
         if (config.getHeaders() != null) {
             for (Map.Entry<String, String> header : config.getHeaders().entrySet()) {
                 httpRequest.header(header.getKey(), header.getValue());
@@ -489,6 +488,7 @@ public abstract class AbstractKieServicesClientImpl {
                 httpRequest.header(config.getCredentialsProvider().getHeaderName(), authorization);
             }
         }
+        httpRequest.clientCertificate(config.getClientCertificate());
         // apply conversationId
         if (owner.getConversationId() != null) {
             httpRequest.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER, owner.getConversationId());
