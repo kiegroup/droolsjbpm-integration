@@ -31,6 +31,8 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.balancer.LoadBalancer;
 import org.kie.server.client.credentials.EnteredTokenCredentialsProvider;
+import org.kie.server.common.rest.ClientCertificate;
+import org.kie.server.common.rest.KieServerHttpRequestException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.Assert.*;
@@ -60,6 +62,60 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
         ServiceResponse<KieServerInfo> response = client.getServerInfo();
         assertSuccess(response);
         assertEquals("Server version", "1.2.3", response.getResult().getVersion());
+    }
+
+    @Test
+    public void testGetServerInfoWithClientCertificate() {
+        stubFor(get(urlEqualTo("/"))
+                .withHeader("Accept", equalTo("application/xml"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/xml")
+                        .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
+                                "  <kie-server-info>\n" +
+                                "    <version>1.2.3</version>\n" +
+                                "  </kie-server-info>\n" +
+                                "</response>")));
+
+        KieServicesConfiguration clientCertConfig = sslConfig.clone();
+        clientCertConfig.setClientCertificate(new ClientCertificate()
+                .setCertName("kie-client")
+                .setCertPassword("password")
+                .setKeystore("src/test/resources/2wayssl/client.jks")
+                .setKeystorePassword("password")
+                .setTruststore("src/test/resources/2wayssl/client-truststore.jks")
+                .setTruststorePassword("password"));
+        KieServicesClient client = KieServicesFactory.newKieServicesClient(clientCertConfig);
+        ServiceResponse<KieServerInfo> response = client.getServerInfo();
+        assertSuccess(response);
+        assertEquals("Server version", "1.2.3", response.getResult().getVersion());
+    }
+
+    @Test
+    public void testGetServerInfoWithUnauthenticatedClientCertificate() {
+        try {
+            KieServicesClient client = KieServicesFactory.newKieServicesClient(sslConfig);
+            fail("exception expected");
+        } catch (RuntimeException e) {
+            assertTrue(e.getCause() instanceof KieServerHttpRequestException);
+        }
+    }
+
+    @Test
+    public void testGetServerInfoWithUnauthorizedClientCertificate() {
+        try {
+            KieServicesConfiguration clientCertConfig = sslConfig.clone();
+            clientCertConfig.setClientCertificate(new ClientCertificate()
+                    .setCertName("other")
+                    .setCertPassword("password")
+                    .setKeystore("src/test/resources/2wayssl/client.jks")
+                    .setKeystorePassword("password")
+                    .setTruststore("src/test/resources/2wayssl/client-truststore.jks")
+                    .setTruststorePassword("password"));
+            KieServicesClient client = KieServicesFactory.newKieServicesClient(clientCertConfig);
+        } catch (RuntimeException e) {
+            assertTrue(e.getCause() instanceof KieServerHttpRequestException);
+        }
     }
 
     @Test
