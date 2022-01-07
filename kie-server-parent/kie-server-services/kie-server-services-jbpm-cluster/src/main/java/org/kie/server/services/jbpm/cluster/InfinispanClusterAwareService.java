@@ -21,6 +21,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
 import org.infinispan.Cache;
 import org.infinispan.CacheCollection;
 import org.infinispan.CacheSet;
@@ -51,7 +54,6 @@ public class InfinispanClusterAwareService implements ClusterAwareService {
     private static final Logger logger = LoggerFactory.getLogger(InfinispanClusterAwareService.class);
 
     private List<ClusterListener> listeners;
-    private EmbeddedCacheManager cacheManager;
 
     private String kieServerId;
     private String kieServerLocation;
@@ -72,8 +74,17 @@ public class InfinispanClusterAwareService implements ClusterAwareService {
         return new ClusterNode(kieServerId, kieServerLocation);
     }
 
-    public void init(EmbeddedCacheManager cacheManager) {
-        this.cacheManager = cacheManager;
+    private EmbeddedCacheManager lookup () {
+        try {
+            Context context = new InitialContext();
+            return (EmbeddedCacheManager) context.lookup(EJBCacheInitializer.CACHE_NAME_LOOKUP);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public void init() {
+        EmbeddedCacheManager cacheManager = lookup();
         cacheManager.addListener(this);
         Cache<Address, ClusterNode> nodes = cacheManager.<Address, ClusterNode> getCache(CLUSTER_NODES_KEY);
         nodes.addListener(this);
@@ -106,6 +117,7 @@ public class InfinispanClusterAwareService implements ClusterAwareService {
 
     @ViewChanged
     public void viewChanged(ViewChangedEvent event) {
+        EmbeddedCacheManager cacheManager = lookup();
         logger.info("jBPM cluster view changed. Current active nodes: {}", event.getNewMembers());
         if (Event.Type.VIEW_CHANGED.equals(event.getType()) && isCoordinator()) {
             List<Address> changedAddress = event.getNewMembers();
@@ -129,58 +141,71 @@ public class InfinispanClusterAwareService implements ClusterAwareService {
 
     @Override
     public boolean isCoordinator() {
+        EmbeddedCacheManager cacheManager = lookup();
         return cacheManager.isCoordinator();
     }
 
     @Override
     public Collection<ClusterNode> getActiveClusterNodes() {
+        EmbeddedCacheManager cacheManager = lookup();
         return cacheManager.<Address, ClusterNode> getCache(CLUSTER_NODES_KEY).values();
     }
 
     @Override
     public <T> void removeData(String key, String partition, T value) {
+        EmbeddedCacheManager cacheManager = lookup();
         if (!cacheManager.cacheExists(key)) {
             return;
         }
         Cache<String, List<T>> cache = cacheManager.<String, List<T>> getCache(key);
-        List<T> values = cache.get(partition);
-        if(values == null) {
-            return;
+
+        synchronized (this) {
+            List<T> values = cache.computeIfAbsent(partition, (k) -> new ArrayList<>());
+            values.remove(value);
+            cache.put(partition, values);
         }
-        values.remove(value);
-        cache.put(partition, values);
+
     }
 
     @Override
     public <T> void addData(String key, String partition, T value) {
+        EmbeddedCacheManager cacheManager = lookup();
         if (!cacheManager.cacheExists(key)) {
             return;
         }
+
         Cache<String, List<T>> cache = cacheManager.<String, List<T>> getCache(key);
-        List<T> values = cache.get(partition);
-        if(values == null) {
-            values = new ArrayList<>();
+
+        synchronized (this) {
+            List<T> values = cache.computeIfAbsent(partition, (k) -> new ArrayList<>());
+            values.add(value);
+            cache.put(partition, values);
         }
-        values.add(value);
-        cache.put(partition, values);
+
     }
 
     @Override
     public <T> List<T> getData(String key) {
+        EmbeddedCacheManager cacheManager = lookup();
         if (!cacheManager.cacheExists(key)) {
             return emptyList();
         }
-        CacheCollection<List<T>> values = cacheManager.<String, List<T>> getCache(key).values();
-        return values.stream().flatMap(Collection::stream).collect(toList());
+        synchronized (this) {
+            CacheCollection<List<T>> values = cacheManager.<String, List<T>> getCache(key).values();
+            return values.stream().flatMap(Collection::stream).collect(toList());
+        }
     }
 
     @Override
     public <T> List<T> getDataFromPartition(String key, String partition) {
+        EmbeddedCacheManager cacheManager = lookup();
         if (!cacheManager.cacheExists(key)) {
             return emptyList();
         }
-        List<T> values = cacheManager.<String, List<T>> getCache(key).get(partition);
-        return values == null ? emptyList() : values;
+        synchronized (this) {
+            List<T> values = cacheManager.<String, List<T>> getCache(key).get(partition);
+            return values == null ? emptyList() : values;
+        }
     }
 
     @Override

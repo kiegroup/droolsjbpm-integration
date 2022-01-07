@@ -54,7 +54,7 @@ public class EJBCacheInitializer {
     @PostConstruct
     public void init() {
         ClusterAwareService clusterService = ServiceRegistry.getService(ClusterAwareService.class);
-        ((InfinispanClusterAwareService) clusterService).init(cacheManager);
+        ((InfinispanClusterAwareService) clusterService).init();
     }
 
 }
