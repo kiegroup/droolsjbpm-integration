@@ -25,19 +25,20 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.kie.server.router.ConfigurationManager;
+import org.kie.server.router.proxy.aggragate.ResponseAggregator;
+
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.ResponseCodeHandler;
-import io.undertow.server.handlers.proxy.ProxyHandler;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
-import org.kie.server.router.proxy.aggragate.ResponseAggregator;
 
 public class QueriesDataHttpHandler extends AbstractAggregateHttpHandler {
 
-    public QueriesDataHttpHandler(HttpHandler httpHandler, AdminHttpHandler adminHandler) {
-        super(httpHandler, adminHandler);
+    public QueriesDataHttpHandler(HttpHandler httpHandler, ConfigurationManager configurationManager) {
+        super(httpHandler, configurationManager);
     }
 
     @Override
@@ -111,8 +112,8 @@ public class QueriesDataHttpHandler extends AbstractAggregateHttpHandler {
             String response = "";
 
             if (returnResponses.size() > 0) {
-                ResponseAggregator responseAggregator = adminHandler.getAggregators().stream().filter(a -> a.supports(kieContentType, accept, DEFAULT_ACCEPT)).findFirst().orElseThrow(() ->
-                                new RuntimeException("not possible to find response aggregator for " + responseHeaders.get(Headers.ACCEPT))
+                ResponseAggregator responseAggregator = configurationManager.getConfiguration().getAggregators().stream().filter(a -> a.supports(kieContentType, accept, DEFAULT_ACCEPT)).findFirst().orElseThrow(() ->
+                                new RuntimeException("not possible to find response aggregator for " + responseHeaders.get(accept.toString()))
                 );
 
                 if (supportAdvancedAggregate() && useAdvanced) {
