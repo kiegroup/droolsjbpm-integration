@@ -15,12 +15,14 @@
 
 package org.kie.server.router.handlers;
 
+import org.kie.server.router.ConfigurationManager;
+
 import io.undertow.server.HttpHandler;
 
 public class DocumentsHttpHandler extends AbstractAggregateHttpHandler {
 
-    public DocumentsHttpHandler(HttpHandler httpHandler, AdminHttpHandler adminHandler) {
-        super(httpHandler, adminHandler);
+    public DocumentsHttpHandler(HttpHandler httpHandler, ConfigurationManager configurationManager) {
+        super(httpHandler, configurationManager);
     }
 
 }
