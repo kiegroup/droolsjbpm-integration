@@ -31,15 +31,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import org.jboss.logging.Logger;
+import org.kie.server.router.ConfigurationManager;
+import org.kie.server.router.proxy.aggragate.ResponseAggregator;
+import org.kie.server.router.utils.MediaTypeUtil;
+
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.ResponseCodeHandler;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
-import org.jboss.logging.Logger;
-import org.kie.server.router.proxy.aggragate.ResponseAggregator;
-import org.kie.server.router.utils.MediaTypeUtil;
 
 
 public abstract class AbstractAggregateHttpHandler implements HttpHandler {
@@ -52,13 +54,13 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
     protected static final String DEFAULT_ACCEPT = "application/xml";
 
     protected HttpHandler httpHandler;
-    protected AdminHttpHandler adminHandler;
+    protected ConfigurationManager configurationManager;
 
     private RoundRobinHostSelector selector = new RoundRobinHostSelector();
 
-    public AbstractAggregateHttpHandler(HttpHandler httpHandler, AdminHttpHandler adminHandler) {
+    public AbstractAggregateHttpHandler(HttpHandler httpHandler, ConfigurationManager configurationManager) {
         this.httpHandler = httpHandler;
-        this.adminHandler = adminHandler;
+        this.configurationManager = configurationManager;
     }
 
     @Override
@@ -126,7 +128,7 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
         HeaderValues accept = exchange.getRequestHeaders().get(Headers.ACCEPT);
         HeaderValues kieContentType = exchange.getRequestHeaders().get("X-KIE-ContentType");
 
-        ResponseAggregator responseAggregator = adminHandler.getAggregators().stream().filter(a -> a.supports(kieContentType, accept, DEFAULT_ACCEPT)).findFirst().orElseThrow(() ->
+        ResponseAggregator responseAggregator = configurationManager.getConfiguration().getAggregators().stream().filter(a -> a.supports(kieContentType, accept, DEFAULT_ACCEPT)).findFirst().orElseThrow(() ->
                         new RuntimeException("not possible to find response aggregator for " + responseHeaders.get(Headers.ACCEPT))
         );
 
@@ -242,8 +244,7 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
     }
 
     protected Set<String> getServerHosts() {
-
-        return adminHandler.getHostsPerServer().values().stream().map(hosts -> {
+        return configurationManager.getConfiguration().getHostsPerServer().values().stream().map(hosts -> {
             Set<String> uniqueHosts = new LinkedHashSet<>(hosts);
             return selector.selectHost(uniqueHosts.toArray(new String[uniqueHosts.size()]));
         }).filter(host -> host != null)
@@ -252,7 +253,7 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
 
     protected void removeHostOnException(String url, Exception e) {
         if (e instanceof SocketException || e instanceof UnknownHostException) {
-            adminHandler.removeUnavailableServer(url);
+            configurationManager.disconnectFailedHost(url);
             log.warn("Removed host '" + url + "' due to its unavailability (cause " + e.getMessage() + ")");
         }
     }

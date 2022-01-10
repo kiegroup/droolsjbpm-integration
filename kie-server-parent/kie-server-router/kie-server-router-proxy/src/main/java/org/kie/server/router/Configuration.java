@@ -18,7 +18,6 @@ package org.kie.server.router;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +25,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.jboss.logging.Logger;
-import org.kie.server.router.spi.ConfigRepository;
+import org.kie.server.router.proxy.aggragate.JSONResponseAggregator;
+import org.kie.server.router.proxy.aggragate.JaxbXMLResponseAggregator;
+import org.kie.server.router.proxy.aggragate.ResponseAggregator;
+import org.kie.server.router.proxy.aggragate.XstreamXMLResponseAggregator;
 import org.kie.server.router.utils.FailedHostInfo;
 
 public class Configuration {
@@ -38,7 +40,15 @@ public class Configuration {
     private Map<String, List<ContainerInfo>> containerInfosPerContainer = new ConcurrentHashMap<>();
 
     private Set<ConfigurationListener> listeners = new CopyOnWriteArraySet<>();
-    
+
+    private List<ResponseAggregator> aggregators = new ArrayList<>();
+
+    public Configuration() {
+        this.aggregators.add(new JSONResponseAggregator());
+        this.aggregators.add(new XstreamXMLResponseAggregator());
+        this.aggregators.add(new JaxbXMLResponseAggregator());
+    }
+
     public Map<String, List<String>> getHostsPerServer() {
         return hostsPerServer;
     }
@@ -75,13 +85,14 @@ public class Configuration {
 
     public void addContainerInfo(ContainerInfo containerInfo) {
         List<ContainerInfo> containersByAlias = containerInfosPerContainer.get(containerInfo.getAlias());
+        List<ContainerInfo> containersById = containerInfosPerContainer.get(containerInfo.getContainerId());
+
         if (containersByAlias == null) {
             containersByAlias = new ArrayList<>();
             containerInfosPerContainer.put(containerInfo.getAlias(), containersByAlias);
         }
         containersByAlias.add(containerInfo);
 
-        List<ContainerInfo> containersById = containerInfosPerContainer.get(containerInfo.getContainerId());
         if (containersById == null) {
             containersById = new ArrayList<>();
             containerInfosPerContainer.put(containerInfo.getContainerId(), containersById);
@@ -207,8 +218,15 @@ public class Configuration {
             hostsPerServer.put(serverId, hosts);
         }
     }
-    
-    public synchronized void reloadFrom(Configuration updated) {
+
+
+    public void reloadFromRepository(Configuration loaded) {
+        this.containerInfosPerContainer = loaded.getContainerInfosPerContainer();
+        this.hostsPerContainer = loaded.getHostsPerContainer();
+        this.hostsPerServer = loaded.getHostsPerServer();
+    }
+
+    public void syncFromRepository(Configuration updated) {
         this.containerInfosPerContainer = updated.getContainerInfosPerContainer();
         
         // remove items if they are not existing in updated configuration        
@@ -278,13 +296,8 @@ public class Configuration {
         
         this.listeners.forEach(l -> l.onConfigurationReloaded());
     }
-    
-    public synchronized void reloadFromRepository(ConfigRepository repository) {
-        
-        Configuration loaded = repository.load();
-        
-        this.containerInfosPerContainer = loaded.getContainerInfosPerContainer();
-        this.hostsPerContainer = loaded.getHostsPerContainer();
-        this.hostsPerServer = loaded.getHostsPerServer();
+
+    public List<ResponseAggregator>  getAggregators() {
+        return Collections.unmodifiableList(aggregators);
     }
 }

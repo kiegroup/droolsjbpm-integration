@@ -15,22 +15,6 @@
 
 package org.kie.server.router.proxy;
 
-import io.undertow.protocols.ssl.UndertowXnioSsl;
-import io.undertow.server.HttpServerExchange;
-import io.undertow.server.handlers.proxy.LoadBalancingProxyClient;
-import io.undertow.server.handlers.proxy.ProxyCallback;
-import io.undertow.server.handlers.proxy.ProxyClient;
-import io.undertow.server.handlers.proxy.ProxyConnection;
-import org.jboss.logging.Logger;
-import org.kie.server.router.Configuration;
-import org.kie.server.router.ConfigurationListener;
-import org.kie.server.router.handlers.AdminHttpHandler;
-import org.kie.server.router.spi.ContainerResolver;
-import org.kie.server.router.spi.RestrictionPolicy;
-import org.kie.server.router.utils.SSLContextBuilder;
-import org.xnio.ssl.XnioSsl;
-
-import javax.net.ssl.SSLContext;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.UnknownHostException;
@@ -41,6 +25,23 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.SSLContext;
+
+import org.jboss.logging.Logger;
+import org.kie.server.router.ConfigurationListener;
+import org.kie.server.router.ConfigurationManager;
+import org.kie.server.router.spi.ContainerResolver;
+import org.kie.server.router.spi.RestrictionPolicy;
+import org.kie.server.router.utils.SSLContextBuilder;
+import org.xnio.ssl.XnioSsl;
+
+import io.undertow.protocols.ssl.UndertowXnioSsl;
+import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.proxy.LoadBalancingProxyClient;
+import io.undertow.server.handlers.proxy.ProxyCallback;
+import io.undertow.server.handlers.proxy.ProxyClient;
+import io.undertow.server.handlers.proxy.ProxyConnection;
 
 public class KieServerProxyClient implements ProxyClient, ConfigurationListener {
 
@@ -54,16 +55,14 @@ public class KieServerProxyClient implements ProxyClient, ConfigurationListener 
 
     private Map<String, CaptureHostLoadBalancingProxyClient> containerClients = new ConcurrentHashMap<>();
 
-    private Configuration configuration;
-    private AdminHttpHandler adminHandler;
+    private ConfigurationManager configurationManager;
 
     private String userProvidedTruststore = System.getProperty("javax.net.ssl.trustStore", "");
     private String userProvidedTruststorePassword = System.getProperty("javax.net.ssl.trustStorePassword", "");
 
-    public KieServerProxyClient(Configuration configuration, AdminHttpHandler adminHandler) {
-        this.configuration = configuration;
-        this.adminHandler = adminHandler;
-        this.configuration.addListener(this);
+    public KieServerProxyClient(ConfigurationManager configurationManager) {
+        this.configurationManager = configurationManager;
+        this.configurationManager.getConfiguration().addListener(this);
         List<ContainerResolver> foundResolvers = new ArrayList<>();
         containerResolverServiceLoader.forEach(cr -> foundResolvers.add(cr));
 
@@ -118,7 +117,7 @@ public class KieServerProxyClient implements ProxyClient, ConfigurationListener 
     @Override
     public ProxyTarget findTarget(HttpServerExchange exchange) {
 
-        String containerId = containerResolver.resolveContainerId(exchange, configuration.getContainerInfosPerContainer());
+        String containerId = containerResolver.resolveContainerId(exchange, configurationManager.getConfiguration().getContainerInfosPerContainer());
         if (restrictionPolicy.restrictedEndpoint(exchange, containerId)) {
             log.debugf("URL %s is restricted according to policy %s", exchange.getRelativePath(), restrictionPolicy.toString());
             return null;
@@ -134,7 +133,7 @@ public class KieServerProxyClient implements ProxyClient, ConfigurationListener 
 
     @Override
     public void getConnection(ProxyTarget target, HttpServerExchange exchange, final ProxyCallback<ProxyConnection> callback, long timeout, TimeUnit timeUnit) {
-        String containerId = containerResolver.resolveContainerId(exchange, configuration.getContainerInfosPerContainer());
+        String containerId = containerResolver.resolveContainerId(exchange, configurationManager.getConfiguration().getContainerInfosPerContainer());
         CaptureHostLoadBalancingProxyClient client = containerClients.get(containerId);
         try {
             client.getConnection(target, exchange, new ProxyCallback<ProxyConnection>() {
@@ -146,7 +145,7 @@ public class KieServerProxyClient implements ProxyClient, ConfigurationListener 
                 @Override
                 public void failed(HttpServerExchange httpServerExchange) {
                     try {
-                        adminHandler.removeUnavailableServer(client.getUri());
+                        configurationManager.disconnectFailedHost(client.getUri());
                     } finally {
                         callback.failed(exchange);
                         client.clear();
@@ -169,7 +168,7 @@ public class KieServerProxyClient implements ProxyClient, ConfigurationListener 
                     || e instanceof UnresolvedAddressException
                     // xnio throws IllegalArgumentException for unresolvable host
                     || e instanceof IllegalArgumentException) {
-                adminHandler.removeUnavailableServer(client.getUri());
+                configurationManager.disconnectFailedHost(client.getUri());
             }
 
             throw new RuntimeException(e);

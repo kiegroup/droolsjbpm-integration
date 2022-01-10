@@ -91,9 +91,11 @@ public class KieServerRouter {
     private Undertow server;
     private ConfigRepository repository;
 
-    private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(8);
     private ScheduledFuture<?> controllerConnectionAttempts;
     private KieServerRouterEnvironment env;
+
+    private ConfigurationManager configurationManager;
 
     public KieServerRouter() {
         this(new KieServerRouterEnvironment());
@@ -177,18 +179,20 @@ public class KieServerRouter {
         
         boolean isHttpEnabled = environment().isHttpEnabled();
 
-        Configuration configuration = repository.load();
+        configurationManager = new ConfigurationManager(environment(), repository, executorService);
+        Configuration configuration = configurationManager.getConfiguration();
 
         for (ConfigurationListener listener : listeners) {
-            configuration.addListener(listener);
+            configurationManager.getConfiguration().addListener(listener);
         }
 
-        AdminHttpHandler adminHandler = new AdminHttpHandler(environment(),
-                                                             configuration,
-                                                             repository,
-                                                             executorService);
-        final KieServerProxyClient proxyClient = new KieServerProxyClient(configuration,
-                                                                          adminHandler);
+        // setup config file watcher to be updated when changes are discovered
+        if (environment().isConfigFileWatcherEnabled()) {
+            configurationManager.startWatcher();
+        }
+
+        AdminHttpHandler adminHandler = new AdminHttpHandler(configurationManager);
+        final KieServerProxyClient proxyClient = new KieServerProxyClient(configurationManager);
         Map<String, List<String>> perContainer = configuration.getHostsPerContainer();
 
         for (Map.Entry<String, List<String>> entry : perContainer.entrySet()) {
@@ -206,25 +210,20 @@ public class KieServerRouter {
         .setMaxRequestTime(-1)
         .setRewriteHostHeader(true)
         .setReuseXForwarded(false)        
-        .setNext(new OptionsHttpHandler(notFoundHandler, adminHandler))        
+        .setNext(new OptionsHttpHandler(notFoundHandler, configurationManager))        
         .build();
         
         PathHandler pathHandler = Handlers.path(proxyHandler);
         pathHandler.addPrefixPath("/queries/definitions",
-                                  new QueriesDataHttpHandler(notFoundHandler,
-                                                             adminHandler));
+                                  new QueriesDataHttpHandler(notFoundHandler, configurationManager));
         pathHandler.addPrefixPath("/queries",
-                                  new QueriesHttpHandler(notFoundHandler,
-                                                         adminHandler));
+                                  new QueriesHttpHandler(notFoundHandler, configurationManager));
         pathHandler.addPrefixPath("/jobs",
-                                  new JobsHttpHandler(proxyHandler,
-                                                      adminHandler));
+                                  new JobsHttpHandler(proxyHandler, configurationManager));
         pathHandler.addPrefixPath("/documents",
-                                  new DocumentsHttpHandler(notFoundHandler,
-                                                           adminHandler));
+                                  new DocumentsHttpHandler(notFoundHandler, configurationManager));
         pathHandler.addExactPath("/containers",
-                                 new ContainersHttpHandler(notFoundHandler,
-                                                           adminHandler));
+                                 new ContainersHttpHandler(notFoundHandler, configurationManager));
 
         if (environment().isManagementSecured()) {
             IdentityManager idm = getIdentityService();
@@ -278,14 +277,17 @@ public class KieServerRouter {
             logServerInfo("KieServerRouter started on: ", host, port, portTls);
         }
         
-        connectToController(adminHandler);
+        connectToController(configurationManager);
     }
     
     public void stop() {
         stop(false);
+        
     }
 
     public void stop(boolean clean) {
+        configurationManager.close();
+
         executorService.shutdownNow();
         disconnectToController();
         if (server != null) {
@@ -317,31 +319,31 @@ public class KieServerRouter {
     }
 
 
-    protected void connectToController(AdminHttpHandler adminHandler) {
+    protected void connectToController(ConfigurationManager configurationManager) {
         if (!environment().hasKieControllerUrl()) {
             return;
         }
         try {
             String jsonResponse = HttpUtils.putHttpCall(environment(), environment().getKieControllerUrl() + "/server/" + environment().getRouterId(),  buildServerInfo(environment()));
             log.debugf("Controller response :: ", jsonResponse);
-            boostrapFromControllerResponse(jsonResponse, adminHandler);
+            boostrapFromControllerResponse(configurationManager, jsonResponse);
             log.infof("KieServerRouter connected to controller at " + environment().getKieControllerUrl());
         } catch (Exception e) {
             log.error("Error when connecting to controller at " + environment().getKieControllerUrl() + " due to " + e.getMessage());
             log.debug(e);
-            controllerConnectionAttempts = executorService.scheduleAtFixedRate(() -> tryToConnectToController(adminHandler),
+            controllerConnectionAttempts = executorService.scheduleAtFixedRate(() -> tryToConnectToController(configurationManager),
                     environment().getKieControllerAttemptInterval(),
                     environment().getKieControllerAttemptInterval(),
                     TimeUnit.SECONDS);
         }
     }
 
-    private void tryToConnectToController(AdminHttpHandler adminHandler) {
+    private void tryToConnectToController(ConfigurationManager configurationManager) {
         try {
             String jsonResponse = HttpUtils.putHttpCall(environment(), environment().getKieControllerUrl() + "/server/" + environment().getRouterId(), buildServerInfo(environment()));
             log.debugf("Controller response :: ",
                        jsonResponse);
-            boostrapFromControllerResponse(jsonResponse, adminHandler);
+            boostrapFromControllerResponse(configurationManager, jsonResponse);
 
             controllerConnectionAttempts.cancel(false);
             log.infof("KieServerRouter connected to controller at " + environment().getKieControllerUrl());
@@ -365,8 +367,7 @@ public class KieServerRouter {
         }
     }
 
-    protected void boostrapFromControllerResponse(String jsonResponse,
-                                                  AdminHttpHandler adminHandler) throws JSONException {
+    protected void boostrapFromControllerResponse(ConfigurationManager configurationManager, String jsonResponse) throws JSONException {
         List<String> containers = new ArrayList<>();
 
         JSONObject serverConfig = new JSONObject(jsonResponse);
@@ -379,11 +380,10 @@ public class KieServerRouter {
             }
         } catch (JSONException e) {
             // if the server template did not exist the containers can be null, meaning not JSONArray
-            log.debug("Error when getting list of containers:: " + e.getMessage(),
-                      e);
+            log.debug("Error when getting list of containers:: " + e.getMessage(), e);
         }
 
-        adminHandler.addControllerContainers(containers);
+        configurationManager.addControllerContainers(containers);
     }
 
     private static class IdentityServiceNotFound extends RuntimeException {

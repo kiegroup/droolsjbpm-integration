@@ -15,12 +15,16 @@
 
 package org.kie.server.router.handlers;
 
+
+
+import org.kie.server.router.ConfigurationManager;
+
 import io.undertow.server.HttpHandler;
 
 public class ContainersHttpHandler extends AbstractAggregateHttpHandler {
 
-    public ContainersHttpHandler(HttpHandler httpHandler, AdminHttpHandler adminHandler) {
-        super(httpHandler, adminHandler);
+    public ContainersHttpHandler(HttpHandler httpHandler, ConfigurationManager configurationManager) {
+        super(httpHandler, configurationManager);
     }
 
     @Override

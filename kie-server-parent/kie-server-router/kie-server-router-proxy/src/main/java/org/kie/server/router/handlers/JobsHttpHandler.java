@@ -15,6 +15,8 @@
 
 package org.kie.server.router.handlers;
 
+import org.kie.server.router.ConfigurationManager;
+
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
@@ -23,8 +25,8 @@ public class JobsHttpHandler extends AbstractAggregateHttpHandler {
     
     private static final String PREFIX = "/jobs";
 
-    public JobsHttpHandler(HttpHandler httpHandler, AdminHttpHandler adminHandler) {
-        super(httpHandler, adminHandler);
+    public JobsHttpHandler(HttpHandler httpHandler, ConfigurationManager configurationManager) {
+        super(httpHandler, configurationManager);
     }
 
     @Override

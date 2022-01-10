@@ -154,7 +154,7 @@ public class ConfigurationTest {
         ContainerInfo updatedContainerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
         updated.addContainerInfo(updatedContainerInfo);
         
-        config.reloadFrom(updated);
+        config.syncFromRepository(updated);
         
         assertEquals(2, config.getHostsPerContainer().size());
         assertEquals(2, config.getHostsPerServer().size());
@@ -186,7 +186,7 @@ public class ConfigurationTest {
         ContainerInfo updatedContainerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
         updated.addContainerInfo(updatedContainerInfo);
         
-        config.reloadFrom(updated);
+        config.syncFromRepository(updated);
         
         assertEquals(1, config.getHostsPerContainer().size());
         assertEquals(1, config.getHostsPerServer().size());
@@ -221,7 +221,7 @@ public class ConfigurationTest {
         ContainerInfo updatedContainerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
         updated.addContainerInfo(updatedContainerInfo);
         
-        config.reloadFrom(updated);
+        config.syncFromRepository(updated);
         
         assertEquals(1, config.getHostsPerContainer().size());
         assertEquals(1, config.getHostsPerServer().size());
@@ -259,7 +259,7 @@ public class ConfigurationTest {
         ContainerInfo updatedContainerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
         updated.addContainerInfo(updatedContainerInfo);
         
-        config.reloadFrom(updated);
+        config.syncFromRepository(updated);
         
         assertEquals(1, config.getHostsPerContainer().size());
         assertEquals(1, config.getHostsPerServer().size());
@@ -311,24 +311,7 @@ public class ConfigurationTest {
         assertEquals(1, config.getHostsPerServer().get("server1").size());
         assertEquals(1, config.getHostsPerServer().get("server2").size());
 
-        config.reloadFromRepository(new ConfigRepository() {
-            
-            
-            @Override
-            public void persist(Configuration configuration) {
-                
-            }
-            
-            @Override
-            public Configuration load() {
-                return new Configuration();
-            }
-            
-            @Override
-            public void clean() {
-                
-            }
-        });
+        config.syncFromRepository(new Configuration());
 
         assertEquals(0, config.getHostsPerContainer().size());
         assertEquals(0, config.getHostsPerServer().size());
@@ -365,11 +348,29 @@ public class ConfigurationTest {
         containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
         updated.addContainerInfo(containerInfo);
 
-        config.reloadFrom(updated);
+        config.syncFromRepository(updated);
 
         Assertions.assertThat(config.getHostsPerContainer()).hasSize(1);
         Assertions.assertThat(config.getHostsPerServer()).hasSize(1);
         Assertions.assertThat(config.getHostsPerContainer().get("container1")).hasSize(1);
         Assertions.assertThat(config.getHostsPerServer().get("server1")).hasSize(1);
+    }
+
+    @Test
+    public void testAliasEqualsContainerId() {
+
+        Configuration config = new Configuration();
+
+        config.addContainerHost("container1", "http://localhost:8080/server");
+        config.addContainerHost("container2", "http://localhost:8180/server");
+
+        config.addServerHost("server1", "http://localhost:8080/server");
+        config.addServerHost("server2", "http://localhost:8180/server");
+
+        ContainerInfo containerInfo = new ContainerInfo("test", "test", "org.kie:test:1.0");
+        config.addContainerInfo(containerInfo);
+
+        assertEquals(1,  config.getContainerInfosPerContainer().get("test").size());
+
     }
 }
