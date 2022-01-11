@@ -16,35 +16,90 @@
 
 package org.kie.server.services.jbpm.security;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.jbpm.services.task.identity.adapter.UserGroupAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.wildfly.security.auth.server.RealmIdentity;
+import org.wildfly.security.auth.server.RealmUnavailableException;
 import org.wildfly.security.auth.server.SecurityDomain;
 import org.wildfly.security.auth.server.SecurityIdentity;
+import org.wildfly.security.authz.AuthorizationFailureException;
 
 public class ElytronUserGroupAdapter implements UserGroupAdapter {
+
+    private static final Logger logger = LoggerFactory.getLogger(ElytronUserGroupAdapter.class);
 
     @Override
     public List<String> getGroupsForUser(String userId) {
 
-        Optional<SecurityIdentity> identityOptional = getCurrentSecurityIdentity();
-
-        if (identityOptional.isPresent()) {
-            SecurityIdentity identity = identityOptional.get();
-            if (identity.getPrincipal().getName().equals(userId)) {
-                return StreamSupport.stream(identity.getRoles().spliterator(), false)
-                        .collect(Collectors.toList());
-            }
+        String userName = getUserName();
+        logger.debug("Identifier Elytron as {}", userId);
+        if (userName == null) {
+            return new ArrayList<>();
         }
 
-        return Collections.emptyList();
+        if (userId.equals(userName)) {
+            logger.debug("User identified as {} but auth as {}", userId, userName);
+            return toPrincipalRoles(userId);
+        } else {
+            try {
+                if (runAsPrincipalExists(userId)) {
+                    logger.debug("Executing run as {}", userId);
+                   return toRunAsPrincipalRoles(userId, true);
+                } else {
+                   return new ArrayList<>();
+                }
+            } catch (AuthorizationFailureException ex) {
+                return toRunAsPrincipalRoles(userId, false);
+            } catch (RealmUnavailableException | SecurityException e) {
+                return new ArrayList<>();
+            }
+        }
     }
 
-    private Optional<SecurityIdentity> getCurrentSecurityIdentity() {
+    public List<String> toPrincipalRoles(String userId) {
+        return toRoles(getCurrentSecurityIdentity().get());
+    }
+
+    public List<String> toRunAsPrincipalRoles(String userId, boolean authenticate) {
+        return toRoles(getCurrentSecurityIdentity().get().createRunAsIdentity(userId, authenticate));
+    }
+
+    public String getUserName() {
+        Optional<SecurityIdentity> identityOptional = getCurrentSecurityIdentity();
+        return identityOptional.isPresent() ? identityOptional.get().getPrincipal().getName() : null;
+    }
+
+    public List<String> toRoles(SecurityIdentity securityIdentity) {
+        if (securityIdentity == null) {
+            return new ArrayList<>();
+        }
+
+        List<String> roles = StreamSupport.stream(securityIdentity.getRoles().spliterator(), false)
+                .collect(Collectors.toCollection(ArrayList::new));
+        return roles;
+    }
+
+    public boolean runAsPrincipalExists(String runAsPrincipal) throws RealmUnavailableException {
+        SecurityDomain securityDomain = SecurityDomain.getCurrent();
+        RealmIdentity realmIdentity = null;
+        try {
+            realmIdentity = securityDomain.getIdentity(runAsPrincipal);
+            return realmIdentity.exists();
+        } finally {
+            if (realmIdentity != null) {
+                realmIdentity.dispose();
+            }
+        }
+    }
+
+    public Optional<SecurityIdentity> getCurrentSecurityIdentity() {
         SecurityDomain securityDomain = SecurityDomain.getCurrent();
         if (securityDomain == null) {
             return Optional.empty();
