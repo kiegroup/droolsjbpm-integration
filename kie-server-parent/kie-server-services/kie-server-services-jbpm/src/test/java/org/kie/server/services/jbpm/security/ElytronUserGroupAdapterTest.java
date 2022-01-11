@@ -16,29 +16,20 @@
 
 package org.kie.server.services.jbpm.security;
 
-import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.wildfly.security.auth.server.SecurityDomain;
-import org.wildfly.security.auth.server.SecurityIdentity;
-import org.wildfly.security.authz.Roles;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.wildfly.security.auth.server.RealmUnavailableException;
 
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-@PowerMockIgnore("javax.security.auth.*")
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({SecurityDomain.class, SecurityIdentity.class})
+@RunWith(MockitoJUnitRunner.class)
 public class ElytronUserGroupAdapterTest {
 
     private static final String USER_ID = "user";
@@ -48,39 +39,15 @@ public class ElytronUserGroupAdapterTest {
     private static final String ROLE_2 = "role2";
     private static final String ROLE_3 = "role3";
 
-    private SecurityIdentity identity;
 
     @Mock
-    private Principal principal;
-
-    @Mock
-    private Roles roles;
-
-    @Mock
-    private SecurityDomain securityDomain;
-
     private ElytronUserGroupAdapter adapter;
-    
-    @Before
-    public void init() {
-        mockStatic(SecurityDomain.class);
-        when(SecurityDomain.getCurrent()).thenReturn(securityDomain);
 
-        when(principal.getName()).thenReturn(USER_ID);
-        identity = mock(SecurityIdentity.class);
-        when(identity.getPrincipal()).thenReturn(principal);
-        when(identity.getRoles()).thenReturn(roles);
-        when(roles.spliterator()).thenReturn(Arrays.asList(ROLE_1, ROLE_2, ROLE_3).spliterator());
-
-        when(securityDomain.getCurrentSecurityIdentity()).thenReturn(identity);
-
-        adapter = new ElytronUserGroupAdapter();
-    }
 
     @Test
     public void testNoSecurityContext() {
-        when(SecurityDomain.getCurrent()).thenReturn(null);
-
+        when(adapter.getGroupsForUser(Mockito.anyObject())).thenCallRealMethod();
+        when(adapter.getUserName()).thenReturn(null);
         List<String> roles = adapter.getGroupsForUser(USER_ID);
 
         Assertions.assertThat(roles)
@@ -90,7 +57,8 @@ public class ElytronUserGroupAdapterTest {
 
     @Test
     public void testSecurityContextNoIdentity() {
-        when(securityDomain.getCurrentSecurityIdentity()).thenReturn(null);
+        when(adapter.getGroupsForUser(Mockito.anyObject())).thenCallRealMethod();
+        when(adapter.getUserName()).thenReturn(USER_ID);
 
         List<String> roles = adapter.getGroupsForUser(USER_ID);
 
@@ -100,16 +68,26 @@ public class ElytronUserGroupAdapterTest {
     }
 
     @Test
-    public void testSecurityForWrongUser() {
+    public void testSecurityForWrongUser() throws RealmUnavailableException {
+        when(adapter.getGroupsForUser(Mockito.anyObject())).thenCallRealMethod();
+        when(adapter.getUserName()).thenReturn(USER_ID);
+        when(adapter.runAsPrincipalExists(WRONG_USER_ID)).thenReturn(true);
+        when(adapter.toRunAsPrincipalRoles(WRONG_USER_ID, true)).thenReturn(Arrays.asList(ROLE_1, ROLE_2));
+
         List<String> roles = adapter.getGroupsForUser(WRONG_USER_ID);
 
         Assertions.assertThat(roles)
                 .isNotNull()
-                .isEmpty();
+                .hasSize(2)
+                .contains(ROLE_1, ROLE_2);
     }
 
     @Test
     public void testSecurityForLoggedUser() {
+        when(adapter.getGroupsForUser(Mockito.anyObject())).thenCallRealMethod();
+        when(adapter.getUserName()).thenReturn(USER_ID);
+        when(adapter.toPrincipalRoles(Mockito.anyObject())).thenReturn(Arrays.asList(ROLE_1, ROLE_2, ROLE_3));
+
         List<String> roles = adapter.getGroupsForUser(USER_ID);
 
         Assertions.assertThat(roles)
