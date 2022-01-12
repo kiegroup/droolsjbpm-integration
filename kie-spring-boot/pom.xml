@@ -33,7 +33,7 @@
   </modules>
 
   <properties>
-    <version.me.snowdrop.narayana>2.6.1.redhat-00001</version.me.snowdrop.narayana>
+    <version.me.snowdrop.narayana>2.6.1</version.me.snowdrop.narayana>
     <version.org.apache.commons-dbcp2>2.4.0</version.org.apache.commons-dbcp2>
   </properties>
 
