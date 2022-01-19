@@ -106,11 +106,13 @@ public class FormServiceBase {
     }
 
     protected String getUser(String queryParamUser) {
-        if (bypassAuthUser) {
-            return queryParamUser;
+        if (!bypassAuthUser) {
+            return registry.getIdentityProvider().getName();
         }
-
-        return registry.getIdentityProvider().getName();
+        if (queryParamUser == null || queryParamUser.isEmpty()) {
+            return registry.getIdentityProvider().getName();
+        }
+        return queryParamUser;
     }
 
     public String getFormDisplayProcess(String containerId, String processId, String lang, boolean filterContent, String formType) {

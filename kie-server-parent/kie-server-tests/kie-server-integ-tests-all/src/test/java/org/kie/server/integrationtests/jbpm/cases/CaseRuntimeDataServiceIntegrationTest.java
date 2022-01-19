@@ -67,11 +67,20 @@ import static org.junit.Assert.fail;
 import static org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED;
 import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
 import static org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED;
+import static org.kie.api.task.model.Status.Ready;
+import static org.kie.api.task.model.Status.Reserved;
 
 public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "case-insurance",
             "1.0.0.Final");
+
+    private static final String ACTOR_ID = "ActorId";
+    private static final String GROUP_ID = "GroupId";
+    private static final String COMMENT = "Comment";
+    private static final String BUSINESS_ADMINISTRATOR_ID = "BusinessAdministratorId";
+    private static final String BUSINESS_ADMINISTRATOR_GROUP_ID = "BusinessAdministratorGroupId";
+    private static final String TASK_STAKEHOLDER_ID = "TaskStakeholderId";
 
     private static final String CONTAINER_ID = "insurance";
     private static final String CONTAINER_ID2 = "insurance-second";
@@ -80,6 +89,9 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
     private static final String CASE_OWNER_ROLE = "owner";
     private static final String CASE_CONTACT_ROLE = "contact";
+    private static final String CASE_PARTICIPANT_ROLE = "participant";
+    private static final String CASE_HR_GROUP = "HR";
+    private static final String CASE_ADMIN_GROUP = "Administrators";
 
     private static final String CASE_INSURED_ROLE = "insured";
     private static final String CASE_INS_REP_ROLE = "insuranceRepresentative";
@@ -540,6 +552,75 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(caseId, instance.getCaseId());
         assertNotNull (instance.getCaseFile());
         assertEquals("first case started", instance.getCaseFile().getData().get("s"));
+    }
+
+    @Test
+    public void testFindCaseTasksAssignedAsPotentialOwnerByPassAuth() throws Exception {
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+
+        assertTaskListAsPotentialOwner(caseId, USER_YODA, USER_JOHN, true);
+        caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
+
+        changeUser(USER_JOHN);
+
+        caseId = startUserTaskCase(USER_JOHN, USER_YODA);
+        assertNotNull(caseId);
+        assertFalse(caseId.isEmpty());
+
+        assertTaskListAsPotentialOwner(caseId, USER_JOHN, USER_YODA, false);
+        caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
+    }
+
+    @Test
+    public void testFindCaseTasksAssignedAsBusinessAdminByPassAuth() throws Exception {
+        CaseFile caseFile = CaseFile.builder()
+                .addUserAssignments(CASE_OWNER_ROLE, USER_YODA)
+                .addUserAssignments(CASE_CONTACT_ROLE, USER_JOHN)
+                .addGroupAssignments(CASE_PARTICIPANT_ROLE, CASE_ADMIN_GROUP)
+                .build();
+        String caseId = startUserTaskCase(caseFile);
+
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+        assertTaskListAsBusinessAdmin(caseId, USER_YODA, USER_YODA);
+        caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
+
+        caseId = startUserTaskCase(caseFile);
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+
+        assertTaskListAsBusinessAdmin(caseId, USER_YODA, USER_ADMINISTRATOR);
+        changeUser(USER_YODA);
+        caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
+    }
+
+    @Test
+    public void testFindCaseTasksAssignedAsStakeHolderByPassAuth() throws Exception {
+        assertEquals(USER_YODA, configuration.getUserName()); // Check current authenticated user is yoda
+        String caseId = startUserTaskCase(CaseFile.builder()
+                                                  .addUserAssignments(CASE_OWNER_ROLE, USER_YODA)
+                                                  .addUserAssignments(CASE_CONTACT_ROLE, USER_JOHN)
+                                                  .addUserAssignments(CASE_PARTICIPANT_ROLE, USER_MARY)
+                                                  .build());
+
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+        assertTaskListAsStakeHolder(caseId, USER_MARY);
+        caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
+
+        changeUser(USER_JOHN);
+        caseId = startUserTaskCase(CaseFile.builder()
+                                           .addUserAssignments(CASE_OWNER_ROLE, USER_JOHN)
+                                           .addUserAssignments(CASE_CONTACT_ROLE, USER_YODA)
+                                           .addGroupAssignments(CASE_PARTICIPANT_ROLE, CASE_HR_GROUP)
+                                           .build());
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+
+        assertTaskListAsStakeHolder(caseId, USER_MARY);
+        caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
     }
     
     @Test
@@ -1475,11 +1556,11 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(caseId2);
         assertTrue(caseId2.startsWith(CASE_HR_ID_PREFIX));
 
-        instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10);
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, Arrays.asList(Ready.toString(), Status.Reserved.toString()), 0, 10);
         assertNotNull(instances);
         assertEquals(1, instances.size());
 
-        instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId2, USER_YODA, Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10, "t.name", true);
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId2, USER_YODA, Arrays.asList(Ready.toString(), Status.Reserved.toString()), 0, 10, "t.name", true);
         assertNotNull(instances);
         assertEquals(1, instances.size());
 
@@ -1497,7 +1578,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         Assertions.assertThat(instances).isNotNull().isEmpty();
 
         instances = caseClient.findCaseTasksAssignedAsPotentialOwner("not-existing-case", USER_YODA,
-                Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10);
+                Arrays.asList(Ready.toString(), Status.Reserved.toString()), 0, 10);
         Assertions.assertThat(instances).isNotNull().isEmpty();
 
         instances = caseClient.findCaseTasksAssignedAsPotentialOwner("not-existing-case", USER_YODA, 0, 10,
@@ -1505,7 +1586,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         Assertions.assertThat(instances).isNotNull().isEmpty();
 
         instances = caseClient.findCaseTasksAssignedAsPotentialOwner("not-existing-case", USER_YODA,
-                Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10,
+                Arrays.asList(Ready.toString(), Status.Reserved.toString()), 0, 10,
                 "t.name", false);
         Assertions.assertThat(instances).isNotNull().isEmpty();
     }
@@ -1519,14 +1600,14 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         Assertions.assertThat(instances).isNotNull().isEmpty();
 
         instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA,
-                Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10);
+                Arrays.asList(Ready.toString(), Status.Reserved.toString()), 0, 10);
         Assertions.assertThat(instances).isNotNull().isEmpty();
 
         instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, 0, 10, "t.id", true);
         Assertions.assertThat(instances).isNotNull().isEmpty();
 
         instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA,
-                Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10, "t.name", false);
+                Arrays.asList(Ready.toString(), Status.Reserved.toString()), 0, 10, "t.name", false);
         Assertions.assertThat(instances).isNotNull().isEmpty();
     }
 
@@ -1544,16 +1625,16 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
                 .extracting(TaskSummary::getName).containsOnly("TaskA", "TaskB", "TaskC");
 
         instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA,
-                Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 1, 3);
+                Arrays.asList(Ready.toString(), Status.Reserved.toString()), 1, 3);
         Assertions.assertThat(instances).isNotNull().isEmpty();
 
         instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA,
-                Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 2, "t.id", true);
+                Arrays.asList(Ready.toString(), Status.Reserved.toString()), 0, 2, "t.id", true);
         Assertions.assertThat(instances).isNotNull()
                 .extracting(TaskSummary::getName).containsOnly("TaskA", "TaskB");
 
         instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA,
-                Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 1, 2, "t.id", true);
+                Arrays.asList(Ready.toString(), Status.Reserved.toString()), 1, 2, "t.id", true);
         Assertions.assertThat(instances).isNotNull()
                 .extracting(TaskSummary::getName).containsOnly("TaskC");
 
@@ -1584,7 +1665,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
                 .extracting(TaskSummary::getName).containsExactly("TaskA", "TaskB", "TaskC");
 
         instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA,
-                Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10, "t.name", false);
+                Arrays.asList(Ready.toString(), Status.Reserved.toString()), 0, 10, "t.name", false);
         Assertions.assertThat(instances).isNotNull()
                 .extracting(TaskSummary::getName).containsExactly("TaskC", "TaskB", "TaskA");
     }
@@ -1608,11 +1689,11 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertTrue(caseId2.startsWith(CASE_HR_ID_PREFIX));
 
         changeUser(USER_ADMINISTRATOR);
-        instances = caseClient.findCaseTasksAssignedAsBusinessAdministrator(caseId, USER_ADMINISTRATOR, Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10);
+        instances = caseClient.findCaseTasksAssignedAsBusinessAdministrator(caseId, USER_ADMINISTRATOR, Arrays.asList(Ready.toString(), Status.Reserved.toString()), 0, 10);
         assertNotNull(instances);
         assertEquals(1, instances.size());
 
-        instances = caseClient.findCaseTasksAssignedAsBusinessAdministrator(caseId2, USER_ADMINISTRATOR, Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10, "t.name", true);
+        instances = caseClient.findCaseTasksAssignedAsBusinessAdministrator(caseId2, USER_ADMINISTRATOR, Arrays.asList(Ready.toString(), Status.Reserved.toString()), 0, 10, "t.name", true);
         assertNotNull(instances);
         assertEquals(1, instances.size());
 
@@ -1632,7 +1713,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("input", "text data");
-        parameters.put("TaskStakeholderId", USER_YODA);
+        parameters.put(TASK_STAKEHOLDER_ID, USER_YODA);
 
         caseClient.addDynamicUserTask(CONTAINER_ID, caseId, "dynamic task", "simple description", USER_JOHN, null, parameters);
 
@@ -1650,11 +1731,11 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertTrue(caseId2.startsWith(CASE_HR_ID_PREFIX));
         caseClient.addDynamicUserTask(CONTAINER_ID, caseId2, "dynamic task", "simple description", USER_JOHN, null, parameters);
 
-        tasks = caseClient.findCaseTasksAssignedAsStakeholder(caseId, USER_YODA, Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10);
+        tasks = caseClient.findCaseTasksAssignedAsStakeholder(caseId, USER_YODA, Arrays.asList(Ready.toString(), Status.Reserved.toString()), 0, 10);
         assertNotNull(tasks);
         assertEquals(1, tasks.size());
 
-        tasks = caseClient.findCaseTasksAssignedAsStakeholder(caseId2, USER_YODA, Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10, "t.name", true);
+        tasks = caseClient.findCaseTasksAssignedAsStakeholder(caseId2, USER_YODA, Arrays.asList(Ready.toString(), Status.Reserved.toString()), 0, 10, "t.name", true);
         assertNotNull(tasks);
         assertEquals(1, tasks.size());
 
@@ -2374,11 +2455,119 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         for (int i = 0; i < tasksToAdd; i++) {
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("input", "text data");
-            parameters.put("TaskStakeholderId", USER_YODA);
+            parameters.put(TASK_STAKEHOLDER_ID, USER_YODA);
             caseClient.addDynamicUserTask(CONTAINER_ID, caseId, "Task" + (i + 1), "desc", USER_JOHN, "", parameters);
         }
 
         assertPagination((page, pageSize) -> caseClient.findCaseTasksAssignedAsStakeholder(caseId, USER_YODA, page, pageSize), 2);
+    }
+
+    private void assertTaskListAsPotentialOwner(String caseId, String caseOwner, String potOwner, boolean isInHR) {
+        List<TaskSummary> tasks = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, caseOwner, 0, 10);
+        assertNotNull(tasks);
+        assertEquals(1, tasks.size());
+        assertEquals("Hello1", tasks.get(0).getName());
+        assertEquals(caseOwner, tasks.get(0).getActualOwner());
+        assertEquals(Reserved, Status.valueOf(tasks.get(0).getStatus()));
+
+        Map<String, Object> taskInput = new HashMap<>();
+        taskInput.put(ACTOR_ID, potOwner);
+        taskInput.put(COMMENT, "User's comment");
+        caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, "Hello2", taskInput);
+        tasks = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, potOwner, 0, 10);
+        assertNotNull(tasks);
+        assertEquals(1, tasks.size());
+        assertEquals("Hello2", tasks.get(0).getName());
+        assertEquals(potOwner, tasks.get(0).getActualOwner());
+        assertEquals(Reserved, Status.valueOf(tasks.get(0).getStatus()));
+        assertEquals("User's comment", tasks.get(0).getDescription());
+        taskClient.startTask(CONTAINER_ID, tasks.get(0).getId(), potOwner);
+        taskClient.completeTask(CONTAINER_ID, tasks.get(0).getId(), potOwner, null);
+
+        taskInput = new HashMap<>();
+        taskInput.put(GROUP_ID, CASE_HR_GROUP);
+        taskInput.put(COMMENT, "HR's comment");
+        caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, "Hello2", taskInput);
+        tasks = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, potOwner, 0, 10);
+        assertNotNull(tasks);
+        if (isInHR) {
+            assertEquals(1, tasks.size());
+            assertEquals("Hello2", tasks.get(0).getName());
+            assertNull(tasks.get(0).getActualOwner());
+            assertEquals(Ready, Status.valueOf(tasks.get(0).getStatus()));
+            assertEquals("HR's comment", tasks.get(0).getDescription());
+            taskClient.claimTask(CONTAINER_ID, tasks.get(0).getId(), potOwner);
+            taskClient.startTask(CONTAINER_ID, tasks.get(0).getId(), potOwner);
+            taskClient.completeTask(CONTAINER_ID, tasks.get(0).getId(), potOwner, null);
+        } else {
+            assertEquals(0, tasks.size());
+        }
+    }
+
+    private void assertTaskListAsBusinessAdmin(String caseId, String caseOwner, String lookupUser) throws Exception {
+        List<TaskSummary> tasks = caseClient.findCaseTasksAssignedAsBusinessAdministrator(caseId, USER_ADMINISTRATOR, 0, 10);
+        assertNotNull(tasks);
+        assertEquals(1, tasks.size());
+
+        Map<String, Object> taskInput = new HashMap<>();
+
+        changeUser(caseOwner);
+        taskInput.put(BUSINESS_ADMINISTRATOR_ID, "contact");
+        taskInput.put(COMMENT, "User's comment");
+        caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, "Hello2", taskInput);
+
+        changeUser(lookupUser);
+        tasks = caseClient.findCaseTasksAssignedAsBusinessAdministrator(caseId, USER_ADMINISTRATOR, 0, 10);
+        assertNotNull(tasks);
+        assertEquals(2, tasks.size()); // 1 for Yoda and 1 for John
+        assertTaskByActualOwner(tasks, USER_YODA, "Hello1", Reserved, "");
+        assertTaskByActualOwner(tasks, USER_JOHN, "Hello2", Reserved, "User's comment");
+
+        changeUser(caseOwner);
+        taskInput.put(BUSINESS_ADMINISTRATOR_GROUP_ID, CASE_PARTICIPANT_ROLE);
+        taskInput.put(COMMENT, "User's comment");
+        caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, "Hello2", taskInput);
+
+        changeUser(lookupUser);
+        tasks = caseClient.findCaseTasksAssignedAsBusinessAdministrator(caseId, USER_ADMINISTRATOR, 0, 10);
+        assertNotNull(tasks);
+        assertEquals(3, tasks.size()); // 1 for Yoda and 2 ad-hoc tasks for John
+        assertEquals(2, tasks.stream()
+                .filter(taskSummary -> USER_JOHN.equals(taskSummary.getActualOwner()))
+                .count());
+        assertTaskByActualOwner(tasks, USER_YODA, "Hello1", Reserved, "");
+        assertTaskByActualOwner(tasks, USER_JOHN, "Hello2", Reserved, "User's comment");
+    }
+
+    private void assertTaskByActualOwner(List<TaskSummary> tasks, String expectedActualOwner,
+                                         String expectedName, Status expectedStatus, String expectedDescription) {
+        tasks.stream()
+                .filter(taskSummary -> expectedActualOwner.equals(taskSummary.getActualOwner()))
+                .forEach(task -> {
+                    assertEquals(expectedName, task.getName());
+                    assertEquals(expectedStatus, Status.valueOf(task.getStatus()));
+                    assertEquals(expectedDescription, task.getDescription());
+                });
+    }
+
+    private void assertTaskListAsStakeHolder(String caseId, String stakeHolder) {
+        List<TaskSummary> tasks = caseClient.findCaseTasksAssignedAsStakeholder(caseId, stakeHolder, 0, 10);
+        assertNotNull(tasks);
+        assertEquals(0, tasks.size());
+
+        Map<String, Object> taskInput = new HashMap<>();
+
+        taskInput.put(TASK_STAKEHOLDER_ID, CASE_PARTICIPANT_ROLE);
+        taskInput.put(COMMENT, "User's comment");
+        caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, "Hello2", taskInput);
+
+        tasks = caseClient.findCaseTasksAssignedAsStakeholder(caseId, stakeHolder, 0, 10);
+        assertNotNull(tasks);
+        assertEquals(1, tasks.size());
+        assertEquals("Hello2", tasks.get(0).getName());
+        assertEquals(Reserved, Status.valueOf(tasks.get(0).getStatus()));
+        assertEquals(USER_JOHN, tasks.get(0).getActualOwner());
+        assertEquals("User's comment", tasks.get(0).getDescription());
     }
 
     private <T> void assertSearchOperationOnNonExistingContainer(Function<String, Collection<T>> operation) {
@@ -2419,6 +2608,16 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
                 .addUserAssignments(CASE_CONTACT_ROLE, contact)
                 .data(data)
                 .build();
+
+        String caseId = caseClient.startCase(CONTAINER_ID, CASE_HR_DEF_ID, caseFile);
+        assertNotNull(caseId);
+        return caseId;
+    }
+
+    private String startUserTaskCase(CaseFile caseFile) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("s", "first case started");
+        caseFile.setData(data);
 
         String caseId = caseClient.startCase(CONTAINER_ID, CASE_HR_DEF_ID, caseFile);
         assertNotNull(caseId);
