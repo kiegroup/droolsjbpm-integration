@@ -138,6 +138,7 @@
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
               <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
+              <org.kie.server.bypass.auth.user>true</org.kie.server.bypass.auth.user>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -174,6 +175,7 @@
               <!-- For including complete stack trace in the response -->
               <org.kie.server.stacktrace.included>true</org.kie.server.stacktrace.included>
               <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly23x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
+              <org.kie.server.bypass.auth.user>true</org.kie.server.bypass.auth.user>
             </systemProperties>
           </container>
         </configuration>
@@ -367,6 +369,7 @@
         <jbpm.executor.disabled>true</jbpm.executor.disabled>
         <!-- For including complete stack trace in the response -->
         <org.kie.server.stacktrace.included>true</org.kie.server.stacktrace.included>
+        <org.kie.server.bypass.auth.user>true</org.kie.server.bypass.auth.user>
       </properties>
     </profile>
   </profiles>
