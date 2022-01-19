@@ -34,7 +34,7 @@ public class BootstrapFormRenderer extends AbstractFormRenderer {
     }
     
     protected void loadTemplates() {
-        loadTemplate(MAIN_LAYOUT_TEMPLATE, this.getClass().getResourceAsStream("/form-templates-providers/bootstrap/master-template.html"));
+        loadTemplate(MAIN_LAYOUT_TEMPLATE, this.getClass().getResourceAsStream("/form-templates-providers/bootstrap/main-template.html"));
         loadTemplate(PROCESS_LAYOUT_TEMPLATE, this.getClass().getResourceAsStream("/form-templates-providers/bootstrap/process-layout-template.html"));
         loadTemplate(TASK_LAYOUT_TEMPLATE, this.getClass().getResourceAsStream("/form-templates-providers/bootstrap/task-layout-template.html"));
         loadTemplate(FORM_GROUP_LAYOUT_TEMPLATE, this.getClass().getResourceAsStream("/form-templates-providers/bootstrap/input-form-group-template.html"));
