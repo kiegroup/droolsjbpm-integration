@@ -39,7 +39,7 @@ public class KeyStoreHelperUtil {
 
     public static String loadPasswordKey(String pwdKeyAliasProperty, String pwdKeyPasswordProperty, String defaultPassword) {
         String passwordKey;
-        KeyStoreHelper keyStoreHelper = new KeyStoreHelper();
+        KeyStoreHelper keyStoreHelper = KeyStoreHelper.get();
         try {
             String pwdKeyAlias = System.getProperty(pwdKeyAliasProperty, "");
             String pwdKeyPassword = System.getProperty(pwdKeyPasswordProperty, "");
