@@ -24,6 +24,7 @@ import java.lang.reflect.Member;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -81,7 +82,6 @@ import org.drools.core.xml.jaxb.util.JaxbListWrapper;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.Marshaller;
-import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.marshalling.ModelWrapper;
@@ -93,7 +93,7 @@ import org.slf4j.LoggerFactory;
 
 public class JSONMarshaller implements Marshaller {
 
-    private static final Logger logger = LoggerFactory.getLogger(MarshallerFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(JSONMarshaller.class);
 
     private static final boolean STRICT_ID_FORMAT = Boolean.getBoolean(KieServerConstants.KIE_SERVER_STRICT_ID_FORMAT);
     private final boolean STRICT_JAVABEANS_SERIALIZERS = Boolean.getBoolean(KieServerConstants.KIE_SERVER_STRICT_JAVABEANS_SERIALIZERS);
@@ -109,6 +109,14 @@ public class JSONMarshaller implements Marshaller {
     private boolean fallbackClassLoaderEnabled = Boolean.parseBoolean(System.getProperty("org.kie.server.json.fallbackClassLoader.enabled", "false"));
 
     private boolean findDeserializerFirst = Boolean.parseBoolean(System.getProperty("org.kie.server.json.findDeserializerFirst.enabled", "true"));
+
+    public static enum CNFEBehavior {
+        IGNORE,
+        WARN,
+        EXCEPTION
+    }
+
+    private CNFEBehavior customObjectDeserializerCNFEBehavior = getCNFEBehavior();
 
     public static class JSONContext {
 
@@ -202,7 +210,16 @@ public class JSONMarshaller implements Marshaller {
         buildMarshaller(classes, classLoader);
         configureMarshaller(classes, classLoader);
         this.notNullObjectMapper = objectMapper.copy().setSerializationInclusion(Include.NON_NULL);
+    }
 
+    private static CNFEBehavior getCNFEBehavior() {
+        String cnfeBehaviorValue = System.getProperty(KieServerConstants.JSON_CUSTOM_OBJECT_DESERIALIZER_CNFE_BEHAVIOR, CNFEBehavior.IGNORE.name());
+        try {
+            return CNFEBehavior.valueOf(cnfeBehaviorValue);
+        } catch (IllegalArgumentException iae) {
+            throw new MarshallingException(cnfeBehaviorValue + " is not supported for " + KieServerConstants.JSON_CUSTOM_OBJECT_DESERIALIZER_CNFE_BEHAVIOR +
+                                           ". Please choose from " + Arrays.asList(CNFEBehavior.values()).toString(), iae);
+        }
     }
 
     protected void buildMarshaller(Set<Class<?>> classes, final ClassLoader classLoader) {
@@ -826,6 +843,16 @@ public class JSONMarshaller implements Marshaller {
 
                         return value;
                     } catch (ClassNotFoundException e) {
+                        switch (customObjectDeserializerCNFEBehavior) {
+                            case WARN:
+                                logger.warn(field1 + " is not found. Deserialized as a Map");
+                                break;
+                            case EXCEPTION:
+                                throw new MarshallingException(field1 + " is not found. Failed to unmarshal.");
+                            case IGNORE:
+                            default:
+                                break;
+                        }
                     }
                 }
 
