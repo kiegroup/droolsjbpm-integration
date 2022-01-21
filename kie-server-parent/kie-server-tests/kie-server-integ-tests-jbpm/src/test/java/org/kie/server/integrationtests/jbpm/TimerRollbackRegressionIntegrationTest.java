@@ -71,7 +71,7 @@ public class TimerRollbackRegressionIntegrationTest extends JbpmKieServerBaseInt
 
     @Test(timeout = 60 * 1000)
     public void testTimerRollbackTimerCancel() throws Exception {
-        String containerId = "timer-project-" + runtimeStrategy;
+        String containerId = "timer-rollback-project-" + runtimeStrategy;
         createContainer(containerId, releaseId, new KieServerConfigItem(KieServerConstants.PCFG_RUNTIME_STRATEGY, runtimeStrategy, String.class.getName()));
 
         this.processClient.startProcess(containerId, "error-handling.test-rollback");
