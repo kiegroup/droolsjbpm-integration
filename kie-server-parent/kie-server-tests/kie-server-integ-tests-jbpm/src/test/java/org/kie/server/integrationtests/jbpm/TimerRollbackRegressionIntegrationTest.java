@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
 
 public class TimerRollbackRegressionIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
-    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "timer-project",
+    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "timer-rollback-project",
             "1.0.0.Final");
 
     @Parameterized.Parameters(name = "{0} {1} {2}")
@@ -61,11 +61,16 @@ public class TimerRollbackRegressionIntegrationTest extends JbpmKieServerBaseInt
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/timer-project");
+        KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/timer-rollback-project");
     }
 
     @After
     public void disposeContainers() {
+        String containerId = "timer-rollback-project-" + runtimeStrategy;
+        List<ProcessInstance> startedInstances = queryClient.findProcessInstancesByContainerId(containerId, null, 0, 10, null, false);
+        for(ProcessInstance processInstanceId : startedInstances) {
+            processClient.abortProcessInstance(containerId, processInstanceId.getId());
+        }
         disposeAllContainers();
     }
 
@@ -74,10 +79,7 @@ public class TimerRollbackRegressionIntegrationTest extends JbpmKieServerBaseInt
         String containerId = "timer-rollback-project-" + runtimeStrategy;
         createContainer(containerId, releaseId, new KieServerConfigItem(KieServerConstants.PCFG_RUNTIME_STRATEGY, runtimeStrategy, String.class.getName()));
 
-        this.processClient.startProcess(containerId, "error-handling.test-rollback");
-        List<ProcessInstance> startedInstances = queryClient.findProcessInstancesByContainerId(containerId, null, 0, 10, null, false);
-
-        assertEquals(1, startedInstances.size());
+        Long pid = this.processClient.startProcess(containerId, "error-handling.test-rollback");
 
         // this should fail
         try {
@@ -93,6 +95,6 @@ public class TimerRollbackRegressionIntegrationTest extends JbpmKieServerBaseInt
 
         Thread.sleep(6000L);
         // the timer should still be active and triggered
-        startedInstances = queryClient.findProcessInstancesByContainerId(containerId, null, 0, 10, null, false);
-        assertEquals(0, startedInstances.size());
+        ProcessInstance processInstance = this.queryClient.findProcessInstanceById(pid);
+        assertEquals((Integer) 2, processInstance.getState());
     }}
