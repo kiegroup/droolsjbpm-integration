@@ -64,6 +64,11 @@ public class TimerIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     @After
     public void disposeContainers() {
+        String containerId = "timer-project-" + runtimeStrategy;
+        List<ProcessInstance> startedInstances = queryClient.findProcessInstancesByContainerId(containerId, null, 0, 10, null, false);
+        for(ProcessInstance processInstanceId : startedInstances) {
+            processClient.abortProcessInstance(containerId, processInstanceId.getId());
+        }
         disposeAllContainers();
     }
 
@@ -75,7 +80,7 @@ public class TimerIntegrationTest extends JbpmKieServerBaseIntegrationTest {
         List<Integer> completedOnly = Arrays.asList(2);
         KieServerSynchronization.waitForProcessInstanceStart(queryClient, containerId, 3, completedOnly);
 
-        List<ProcessInstance> startedInstances = queryClient.findProcessInstancesByContainerId(containerId, completedOnly, 0, 10, "Id", false);
+        List<ProcessInstance> startedInstances = queryClient.findProcessInstancesByContainerId(containerId, completedOnly, 0, 10, "log.processInstanceId", false);
 
         assertEquals(3, startedInstances.size());
 
