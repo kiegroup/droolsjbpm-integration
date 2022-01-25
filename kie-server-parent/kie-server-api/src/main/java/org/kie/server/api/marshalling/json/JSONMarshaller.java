@@ -110,7 +110,7 @@ public class JSONMarshaller implements Marshaller {
 
     private boolean findDeserializerFirst = Boolean.parseBoolean(System.getProperty("org.kie.server.json.findDeserializerFirst.enabled", "true"));
 
-    public static enum CNFEBehavior {
+    public enum CNFEBehavior {
         IGNORE,
         WARN,
         EXCEPTION
@@ -845,7 +845,7 @@ public class JSONMarshaller implements Marshaller {
                     } catch (ClassNotFoundException e) {
                         switch (customObjectDeserializerCNFEBehavior) {
                             case WARN:
-                                logger.warn(field1 + " is not found. Deserialized as a Map");
+                                logger.warn("{} is not found. Deserialized as a Map", field1);
                                 break;
                             case EXCEPTION:
                                 throw new MarshallingException(field1 + " is not found. Failed to unmarshal.");
