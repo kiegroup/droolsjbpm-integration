@@ -40,6 +40,7 @@
           <debug>true</debug>
           <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
           <logDirectory>${project.build.directory}/it</logDirectory>
+          <streamLogsOnFailures>true</streamLogsOnFailures>
           <filterProperties>
             <org.kie.version>${project.version}</org.kie.version>
           </filterProperties>
