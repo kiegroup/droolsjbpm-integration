@@ -175,4 +175,6 @@ public class KieServerConstants {
     public static final String SYSTEM_XSTREAM_ENABLED_PACKAGES = "org.kie.server.xstream.enabled.packages";
 
     public static final String RESET_CONTAINER_BEFORE_UPDATE = "resetBeforeUpdate";
+
+    public static final String JSON_CUSTOM_OBJECT_DESERIALIZER_CNFE_BEHAVIOR = "org.kie.server.json.customObjectDeserializerCNFEBehavior";
 }
