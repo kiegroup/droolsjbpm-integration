@@ -38,3 +38,6 @@
 /subsystem=elytron/filesystem-realm=KieRealm:add-identity(identity=maciek)
 /subsystem=elytron/filesystem-realm=KieRealm:set-password(identity=maciek, clear={password="maciek123*"})
 /subsystem=elytron/filesystem-realm=KieRealm:add-identity-attribute(identity=maciek, name=role, value=["kie-server","user","CreditAnalyst"])
+
+# Disable jaeger-tracer (same as proposed at WFLY-14625)
+/subsystem=microprofile-opentracing-smallrye/jaeger-tracer=jaeger:write-attribute(name=sampler-param, value=0)
