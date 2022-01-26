@@ -33,7 +33,7 @@
   </modules>
 
   <properties>
-    <version.me.snowdrop.narayana>2.4.1</version.me.snowdrop.narayana>
+    <version.me.snowdrop.narayana>2.6.1</version.me.snowdrop.narayana>
     <version.org.apache.commons-dbcp2>2.4.0</version.org.apache.commons-dbcp2>
   </properties>
 
@@ -211,6 +211,10 @@
           <exclusion>
             <groupId>org.jboss.spec.javax.transaction</groupId>
             <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jms_2.0_spec</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
