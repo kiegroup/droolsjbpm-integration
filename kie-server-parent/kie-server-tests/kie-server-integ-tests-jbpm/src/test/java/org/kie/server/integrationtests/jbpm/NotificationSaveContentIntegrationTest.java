@@ -18,6 +18,7 @@ package org.kie.server.integrationtests.jbpm;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -50,6 +51,11 @@ public class NotificationSaveContentIntegrationTest extends JbpmKieServerBaseInt
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
         createContainer(CONTAINER_ID_NOTIFICATION, releaseId);
+    }
+    
+    @AfterClass
+    public static void disposeAndCleanUp() {
+        disposeAllContainers();
     }
 
     @Test(timeout = 10000)
