@@ -67,14 +67,14 @@ public class TimerRollbackRegressionIntegrationTest extends JbpmKieServerBaseInt
     @After
     public void disposeContainers() {
         String containerId = "timer-rollback-project-" + runtimeStrategy;
-        List<ProcessInstance> startedInstances = queryClient.findProcessInstancesByContainerId(containerId, null, 0, 10, null, false);
+        List<ProcessInstance> startedInstances = queryClient.findProcessInstancesByContainerId(containerId, null, 0, 10);
         for(ProcessInstance processInstanceId : startedInstances) {
             processClient.abortProcessInstance(containerId, processInstanceId.getId());
         }
         disposeAllContainers();
     }
 
-    @Test(timeout = 60 * 1000)
+    @Test(timeout = 120 * 1000)
     public void testTimerRollbackTimerCancel() throws Exception {
         String containerId = "timer-rollback-project-" + runtimeStrategy;
         createContainer(containerId, releaseId, new KieServerConfigItem(KieServerConstants.PCFG_RUNTIME_STRATEGY, runtimeStrategy, String.class.getName()));
@@ -93,7 +93,7 @@ public class TimerRollbackRegressionIntegrationTest extends JbpmKieServerBaseInt
             // do nothing as it should fail
         }
 
-        Thread.sleep(6000L);
+        Thread.sleep(35000L);
         // the timer should still be active and triggered
         ProcessInstance processInstance = this.queryClient.findProcessInstanceById(pid);
         assertEquals((Integer) 2, processInstance.getState());

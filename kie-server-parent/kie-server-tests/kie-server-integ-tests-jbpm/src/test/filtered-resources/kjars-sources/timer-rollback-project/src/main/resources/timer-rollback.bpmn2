@@ -140,7 +140,7 @@ throw new Exception ("launching an error");]]></bpmn2:script>
     <bpmn2:boundaryEvent id="_2C85BED1-654B-434D-90FB-E05E03285275" drools:dockerinfo="82.8^74.0|" drools:boundaryca="true" attachedToRef="_5A57C9C6-378E-411E-A29E-DE981DC02352">
       <bpmn2:outgoing>_534F9545-5966-4F13-A8AE-5E28EE531E0E</bpmn2:outgoing>
       <bpmn2:timerEventDefinition id="_ieLaQGMoEeyeiZ34wMK65A">
-        <bpmn2:timeDuration xsi:type="bpmn2:tFormalExpression" id="_ieLaQWMoEeyeiZ34wMK65A">PT2S</bpmn2:timeDuration>
+        <bpmn2:timeDuration xsi:type="bpmn2:tFormalExpression" id="_ieLaQWMoEeyeiZ34wMK65A">PT30S</bpmn2:timeDuration>
       </bpmn2:timerEventDefinition>
     </bpmn2:boundaryEvent>
   </bpmn2:process>
