@@ -77,11 +77,11 @@ public class JobServiceMigrationIntegrationTest extends JbpmKieServerBaseIntegra
         KieServerSynchronization.waitForJobToFinish(jsc, jobId, 15000L);
     }
     
-    @Test
+    @Test(timeout = 60000)
     public void testMigrateAndRequeueFailingJob() throws Exception {
         Long pid = processClient.startProcess(CONTAINER_ID1, PROCESS_ID);
         
-        waitForErrors(CONTAINER_ID1, 5000L);
+        waitForErrors(CONTAINER_ID1, 15000L);
         
         // first container has a wrong deployment-structure (without CustomWorkItemHandler definition), so job ends up in Error status
         List<RequestInfoInstance> errors = jobServicesClient.getRequestsByContainer(CONTAINER_ID1, singletonList(ERROR.toString()), 0, 10);
@@ -106,12 +106,10 @@ public class JobServiceMigrationIntegrationTest extends JbpmKieServerBaseIntegra
 
     private void waitForErrors(String containerId, long timeOut) throws Exception {
         KieServerSynchronization.waitForCondition(() -> {
-            List<ExecutionErrorInstance> list = processAdminClient.getErrors(containerId, false, 0, 10);
-            // There are 4 attempts (3 retries by default plus 1 normal), so the same number of errors.
-            if (list.size()==4) {
-                return true;
-            }
-            return false;
+            // There are 4 attempts (3 retries by default plus 1 normal), so the same number of errors
+            // and also have to wait to update RequestInfo and not being empty
+            return processAdminClient.getErrors(containerId, false, 0, 10).size() == 4 &&
+                   !jobServicesClient.getRequestsByContainer(containerId, singletonList(ERROR.toString()), 0, 10).isEmpty();
         }, timeOut);
     }
 }
