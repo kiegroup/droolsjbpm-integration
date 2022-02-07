@@ -301,7 +301,17 @@
                 "methodName": "reassign",
                 "elementKind": "method",
                 "justification": "[JBPM-9610] Fix typos in successful call messages"
-            }
+            },
+            {
+               "code": "java.method.numberOfParametersChanged",
+               "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.UserTaskResource::suspend(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String)",
+               "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.UserTaskResource::suspend(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String)",
+               "package": "org.kie.server.remote.rest.jbpm",
+               "classSimpleName": "UserTaskResource",
+               "methodName": "suspend",
+               "elementKind": "method",
+               "justification": "[JBPM-10015] Allow to set suspendUntil during user task suspend operation as parameter."
+             }
             ]
         }
     }

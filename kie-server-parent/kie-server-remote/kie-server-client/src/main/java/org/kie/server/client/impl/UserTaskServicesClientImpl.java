@@ -325,11 +325,16 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
     @Override
     public void suspendTask(String containerId, Long taskId, String userId) {
-        if( config.isRest() ) {
+        this.suspendTask(containerId, taskId, userId, Collections.emptyMap());
+    }
 
-            sendTaskOperation(containerId, taskId, TASK_URI + "/" + TASK_INSTANCE_SUSPEND_PUT_URI, getUserQueryStr(userId));
+    @Override
+    public void suspendTask(String containerId, Long taskId, String userId, Map<String, Object> parameters) {
+        if( config.isRest() ) {
+            sendTaskOperation(containerId, taskId, TASK_URI + "/" + TASK_INSTANCE_SUSPEND_PUT_URI, getUserQueryStr(userId), parameters);
         } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "suspend", new Object[]{containerId, taskId, userId}) ) );
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "suspend", 
+                    serialize(safeMap(parameters)), marshaller.getFormat().getType(),  new Object[]{containerId, taskId, userId}) ) );
             ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
