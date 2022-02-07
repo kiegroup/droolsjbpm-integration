@@ -86,6 +86,15 @@
               "methodName": "getUseSsl",
               "elementKind": "method",
               "justification": "Fixed typo in method signature"
+            },
+            {
+              "code": "java.method.addedToInterface",
+              "new": "method void org.kie.server.client.UserTaskServicesClient::suspendTask(java.lang.String, java.lang.Long, java.lang.String, java.util.Map<java.lang.String, java.lang.Object>)",
+              "package": "org.kie.server.client",
+              "classSimpleName": "UserTaskServicesClient",
+              "methodName": "suspendTask",
+              "elementKind": "method",
+              "justification": "[JBPM-10015] Allow to set suspendUntil during user task suspend operation as parameter."
             }
          ]
         }
