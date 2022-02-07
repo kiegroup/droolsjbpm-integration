@@ -59,6 +59,8 @@ public interface UserTaskServicesClient {
 
     void suspendTask(String containerId, Long taskId, String userId);
 
+    void suspendTask(String containerId, Long taskId, String userId, Map<String, Object> parameters);
+
     void nominateTask(String containerId, Long taskId, String userId, List<String> potentialOwners);
 
     void setTaskPriority(String containerId, Long taskId, int priority);

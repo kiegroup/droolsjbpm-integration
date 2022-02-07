@@ -371,6 +371,38 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
     }
 
     @Test
+    public void testSuspendAndAutoResume() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            checkTaskNameAndStatus(taskSummary, "First task", Status.Reserved);
+
+            // release task
+            taskClient.suspendTask(CONTAINER_ID, taskSummary.getId(), USER_YODA, Collections.singletonMap("suspendUntil", "PT3S"));
+            long time = 0L;
+            do {
+                taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+                assertNotNull(taskList);
+                assertEquals(1, taskList.size());
+                taskSummary = taskList.get(0);
+                Thread.sleep(500L);
+                time += 500L;
+            } while (time <= 6000L && !Status.Reserved.toString().equals(taskSummary.getStatus()));
+
+            checkTaskNameAndStatus(taskSummary, "First task", Status.Reserved);
+
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    @Test
     public void testFailUserTask() throws Exception {
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);

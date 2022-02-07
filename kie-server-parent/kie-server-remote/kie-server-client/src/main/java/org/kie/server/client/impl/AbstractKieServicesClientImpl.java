@@ -164,12 +164,16 @@ public abstract class AbstractKieServicesClientImpl {
     }
 
     protected void sendTaskOperation(String containerId, Long taskId, String operation, String queryString) {
+        this.sendTaskOperation(containerId, taskId, operation, queryString, null);
+    }
+
+    protected void sendTaskOperation(String containerId, Long taskId, String operation, String queryString, Object data) {
         Map<String, Object> valuesMap = new HashMap<String, Object>();
         valuesMap.put(CONTAINER_ID, containerId);
         valuesMap.put(TASK_INSTANCE_ID, taskId);
 
         makeHttpPutRequestAndCreateCustomResponse(
-                build(loadBalancer.getUrl(), operation, valuesMap) + queryString, null, String.class, getHeaders(null));
+                build(loadBalancer.getUrl(), operation, valuesMap) + queryString, data, String.class, getHeaders(null));
     }
 
     @SuppressWarnings("unchecked")
