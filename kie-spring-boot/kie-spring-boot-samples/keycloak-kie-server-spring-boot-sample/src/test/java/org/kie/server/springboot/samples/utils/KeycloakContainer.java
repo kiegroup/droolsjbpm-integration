@@ -35,7 +35,9 @@ public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
     private static final String KEYCLOAK_VERSION = System.getProperty("keycloak.version");
 
     private static final int KEYCLOAK_PORT_HTTP = Integer.getInteger("keycloak.http.port");
-    
+
+    private static boolean isLatestImage = false;
+
     /**
      * Create a KeycloakContainer from image and version at system properties.
      * If that version is not found, it will use latest
@@ -56,12 +58,23 @@ public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
 
     @Override
     protected void configure() {
-        withEnv("KEYCLOAK_USER", KEYCLOAK_ADMIN_USER);
-        withEnv("KEYCLOAK_PASSWORD", KEYCLOAK_ADMIN_PASSWORD);
+        if (isLatestImage) {
+            withCommand("start-dev"); // Required from 17.0.0 version onwards
+            withEnv("KEYCLOAK_ADMIN", KEYCLOAK_ADMIN_USER);
+            withEnv("KEYCLOAK_ADMIN_PASSWORD", KEYCLOAK_ADMIN_PASSWORD);
+        } else {
+            withEnv("KEYCLOAK_USER", KEYCLOAK_ADMIN_USER);
+            withEnv("KEYCLOAK_PASSWORD", KEYCLOAK_ADMIN_PASSWORD);
+        }
     }
 
     public String getAuthServerUrl() {
-        return String.format("http://%s:%s%s", getContainerIpAddress(), getMappedPort(KEYCLOAK_PORT_HTTP), KEYCLOAK_AUTH_PATH);
+        if (isLatestImage) {
+            // Path /auth removed from 17.0.0 version onwards
+            return String.format("http://%s:%s%s", getContainerIpAddress(), getMappedPort(KEYCLOAK_PORT_HTTP), "/");
+        } else {
+            return String.format("http://%s:%s%s", getContainerIpAddress(), getMappedPort(KEYCLOAK_PORT_HTTP), KEYCLOAK_AUTH_PATH);
+        }
     }
     
     private static String findImage() {
@@ -73,6 +86,7 @@ public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
             return targetImage;
         } catch (NotFoundException e) {
             logger.info("Not Found '{}' image, using latest", targetImage);
+            isLatestImage = true;
             return KEYCLOAK_IMAGE + ":latest";
         }
     }
