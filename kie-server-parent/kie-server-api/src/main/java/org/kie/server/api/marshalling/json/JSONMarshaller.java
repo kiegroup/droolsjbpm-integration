@@ -38,6 +38,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
@@ -59,6 +60,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyName;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -460,10 +462,6 @@ public class JSONMarshaller implements Marshaller {
 
         return data;
     }
-    
-    
-
-  
 
     class ExtendedJaxbAnnotationIntrospector extends JaxbAnnotationIntrospector {
 
@@ -619,6 +617,26 @@ public class JSONMarshaller implements Marshaller {
                 return ClassUtil.createInstance(cls, true);
             }
             return null;
+        }
+
+        @Override
+        public PropertyName findNameForSerialization(Annotated a) {
+            PropertyName pn = super.findNameForSerialization(a);
+            // JaxbAnnotationIntrospector doesn't handle XmlAnyElement
+            if (pn == null && a.getAnnotation(XmlAnyElement.class) != null) {
+                return PropertyName.USE_DEFAULT;
+            }
+            return pn;
+        }
+
+        @Override
+        public PropertyName findNameForDeserialization(Annotated a) {
+            PropertyName pn = super.findNameForDeserialization(a);
+            // JaxbAnnotationIntrospector doesn't handle XmlAnyElement
+            if (pn == null && a.getAnnotation(XmlAnyElement.class) != null) {
+                return PropertyName.USE_DEFAULT;
+            }
+            return pn;
         }
     }
 

@@ -29,8 +29,9 @@ import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.command.KieCommands;
+import org.kie.server.api.marshalling.BaseMarshallerBuilder;
 import org.kie.server.api.marshalling.Marshaller;
-import org.kie.server.api.marshalling.MarshallerFactory;
+import org.kie.server.api.marshalling.MarshallerBuilder;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.marshalling.objects.PojoA;
 import org.kie.server.api.marshalling.objects.PojoB;
@@ -73,48 +74,39 @@ public class DroolsCommandWithListMarshallingTest {
                                                       "    <fire-all-rules max=\"-1\" out-identifier=\"fire-result\"/>\n" +
                                                       "</batch-execution>";
 
-    private static final String xstreamExpectedPayload = "<org.drools.core.command.runtime.BatchExecutionCommandImpl>\n" +
-                                                         "  <commands>\n" +
-                                                         "    <org.drools.core.command.runtime.rule.InsertObjectCommand>\n" +
-                                                         "      <object class=\"org.kie.server.api.marshalling.objects.PojoA\">\n" +
-                                                         "        <name>A</name>\n" +
-                                                         "        <pojoBList>\n" +
-                                                         "          <org.kie.server.api.marshalling.objects.PojoB>\n" +
-                                                         "            <name>B1</name>\n" +
-                                                         "            <pojoCList>\n" +
-                                                         "              <org.kie.server.api.marshalling.objects.PojoC>\n" +
-                                                         "                <name>C1</name>\n" +
-                                                         "              </org.kie.server.api.marshalling.objects.PojoC>\n" +
-                                                         "              <org.kie.server.api.marshalling.objects.PojoC>\n" +
-                                                         "                <name>C2</name>\n" +
-                                                         "              </org.kie.server.api.marshalling.objects.PojoC>\n" +
-                                                         "            </pojoCList>\n" +
-                                                         "          </org.kie.server.api.marshalling.objects.PojoB>\n" +
-                                                         "          <org.kie.server.api.marshalling.objects.PojoB>\n" +
-                                                         "            <name>B2</name>\n" +
-                                                         "            <pojoCList>\n" +
-                                                         "              <org.kie.server.api.marshalling.objects.PojoC>\n" +
-                                                         "                <name>C3</name>\n" +
-                                                         "              </org.kie.server.api.marshalling.objects.PojoC>\n" +
-                                                         "            </pojoCList>\n" +
-                                                         "          </org.kie.server.api.marshalling.objects.PojoB>\n" +
-                                                         "        </pojoBList>\n" +
-                                                         "        <stringList>\n" +
-                                                         "          <string>Hello</string>\n" +
-                                                         "          <string>Bye</string>\n" +
-                                                         "        </stringList>\n" +
-                                                         "      </object>\n" +
-                                                         "      <outIdentifier>fact-pojoA</outIdentifier>\n" +
-                                                         "      <returnObject>true</returnObject>\n" +
-                                                         "      <entryPoint>DEFAULT</entryPoint>\n" +
-                                                         "      <disconnected>false</disconnected>\n" +
-                                                         "    </org.drools.core.command.runtime.rule.InsertObjectCommand>\n" +
-                                                         "    <org.drools.core.command.runtime.rule.FireAllRulesCommand>\n" +
-                                                         "      <max>-1</max>\n" +
-                                                         "      <outIdentifier>fire-result</outIdentifier>\n" +
-                                                         "    </org.drools.core.command.runtime.rule.FireAllRulesCommand>\n" +
-                                                         "  </commands>\n" +
-                                                         "</org.drools.core.command.runtime.BatchExecutionCommandImpl>";
+    private static final String xstreamExpectedPayload = "<batch-execution>\n" +
+                                                         "  <insert out-identifier=\"fact-pojoA\" return-object=\"true\" entry-point=\"DEFAULT\">\n" +
+                                                         "    <org.kie.server.api.marshalling.objects.PojoA>\n" +
+                                                         "      <name>A</name>\n" +
+                                                         "      <pojoBList>\n" +
+                                                         "        <org.kie.server.api.marshalling.objects.PojoB>\n" +
+                                                         "          <name>B1</name>\n" +
+                                                         "          <pojoCList>\n" +
+                                                         "            <org.kie.server.api.marshalling.objects.PojoC>\n" +
+                                                         "              <name>C1</name>\n" +
+                                                         "            </org.kie.server.api.marshalling.objects.PojoC>\n" +
+                                                         "            <org.kie.server.api.marshalling.objects.PojoC>\n" +
+                                                         "              <name>C2</name>\n" +
+                                                         "            </org.kie.server.api.marshalling.objects.PojoC>\n" +
+                                                         "          </pojoCList>\n" +
+                                                         "        </org.kie.server.api.marshalling.objects.PojoB>\n" +
+                                                         "        <org.kie.server.api.marshalling.objects.PojoB>\n" +
+                                                         "          <name>B2</name>\n" +
+                                                         "          <pojoCList>\n" +
+                                                         "            <org.kie.server.api.marshalling.objects.PojoC>\n" +
+                                                         "              <name>C3</name>\n" +
+                                                         "            </org.kie.server.api.marshalling.objects.PojoC>\n" +
+                                                         "          </pojoCList>\n" +
+                                                         "        </org.kie.server.api.marshalling.objects.PojoB>\n" +
+                                                         "      </pojoBList>\n" +
+                                                         "      <stringList>\n" +
+                                                         "        <string>Hello</string>\n" +
+                                                         "        <string>Bye</string>\n" +
+                                                         "      </stringList>\n" +
+                                                         "    </org.kie.server.api.marshalling.objects.PojoA>\n" +
+                                                         "  </insert>\n" +
+                                                         "  <fire-all-rules out-identifier=\"fire-result\"/>\n" +
+                                                         "</batch-execution>";
 
     private static final String jsonExpectedPayload = "{\n" +
                                                       "  \"lookup\" : null,\n" +
@@ -145,10 +137,13 @@ public class DroolsCommandWithListMarshallingTest {
                                                       "  }, {\n" +
                                                       "    \"fire-all-rules\" : {\n" +
                                                       "      \"max\" : -1,\n" +
+                                                      "      \"agendaFilter\" : null,\n" +
                                                       "      \"out-identifier\" : \"fire-result\"\n" +
                                                       "    }\n" +
                                                       "  } ]\n" +
                                                       "}";
+
+    private MarshallerBuilder marshallerBuilder = new BaseMarshallerBuilder(); // don't use MarshallerFactory to avoid CustomXstreamMarshallerBuilder
 
     private static BatchExecutionCommand createTestCommand() {
         KieCommands commandsFactory = KieServices.Factory.get().getCommands();
@@ -199,19 +194,19 @@ public class DroolsCommandWithListMarshallingTest {
 
     @Test
     public void testJaxb() {
-        Marshaller marshaller = MarshallerFactory.getMarshaller(getCustomClasses(), MarshallingFormat.JAXB, getClass().getClassLoader());
+        Marshaller marshaller = marshallerBuilder.build(getCustomClasses(), MarshallingFormat.JAXB, getClass().getClassLoader());
         verifyMarshallingRoundTrip(marshaller, createTestCommand(), jaxbExpectedPayload);
     }
 
     @Test
     public void testXStream() {
-        Marshaller marshaller = MarshallerFactory.getMarshaller(getCustomClasses(), MarshallingFormat.XSTREAM, getClass().getClassLoader());
+        Marshaller marshaller = marshallerBuilder.build(getCustomClasses(), MarshallingFormat.XSTREAM, getClass().getClassLoader());
         verifyMarshallingRoundTrip(marshaller, createTestCommand(), xstreamExpectedPayload);
     }
 
     @Test
     public void testJSON() {
-        Marshaller marshaller = MarshallerFactory.getMarshaller(getCustomClasses(), MarshallingFormat.JSON, getClass().getClassLoader());
+        Marshaller marshaller = marshallerBuilder.build(getCustomClasses(), MarshallingFormat.JSON, getClass().getClassLoader());
         verifyMarshallingRoundTrip(marshaller, createTestCommand(), jsonExpectedPayload);
     }
 

@@ -29,8 +29,9 @@ import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.command.KieCommands;
+import org.kie.server.api.marshalling.BaseMarshallerBuilder;
 import org.kie.server.api.marshalling.Marshaller;
-import org.kie.server.api.marshalling.MarshallerFactory;
+import org.kie.server.api.marshalling.MarshallerBuilder;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.marshalling.objects.Pojo1;
 import org.kie.server.api.marshalling.objects.Pojo2;
@@ -40,9 +41,9 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 
-public class DroolsCommandMarshallingTest {
+public class DroolsCommandNestedPojoMarshallingTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(DroolsCommandMarshallingTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(DroolsCommandNestedPojoMarshallingTest.class);
 
     // NOTE: These expected payloads are actual results as of current version. They could be changed with a good reason.
 
@@ -63,30 +64,21 @@ public class DroolsCommandMarshallingTest {
                                                       "    <fire-all-rules max=\"-1\" out-identifier=\"fire-result\"/>\n" +
                                                       "</batch-execution>\n";
 
-    private static final String xstreamExpectedPayload = "<org.drools.core.command.runtime.BatchExecutionCommandImpl>\n" +
-                                                         "  <commands>\n" +
-                                                         "    <org.drools.core.command.runtime.rule.InsertObjectCommand>\n" +
-                                                         "      <object class=\"org.kie.server.api.marshalling.objects.Pojo1\">\n" +
-                                                         "        <desc>C</desc>\n" +
-                                                         "        <pojo2>\n" +
-                                                         "          <desc2>B</desc2>\n" +
-                                                         "          <primitiveBoolean>true</primitiveBoolean>\n" +
-                                                         "          <pojo3>\n" +
-                                                         "            <desc3>A</desc3>\n" +
-                                                         "          </pojo3>\n" +
-                                                         "        </pojo2>\n" +
-                                                         "      </object>\n" +
-                                                         "      <outIdentifier>fact-pojo1</outIdentifier>\n" +
-                                                         "      <returnObject>true</returnObject>\n" +
-                                                         "      <entryPoint>DEFAULT</entryPoint>\n" +
-                                                         "      <disconnected>false</disconnected>\n" +
-                                                         "    </org.drools.core.command.runtime.rule.InsertObjectCommand>\n" +
-                                                         "    <org.drools.core.command.runtime.rule.FireAllRulesCommand>\n" +
-                                                         "      <max>-1</max>\n" +
-                                                         "      <outIdentifier>fire-result</outIdentifier>\n" +
-                                                         "    </org.drools.core.command.runtime.rule.FireAllRulesCommand>\n" +
-                                                         "  </commands>\n" +
-                                                         "</org.drools.core.command.runtime.BatchExecutionCommandImpl>";
+    private static final String xstreamExpectedPayload = "<batch-execution>\n" +
+                                                         "  <insert out-identifier=\"fact-pojo1\" return-object=\"true\" entry-point=\"DEFAULT\">\n" +
+                                                         "    <org.kie.server.api.marshalling.objects.Pojo1>\n" +
+                                                         "      <desc>C</desc>\n" +
+                                                         "      <pojo2>\n" +
+                                                         "        <desc2>B</desc2>\n" +
+                                                         "        <primitiveBoolean>true</primitiveBoolean>\n" +
+                                                         "        <pojo3>\n" +
+                                                         "          <desc3>A</desc3>\n" +
+                                                         "        </pojo3>\n" +
+                                                         "      </pojo2>\n" +
+                                                         "    </org.kie.server.api.marshalling.objects.Pojo1>\n" +
+                                                         "  </insert>\n" +
+                                                         "  <fire-all-rules out-identifier=\"fire-result\"/>\n" +
+                                                         "</batch-execution>";
 
     private static final String jsonExpectedPayload = "{\n" +
                                                       "  \"lookup\" : null,\n" +
@@ -110,10 +102,13 @@ public class DroolsCommandMarshallingTest {
                                                       "  }, {\n" +
                                                       "    \"fire-all-rules\" : {\n" +
                                                       "      \"max\" : -1,\n" +
+                                                      "      \"agendaFilter\" : null,\n" +
                                                       "      \"out-identifier\" : \"fire-result\"\n" +
                                                       "    }\n" +
                                                       "  } ]\n" +
                                                       "}";
+
+    private MarshallerBuilder marshallerBuilder = new BaseMarshallerBuilder(); // don't use MarshallerFactory to avoid CustomXstreamMarshallerBuilder
 
     private static BatchExecutionCommand createTestCommand() {
 
@@ -138,19 +133,19 @@ public class DroolsCommandMarshallingTest {
 
     @Test
     public void testJaxb() {
-        Marshaller marshaller = MarshallerFactory.getMarshaller(getCustomClasses(), MarshallingFormat.JAXB, getClass().getClassLoader());
+        Marshaller marshaller = marshallerBuilder.build(getCustomClasses(), MarshallingFormat.JAXB, getClass().getClassLoader());
         verifyMarshallingRoundTrip(marshaller, createTestCommand(), jaxbExpectedPayload);
     }
 
     @Test
     public void testXStream() {
-        Marshaller marshaller = MarshallerFactory.getMarshaller(getCustomClasses(), MarshallingFormat.XSTREAM, getClass().getClassLoader());
+        Marshaller marshaller = marshallerBuilder.build(getCustomClasses(), MarshallingFormat.XSTREAM, getClass().getClassLoader());
         verifyMarshallingRoundTrip(marshaller, createTestCommand(), xstreamExpectedPayload);
     }
 
     @Test
     public void testJSON() {
-        Marshaller marshaller = MarshallerFactory.getMarshaller(getCustomClasses(), MarshallingFormat.JSON, getClass().getClassLoader());
+        Marshaller marshaller = marshallerBuilder.build(getCustomClasses(), MarshallingFormat.JSON, getClass().getClassLoader());
         verifyMarshallingRoundTrip(marshaller, createTestCommand(), jsonExpectedPayload);
     }
 
