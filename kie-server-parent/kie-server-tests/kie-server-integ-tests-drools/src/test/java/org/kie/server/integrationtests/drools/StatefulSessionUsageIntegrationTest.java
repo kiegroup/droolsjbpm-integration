@@ -380,7 +380,6 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
         ExecutionResults actualData = reply.getResult();
 
         Object fired = actualData.getValue(FIRED_IDENTIFIER);
-        System.out.println("fired = " + fired + ", fired.class = " + fired.getClass());
         assertEquals("Rule should not be fired because of AgendaFilter", 0, fired);
 
         Object result = actualData.getValue(PERSON_1_OUT_IDENTIFIER);
@@ -401,8 +400,6 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
 
         FactHandle factHandle = (FactHandle) reply.getResult().getFactHandle(PERSON_1_OUT_IDENTIFIER);
-        System.out.println("  **** factHandle = " + factHandle);
-        System.out.println("  **** factHandle.class = " + factHandle.getClass());
 
         // update object by fact handle
         commands = new ArrayList<Command<?>>();
