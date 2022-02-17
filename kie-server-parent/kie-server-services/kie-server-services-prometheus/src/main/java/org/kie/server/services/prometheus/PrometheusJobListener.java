@@ -63,7 +63,7 @@ public class PrometheusJobListener implements AsynchronousJobListener {
             .labelNames("container_id", "command_name")
             .register();    
     
-    protected static final Counter numberOfJobsRetrying = Counter.build()
+    protected static final Gauge numberOfJobsRetrying = Gauge.build()
             .name("kie_server_job_in_retry_total")
             .help("Kie Server Retrying Jobs")
             .labelNames("container_id", "failed", "command_name")
@@ -105,7 +105,8 @@ public class PrometheusJobListener implements AsynchronousJobListener {
         	numberOfJobsRetrying.labels(defaultString(job.getDeploymentId()), String.valueOf(event.failed()), job.getCommandName()).inc();
         }
         else if(job.getRetries() == 0 && job.getStatus().equals(STATUS.ERROR)) {        	
-        	numberOfJobsErrored.labels(defaultString(job.getDeploymentId()), String.valueOf(event.failed()), job.getCommandName()).inc();        	
+        	numberOfJobsErrored.labels(defaultString(job.getDeploymentId()), String.valueOf(event.failed()), job.getCommandName()).inc(); 
+        	numberOfJobsRetrying.labels(defaultString(job.getDeploymentId()), String.valueOf(event.failed()), job.getCommandName()).dec();
         }        
         if(job.getTime() != null) {
             final double duration = millisToSeconds(System.currentTimeMillis() - job.getTime().getTime());
