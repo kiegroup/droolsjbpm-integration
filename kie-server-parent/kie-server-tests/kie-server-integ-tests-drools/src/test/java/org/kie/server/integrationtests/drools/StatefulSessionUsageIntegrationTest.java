@@ -24,6 +24,9 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.drools.core.base.RuleNameEndsWithAgendaFilter;
+import org.drools.core.command.runtime.rule.FireAllRulesCommand;
+import org.drools.core.command.runtime.rule.UpdateCommand;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -60,7 +63,9 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
     private static final String PERSON_EXPECTED_SURNAME = "Vader";
     private static final String PERSON_EXPECTED_SURNAME_AFTER_UPDATE = "Lord Vader";
     private static final String GET_OBJECTS_IDENTIFIER = "get-objects";
+    private static final String GET_OBJECT_IDENTIFIER = "get-object";
     private static final String GET_FACTS_IDENTIFIER = "facts";
+    private static final String FIRED_IDENTIFIER = "fired";
 
     private static ClassLoader kjarClassLoader;
 
@@ -357,5 +362,66 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
         commands.add(commandsFactory.newDispose());
         reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+    }
+
+    @Test
+    public void testAgendaFilter() {
+        // insert and fire
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+
+        Object person = createInstance(PERSON_CLASS_NAME, PERSON_NAME, "");
+        commands.add(commandsFactory.newInsert(person, PERSON_1_OUT_IDENTIFIER));
+        commands.add(new FireAllRulesCommand(FIRED_IDENTIFIER, -1, new RuleNameEndsWithAgendaFilter("Darth", false))); // Don't fire "Set lastname for Darth" rule
+
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
+        ExecutionResults actualData = reply.getResult();
+
+        Object fired = actualData.getValue(FIRED_IDENTIFIER);
+        assertEquals("Rule should not be fired because of AgendaFilter", 0, fired);
+
+        Object result = actualData.getValue(PERSON_1_OUT_IDENTIFIER);
+        assertEquals("Surname to remain empty", "", KieServerReflections.valueOf(result, PERSON_SURNAME_FIELD));
+    }
+
+    @Test
+    public void testUpdate() {
+        // insert and fire
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+
+        Object person = createInstance(PERSON_CLASS_NAME, PERSON_NAME, "");
+        commands.add(commandsFactory.newInsert(person, PERSON_1_OUT_IDENTIFIER));
+        commands.add(commandsFactory.newFireAllRules());
+
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
+        FactHandle factHandle = (FactHandle) reply.getResult().getFactHandle(PERSON_1_OUT_IDENTIFIER);
+
+        // update object by fact handle
+        commands = new ArrayList<Command<?>>();
+        executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+
+        Object newPerson = createInstance(PERSON_CLASS_NAME, PERSON_NAME, "Lord Vader");
+        commands.add(new UpdateCommand(factHandle, newPerson, new String[]{PERSON_SURNAME_FIELD}));
+
+        reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
+        // get object
+        commands = new ArrayList<Command<?>>();
+        executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+        commands.add(commandsFactory.newGetObject(factHandle, GET_OBJECT_IDENTIFIER));
+
+        reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
+        Object returnedPerson = reply.getResult().getValue(GET_OBJECT_IDENTIFIER);
+
+        assertEquals("Expected surname to be set to 'Lord Vader'",
+                     PERSON_EXPECTED_SURNAME_AFTER_UPDATE, KieServerReflections.valueOf(returnedPerson, PERSON_SURNAME_FIELD));
     }
 }
