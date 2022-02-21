@@ -215,7 +215,7 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
     
 	@Test
 	@Category(JEEOnly.class) // Executor in kie-server-integ-tests-all is using JMS for execution. Skipping test for non JEE containers as they don't have JMS.
-	public void testPrometheusJobErroMetrics() throws Exception {
+	public void testPrometheusJobErrorMetrics() throws Exception {
 		JobRequestInstance jobRequestErrorInstanceNow = createJobRequestExecutionErrorInstance();
 		Long jobId = jobServicesClient.scheduleRequest(jobRequestErrorInstanceNow);
 		KieServerSynchronization.waitForJobToFinish(jobServicesClient, jobId);
