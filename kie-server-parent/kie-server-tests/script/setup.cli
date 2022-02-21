@@ -40,4 +40,6 @@
 /subsystem=elytron/filesystem-realm=KieRealm:add-identity-attribute(identity=mary, name=role, value=["kie-server","guest","engineering","HR","IT","Accounting"])
 
 # Disable jaeger-tracer (same as proposed at WFLY-14625)
-/subsystem=microprofile-opentracing-smallrye/jaeger-tracer=jaeger:write-attribute(name=sampler-param, value=0)
+if (outcome == success) of /subsystem=microprofile-opentracing-smallrye:read-resource
+  /subsystem=microprofile-opentracing-smallrye/jaeger-tracer=jaeger:write-attribute(name=sampler-param, value=0)
+end-if
