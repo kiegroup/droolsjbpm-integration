@@ -356,6 +356,7 @@
               !org.drools.container.spring.beans.persistence,
               =javax.persistence.criteria;resolution:=optional,
               =org.jbpm.shared.services.impl;resolution:=optional,
+              javax.persistence.metamodel;resolution:=optional,
               *
             </Import-Package>
             <Export-Package>
