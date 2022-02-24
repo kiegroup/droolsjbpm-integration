@@ -101,12 +101,14 @@ public class PrometheusJobListener implements AsynchronousJobListener {
         final RequestInfo job = event.getJob();
         numberOfJobsExecuted.labels(defaultString(job.getDeploymentId()), String.valueOf(event.failed()), job.getCommandName()).inc();
         numberOfRunningJobs.labels(defaultString(job.getDeploymentId()), job.getCommandName()).dec();
-        if(job.getRetries() > 0 && job.getStatus().equals(STATUS.RETRYING)) {
+        if(job.getRetries() >= 0 && job.getStatus().equals(STATUS.RETRYING)) {
         	numberOfJobsRetrying.labels(defaultString(job.getDeploymentId()), String.valueOf(event.failed()), job.getCommandName()).inc();
         }
         else if(job.getRetries() == 0 && job.getStatus().equals(STATUS.ERROR)) {        	
-        	numberOfJobsErrored.labels(defaultString(job.getDeploymentId()), String.valueOf(event.failed()), job.getCommandName()).inc(); 
-        	numberOfJobsRetrying.labels(defaultString(job.getDeploymentId()), String.valueOf(event.failed()), job.getCommandName()).dec();
+        	numberOfJobsErrored.labels(defaultString(job.getDeploymentId()), String.valueOf(event.failed()), job.getCommandName()).inc();     
+        	if(job.getExecutions() > 2) {        	
+        		numberOfJobsRetrying.labels(defaultString(job.getDeploymentId()), String.valueOf(event.failed()), job.getCommandName()).dec(); 
+        	}
         }        
         if(job.getTime() != null) {
             final double duration = millisToSeconds(System.currentTimeMillis() - job.getTime().getTime());
