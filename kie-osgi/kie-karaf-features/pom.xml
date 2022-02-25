@@ -54,7 +54,7 @@
     <!-- used by kie-server-client -->
     <karaf.version.org.apache.servicemix.specs>2.9.1</karaf.version.org.apache.servicemix.specs>
 
-    <karaf.version.org.apache.logging.log4j>2.5</karaf.version.org.apache.logging.log4j>
+    <karaf.version.org.apache.logging.log4j>2.17.1</karaf.version.org.apache.logging.log4j>
     <!-- used by hibernate-validator -->
     <karaf.version.org.apache.servicemix.specs.jsr303-api>2.4.0</karaf.version.org.apache.servicemix.specs.jsr303-api>
 
