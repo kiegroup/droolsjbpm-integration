@@ -11,8 +11,8 @@
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${karaf.servicemix.version.org.antlr}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xstream-java8/${karaf.servicemix.version.com.thoughtworks.xstream}</bundle>
     <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.3/${karaf.servicemix.version.javax.xml.bind.jaxb}</bundle>
-    <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-xjc/${karaf.servicemix.version.com.sun.xml.bind.jaxb}</bundle>
-    <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/${karaf.servicemix.version.com.sun.xml.bind.jaxb}</bundle>
+    <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-xjc/${karaf.servicemix.version.com.sun.xml.bind.jaxb.xjc}</bundle>
+    <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-runtime/${karaf.servicemix.version.com.sun.xml.bind.jaxb}</bundle>
     <bundle>mvn:org.mvel/mvel2/${version.org.mvel}</bundle>
     <bundle>wrap:mvn:org.eclipse.jdt/ecj/${karaf.version.org.eclipse.jdt}$Bundle-SymbolicName=Eclipse-JDT-Compiler&amp;Bundle-Version=${karaf.version.org.eclipse.jdt}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-atinject_1.0_spec/${karaf.version.org.apache.geronimo.specs.atinject}</bundle>
@@ -171,11 +171,12 @@
     <bundle>mvn:org.kie/kie-dmn-api/${version.org.kie}</bundle>   <!-- needed as the kie-server contains DMN client, which uses the kie-dmn-api -->
     <bundle>mvn:org.drools/drools-ruleunit/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/kie-pmml/${version.org.kie}</bundle>
-    <bundle>wrap:mvn:jakarta.ws.rs/jakarta.ws.rs-api/${version.jakarta.ws.rs-api}</bundle>
+    <bundle start-level="10" dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxrs-api-2.1/${karaf.version.org.apache.servicemix.specs}</bundle>
     <bundle>mvn:org.apache.commons/commons-lang3/${version.org.apache.commons.lang3}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${karaf.version.org.apache.geronimo.specs.jta}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${karaf.version.org.apache.geronimo.specs.jms}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xpp3/${karaf.servicemix.version.com.thoughtworks.xmlpull}</bundle>
+    <bundle>mvn:org.apache.httpcomponents/httpcore-osgi/${version.org.apache.httpcomponents.httpcore}</bundle>
   </feature>
 
   <feature name="servlet-api-kie" version="${project.version}">

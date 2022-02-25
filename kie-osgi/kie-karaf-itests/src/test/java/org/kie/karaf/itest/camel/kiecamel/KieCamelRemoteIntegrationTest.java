@@ -46,6 +46,7 @@ import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
+import static org.ops4j.pax.exam.CoreOptions.bootDelegationPackages;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
@@ -166,6 +167,10 @@ public class KieCamelRemoteIntegrationTest extends AbstractKarafIntegrationTest 
 
                 // Option to be used to do remote debugging
 //                  debugConfiguration("5005", true),
+
+                // without this, JAXB model uses annotations from JAXB API bundle, while the runtime itself
+                // comes from the system classloader
+                bootDelegationPackages("javax.xml.bind", "javax.xml.bind.*"),
 
                 AbstractKarafIntegrationTest.loadKieFeatures("drools-module", "drools-decisiontable", "kie-ci", "kie-aries-blueprint", "kie-camel"),
 
