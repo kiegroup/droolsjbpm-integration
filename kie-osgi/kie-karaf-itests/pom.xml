@@ -15,7 +15,7 @@
     <skipTests>true</skipTests>
 
     <java.module.name>org.kie.karaf.itests.main</java.module.name>
-    <version.org.apache.karaf>4.3.2</version.org.apache.karaf>
+    <version.org.apache.karaf>4.3.6</version.org.apache.karaf>
     <!-- use global version property from kie-parent -->
     <!-- <version.org.apache.cxf>3.2.8</version.org.apache.cxf> -->
     <!-- version.org.apache.camel>2.21.5</version.org.apache.camel -->
