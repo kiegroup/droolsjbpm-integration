@@ -72,6 +72,9 @@ public class KieCamelRemoteIntegrationTest extends AbstractKarafIntegrationTest 
 
     @Test
     public void testListContainers() {
+
+        System.out.println("**** KieCamelRemoteIntegrationTest : TEST1 ****");
+
         final ExecutionServerCommand executionServerCommand = new ExecutionServerCommand();
         executionServerCommand.setClient("kieServices");
         executionServerCommand.setOperation("listContainers");

@@ -106,6 +106,10 @@ public class DroolsCommandsMarshallingTest {
 
     @Test
     public void testFireAllRulesCommandAgendaFilter() {
+
+        System.out.println("**** DroolsCommandsMarshallingTest : TEST1 ****");
+
+
         RuleNameEndsWithAgendaFilter filter = new RuleNameEndsWithAgendaFilter("suffix", true);
         FireAllRulesCommand command = new FireAllRulesCommand(randomString(), random.nextInt(1000), filter);
         FireAllRulesCommand result = roundTrip(command);
