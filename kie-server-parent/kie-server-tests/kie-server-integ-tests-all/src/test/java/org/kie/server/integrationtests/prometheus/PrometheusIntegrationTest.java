@@ -248,6 +248,17 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 				"kie_server_job_error_total{container_id=\"\",failed=\"true\",command_name=\""
 						+ JOB_EXECUTION_ERROR_COMMAND + "\",} ");
 	}
+	
+	@Test
+	@Category(JEEOnly.class) // Executor in kie-server-integ-tests-all is using JMS for execution. Skipping test for non JEE containers as they don't have JMS.
+	public void testPrometheusJobErrorMetricsWithTenRetries() throws Exception {
+		JobRequestInstance jobRequestErrorInstanceNow = createJobRequestExecutionErrorInstanceWithTenRetries();
+		Long jobId = jobServicesClient.scheduleRequest(jobRequestErrorInstanceNow);
+		KieServerSynchronization.waitForJobToFinish(jobServicesClient, jobId);		
+		assertThat(getMetrics()).contains(				
+				"kie_server_job_error_total{container_id=\"\",failed=\"true\",command_name=\""
+						+ JOB_EXECUTION_ERROR_COMMAND + "\",} ");
+	}
    
     private String startUserTaskCase(String owner, String contact) {
         Map<String, Object> data = new HashMap<>();
@@ -296,6 +307,16 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         Map<String, Object> data = new HashMap<>();
         data.put("businessKey", BUSINESS_KEY);
         data.put("retries", 0);
+        JobRequestInstance jobRequestInstance = new JobRequestInstance();
+        jobRequestInstance.setCommand(JOB_EXECUTION_ERROR_COMMAND);
+        jobRequestInstance.setData(data);
+        return jobRequestInstance;
+    }
+    
+    private JobRequestInstance createJobRequestExecutionErrorInstanceWithTenRetries() {
+        Map<String, Object> data = new HashMap<>();
+        data.put("businessKey", BUSINESS_KEY);
+        data.put("retries", 10);
         JobRequestInstance jobRequestInstance = new JobRequestInstance();
         jobRequestInstance.setCommand(JOB_EXECUTION_ERROR_COMMAND);
         jobRequestInstance.setData(data);
