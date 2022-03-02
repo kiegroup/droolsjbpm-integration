@@ -28,6 +28,7 @@
     <version.logback.kafka.appender>0.2.0-RC2</version.logback.kafka.appender>
     <version.servlet>2.0.0.Final</version.servlet>
     <version.slf4j>1.7.26</version.slf4j>
+    <version.scala-collection-compact>2.6.0</version.scala-collection-compact>
   </properties>
 
   <modules>
@@ -93,6 +94,12 @@
         <artifactId>kafka_2.12</artifactId>
         <version>${version.org.apache.kafka}</version>
         <classifier>test</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.scala-lang.modules</groupId>
+        <artifactId>scala-collection-compat_2.12</artifactId>
+        <version>${version.scala-collection-compact}</version>
+        <scope>test</scope>
       </dependency>
 
       <dependency>
