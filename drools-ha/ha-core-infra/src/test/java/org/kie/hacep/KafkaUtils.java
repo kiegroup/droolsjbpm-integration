@@ -34,7 +34,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServer;
-import kafka.server.NotRunning;
 import kafka.utils.TestUtils;
 import kafka.zk.EmbeddedZookeeper;
 import org.apache.kafka.clients.admin.AdminClient;
@@ -46,6 +45,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.common.utils.SystemTime;
 import org.apache.kafka.common.utils.Time;
+import org.apache.kafka.metadata.BrokerState;
 import org.kie.hacep.core.Bootstrap;
 import org.kie.hacep.core.InfraFactory;
 import org.kie.hacep.sample.kjar.StockTickEvent;
@@ -73,7 +73,6 @@ public class KafkaUtils implements AutoCloseable {
     private KafkaAdminClient adminClient;
     private Logger kafkaLogger = LoggerFactory.getLogger("org.hacep");
 
-
     public Map<String, Object> getKafkaProps() {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
@@ -86,10 +85,9 @@ public class KafkaUtils implements AutoCloseable {
         return props;
     }
 
-
     public KafkaServer startServer() throws IOException {
         tmpDir = Files.createTempDirectory(Paths.get(System.getProperty("user.dir"), File.separator, "target"),
-                                           "kafkatest-").toAbsolutePath().toString();
+                "kafkatest-").toAbsolutePath().toString();
         zkServer = new EmbeddedZookeeper();
         String zkConnect = ZOOKEEPER_HOST + ":" + zkServer.port();
         Properties brokerProps = new Properties();
@@ -98,23 +96,23 @@ public class KafkaUtils implements AutoCloseable {
         brokerProps.setProperty("log.dirs", tmpDir);
         brokerProps.setProperty("listeners", "PLAINTEXT://" + BROKER_HOST + ":" + BROKER_PORT);
         brokerProps.setProperty("offsets.topic.replication.factor", "1");
-        brokerProps.setProperty("auto.create.topics.enable","true");
+        brokerProps.setProperty("auto.create.topics.enable", "true");
         KafkaConfig config = new KafkaConfig(brokerProps);
         Time mock = new SystemTime();
         kafkaServer = TestUtils.createServer(config, mock);
-        Map<String, Object>  props = getKafkaProps();
+        Map<String, Object> props = getKafkaProps();
         adminClient = (KafkaAdminClient) AdminClient.create(props);
         return kafkaServer;
     }
 
     public void shutdownServer() {
-        if(adminClient != null) {
+        if (adminClient != null) {
             adminClient.close();
         }
         logger.warn("Shutdown kafka server");
         Path tmp = Paths.get(tmpDir);
         try {
-            if (kafkaServer.brokerState().currentState() != (NotRunning.state())) {
+            if (kafkaServer.brokerState().get() != BrokerState.NOT_RUNNING) {
                 kafkaServer.shutdown();
                 kafkaServer.awaitShutdown();
             }
@@ -151,7 +149,7 @@ public class KafkaUtils implements AutoCloseable {
             }
         } catch (IOException e) {
             logger.error(e.getMessage(),
-                         e);
+                    e);
         }
     }
 
@@ -177,7 +175,6 @@ public class KafkaUtils implements AutoCloseable {
         return producerProps;
     }
 
-
     public <K, V> KafkaConsumer<K, V> getStringConsumer(String topic) {
         Properties consumerProps = getConsumerConfig();
         consumerProps.setProperty("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
@@ -185,7 +182,6 @@ public class KafkaUtils implements AutoCloseable {
         consumer.subscribe(Arrays.asList(topic));
         return consumer;
     }
-
 
     public KafkaConsumer getConsumer(String topic, Properties props) {
         KafkaConsumer consumer = new KafkaConsumer(props);
@@ -203,32 +199,36 @@ public class KafkaUtils implements AutoCloseable {
     }
 
     public void insertBatchStockTicketEvent(int items, TopicsConfig topicsConfig, Class sessionType, Listener listener) {
-        insertBatchStockTicketEvent(items, topicsConfig, sessionType, Config.getProducerConfig("InsertBatchStockTicketEvent" ), listener);
+        insertBatchStockTicketEvent(items, topicsConfig, sessionType, Config.getProducerConfig("InsertBatchStockTicketEvent"),
+                listener);
     }
 
-    public void insertBatchStockTicketEvent(int items, TopicsConfig topicsConfig, Class sessionType, Properties props, Listener listener) {
+    public void insertBatchStockTicketEvent(int items, TopicsConfig topicsConfig, Class sessionType, Properties props,
+            Listener listener) {
         if (sessionType.equals(RemoteKieSession.class)) {
-            RemoteKieSessionImpl producer = new RemoteKieSessionImpl(props, topicsConfig, listener, InfraFactory.getProducer(false));
-            producer.fireUntilHalt();
-            try{
-                for (int i = 0; i < items; i++) {
-                    StockTickEvent ticket = new StockTickEvent("RHT", ThreadLocalRandom.current().nextLong(80, 100));
-                    producer.insert(ticket);
-                }
-            }finally {
-                producer.close();
-            }
-
-        }
-        if (sessionType.equals( RemoteStreamingKieSession.class)) {
-            RemoteStreamingKieSessionImpl producer = new RemoteStreamingKieSessionImpl(props, topicsConfig, listener, InfraFactory.getProducer(false));
+            RemoteKieSessionImpl producer =
+                    new RemoteKieSessionImpl(props, topicsConfig, listener, InfraFactory.getProducer(false));
             producer.fireUntilHalt();
             try {
                 for (int i = 0; i < items; i++) {
                     StockTickEvent ticket = new StockTickEvent("RHT", ThreadLocalRandom.current().nextLong(80, 100));
                     producer.insert(ticket);
                 }
-            }finally {
+            } finally {
+                producer.close();
+            }
+
+        }
+        if (sessionType.equals(RemoteStreamingKieSession.class)) {
+            RemoteStreamingKieSessionImpl producer =
+                    new RemoteStreamingKieSessionImpl(props, topicsConfig, listener, InfraFactory.getProducer(false));
+            producer.fireUntilHalt();
+            try {
+                for (int i = 0; i < items; i++) {
+                    StockTickEvent ticket = new StockTickEvent("RHT", ThreadLocalRandom.current().nextLong(80, 100));
+                    producer.insert(ticket);
+                }
+            } finally {
                 producer.close();
             }
         }
