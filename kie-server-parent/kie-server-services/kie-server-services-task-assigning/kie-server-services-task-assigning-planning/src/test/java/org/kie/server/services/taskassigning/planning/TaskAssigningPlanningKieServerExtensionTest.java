@@ -284,6 +284,8 @@ public class TaskAssigningPlanningKieServerExtensionTest {
         if (keyStoreResourceURL == null) {
             fail(currentKeyStore + " was not found");
         } else {
+            System.out.println("Current key store loaded: " + currentKeyStore);
+            System.out.println("keyStoreResourceURL = " + keyStoreResourceURL.toURI());
             System.setProperty(PROP_PWD_KS_URL, keyStoreResourceURL.toURI().toString());
             System.setProperty(PROP_PWD_KS_PWD, KEY_STORE_PASSWORD);
             System.setProperty(TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_ALIAS, alias);

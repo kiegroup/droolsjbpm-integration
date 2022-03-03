@@ -45,6 +45,9 @@ public class KeyStoreHelperUtil {
             String pwdKeyPassword = System.getProperty(pwdKeyPasswordProperty, "");
             passwordKey = keyStoreHelper.getPasswordKey(pwdKeyAlias, pwdKeyPassword.toCharArray());
         } catch (RuntimeException re) {
+            re.printStackTrace();
+            logger.error("Error while loading password due to {}", re);
+            System.out.println("exception " + re.getMessage());
             passwordKey = defaultPassword;
             if (hasNotBeenInvoked(pwdKeyAliasProperty, pwdKeyPasswordProperty, passwordKey)) {
                 // only print when it has not been invoked
