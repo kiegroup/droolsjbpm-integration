@@ -201,10 +201,10 @@ public class UserTaskServiceBase {
         containerId = context.getContainerId(containerId, new ByTaskIdContainerLocator(taskId.longValue()));
         userId = getUser(userId);
         Map<String, Object> parameters = Collections.emptyMap();
-        if(payload != null) {
+        if(payload != null && !payload.trim().isEmpty()) {
             parameters = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class);
         }
-        logger.debug("About to suspend task with id '{}' as user '{}' with parameters", taskId, userId, parameters);
+        logger.debug("About to suspend task with id '{}' as user '{}' with parameters {}", taskId, userId, parameters);
         userTaskService.suspend(containerId, taskId.longValue(), userId, parameters);
     }
 
