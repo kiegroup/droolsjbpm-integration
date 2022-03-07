@@ -65,7 +65,7 @@ public class TimerIntegrationTest extends JbpmKieServerBaseIntegrationTest {
     @After
     public void disposeContainers() {
         String containerId = "timer-project-" + runtimeStrategy;
-        List<ProcessInstance> startedInstances = queryClient.findProcessInstancesByContainerId(containerId, null, 0, 10, null, false);
+        List<ProcessInstance> startedInstances = queryClient.findProcessInstancesByContainerId(containerId, null, 0, 10, "log.processInstanceId", false);
         for(ProcessInstance processInstanceId : startedInstances) {
             processClient.abortProcessInstance(containerId, processInstanceId.getId());
         }
