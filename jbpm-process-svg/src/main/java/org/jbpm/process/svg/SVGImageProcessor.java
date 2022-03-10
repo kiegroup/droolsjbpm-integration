@@ -17,6 +17,7 @@ package org.jbpm.process.svg;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ import org.w3c.dom.Document;
 import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_BORDER_COLOR;
 import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_BORDER_COLOR;
 import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_COLOR;
+import static org.jbpm.process.svg.processor.SVGProcessor.ASYNC_ACTIVE_BORDER_COLOR;
 
 public class SVGImageProcessor {
 
@@ -92,6 +94,14 @@ public class SVGImageProcessor {
     public static String transform(InputStream svg, List<String> completed, List<String> active,
                                    Map<String, String> subProcessLinks, String completedNodeColor,
                                    String completedNodeBorderColor, String activeNodeBorderColor, Map<String, Long> badges) {
+        return transform(svg, completed, active, Collections.emptyList(), subProcessLinks, completedNodeColor,
+                         completedNodeBorderColor, activeNodeBorderColor, ASYNC_ACTIVE_BORDER_COLOR, badges);
+    }
+
+    public static String transform(InputStream svg, List<String> completed, List<String> active, List<String> asyncActive,
+                                   Map<String, String> subProcessLinks, String completedNodeColor,
+                                   String completedNodeBorderColor, String activeNodeBorderColor,
+                                   String asyncActiveNodeBorderColor, Map<String, Long> badges) {
         SVGProcessor processor = new SVGImageProcessor(svg, subProcessLinks, badges).getProcessor();
 
         for (String nodeId : completed) {
@@ -101,6 +111,10 @@ public class SVGImageProcessor {
         }
         for (String nodeId : active) {
             processor.defaultActiveTransformation(nodeId, activeNodeBorderColor);
+        }
+
+        for (String nodeId : asyncActive) {
+            processor.defaultAsyncActiveTransformation(nodeId, asyncActiveNodeBorderColor);
         }
 
         if (subProcessLinks != null) {

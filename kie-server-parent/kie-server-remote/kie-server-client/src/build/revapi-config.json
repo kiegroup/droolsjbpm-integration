@@ -95,6 +95,15 @@
               "methodName": "suspendTask",
               "elementKind": "method",
               "justification": "[JBPM-10015] Allow to set suspendUntil during user task suspend operation as parameter."
+            },
+            {
+              "code": "java.method.addedToInterface",
+              "new": "method java.lang.String org.kie.server.client.UIServicesClient::getProcessInstanceImageCustomColor(java.lang.String, java.lang.Long, java.lang.String, java.lang.String, java.lang.String, java.lang.String)",
+              "package": "org.kie.server.client",
+              "classSimpleName": "UIServicesClient",
+              "methodName": "getProcessInstanceImageCustomColor",
+              "elementKind": "method",
+              "justification": "JBPM-9979 mark async active nodes. Make active node border color blue as default"
             }
          ]
         }
