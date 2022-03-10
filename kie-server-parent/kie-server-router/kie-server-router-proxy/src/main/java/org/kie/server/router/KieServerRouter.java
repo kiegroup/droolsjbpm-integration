@@ -325,7 +325,7 @@ public class KieServerRouter {
         }
         try {
             String jsonResponse = HttpUtils.putHttpCall(environment(), environment().getKieControllerUrl() + "/server/" + environment().getRouterId(),  buildServerInfo(environment()));
-            log.debugf("Controller response :: ", jsonResponse);
+            log.debugf("Controller response :: %s", jsonResponse);
             boostrapFromControllerResponse(configurationManager, jsonResponse);
             log.infof("KieServerRouter connected to controller at " + environment().getKieControllerUrl());
         } catch (Exception e) {
@@ -341,8 +341,7 @@ public class KieServerRouter {
     private void tryToConnectToController(ConfigurationManager configurationManager) {
         try {
             String jsonResponse = HttpUtils.putHttpCall(environment(), environment().getKieControllerUrl() + "/server/" + environment().getRouterId(), buildServerInfo(environment()));
-            log.debugf("Controller response :: ",
-                       jsonResponse);
+            log.debugf("Controller response :: %s", jsonResponse);
             boostrapFromControllerResponse(configurationManager, jsonResponse);
 
             controllerConnectionAttempts.cancel(false);

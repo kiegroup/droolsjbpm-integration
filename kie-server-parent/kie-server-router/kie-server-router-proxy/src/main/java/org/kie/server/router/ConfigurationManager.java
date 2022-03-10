@@ -151,10 +151,11 @@ public class ConfigurationManager {
             return;
         }
         Iterator<FailedHostInfo> it = failedHosts.iterator();
+        List<FailedHostInfo> toRemove = new ArrayList<>();
         while (it.hasNext()) {
             FailedHostInfo failedHost = it.next();
             if (environment().getKieControllerRecoveryAttemptLimit() == failedHost.getAttempts()) {
-                it.remove();
+            	toRemove.add(failedHost);
                 log.info("Host " + failedHost.getServerUrl() + " has reached reconnect attempts limit " + environment().getKieControllerRecoveryAttemptLimit() + " quiting");
                 continue;
             }
@@ -163,6 +164,7 @@ public class ConfigurationManager {
 
                 failedHostsReconnects.cancel(false);
                 reconnectFailedHost(failedHost);
+                toRemove.add(failedHost);
             } catch (Exception e) {
                 log.debug("Host " + failedHost.getServerUrl() + " is still not available, attempting to reconnect in " + environment().getKieControllerAttemptInterval() + " seconds, error "
                         + e.getMessage());
@@ -170,6 +172,7 @@ public class ConfigurationManager {
                 failedHost.attempted();
             }
         }
+        failedHosts.removeAll(toRemove);
     }
 
     private void updateControllerOnRemove(String containerId) {
