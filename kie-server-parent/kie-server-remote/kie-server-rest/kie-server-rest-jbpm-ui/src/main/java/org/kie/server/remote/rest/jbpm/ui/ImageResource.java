@@ -106,7 +106,7 @@ public class ImageResource {
                                             @ApiParam(value = "svg completed node border color", required = false, example = COMPLETED_BORDER_COLOR) @QueryParam(SVG_NODE_COMPLETED_BORDER_COLOR) @DefaultValue(COMPLETED_BORDER_COLOR) String svgNodeCompletedBorderColor,
                                             @ApiParam(value = "svg active node border color", required = false, example = ACTIVE_BORDER_COLOR) @QueryParam(SVG_NODE_ACTIVE_COLOR) @DefaultValue(ACTIVE_BORDER_COLOR) String svgActiveNodeBorderColor,
                                             @ApiParam(value = "show or hidden instance badges", required = false, example = SHOW_INSTANCE_BADGES_DEFAULT) @QueryParam(SVG_INSTANCE_BADGES_SHOW) @DefaultValue(SHOW_INSTANCE_BADGES_DEFAULT) boolean showBadges,
-                                            @ApiParam(value = "svg active async node border color", required = false, example = ASYNC_ACTIVE_BORDER_COLOR) @QueryParam(ASYNC_ACTIVE_BORDER_COLOR) @DefaultValue(ASYNC_ACTIVE_BORDER_COLOR) String svgAsyncActiveNodeBorderColor) {
+                                            @ApiParam(value = "svg active async node border color", required = false, example = ASYNC_ACTIVE_BORDER_COLOR) @QueryParam(SVG_NODE_ASYNC_ACTIVE_BORDER_COLOR) @DefaultValue(ASYNC_ACTIVE_BORDER_COLOR) String svgAsyncActiveNodeBorderColor) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
