@@ -292,6 +292,7 @@ public class TaskAssigningPlanningKieServerExtensionTest {
             System.setProperty(TASK_ASSIGNING_KEY_STORE_PROCESS_RUNTIME_PWD, aliasPwd);
             enableExtension();
             System.setProperty(TASK_ASSIGNING_USER_SYSTEM_NAME, USER_SYSTEM_NAME);
+            System.getProperties().list(System.out);
             extension.init(kieServer, registry);
             verify(extension).createRuntimeClient(RUNTIME_URL, RUNTIME_USER, expectedPwd, Long.parseLong(RUNTIME_TIMEOUT));
         }
