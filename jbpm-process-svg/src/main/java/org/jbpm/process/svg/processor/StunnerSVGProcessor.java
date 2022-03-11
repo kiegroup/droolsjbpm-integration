@@ -58,8 +58,8 @@ public class StunnerSVGProcessor extends AbstractSVGProcessor {
     }
 
     @Override
-    public void defaultAsyncActiveTransformation(String nodeId, String asyncActiveNodeBorderColor) {
-        defaultBorderTransformation(nodeId, asyncActiveNodeBorderColor);
+    public void defaultActiveAsyncTransformation(String nodeId, String activeAsyncNodeBorderColor) {
+        defaultBorderTransformation(nodeId, activeAsyncNodeBorderColor);
     }
 
     public void defaultBorderTransformation(String nodeId, String nodeBorderColor) {

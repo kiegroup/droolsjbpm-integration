@@ -8,7 +8,7 @@ public interface SVGProcessor {
     String COMPLETED_COLOR = "#C0C0C0";
     String COMPLETED_BORDER_COLOR = "#030303";
     String ACTIVE_BORDER_COLOR = "#1e90ff";
-    String ASYNC_ACTIVE_BORDER_COLOR = "#FF0000";
+    String ACTIVE_ASYNC_BORDER_COLOR = "#FF0000";
     String SHOW_INSTANCE_BADGES_DEFAULT = "false";
 
     void transform(Transformation t);
@@ -23,7 +23,7 @@ public interface SVGProcessor {
 
     void defaultSubProcessLinkTransformation(String nodeId, String link);
 
-    void defaultAsyncActiveTransformation(String nodeId, String asyncActiveNodeBorderColor);
+    void defaultActiveAsyncTransformation(String nodeId, String activeAsyncNodeBorderColor);
 
     String getSVG();
 

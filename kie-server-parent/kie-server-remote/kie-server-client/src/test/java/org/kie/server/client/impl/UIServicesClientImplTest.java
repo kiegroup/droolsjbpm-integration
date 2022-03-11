@@ -29,7 +29,7 @@ public class UIServicesClientImplTest {
         String completedNodeColor = "#FFFFFF";
         String completedNodeBorderColor = "#C0C0C0";
         String activeNodeBorderColor = "#F0F0F0";
-        String asyncActiveNodeBorderColor = "#FF0000";
+        String activeAsyncNodeBorderColor = "#FF0000";
         KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration("testServerUrl",
                                                                                          "testUSer",
                                                                                          "TestPassword");
@@ -41,8 +41,8 @@ public class UIServicesClientImplTest {
         assertEquals(RestURI.SVG_NODE_COMPLETED_COLOR + "=" + uiServicesClientImpl.encode(completedNodeColor) +
                              "&" + RestURI.SVG_NODE_COMPLETED_BORDER_COLOR + "=" + uiServicesClientImpl.encode(completedNodeBorderColor) +
                              "&" + RestURI.SVG_NODE_ACTIVE_COLOR + "=" + uiServicesClientImpl.encode(activeNodeBorderColor) +
-                             "&" + RestURI.SVG_NODE_ASYNC_ACTIVE_BORDER_COLOR + "=" + uiServicesClientImpl.encode(asyncActiveNodeBorderColor),
-                     uiServicesClientImpl.createColorURLParams(completedNodeColor, completedNodeBorderColor, activeNodeBorderColor, asyncActiveNodeBorderColor));
+                             "&" + RestURI.SVG_NODE_ACTIVE_ASYNC_BORDER_COLOR + "=" + uiServicesClientImpl.encode(activeAsyncNodeBorderColor),
+                     uiServicesClientImpl.createColorURLParams(completedNodeColor, completedNodeBorderColor, activeNodeBorderColor, activeAsyncNodeBorderColor));
 
         assertEquals(RestURI.SVG_NODE_COMPLETED_COLOR + "=" + uiServicesClientImpl.encode(completedNodeColor),
                      uiServicesClientImpl.createColorURLParams(completedNodeColor, "", "", ""));
@@ -50,8 +50,8 @@ public class UIServicesClientImplTest {
                      uiServicesClientImpl.createColorURLParams("", completedNodeBorderColor, "", ""));
         assertEquals(RestURI.SVG_NODE_ACTIVE_COLOR + "=" + uiServicesClientImpl.encode(activeNodeBorderColor),
                      uiServicesClientImpl.createColorURLParams("", "", activeNodeBorderColor, ""));
-        assertEquals(RestURI.SVG_NODE_ASYNC_ACTIVE_BORDER_COLOR + "=" + uiServicesClientImpl.encode(asyncActiveNodeBorderColor),
-                     uiServicesClientImpl.createColorURLParams("", "", "", asyncActiveNodeBorderColor));
+        assertEquals(RestURI.SVG_NODE_ACTIVE_ASYNC_BORDER_COLOR + "=" + uiServicesClientImpl.encode(activeAsyncNodeBorderColor),
+                     uiServicesClientImpl.createColorURLParams("", "", "", activeAsyncNodeBorderColor));
 
         assertEquals(RestURI.SVG_NODE_COMPLETED_COLOR + "=" + uiServicesClientImpl.encode(completedNodeColor) +
                              "&" + RestURI.SVG_NODE_COMPLETED_BORDER_COLOR + "=" + uiServicesClientImpl.encode(completedNodeBorderColor),
@@ -63,7 +63,7 @@ public class UIServicesClientImplTest {
                              "&" + RestURI.SVG_NODE_ACTIVE_COLOR + "=" + uiServicesClientImpl.encode(activeNodeBorderColor),
                      uiServicesClientImpl.createColorURLParams(completedNodeColor, "", activeNodeBorderColor, ""));
         assertEquals(RestURI.SVG_NODE_COMPLETED_COLOR + "=" + uiServicesClientImpl.encode(completedNodeColor) +
-                             "&" + RestURI.SVG_NODE_ASYNC_ACTIVE_BORDER_COLOR + "=" + uiServicesClientImpl.encode(asyncActiveNodeBorderColor),
-                     uiServicesClientImpl.createColorURLParams(completedNodeColor, "", "", asyncActiveNodeBorderColor));
+                             "&" + RestURI.SVG_NODE_ACTIVE_ASYNC_BORDER_COLOR + "=" + uiServicesClientImpl.encode(activeAsyncNodeBorderColor),
+                     uiServicesClientImpl.createColorURLParams(completedNodeColor, "", "", activeAsyncNodeBorderColor));
     }
 }

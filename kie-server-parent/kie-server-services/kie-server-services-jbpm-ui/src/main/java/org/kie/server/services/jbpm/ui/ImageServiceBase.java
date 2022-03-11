@@ -44,7 +44,7 @@ import org.jbpm.services.api.RuntimeDataService.EntryType;
 import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_BORDER_COLOR;
 import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_BORDER_COLOR;
 import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_COLOR;
-import static org.jbpm.process.svg.processor.SVGProcessor.ASYNC_ACTIVE_BORDER_COLOR;
+import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_ASYNC_BORDER_COLOR;
 import static org.kie.server.api.KieServerConstants.KIE_SERVER_IMAGESERVICE_MAX_NODES;
 
 public class ImageServiceBase {
@@ -119,12 +119,12 @@ public class ImageServiceBase {
 
     public String getActiveProcessImage(String containerId, long procInstId) {
         return getActiveProcessImage(containerId, procInstId, COMPLETED_COLOR, COMPLETED_BORDER_COLOR, ACTIVE_BORDER_COLOR,
-                                     false, ASYNC_ACTIVE_BORDER_COLOR);
+                                     false, ACTIVE_ASYNC_BORDER_COLOR);
     }
 
     public String getActiveProcessImage(String containerId, long procInstId, String completedNodeColor,
                                         String completedNodeBorderColor, String activeNodeBorderColor, Boolean showBadges,
-                                        String asyncActiveNodeBorderColor) {
+                                        String activeAsyncNodeBorderColor) {
         ProcessInstanceDesc instance = dataService.getProcessInstanceById(procInstId);
         if (instance == null) {
             throw new ProcessInstanceNotFoundException("No instance found for process instance id " + procInstId);
@@ -141,7 +141,7 @@ public class ImageServiceBase {
             Collection<NodeInstanceDesc> fullLogs = dataService.getProcessInstanceFullHistory(procInstId, qc);
 
             // Async active nodes don't have any related completed node instance
-            List<String> asyncActiveNodes =
+            List<String> activeAsyncNodes =
                     fullLogs.stream()
                             .filter(nodeInstanceDesc ->
                                             (((org.jbpm.kie.services.impl.model.NodeInstanceDesc) nodeInstanceDesc).getType() == NodeInstanceLog.TYPE_ASYNC_ENTER) &&
@@ -180,9 +180,9 @@ public class ImageServiceBase {
 
             ByteArrayInputStream svgStream = new ByteArrayInputStream(imageSVG);
 
-            imageSVGString = SVGImageProcessor.transform(svgStream, completed, new ArrayList<String>(active.values()), asyncActiveNodes,
+            imageSVGString = SVGImageProcessor.transform(svgStream, completed, new ArrayList<String>(active.values()), activeAsyncNodes,
                                                          subProcessLinks, completedNodeColor, completedNodeBorderColor,
-                                                         activeNodeBorderColor, asyncActiveNodeBorderColor, badges);
+                                                         activeNodeBorderColor, activeAsyncNodeBorderColor, badges);
 
             return imageSVGString;
         }

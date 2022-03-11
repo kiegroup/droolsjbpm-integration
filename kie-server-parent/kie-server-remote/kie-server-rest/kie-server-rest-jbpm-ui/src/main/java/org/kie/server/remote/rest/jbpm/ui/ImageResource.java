@@ -18,7 +18,7 @@ package org.kie.server.remote.rest.jbpm.ui;
 import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_BORDER_COLOR;
 import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_BORDER_COLOR;
 import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_COLOR;
-import static org.jbpm.process.svg.processor.SVGProcessor.ASYNC_ACTIVE_BORDER_COLOR;
+import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_ASYNC_BORDER_COLOR;
 import static org.jbpm.process.svg.processor.SVGProcessor.SHOW_INSTANCE_BADGES_DEFAULT;
 import static org.kie.server.api.rest.RestURI.*;
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
@@ -106,7 +106,7 @@ public class ImageResource {
                                             @ApiParam(value = "svg completed node border color", required = false, example = COMPLETED_BORDER_COLOR) @QueryParam(SVG_NODE_COMPLETED_BORDER_COLOR) @DefaultValue(COMPLETED_BORDER_COLOR) String svgNodeCompletedBorderColor,
                                             @ApiParam(value = "svg active node border color", required = false, example = ACTIVE_BORDER_COLOR) @QueryParam(SVG_NODE_ACTIVE_COLOR) @DefaultValue(ACTIVE_BORDER_COLOR) String svgActiveNodeBorderColor,
                                             @ApiParam(value = "show or hidden instance badges", required = false, example = SHOW_INSTANCE_BADGES_DEFAULT) @QueryParam(SVG_INSTANCE_BADGES_SHOW) @DefaultValue(SHOW_INSTANCE_BADGES_DEFAULT) boolean showBadges,
-                                            @ApiParam(value = "svg active async node border color", required = false, example = ASYNC_ACTIVE_BORDER_COLOR) @QueryParam(SVG_NODE_ASYNC_ACTIVE_BORDER_COLOR) @DefaultValue(ASYNC_ACTIVE_BORDER_COLOR) String svgAsyncActiveNodeBorderColor) {
+                                            @ApiParam(value = "svg active async node border color", required = false, example = ACTIVE_ASYNC_BORDER_COLOR) @QueryParam(SVG_NODE_ACTIVE_ASYNC_BORDER_COLOR) @DefaultValue(ACTIVE_ASYNC_BORDER_COLOR) String svgActiveAsyncNodeBorderColor) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -114,7 +114,7 @@ public class ImageResource {
                                                                       (COMPLETED_COLOR.equals(svgNodeCompletedColor) ? COMPLETED_COLOR : URLDecoder.decode(svgNodeCompletedColor, "UTF-8")),
                                                                       (COMPLETED_BORDER_COLOR.equals(svgNodeCompletedBorderColor) ? COMPLETED_BORDER_COLOR : URLDecoder.decode(svgNodeCompletedBorderColor, "UTF-8")),
                                                                       (ACTIVE_BORDER_COLOR.equals(svgActiveNodeBorderColor) ? ACTIVE_BORDER_COLOR : URLDecoder.decode(svgActiveNodeBorderColor, "UTF-8")), showBadges,
-                                                                      (ASYNC_ACTIVE_BORDER_COLOR.equals(svgAsyncActiveNodeBorderColor) ? ASYNC_ACTIVE_BORDER_COLOR : URLDecoder.decode(svgAsyncActiveNodeBorderColor, "UTF-8")));
+                                                                      (ACTIVE_ASYNC_BORDER_COLOR.equals(svgActiveAsyncNodeBorderColor) ? ACTIVE_ASYNC_BORDER_COLOR : URLDecoder.decode(svgActiveAsyncNodeBorderColor, "UTF-8")));
 
             logger.debug("Returning OK response with content '{}'", svgString);
             return createResponse(svgString, v, Response.Status.OK, conversationIdHeader);

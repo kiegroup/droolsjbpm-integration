@@ -65,7 +65,7 @@ public class RestURI {
     public static final String SVG_NODE_COMPLETED_COLOR = "svgCompletedColor";
     public static final String SVG_NODE_COMPLETED_BORDER_COLOR = "svgCompletedBorderColor";
     public static final String SVG_NODE_ACTIVE_COLOR = "svgActiveBorderColor";
-    public static final String SVG_NODE_ASYNC_ACTIVE_BORDER_COLOR = "svgAsyncActiveBorderColor";
+    public static final String SVG_NODE_ACTIVE_ASYNC_BORDER_COLOR = "svgActiveAsyncBorderColor";
     public static final String SVG_INSTANCE_BADGES_SHOW = "svgInstanceBadgesShow";
 
     public static final String PROCESS_URI = "containers/{" + CONTAINER_ID + "}/processes";

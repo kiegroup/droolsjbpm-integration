@@ -17,7 +17,7 @@ package org.kie.server.services.jbpm.ui;
 
 import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_BORDER_COLOR;
 import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_BORDER_COLOR;
-import static org.jbpm.process.svg.processor.SVGProcessor.ASYNC_ACTIVE_BORDER_COLOR;
+import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_ASYNC_BORDER_COLOR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -296,23 +296,23 @@ public class ImageServiceBaseTest {
         checkStrokeAttributeAtNode(svgDocument, node_hr_evaluation, ACTIVE_BORDER_COLOR);
         checkStrokeAttributeAtNode(svgDocument, node_self_evaluation, COMPLETED_BORDER_COLOR);
         checkStrokeAttributeAtNode(svgDocument, node_pm_evaluation, COMPLETED_BORDER_COLOR);
-        checkStrokeAttributeAtNode(svgDocument, node_async_failing, ASYNC_ACTIVE_BORDER_COLOR);
+        checkStrokeAttributeAtNode(svgDocument, node_async_failing, ACTIVE_ASYNC_BORDER_COLOR);
         checkStrokeAttributeAtNode(svgDocument, node_asyncOk, COMPLETED_BORDER_COLOR);
 
         String completedNodeColor = "black";
         String completedNodeBorderColor = "grey";
         String activeNodeBorderColor = "blue";
-        String asyncActiveNodeBorderColor = "red";
+        String activeAsyncNodeBorderColor = "red";
         processImageStr = imageServiceBase.getActiveProcessImage(containerId, processInstanceId, completedNodeColor,
                                                                  completedNodeBorderColor, activeNodeBorderColor, false,
-                                                                 asyncActiveNodeBorderColor);
+                                                                 activeAsyncNodeBorderColor);
         svgDocument = readSVG(processImageStr);
 
         checkStrokeAttributeAtNode(svgDocument, node_hr_evaluation, activeNodeBorderColor);
         checkStrokeAttributeAtNode(svgDocument, node_self_evaluation, completedNodeBorderColor);
         checkStrokeAttributeAtNode(svgDocument, node_pm_evaluation, completedNodeBorderColor);
         checkStrokeAttributeAtNode(svgDocument, node_asyncOk, completedNodeBorderColor);
-        checkStrokeAttributeAtNode(svgDocument, node_async_failing, asyncActiveNodeBorderColor);
+        checkStrokeAttributeAtNode(svgDocument, node_async_failing, activeAsyncNodeBorderColor);
     }
 
     private void checkStrokeAttributeAtNode(Document svgDocument, String nodeId, String expectedStrokeValue) {

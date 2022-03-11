@@ -32,7 +32,7 @@ import org.w3c.dom.Document;
 import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_BORDER_COLOR;
 import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_BORDER_COLOR;
 import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_COLOR;
-import static org.jbpm.process.svg.processor.SVGProcessor.ASYNC_ACTIVE_BORDER_COLOR;
+import static org.jbpm.process.svg.processor.SVGProcessor.ACTIVE_ASYNC_BORDER_COLOR;
 
 public class SVGImageProcessor {
 
@@ -95,13 +95,13 @@ public class SVGImageProcessor {
                                    Map<String, String> subProcessLinks, String completedNodeColor,
                                    String completedNodeBorderColor, String activeNodeBorderColor, Map<String, Long> badges) {
         return transform(svg, completed, active, Collections.emptyList(), subProcessLinks, completedNodeColor,
-                         completedNodeBorderColor, activeNodeBorderColor, ASYNC_ACTIVE_BORDER_COLOR, badges);
+                         completedNodeBorderColor, activeNodeBorderColor, ACTIVE_ASYNC_BORDER_COLOR, badges);
     }
 
-    public static String transform(InputStream svg, List<String> completed, List<String> active, List<String> asyncActive,
+    public static String transform(InputStream svg, List<String> completed, List<String> active, List<String> activeAsync,
                                    Map<String, String> subProcessLinks, String completedNodeColor,
                                    String completedNodeBorderColor, String activeNodeBorderColor,
-                                   String asyncActiveNodeBorderColor, Map<String, Long> badges) {
+                                   String activeAsyncNodeBorderColor, Map<String, Long> badges) {
         SVGProcessor processor = new SVGImageProcessor(svg, subProcessLinks, badges).getProcessor();
 
         for (String nodeId : completed) {
@@ -113,8 +113,8 @@ public class SVGImageProcessor {
             processor.defaultActiveTransformation(nodeId, activeNodeBorderColor);
         }
 
-        for (String nodeId : asyncActive) {
-            processor.defaultAsyncActiveTransformation(nodeId, asyncActiveNodeBorderColor);
+        for (String nodeId : activeAsync) {
+            processor.defaultActiveAsyncTransformation(nodeId, activeAsyncNodeBorderColor);
         }
 
         if (subProcessLinks != null) {
