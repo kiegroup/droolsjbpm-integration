@@ -222,6 +222,10 @@ public class ImageServiceBaseTest {
         when(kieServerRegistry.getConfig()).thenReturn(config);
         when(config.getConfigItemValue(anyString(), anyString())).thenReturn("");
 
+        //async triggered again
+        NodeInstanceDesc nodeInstance8_2 = new org.jbpm.kie.services.impl.model.NodeInstanceDesc
+                ("8", node_async_failing, "", "AsyncEventNode", "evaluation_1.0.0-SNAPSHOT", processInstanceId, null,
+                 "", 6, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
         NodeInstanceDesc nodeInstance8 = new org.jbpm.kie.services.impl.model.NodeInstanceDesc
                 ("8", node_async_failing, "", "AsyncEventNode", "evaluation_1.0.0-SNAPSHOT", processInstanceId, null,
                  "", 6, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
@@ -267,12 +271,12 @@ public class ImageServiceBaseTest {
 
         List<NodeInstanceDesc> activeNodes = Arrays.asList(nodeInstance7_start);
         List<NodeInstanceDesc> completedNodes = Arrays.asList(nodeInstance0_end, nodeInstance1_end, nodeInstance3_end,
-                                                              nodeInstance5_end, nodeInstance5_end2,nodeInstance6_end);
+                                                              nodeInstance5_end, nodeInstance5_end2, nodeInstance6_end);
         List<NodeInstanceDesc> fullLogs = Arrays.asList(nodeInstance0_end, nodeInstance0_start, nodeInstance1_start,
                                                         nodeInstance1_end, nodeInstance2, nodeInstance3_end,
                                                         nodeInstance3_start, nodeInstance5_end, nodeInstance5_end2,
                                                         nodeInstance5_start, nodeInstance6_end, nodeInstance6_start,
-                                                        nodeInstance7_start, nodeInstance8);
+                                                        nodeInstance7_start, nodeInstance8, nodeInstance8_2);
         when(dataService.getProcessInstanceHistoryCompleted(anyLong(), any())).thenReturn(completedNodes);
         when(dataService.getProcessInstanceHistoryActive(anyLong(), any())).thenReturn(activeNodes);
         when(dataService.getProcessInstanceFullHistory(anyLong(), any())).thenReturn(fullLogs);

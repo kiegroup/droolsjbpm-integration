@@ -69,7 +69,7 @@
         {
           "code": "java.annotation.attributeValueChanged",
           "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessInstanceImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String, ===java.lang.String===)",
-          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessInstanceImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String, ===java.lang.String===, boolean)",
+          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessInstanceImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String, ===java.lang.String===, boolean, java.lang.String)",
           "annotationType": "io.swagger.annotations.ApiParam",
           "annotation": "@io.swagger.annotations.ApiParam(value = \"svg active node border color\", required = false, example = \"#1e90ff\")",
           "attribute": "example",
@@ -85,7 +85,7 @@
         {
           "code": "java.annotation.attributeValueChanged",
           "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessInstanceImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String, ===java.lang.String===)",
-          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessInstanceImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String, ===java.lang.String===, boolean)",
+          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessInstanceImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String, ===java.lang.String===, boolean, java.lang.String)",
           "annotationType": "javax.ws.rs.DefaultValue",
           "annotation": "@javax.ws.rs.DefaultValue(\"#1e90ff\")",
           "attribute": "value",
@@ -96,6 +96,16 @@
           "methodName": "getProcessInstanceImage",
           "parameterIndex": "5",
           "elementKind": "parameter",
+          "justification": "JBPM-9979 mark async active nodes. Make active node border color blue as default"
+        },
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessInstanceImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String, java.lang.String)",
+          "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.ImageResource::getProcessInstanceImage(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String)",
+          "package": "org.kie.server.remote.rest.jbpm.ui",
+          "classSimpleName": "ImageResource",
+          "methodName": "getProcessInstanceImage",
+          "elementKind": "method",
           "justification": "JBPM-9979 mark async active nodes. Make active node border color blue as default"
         }]
     }

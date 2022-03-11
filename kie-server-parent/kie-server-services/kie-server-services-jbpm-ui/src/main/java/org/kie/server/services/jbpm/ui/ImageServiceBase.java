@@ -140,11 +140,14 @@ public class ImageServiceBase {
             Collection<NodeInstanceDesc> completedLogs = dataService.getProcessInstanceHistoryCompleted(procInstId, qc);
             Collection<NodeInstanceDesc> fullLogs = dataService.getProcessInstanceFullHistory(procInstId, qc);
 
-            // Async completed nodes have more than 1 node instances related with the same nodeId
-            List<String> asyncActiveNodes = fullLogs.stream().filter(nodeInstanceDesc ->
-                                                                             (((org.jbpm.kie.services.impl.model.NodeInstanceDesc) nodeInstanceDesc).getType() == NodeInstanceLog.TYPE_ASYNC_ENTER) &&
-                                                                                     fullLogs.stream().filter(nodeInst -> nodeInstanceDesc.getNodeId().equals(nodeInst.getNodeId())).count() == 1)
-                    .map(NodeInstanceDesc::getNodeId).collect(Collectors.toList());
+            // Async active nodes don't have any related completed node instance
+            List<String> asyncActiveNodes =
+                    fullLogs.stream()
+                            .filter(nodeInstanceDesc ->
+                                            (((org.jbpm.kie.services.impl.model.NodeInstanceDesc) nodeInstanceDesc).getType() == NodeInstanceLog.TYPE_ASYNC_ENTER) &&
+                                                    fullLogs.stream().noneMatch(nodeInst -> nodeInstanceDesc.getNodeId().equals(nodeInst.getNodeId())
+                                                            && (((org.jbpm.kie.services.impl.model.NodeInstanceDesc) nodeInst).getType() == NodeInstanceLog.TYPE_EXIT)))
+                            .map(NodeInstanceDesc::getNodeId).collect(Collectors.toList());
 
             Map<Long, String> active = new HashMap<Long, String>();
             List<String> completed = new ArrayList<String>();
