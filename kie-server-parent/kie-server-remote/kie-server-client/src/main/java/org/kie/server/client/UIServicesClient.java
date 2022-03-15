@@ -196,7 +196,7 @@ public interface UIServicesClient {
      * @param completeNodeColor process instance image complete node color
      * @param completeNodeBorderColor process instance image complete node border color
      * @param activeNodeBorderColor process instance image active node border color
-     * @param activeAsyncNodeBorderColor process instance image error node border color
+     * @param activeAsyncNodeBorderColor process instance image active async node border color
      * @return svg (xml) representing process image annotated with custom colors
      */
     String getProcessInstanceImageCustomColor(String containerId, Long processInstanceId, String completeNodeColor,
