@@ -263,7 +263,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation(){
             @Override
             public KieServerHttpRequest doOperation(String url) {
-                return newRequest( uri ).headers(headers).get();
+                return newRequest( url ).headers(headers).get();
             }
         });
         KieServerHttpResponse response = request.response();
@@ -317,7 +317,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation(){
             @Override
             public KieServerHttpRequest doOperation(String url) {
-                return newRequest( uri ).headers(headers).body(body).post();
+                return newRequest( url ).headers(headers).body(body).post();
             }
         });
 
@@ -349,7 +349,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation(){
             @Override
             public KieServerHttpRequest doOperation(String url) {
-                return newRequest(uri ).headers(headers).body(body).post();
+                return newRequest(url).headers(headers).body(body).post();
             }
         });
 
@@ -377,7 +377,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation(){
             @Override
             public KieServerHttpRequest doOperation(String url) {
-                return newRequest(uri).body(body).put();
+                return newRequest(url).body(body).put();
             }
         });
 
@@ -407,7 +407,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation(){
             @Override
             public KieServerHttpRequest doOperation(String url) {
-                return newRequest( uri ).headers(headers).body(body).put();
+                return newRequest( url ).headers(headers).body(body).put();
             }
         });
 
@@ -430,7 +430,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation(){
             @Override
             public KieServerHttpRequest doOperation(String url) {
-                return newRequest( uri ).delete();
+                return newRequest( url ).delete();
             }
         });
 
@@ -453,7 +453,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation(){
             @Override
             public KieServerHttpRequest doOperation(String url) {
-                return newRequest( uri ).delete();
+                return newRequest( url ).delete();
             }
         });
 

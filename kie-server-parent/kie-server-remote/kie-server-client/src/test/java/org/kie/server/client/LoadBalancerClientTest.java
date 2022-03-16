@@ -15,15 +15,24 @@
 
 package org.kie.server.client;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.stubbing.Scenario;
 import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.client.admin.ProcessAdminServicesClient;
 import org.kie.server.client.balancer.BalancerStrategy;
 import org.kie.server.client.balancer.LoadBalancer;
 import org.kie.server.client.balancer.impl.RoundRobinBalancerStrategy;
@@ -33,15 +42,15 @@ import org.kie.server.common.rest.NoEndpointFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.junit.Assert.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class LoadBalancerClientTest {
 
@@ -536,5 +545,143 @@ public class LoadBalancerClientTest {
 
     private void assertSuccess(ServiceResponse<?> response) {
         assertEquals("Response type", ServiceResponse.ResponseType.SUCCESS, response.getType());
+    }
+
+    @Test
+    public void testFailOverWithRuleServicesClientExecuteCommandsWithResults() throws Exception {
+        wireMockServer1.stop();
+
+        KieServicesConfiguration testConfig = config.clone();
+        testConfig.setCapabilities(Arrays.asList("KieServer", "BRM"));
+        KieServicesClient kieServicesClient = KieServicesFactory.newKieServicesClient(testConfig);
+        RuleServicesClient ruleServicesClient = kieServicesClient.getServicesClient(RuleServicesClient.class);
+
+        try {
+            // internally tests AbstractKieServicesClientImpl.makeHttpPostRequestAndCreateServiceResponse()
+            ruleServicesClient.executeCommandsWithResults("container-id", "<batch-execution></batch-execution>");
+        } catch (NoEndpointFoundException noEndpointFoundException) {
+            fail("Must be able to fail-over to wireMockServer2");
+        } catch (KieServicesHttpException kieServicesHttpException) {
+            // KieServicesHttpException(404) is okay. Just want to test fail-over
+            assertTrue(kieServicesHttpException.getUrl().contains(mockServerBaseUri2));
+        }
+    }
+
+    @Test
+    public void testFailOverWithUIServicesClientImplGetProcessImage() throws Exception {
+        wireMockServer1.stop();
+
+        KieServicesConfiguration testConfig = config.clone();
+        testConfig.setCapabilities(Arrays.asList("KieServer", "BPM-UI"));
+        KieServicesClient kieServicesClient = KieServicesFactory.newKieServicesClient(testConfig);
+        UIServicesClient uiServicesClient = kieServicesClient.getServicesClient(UIServicesClient.class);
+
+        try {
+            // internally tests AbstractKieServicesClientImpl.makeHttpGetRequestAndCreateRawResponse()
+            uiServicesClient.getProcessImage("container-id", "process-id");
+        } catch (NoEndpointFoundException noEndpointFoundException) {
+            fail("Must be able to fail-over to wireMockServer2");
+        } catch (KieServicesHttpException kieServicesHttpException) {
+            // KieServicesHttpException(404) is okay. Just want to test fail-over
+            assertTrue(kieServicesHttpException.getUrl().contains(mockServerBaseUri2));
+        }
+    }
+
+    @Test
+    public void testFailOverWithProcessAdminServicesClientImplTriggerNode() throws Exception {
+        wireMockServer1.stop();
+
+        KieServicesConfiguration testConfig = config.clone();
+        testConfig.setCapabilities(Arrays.asList("KieServer", "BPM"));
+        KieServicesClient kieServicesClient = KieServicesFactory.newKieServicesClient(testConfig);
+        ProcessAdminServicesClient processAdminServicesClient = kieServicesClient.getServicesClient(ProcessAdminServicesClient.class);
+
+        try {
+            // internally tests AbstractKieServicesClientImpl.makeHttpPostRequestAndCreateCustomResponse()
+            processAdminServicesClient.triggerNode("container-id", 1L, 1L);
+        } catch (NoEndpointFoundException noEndpointFoundException) {
+            fail("Must be able to fail-over to wireMockServer2");
+        } catch (KieServicesHttpException kieServicesHttpException) {
+            // KieServicesHttpException(404) is okay. Just want to test fail-over
+            assertTrue(kieServicesHttpException.getUrl().contains(mockServerBaseUri2));
+        }
+    }
+
+    @Test
+    public void testFailOverWithKieServicesClientImplActivateContainer() throws Exception {
+        wireMockServer1.stop();
+
+        KieServicesConfiguration testConfig = config.clone();
+        testConfig.setCapabilities(Arrays.asList("KieServer"));
+        KieServicesClient kieServicesClient = KieServicesFactory.newKieServicesClient(testConfig);
+
+        try {
+            // internally tests AbstractKieServicesClientImpl.makeHttpPutRequestAndCreateServiceResponse()
+            kieServicesClient.activateContainer("container-id");
+        } catch (NoEndpointFoundException noEndpointFoundException) {
+            fail("Must be able to fail-over to wireMockServer2");
+        } catch (KieServicesHttpException kieServicesHttpException) {
+            // KieServicesHttpException(404) is okay. Just want to test fail-over
+            assertTrue(kieServicesHttpException.getUrl().contains(mockServerBaseUri2));
+        }
+    }
+
+    @Test
+    public void testFailOverWithProcessAdminServicesClientImplAcknowledgeError() throws Exception {
+        wireMockServer1.stop();
+
+        KieServicesConfiguration testConfig = config.clone();
+        testConfig.setCapabilities(Arrays.asList("KieServer", "BPM"));
+        KieServicesClient kieServicesClient = KieServicesFactory.newKieServicesClient(testConfig);
+        ProcessAdminServicesClient processAdminServicesClient = kieServicesClient.getServicesClient(ProcessAdminServicesClient.class);
+
+        try {
+            // internally tests AbstractKieServicesClientImpl.makeHttpPutRequestAndCreateCustomResponse()
+            processAdminServicesClient.acknowledgeError("container-id", "error-id");
+        } catch (NoEndpointFoundException noEndpointFoundException) {
+            fail("Must be able to fail-over to wireMockServer2");
+        } catch (KieServicesHttpException kieServicesHttpException) {
+            // KieServicesHttpException(404) is okay. Just want to test fail-over
+            assertTrue(kieServicesHttpException.getUrl().contains(mockServerBaseUri2));
+        }
+    }
+
+    @Test
+    public void testFailOverWithKieServicesClientImplDisposeContainer() throws Exception {
+        wireMockServer1.stop();
+
+        KieServicesConfiguration testConfig = config.clone();
+        testConfig.setCapabilities(Arrays.asList("KieServer"));
+        KieServicesClient kieServicesClient = KieServicesFactory.newKieServicesClient(testConfig);
+
+        try {
+            // internally tests AbstractKieServicesClientImpl.makeHttpDeleteRequestAndCreateServiceResponse()
+            kieServicesClient.disposeContainer("container-id");
+        } catch (NoEndpointFoundException noEndpointFoundException) {
+            fail("Must be able to fail-over to wireMockServer2");
+        } catch (KieServicesHttpException kieServicesHttpException) {
+            // KieServicesHttpException(404) is okay. Just want to test fail-over
+            assertTrue(kieServicesHttpException.getUrl().contains(mockServerBaseUri2));
+        }
+    }
+
+    @Test
+    public void testFailOverWithProcessAdminServicesClientImplCancelNodeInstance() throws Exception {
+        wireMockServer1.stop();
+
+        KieServicesConfiguration testConfig = config.clone();
+        testConfig.setCapabilities(Arrays.asList("KieServer", "BPM"));
+        KieServicesClient kieServicesClient = KieServicesFactory.newKieServicesClient(testConfig);
+        ProcessAdminServicesClient processAdminServicesClient = kieServicesClient.getServicesClient(ProcessAdminServicesClient.class);
+
+        try {
+            // internally tests AbstractKieServicesClientImpl.makeHttpDeleteRequestAndCreateCustomResponse()
+            processAdminServicesClient.cancelNodeInstance("container-id", 1L, 1L);
+        } catch (NoEndpointFoundException noEndpointFoundException) {
+            fail("Must be able to fail-over to wireMockServer2");
+        } catch (KieServicesHttpException kieServicesHttpException) {
+            // KieServicesHttpException(404) is okay. Just want to test fail-over
+            assertTrue(kieServicesHttpException.getUrl().contains(mockServerBaseUri2));
+        }
     }
 }
