@@ -32,6 +32,8 @@ public interface UserTaskServicesClient {
     void activateTask(String containerId, Long taskId, String userId);
 
     void claimTask(String containerId, Long taskId, String userId);
+    
+    void claimTasks(String containerId, List<Long> taskIds, String userId);
 
     void completeTask(String containerId, Long taskId, String userId, Map<String, Object> params);
 
@@ -56,6 +58,8 @@ public interface UserTaskServicesClient {
     void stopTask(String containerId, Long taskId, String userId);
 
     void suspendTask(String containerId, Long taskId, String userId);
+
+    void suspendTask(String containerId, Long taskId, String userId, Map<String, Object> parameters);
 
     void nominateTask(String containerId, Long taskId, String userId, List<String> potentialOwners);
 

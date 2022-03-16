@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-parent</artifactId>
-    <version>7.54.0-SNAPSHOT</version>
+    <version>7.68.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-common</artifactId>
@@ -29,10 +29,23 @@
     </dependency>
     <!-- REST -->
     <dependency>
-      <groupId>org.jboss.spec.javax.ws.rs</groupId>
-      <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
-  
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <!-- logging -->
     <dependency>
       <groupId>org.slf4j</groupId>

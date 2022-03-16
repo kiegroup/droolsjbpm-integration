@@ -111,6 +111,10 @@ public class KafkaFixture {
     
     protected static final String PATH = "src/test/resources/kjars/";
     
+    protected static final String BOOTSTRAP_SERVERS = "org.kie.jbpm.event.emitters.kafka.bootstrap.servers";
+    protected static final String CLIENT_ID = "org.kie.jbpm.event.emitters.kafka.client.id";
+    protected static final String TOPIC_PROCESSES = "org.kie.jbpm.event.emitters.kafka.topic.processes";
+    
     protected static String bootstrapServers;
     
     protected KModuleDeploymentUnit unit = null;
@@ -131,8 +135,8 @@ public class KafkaFixture {
             return;
         }
         
-        System.setProperty("org.kie.jbpm.event.emitters.kafka.boopstrap.servers", bootstrapServers);
-        System.setProperty("org.kie.jbpm.event.emitters.kafka.client.id", "test_jbpm");
+        System.setProperty(BOOTSTRAP_SERVERS, bootstrapServers);
+        System.setProperty(CLIENT_ID, "test_jbpm");
         
         createTopics();
     }

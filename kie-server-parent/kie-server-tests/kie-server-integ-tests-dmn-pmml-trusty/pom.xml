@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.54.0-SNAPSHOT</version>
+    <version>7.68.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -114,13 +114,6 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-common</artifactId>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <!-- Classes from this dependency already packaged in 'xml-apis:xml-apis'-->
-          <groupId>javax.xml.stream</groupId>
-          <artifactId>stax-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -221,7 +214,7 @@
     <plugins>
       <plugin>
         <groupId>org.codehaus.cargo</groupId>
-        <artifactId>cargo-maven2-plugin</artifactId>
+        <artifactId>cargo-maven3-plugin</artifactId>
         <configuration>
           <container>
             <systemProperties>
@@ -235,6 +228,7 @@
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
               <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
               <org.drools.server.filter.classes>true</org.drools.server.filter.classes>
+              <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly23x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
             </systemProperties>
           </container>
         </configuration>

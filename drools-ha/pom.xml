@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>7.54.0-SNAPSHOT</version>
+    <version>7.68.0-SNAPSHOT</version>
   </parent>
 
   <name>Drools :: High Availability</name>
@@ -29,6 +29,7 @@
     <version.logback.kafka.appender>0.2.0-RC2</version.logback.kafka.appender>
     <version.servlet>2.0.0.Final</version.servlet>
     <version.slf4j>1.7.26</version.slf4j>
+    <version.scala-collection-compact>2.6.0</version.scala-collection-compact>
   </properties>
 
   <modules>
@@ -95,6 +96,12 @@
         <version>${version.org.apache.kafka}</version>
         <classifier>test</classifier>
       </dependency>
+      <dependency>
+        <groupId>org.scala-lang.modules</groupId>
+        <artifactId>scala-collection-compat_2.12</artifactId>
+        <version>${version.scala-collection-compact}</version>
+        <scope>test</scope>
+      </dependency>
 
       <dependency>
         <groupId>com.github.danielwegener</groupId>
@@ -108,13 +115,6 @@
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
         <version>${version.com.fasterxml.jackson.databind}</version>
-        <scope>compile</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.jboss.spec.javax.annotation</groupId>
-        <artifactId>jboss-annotations-api_1.3_spec</artifactId>
-        <version>${version.annotations}</version>
         <scope>compile</scope>
       </dependency>
 

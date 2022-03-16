@@ -74,6 +74,7 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
     protected static final String BUSINESS_KEY = "test key";
     protected static final String PRINT_OUT_COMMAND = "org.jbpm.executor.commands.PrintOutCommand";
+    protected static final String JOB_EXECUTION_ERROR_COMMAND = "org.jbpm.executor.commands.JobExecutionErrorCommand";
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "per-process-instance-project", "1.0.0.Final");
     private static ReleaseId caseReleaseId = new ReleaseId("org.kie.server.testing", "case-insurance", "1.0.0.Final");
@@ -117,8 +118,10 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertThat(getMetrics()).contains(
                 "kie_server_start_time{name=\"" + serverName + "\",",
                 "kie_server_deployments_active_total{deployment_id=\"prometheus\",} 1.0",
-                "kie_server_container_started_total{container_id=\"prometheus\",} 1.0",
-                "kie_server_container_running_total{container_id=\"prometheus\",} 1.0"
+                "kie_server_container_running{container_id=\"prometheus\",} 1.0",
+                "kie_server_container_started{container_id=\"prometheus\",} 1.0",
+                "kie_server_container_started_total 2.0",
+                "kie_server_container_running_total 2"
         );
     }
 
@@ -209,7 +212,34 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 //              "kie_server_job_duration_seconds_sum{container_id=\"\",command_name=\"" + PRINT_OUT_COMMAND + "\",}"
           );
     }
+    
+	@Test
+	@Category(JEEOnly.class) // Executor in kie-server-integ-tests-all is using JMS for execution. Skipping test for non JEE containers as they don't have JMS.
+	public void testPrometheusJobErrorMetrics() throws Exception {		
+		Integer numberOfRetries = 0;
+		JobRequestInstance jobRequestErrorInstanceNow = createJobRequestExecutionErrorInstance(numberOfRetries);
+		Long jobId = jobServicesClient.scheduleRequest(jobRequestErrorInstanceNow);
+		KieServerSynchronization.waitForJobToFinish(jobServicesClient, jobId);
 
+		assertThat(getMetrics()).contains(
+				"kie_server_job_in_retry_total{container_id=\"\",failed=\"true\",command_name=\""
+						+ JOB_EXECUTION_ERROR_COMMAND + "\",} 0.0",
+				"kie_server_job_error_total{container_id=\"\",failed=\"true\",command_name=\""
+						+ JOB_EXECUTION_ERROR_COMMAND + "\",} ");
+	}
+	
+	@Test
+	@Category(JEEOnly.class) // Executor in kie-server-integ-tests-all is using JMS for execution. Skipping test for non JEE containers as they don't have JMS.
+	public void testPrometheusJobErrorMetricsWithMultipleRetries() throws Exception {		
+		Integer numberOfRetries = 10;
+		JobRequestInstance jobRequestErrorInstanceNow = createJobRequestExecutionErrorInstance(numberOfRetries);
+		Long jobId = jobServicesClient.scheduleRequest(jobRequestErrorInstanceNow);
+		KieServerSynchronization.waitForJobToFinish(jobServicesClient, jobId);		
+		assertThat(getMetrics()).contains(				
+				"kie_server_job_error_total{container_id=\"\",failed=\"true\",command_name=\""
+						+ JOB_EXECUTION_ERROR_COMMAND + "\",} ");
+	}
+   
     private String startUserTaskCase(String owner, String contact) {
         Map<String, Object> data = new HashMap<>();
         data.put("s", "first case started");
@@ -233,4 +263,15 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         jobRequestInstance.setData(data);
         return jobRequestInstance;
     }
+    
+    private JobRequestInstance createJobRequestExecutionErrorInstance(Integer numberOfRetries) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("businessKey", BUSINESS_KEY);   
+        data.put("retries", numberOfRetries);
+        JobRequestInstance jobRequestInstance = new JobRequestInstance();
+        jobRequestInstance.setCommand(JOB_EXECUTION_ERROR_COMMAND);
+        jobRequestInstance.setData(data);
+        return jobRequestInstance;
+    }    
+  
 }

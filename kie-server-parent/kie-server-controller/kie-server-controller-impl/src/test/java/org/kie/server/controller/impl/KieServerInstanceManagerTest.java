@@ -108,7 +108,6 @@ public class KieServerInstanceManagerTest {
 
     @Test
     public void testGetContainersRemoteOperationWhenResponseTypeIsSUCCESS() {
-
         doReturn(containerResource).when(response).getResult();
         doReturn(response).when(client).getContainerInfo(any());
         doReturn(ServiceResponse.ResponseType.SUCCESS).when(response).getType();

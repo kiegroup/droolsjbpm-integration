@@ -29,6 +29,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.ops4j.pax.exam.CoreOptions.bootDelegationPackages;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
@@ -73,6 +74,10 @@ public class KieServerClientKarafIntegrationJaxbIntegrationTest extends BaseKieS
 
                 // Option to be used to do remote debugging
 //                  debugConfiguration("5005", true),
+
+                // without this, JAXB model uses annotations from JAXB API bundle, while the runtime itself
+                // comes from the system classloader
+                bootDelegationPackages("javax.xml.bind", "javax.xml.bind.*"),
 
                 // Load kie-server-client
                 AbstractKarafIntegrationTest.loadKieFeatures("kie-server-client")

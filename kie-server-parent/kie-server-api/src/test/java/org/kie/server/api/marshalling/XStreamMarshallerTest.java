@@ -36,12 +36,16 @@ import org.kie.server.api.marshalling.objects.DateObject;
 import org.kie.server.api.marshalling.objects.Message;
 import org.kie.server.api.marshalling.xstream.XStreamMarshaller;
 import org.kie.server.api.model.KieContainerResourceFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
 public class XStreamMarshallerTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(XStreamMarshallerTest.class);
 
     @Test
     public void testXstreamMarshalWithAnnotation() {
@@ -89,10 +93,10 @@ public class XStreamMarshallerTest {
         extraClasses.add(ParameterInfo.class);
         Marshaller marshaller = MarshallerFactory.getMarshaller(extraClasses, MarshallingFormat.XSTREAM, getClass().getClassLoader());
         String marshalled = marshaller.marshall(request);
-        System.out.println(marshalled);
+        logger.debug(marshalled);
 
         PMMLRequestData rqst = marshaller.unmarshall(marshalled, PMMLRequestData.class);
-        System.out.println(rqst);
+        logger.info(rqst.toString());
     }
 
     @Test

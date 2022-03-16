@@ -22,6 +22,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
@@ -55,7 +56,7 @@ import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
 import org.drools.compiler.kie.builder.impl.KieModuleKieProject;
 import org.drools.compiler.kie.builder.impl.MemoryKieModule;
-import org.drools.compiler.kie.builder.impl.ResultsImpl;
+import org.drools.compiler.kie.builder.impl.BuildContext;
 import org.drools.modelcompiler.CanonicalKieModule;
 import org.drools.modelcompiler.builder.CanonicalModelKieProject;
 import org.drools.modelcompiler.builder.ModelBuilderImpl;
@@ -63,8 +64,15 @@ import org.drools.modelcompiler.builder.ModelSourceClass;
 import org.drools.modelcompiler.builder.ModelWriter;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
+import org.kie.memorycompiler.JavaCompilerSettings;
+import org.kie.memorycompiler.JavaConfiguration;
+import org.kie.memorycompiler.KieMemoryCompiler;
 
 import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
+import static org.kie.maven.plugin.GenerateCodeUtil.compileAndWriteClasses;
+import static org.kie.maven.plugin.GenerateCodeUtil.createJavaCompilerSettings;
+import static org.kie.maven.plugin.GenerateCodeUtil.getProjectClassLoader;
+import static org.kie.maven.plugin.GenerateCodeUtil.toClassName;
 
 @Mojo(name = "generateModel",
         requiresDependencyResolution = ResolutionScope.NONE,
@@ -110,30 +118,11 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
     }
 
     private void generateModel() throws MojoExecutionException, MojoFailureException {
+        JavaCompilerSettings javaCompilerSettings = createJavaCompilerSettings();
+        URLClassLoader projectClassLoader = getProjectClassLoader(project, outputDirectory, javaCompilerSettings);
+
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            Set<URL> urls = new HashSet<>();
-            for (String element : project.getCompileClasspathElements()) {
-                urls.add(new File(element).toURI().toURL());
-            }
-
-            project.setArtifactFilter(new CumulativeScopeArtifactFilter(Arrays.asList("compile",
-                                                                                      "runtime")));
-            for (Artifact artifact : project.getArtifacts()) {
-                File file = artifact.getFile();
-                if (file != null) {
-                    urls.add(file.toURI().toURL());
-                }
-            }
-            urls.add(outputDirectory.toURI().toURL());
-
-            ClassLoader projectClassLoader = URLClassLoader.newInstance(urls.toArray(new URL[0]),
-                                                                        getClass().getClassLoader());
-
-            Thread.currentThread().setContextClassLoader(projectClassLoader);
-        } catch (DependencyResolutionRequiredException | MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+        Thread.currentThread().setContextClassLoader(projectClassLoader);
 
         try {
             setSystemProperties(properties);
@@ -150,39 +139,22 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
                     .filter(f -> f.endsWith("java"))
                     .collect(Collectors.toList());
 
-
-            Set<String> drlFiles = kieModule.getFileNames()
-                    .stream()
-                    .filter(f -> f.endsWith("drl"))
-                    .collect(Collectors.toSet());
-
             getLog().info(String.format("Found %d generated files in Canonical Model", generatedFiles.size()));
 
             MemoryFileSystem mfs = kieModule instanceof CanonicalKieModule ?
                     ((MemoryKieModule) ((CanonicalKieModule) kieModule).getInternalKieModule()).getMemoryFileSystem() :
                     ((MemoryKieModule) kieModule).getMemoryFileSystem();
 
-            final String droolsModelCompilerPath = "/generated-sources/drools-model-compiler/main/java";
-            final String newCompileSourceRoot = targetDirectory.getPath() + droolsModelCompilerPath;
-            project.addCompileSourceRoot(newCompileSourceRoot);
+            Map<String, String> classNameSourceMap = new HashMap<>();
 
             for (String generatedFile : generatedFiles) {
-                final MemoryFile f = (MemoryFile) mfs.getFile(generatedFile);
-                final Path newFile = Paths.get(targetDirectory.getPath(),
-                                               droolsModelCompilerPath,
-                                               f.getPath().toPortableString());
-
-                try {
-                    Files.deleteIfExists(newFile);
-                    Files.createDirectories(newFile.getParent());
-                    Files.copy(f.getContents(), newFile, StandardCopyOption.REPLACE_EXISTING);
-
-                    getLog().info("Generating " + newFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new MojoExecutionException("Unable to write file", e);
-                }
+                MemoryFile f = (MemoryFile) mfs.getFile(generatedFile);
+                String className = toClassName(generatedFile);
+                classNameSourceMap.put(className, new String(mfs.getFileContents( f )));
+                getLog().info("Generating " + className);
             }
+
+            compileAndWriteClasses(targetDirectory, projectClassLoader, javaCompilerSettings, getCompilerType(), classNameSourceMap, dumpKieSourcesFolder);
 
             // copy the META-INF packages file
             final String path = CanonicalKieModule.getModelFileWithGAV(kieModule.getReleaseId());
@@ -205,10 +177,21 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
             }
 
             if (ExecModelMode.shouldDeleteFile(getGenerateModelOption())) {
+                Set<String> drlFiles = kieModule.getFileNames()
+                        .stream()
+                        .filter(f -> f.endsWith("drl"))
+                        .collect(Collectors.toSet());
                 deleteDrlFiles(drlFiles);
             }
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
+            if (projectClassLoader != null) {
+                try {
+                    projectClassLoader.close();
+                } catch (IOException e) {
+                    getLog().warn(e);
+                }
+            }
         }
 
         getLog().info("DSL successfully generated");
@@ -250,7 +233,7 @@ public class GenerateModelMojo extends AbstractDMNValidationAwareMojo {
             }
 
             @Override
-            public void writeProjectOutput(MemoryFileSystem trgMfs, ResultsImpl messages) {
+            public void writeProjectOutput(MemoryFileSystem trgMfs, BuildContext buildContext) {
                 MemoryFileSystem srcMfs = new MemoryFileSystem();
                 Folder sourceFolder = srcMfs.getFolder("src/main/java");
 

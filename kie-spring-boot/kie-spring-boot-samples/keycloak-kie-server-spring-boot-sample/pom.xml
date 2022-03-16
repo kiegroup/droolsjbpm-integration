@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-spring-boot-samples</artifactId>
-    <version>7.54.0-SNAPSHOT</version>
+    <version>7.68.0-SNAPSHOT</version>
   </parent>
   <artifactId>keycloak-kie-server-spring-boot-sample</artifactId>
 
@@ -21,7 +21,7 @@
       <artifactId>kie-server-spring-boot-starter</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>javax.activation</groupId>
+          <groupId>jakarta.activation</groupId>
           <artifactId>javax.activation-api</artifactId>
         </exclusion>
       </exclusions>
@@ -37,10 +37,6 @@
         <exclusion>
           <artifactId>commons-logging</artifactId>
           <groupId>commons-logging</groupId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.sun.activation</groupId>
-          <artifactId>jakarta.activation</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -96,8 +92,8 @@
       <scope>test</scope>
       <exclusions>
         <exclusion>
-          <groupId>org.jboss.spec.javax.ws.rs</groupId>
-          <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+          <groupId>jakarta.ws.rs</groupId>
+          <artifactId>jakarta.ws.rs-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -128,8 +124,8 @@
           <artifactId>commons-logging</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.jboss.spec.javax.ws.rs</groupId>
-          <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+          <groupId>jakarta.ws.rs</groupId>
+          <artifactId>jakarta.ws.rs-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.jboss.resteasy</groupId>
@@ -140,6 +136,11 @@
           <artifactId>resteasy-jaxb-provider</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.wildfly.client</groupId>
+      <artifactId>wildfly-client-config</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

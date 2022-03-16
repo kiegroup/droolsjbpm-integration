@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
-    <version>7.54.0-SNAPSHOT</version>
+    <version>7.68.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-integ-tests-task-assigning</artifactId>
@@ -120,7 +120,7 @@
     <plugins>
       <plugin>
         <groupId>org.codehaus.cargo</groupId>
-        <artifactId>cargo-maven2-plugin</artifactId>
+        <artifactId>cargo-maven3-plugin</artifactId>
         <configuration>
           <container>
             <systemProperties>
@@ -146,6 +146,7 @@
               <org.kie.server.services.taskassigning.user.system.simple.users>${project.build.testOutputDirectory}/roles.properties</org.kie.server.services.taskassigning.user.system.simple.users>
               <org.kie.server.services.taskassigning.user.system.simple.skills>${project.build.testOutputDirectory}/skills.properties</org.kie.server.services.taskassigning.user.system.simple.skills>
               <org.kie.server.services.taskassigning.core.model.planningUserId>yoda</org.kie.server.services.taskassigning.core.model.planningUserId>
+              <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly23x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
             </systemProperties>
           </container>
           <configuration>
@@ -196,6 +197,9 @@
                 </roles>
               </user>
             </users>
+            <properties>
+              <cargo.wildfly.script.cli.embedded>${project.basedir}/script/setup.cli</cargo.wildfly.script.cli.embedded>
+            </properties>
           </configuration>
         </configuration>
       </plugin>

@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-controller</artifactId>
-    <version>7.54.0-SNAPSHOT</version>
+    <version>7.68.0-SNAPSHOT</version>
   </parent>
   <artifactId>kie-server-controller-standalone</artifactId>
   <packaging>pom</packaging>
@@ -72,14 +72,14 @@
       <artifactId>slf4j-jdk14</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.enterprise</groupId>
-      <artifactId>cdi-api</artifactId>
+      <groupId>jakarta.enterprise</groupId>
+      <artifactId>jakarta.enterprise.cdi-api</artifactId>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.spec.javax.servlet</groupId>
-      <artifactId>jboss-servlet-api_3.1_spec</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -111,10 +111,10 @@
       <plugins>
         <plugin>
           <groupId>org.codehaus.cargo</groupId>
-          <artifactId>cargo-maven2-plugin</artifactId>
+          <artifactId>cargo-maven3-plugin</artifactId>
           <configuration>
             <container>
-              <containerId>wildfly19x</containerId>
+              <containerId>wildfly23x</containerId>
               <type>installed</type>
               <artifactInstaller>
                 <groupId>org.wildfly</groupId>
@@ -151,6 +151,9 @@
                   </roles>
                 </user>
               </users>
+              <properties>
+                <cargo.wildfly.script.cli.embedded>${project.basedir}/script/setup.cli</cargo.wildfly.script.cli.embedded>
+              </properties>
             </configuration>
           </configuration>
         </plugin>

@@ -64,6 +64,7 @@ import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENT_ADD_POST_
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENT_CONTENT_GET_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENT_DELETE_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ATTACHMENT_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_CLAIM_BULK_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_CLAIM_PUT_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_COMMENTS_GET_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_COMMENT_ADD_POST_URI;
@@ -198,6 +199,30 @@ public class UserTaskResource {
             return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
             return notFound(errorMessage(e, MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId)), v, conversationIdHeader);
+        } catch (PermissionDeniedException e){
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
+        }
+    }
+    
+    
+    @ApiOperation(value = "Claims (reserves) multiple task instances for the user sending the request", response = Void.class, code = 200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),  
+                            @ApiResponse(code = 403, message = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
+    @POST
+    @Path(TASK_INSTANCE_CLAIM_BULK_URI)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response claimBulk(@Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifiers of the task instances that should be claimed", required=true, example = "taskId=1&taskId=2&taskId=3") @QueryParam("taskId")  List<Long> taskIds, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user")  String userId) {
+        Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+        try {
+            userTaskServiceBase.claim(containerId, taskIds, userId);
+            return createResponse("", v, Response.Status.OK, conversationIdHeader);
         } catch (PermissionDeniedException e){
             return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
@@ -492,11 +517,15 @@ public class UserTaskResource {
     public Response suspend(@Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the task instance that should be suspended", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
-            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId) {
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
+            @ApiParam(value = "optional map to pass parameters to suspend. e.g suspendUntil", required = false, examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
+                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String parametersPayload) {
         Variant v = getVariant(headers);
+        String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
-            userTaskServiceBase.suspend(containerId, taskId, userId);
+            userTaskServiceBase.suspend(containerId, taskId, userId, parametersPayload, type);
 
             return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){

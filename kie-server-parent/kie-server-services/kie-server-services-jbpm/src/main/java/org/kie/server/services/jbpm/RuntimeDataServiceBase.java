@@ -15,6 +15,30 @@
 
 package org.kie.server.services.jbpm;
 
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_NAME;
+import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_OWNER;
+import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_STATUS;
+import static org.jbpm.services.api.query.model.QueryParam.all;
+import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
+import static org.kie.server.services.jbpm.ConvertUtils.buildQueryFilter;
+import static org.kie.server.services.jbpm.ConvertUtils.buildTaskByNameQueryFilter;
+import static org.kie.server.services.jbpm.ConvertUtils.buildTaskStatuses;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToNodeInstance;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToNodeInstanceList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcess;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstance;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceCustomVarsList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToServiceApiQueryParam;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTask;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskSummaryList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToUserTaskWithVariablesList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToVariablesList;
+import static org.kie.server.services.jbpm.ConvertUtils.nullEmpty;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,6 +57,7 @@ import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.api.model.UserTaskInstanceDesc;
 import org.jbpm.services.api.model.VariableDesc;
+import org.jbpm.services.api.query.model.QueryParam;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.Status;
@@ -63,29 +88,6 @@ import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
-import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_NAME;
-import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_OWNER;
-import static org.jbpm.services.api.AdvanceRuntimeDataService.TASK_ATTR_STATUS;
-import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
-import static org.kie.server.services.jbpm.ConvertUtils.buildQueryFilter;
-import static org.kie.server.services.jbpm.ConvertUtils.buildTaskByNameQueryFilter;
-import static org.kie.server.services.jbpm.ConvertUtils.buildTaskStatuses;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToNodeInstance;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToNodeInstanceList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToProcess;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstance;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceCustomVarsList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToServiceApiQueryParam;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToTask;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskSummaryList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToUserTaskWithVariablesList;
-import static org.kie.server.services.jbpm.ConvertUtils.convertToVariablesList;
-import static org.kie.server.services.jbpm.ConvertUtils.nullEmpty;
-
 public class RuntimeDataServiceBase {
 
     public static final Logger logger = LoggerFactory.getLogger(RuntimeDataServiceBase.class);
@@ -112,6 +114,9 @@ public class RuntimeDataServiceBase {
 
     protected String getUser(String queryParamUser) {
         if (bypassAuthUser) {
+            if (queryParamUser == null || queryParamUser.isEmpty()) {
+        	    return identityProvider.getName();
+            }
             return queryParamUser;
         }
 
@@ -598,6 +603,7 @@ public class RuntimeDataServiceBase {
                         .message(taskSummary.getMessage())
                         .correlationKey(taskSummary.getCorrelationKey())
                         .processType(taskSummary.getProcessType())
+                        .assignedOwner(taskSummary.getCurrentOwner())
                         .build();
                 instances[counter] = task;
                 counter++;
@@ -653,16 +659,13 @@ public class RuntimeDataServiceBase {
             return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
                                                                                                             convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
                                                                                                             queryContext));
-        } else {
-
-            return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariablesAndTask(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
-                                                                                                                   convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
-                                                                                                                   convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
-                                                                                                                   filter.getOwners(),
-                                                                                                                   queryContext));
         }
+        return convertToProcessInstanceCustomVarsList(advanceRuntimeDataService.queryProcessByVariablesAndTask(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
+                                                                                                               convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
+                                                                                                               convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
+                                                                                                               getOwnersQueryParam(filter),
+                                                                                                               queryContext));
     }
-
 
     public ProcessInstanceUserTaskWithVariablesList queryUserTasksByVariables(String payload, String payloadType, QueryContext queryContext) {
         SearchQueryFilterSpec filter = new SearchQueryFilterSpec();
@@ -670,12 +673,20 @@ public class RuntimeDataServiceBase {
             filter = marshallerHelper.unmarshal(payload, payloadType, SearchQueryFilterSpec.class);
         }
         return convertToUserTaskWithVariablesList(advanceRuntimeDataService.queryUserTasksByVariables(convertToServiceApiQueryParam(filter.getAttributesQueryParams()),
-                                                                                                      convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
-                                                                                                      convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
-                                                                                                      filter.getOwners(),
-                                                                                                      queryContext));
+                                                                                                  convertToServiceApiQueryParam(filter.getTaskVariablesQueryParams()),
+                                                                                                  convertToServiceApiQueryParam(filter.getProcessVariablesQueryParams()),
+                                                                                                  getOwnersQueryParam(filter),
+                                                                                                  queryContext));
     }
 
-
+    private QueryParam getOwnersQueryParam(SearchQueryFilterSpec filter) {
+        if(filter.getOwnersQueryParam() != null) {
+            return convertToServiceApiQueryParam(filter.getOwnersQueryParam());
+        }
+        if(filter.getOwners() == null || filter.getOwners().isEmpty()) {
+            return null;
+        }
+        return all(filter.getOwners());
+    }
 
 }

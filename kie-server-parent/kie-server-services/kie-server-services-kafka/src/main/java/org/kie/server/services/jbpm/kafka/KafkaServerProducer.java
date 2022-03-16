@@ -14,93 +14,133 @@
 */
 package org.kie.server.services.jbpm.kafka;
 
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.KAFKA_EXTENSION_PREFIX;
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.topicFromSignal;
+
+import java.io.IOException;
 import java.time.Duration;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.jbpm.services.api.DeploymentEvent;
-import org.kie.api.event.process.DefaultProcessEventListener;
-import org.kie.api.event.process.MessageEvent;
-import org.kie.api.event.process.SignalEvent;
+import org.apache.kafka.common.KafkaException;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.internal.runtime.manager.InternalRegisterableItemsFactory;
-import org.kie.internal.runtime.manager.InternalRuntimeManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.processMessages;
-import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.processSignals;
-import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.topicFromSignal;
 
-class KafkaServerProducer extends DefaultProcessEventListener {
+class KafkaServerProducer {
 
     private static final Logger logger = LoggerFactory.getLogger(KafkaServerProducer.class);
+    private static KafkaServerProducer instance;
+
+    public static void init(KafkaEventProcessorFactory factory,
+                            Supplier<Producer<String, byte[]>> producerSupplier) {
+        instance = new KafkaServerProducer(factory, producerSupplier);
+    }
+
+    public static void cleanup(Duration duration) {
+        if (instance != null) {
+            instance.close(duration);
+            instance = null;
+        }
+    }
+
+    public static void publish(ProcessInstance processInstance,
+                               String name,
+                               Object value) {
+        if (instance != null) {
+            instance.sendEvent(processInstance, name, value);
+        }
+    }
 
     // Kafka producer
     private Producer<String, byte[]> producer;
     private Supplier<Producer<String, byte[]>> producerSupplier;
     private KafkaEventProcessorFactory factory;
+    private KafkaSender kafkaSender;
 
-    private AtomicBoolean producerReady = new AtomicBoolean();
+    private Lock producerLock = new ReentrantLock();
 
-    public KafkaServerProducer(KafkaEventProcessorFactory factory,
-                               Supplier<Producer<String, byte[]>> producerSupplier) {
+    private KafkaServerProducer(KafkaEventProcessorFactory factory,
+                                Supplier<Producer<String, byte[]>> producerSupplier) {
         this.factory = factory;
         this.producerSupplier = producerSupplier;
+        this.kafkaSender = Boolean.getBoolean(KAFKA_EXTENSION_PREFIX + "sync") ? this::sendSync : this::sendAsync;
     }
 
-    void close(Duration duration) {
-        if (producerReady.compareAndSet(true, false)) {
-            producer.close(duration);
-        }
-    }
-
-    @Override
-    public void onMessage(MessageEvent event) {
-        if (processMessages()) {
-            sendEvent(event.getProcessInstance(), event.getMessageName(), event.getMessage());
-        }
-    }
-
-    @Override
-    public void onSignal(SignalEvent event) {
-        if (processSignals(event)) {
-            sendEvent(event.getProcessInstance(), event.getSignalName(), event.getSignal());
+    private void close(Duration duration) {
+        producerLock.lock();
+        try {
+            if (producer != null) {
+                producer.close(duration);
+                producer = null;
+            }
+        } finally {
+            producerLock.unlock();
         }
     }
 
     private void sendEvent(ProcessInstance processInstance,
                            String name,
                            Object value) {
-        if (producerReady.compareAndSet(false, true)) {
-            producer = producerSupplier.get();
-        }
+        producerLock.lock();
         try {
-            String topic = topicFromSignal(name);
-            producer.send(new ProducerRecord<>(topic, factory.getEventWriter(topic)
-                    .writeEvent(processInstance, value)),
-                    (m, e) -> {
-                        if (e != null) {
-                            logError(value, e);
-                        }
-                    });
+            if (producer == null) {
+                producer = producerSupplier.get();
+            }
+        } finally {
+            producerLock.unlock();
+        }
+        String topic = topicFromSignal(name);
+        logger.debug("Publishing event {}  to topic {}", value, topic);
+        kafkaSender.send(topic, value, processInstance);
+    }
+
+    private interface KafkaSender {
+
+        void send(String topic, Object value, ProcessInstance processInstance);
+    }
+
+    private void sendAsync(String topic, Object value, ProcessInstance processInstance) {
+        try {
+
+            producer.send(new ProducerRecord<>(topic, marshall(topic, value, processInstance)),
+                          (m, e) -> {
+                              if (e != null) {
+                                  logError(value, e);
+                              }
+                          });
         } catch (Exception e) {
             logError(value, e);
         }
     }
 
+    private void sendSync(String topic, Object value, ProcessInstance processInstance) {
+        try {
+            producer.send(new ProducerRecord<>(topic, marshall(topic, value, processInstance))).get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException(e);
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof RuntimeException) {
+                throw (RuntimeException) e.getCause();
+            } else {
+                throw new KafkaException(e.getCause());
+            }
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    private byte[] marshall(String topic, Object value, ProcessInstance processInstance) throws IOException {
+        return factory.getEventWriter(topic).writeEvent(processInstance, value);
+    }
+
     private void logError(Object value, Exception e) {
         logger.error("Error publishing event {}", value, e);
-    }
-
-    public void activate(DeploymentEvent event) {
-        ((InternalRegisterableItemsFactory) ((InternalRuntimeManager) event.getDeployedUnit().getRuntimeManager())
-                .getEnvironment().getRegisterableItemsFactory()).addProcessListener(this);
-    }
-
-    public void deactivate(DeploymentEvent event) {
-        // when deployment is deactivated, the listener is gone too
     }
 }

@@ -54,12 +54,14 @@ public class KieServerConstants {
     public static final String KIE_SERVER_STATE_IMMUTABLE_INIT = "org.kie.server.state.immutable.init";
     public static final String KIE_SERVER_CONTAINER_DEPLOYMENT = "org.kie.server.container.deployment";
     public static final String KIE_SERVER_CONTAINER_LOCATOR = "org.kie.server.container.locator";
+    public static final String KIE_SERVER_PROCESS_INSTANCE_CONTAINER_LOCATOR = "org.kie.server.process.instance.container.locator";
     public static final String KIE_SERVER_ACTIVATE_POLICIES = "org.kie.server.policy.activate";
     public static final String KIE_SERVER_MGMT_API_DISABLED = "org.kie.server.mgmt.api.disabled";
     public static final String KIE_SERVER_STARTUP_STRATEGY = "org.kie.server.startup.strategy";
     public static final String KIE_SERVER_MODE = "org.kie.server.mode";
     public static final String KIE_SERVER_INCLUDE_STACKTRACE = "org.kie.server.stacktrace.included";
     public static final String KIE_SERVER_STRICT_ID_FORMAT = "org.kie.server.strict.id.format";
+    public static final String KIE_SERVER_STRICT_JAVABEANS_SERIALIZERS = "org.kie.server.strict.javaBeans.serializers";
     public static final String KIE_SERVER_STRICT_JAXB_FORMAT = "org.kie.server.strict.jaxb.format";
     public static final String KIE_SERVER_IMAGESERVICE_MAX_NODES = "org.kie.server.service.image.max_nodes";
     public static final String KIE_SERVER_REST_MODE_READONLY = "org.kie.server.rest.mode.readonly";
@@ -89,6 +91,7 @@ public class KieServerConstants {
     public static final String CFG_KIE_CONTROLLER_USER = "org.kie.server.controller.user";
     public static final String CFG_KIE_CONTROLLER_PASSWORD = "org.kie.server.controller.pwd";
     public static final String CFG_KIE_CONTROLLER_TOKEN = "org.kie.server.controller.token";
+    public static final String CFG_KIE_CONTROLLER_TIMEOUT = "org.kie.server.controller.timeout";
 
     // non kie server parameters but used by its extensions etc
     public static final String CFG_HT_CALLBACK = "org.jbpm.ht.callback";
@@ -172,4 +175,6 @@ public class KieServerConstants {
     public static final String SYSTEM_XSTREAM_ENABLED_PACKAGES = "org.kie.server.xstream.enabled.packages";
 
     public static final String RESET_CONTAINER_BEFORE_UPDATE = "resetBeforeUpdate";
+
+    public static final String JSON_CUSTOM_OBJECT_DESERIALIZER_CNFE_BEHAVIOR = "org.kie.server.json.customObjectDeserializerCNFEBehavior";
 }

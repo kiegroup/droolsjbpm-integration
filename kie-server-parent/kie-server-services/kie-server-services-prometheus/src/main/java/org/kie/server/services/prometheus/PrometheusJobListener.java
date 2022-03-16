@@ -22,6 +22,7 @@ import io.prometheus.client.Summary;
 import org.jbpm.executor.AsynchronousJobEvent;
 import org.jbpm.executor.AsynchronousJobListener;
 import org.kie.api.executor.RequestInfo;
+import org.kie.api.executor.STATUS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +61,20 @@ public class PrometheusJobListener implements AsynchronousJobListener {
             .name("kie_server_job_duration_seconds")
             .help("Kie Server Job Duration")
             .labelNames("container_id", "command_name")
+            .register();    
+    
+    protected static final Gauge numberOfJobsRetrying = Gauge.build()
+            .name("kie_server_job_in_retry_total")
+            .help("Kie Server Retrying Jobs")
+            .labelNames("container_id", "failed", "command_name")
             .register();
+    
+    protected static final Counter numberOfJobsErrored = Counter.build()
+            .name("kie_server_job_error_total")
+            .help("Kie Server Errored Jobs")
+            .labelNames("container_id", "failed", "command_name")
+            .register();
+    
 
     @Override
     public void beforeJobScheduled(AsynchronousJobEvent event) {
@@ -87,6 +101,15 @@ public class PrometheusJobListener implements AsynchronousJobListener {
         final RequestInfo job = event.getJob();
         numberOfJobsExecuted.labels(defaultString(job.getDeploymentId()), String.valueOf(event.failed()), job.getCommandName()).inc();
         numberOfRunningJobs.labels(defaultString(job.getDeploymentId()), job.getCommandName()).dec();
+        if(job.getRetries() >= 0 && job.getStatus().equals(STATUS.RETRYING) && job.getExecutions() <= 2 ) {        	 
+        	numberOfJobsRetrying.labels(defaultString(job.getDeploymentId()), String.valueOf(event.failed()), job.getCommandName()).inc();
+        }
+        else if(job.getRetries() == 0 && job.getStatus().equals(STATUS.ERROR)) {        	
+        	numberOfJobsErrored.labels(defaultString(job.getDeploymentId()), String.valueOf(event.failed()), job.getCommandName()).inc();     
+        	if(job.getExecutions() > 2) {        	
+        		numberOfJobsRetrying.labels(defaultString(job.getDeploymentId()), String.valueOf(event.failed()), job.getCommandName()).dec(); 
+        	}
+        }        
         if(job.getTime() != null) {
             final double duration = millisToSeconds(System.currentTimeMillis() - job.getTime().getTime());
             LOGGER.debug("Job duration: {}s", duration);

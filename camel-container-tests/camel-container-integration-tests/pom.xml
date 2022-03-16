@@ -5,7 +5,7 @@
   <parent>
     <artifactId>camel-container-tests</artifactId>
     <groupId>org.drools</groupId>
-    <version>7.54.0-SNAPSHOT</version>
+    <version>7.68.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -53,6 +53,11 @@
           <groupId>com.fasterxml.woodstox</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>jakarta.xml.ws</groupId>
+      <artifactId>jakarta.xml.ws-api</artifactId>
     </dependency>
 
     <dependency>
@@ -159,118 +164,18 @@
   <profiles>
     <profile>
       <id>wildfly</id>
+      <!-- wildfly test is disabled because wildfly-camel is not aligned to wildfly 23 -->
       <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>unpack</goal>
-                </goals>
-                <configuration>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>org.wildfly</groupId>
-                      <artifactId>wildfly-dist</artifactId>
-                      <version>${version.org.wildfly}</version>
-                      <type>zip</type>
-                      <outputDirectory>${project.build.directory}/application-server</outputDirectory>
-                    </artifactItem>
-                    <artifactItem>
-                      <groupId>org.wildfly.camel</groupId>
-                      <artifactId>wildfly-camel-patch</artifactId>
-                      <version>${version.org.wildfly.camel}</version>
-                      <type>tar.gz</type>
-                      <outputDirectory>${project.build.directory}/application-server/wildfly-${version.org.wildfly}</outputDirectory>
-                    </artifactItem>
-                  </artifactItems>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
-            <configuration>
-              <container>
-                <containerId>wildfly19x</containerId>
-                <home>${project.build.directory}/application-server/wildfly-${version.org.wildfly}</home>
-                <type>installed</type>
-                <systemProperties>
-                  <kie.maven.settings.custom>${kie.maven.settings.custom}</kie.maven.settings.custom>
-                  <org.kie.server.mode>${org.kie.server.mode.production}</org.kie.server.mode>
-                  <kie.server.port>${container.port}</kie.server.port>
-                </systemProperties>
-                <timeout>300000</timeout>
-              </container>
-              <deployables>
-                <deployable>
-                  <groupId>org.kie.server</groupId>
-                  <artifactId>kie-server</artifactId>
-                  <!-- default, may be overridden in container specific profiles -->
-                  <classifier>${kie.server.classifier}</classifier>
-                  <type>war</type>
-                  <properties>
-                    <context>${kie.server.context}</context>
-                  </properties>
-                  <pingURL>${single.kie.server.base.http.url}</pingURL>
-                  <pingTimeout>300000</pingTimeout>
-                </deployable>
-                <deployable>
-                  <groupId>org.drools</groupId>
-                  <artifactId>camel-container-tests-module</artifactId>
-                  <type>war</type>
-                </deployable>
-              </deployables>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-failsafe-plugin</artifactId>
               <configuration>
-                <users>
-                  <user>
-                    <name>yoda</name>
-                    <password>test</password>
-                    <roles>
-                      <role>kie-server</role>
-                      <role>guest</role>
-                    </roles>
-                  </user>
-                </users>
-                <properties>
-                  <cargo.jboss.configuration>standalone-full-camel</cargo.jboss.configuration>
-                  <cargo.servlet.port>${container.port}</cargo.servlet.port>
-                  <cargo.jboss.ajp.port>${cargo.jboss.ajp.port}</cargo.jboss.ajp.port>
-                  <cargo.jboss.https.port>${cargo.jboss.https.port}</cargo.jboss.https.port>
-                  <cargo.jboss.management-http.port>${cargo.jboss.management-http.port}</cargo.jboss.management-http.port>
-                  <cargo.jboss.management-https.port>${cargo.jboss.management-https.port}</cargo.jboss.management-https.port>
-                  <!--
-                  <cargo.start.jvmargs>
-                    -Xdebug
-                    -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8787
-                    -Xnoagent
-                  </cargo.start.jvmargs>
-                  -->
-                </properties>
+                <skipITs>true</skipITs>
               </configuration>
-            </configuration>
-            <executions>
-              <execution>
-                <id>start-container</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>start</goal>
-                </goals>
-              </execution>
-              <execution>
-                <id>stop-container</id>
-                <phase>post-integration-test</phase>
-                <goals>
-                  <goal>stop</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
+            </plugin>
+          </plugins>
+        </pluginManagement>
       </build>
     </profile>
     <profile>
@@ -309,7 +214,7 @@
           </plugin>
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
+            <artifactId>cargo-maven3-plugin</artifactId>
             <executions>
               <execution>
                 <id>start-fuse-container</id>
@@ -319,7 +224,7 @@
                 </goals>
                 <configuration>
                   <container>
-                    <containerId>wildfly19x</containerId>
+                    <containerId>wildfly23x</containerId>
                     <home>${project.build.directory}/application-server-fuse</home>
                     <type>installed</type>
                     <contextKey>fuse</contextKey>
@@ -367,7 +272,7 @@
                 </goals>
                 <configuration>
                   <container>
-                    <containerId>wildfly19x</containerId>
+                    <containerId>wildfly23x</containerId>
                     <home>${project.build.directory}/application-server-kie-server</home>
                     <type>installed</type>
                     <contextKey>kie-server</contextKey>
@@ -441,7 +346,7 @@
         <plugins>
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
+            <artifactId>cargo-maven3-plugin</artifactId>
             <executions>
               <execution>
                 <id>start-container</id>

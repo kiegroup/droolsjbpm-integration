@@ -17,23 +17,14 @@ package org.kie.maven.plugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -41,16 +32,21 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import org.drools.ancompiler.CompiledNetworkSource;
+import org.drools.ancompiler.CompiledNetworkSources;
 import org.drools.ancompiler.ObjectTypeNodeCompiler;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.modelcompiler.CanonicalKieModule;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
+import org.kie.memorycompiler.JavaCompilerSettings;
 
 import static org.kie.maven.plugin.ExecModelMode.ancEnabled;
 import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
+import static org.kie.maven.plugin.GenerateCodeUtil.compileAndWriteClasses;
+import static org.kie.maven.plugin.GenerateCodeUtil.createJavaCompilerSettings;
+import static org.kie.maven.plugin.GenerateCodeUtil.getProjectClassLoader;
+import static org.kie.maven.plugin.GenerateCodeUtil.toClassName;
 
 @Mojo(name = "generateANC",
         requiresDependencyResolution = ResolutionScope.NONE,
@@ -78,8 +74,6 @@ public class GenerateANCMojo extends AbstractDMNValidationAwareMojo {
     @Parameter(required = true, defaultValue = "${project.build.outputDirectory}")
     private File outputDirectory;
 
-    private static final String ALPHA_NETWORK_COMPILER_PATH = "/generated-sources/alpha-network-compiler/main/java";
-
     @Override
     public void execute() throws MojoExecutionException {
         // GenerateModelMojo is executed when BuildMojo isn't and vice-versa
@@ -94,30 +88,11 @@ public class GenerateANCMojo extends AbstractDMNValidationAwareMojo {
     }
 
     private void generateANC() throws MojoExecutionException {
+        JavaCompilerSettings javaCompilerSettings = createJavaCompilerSettings();
+        URLClassLoader projectClassLoader = getProjectClassLoader(project, outputDirectory, javaCompilerSettings);
+
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        try {
-            Set<URL> urls = new HashSet<>();
-            for (String element : project.getCompileClasspathElements()) {
-                urls.add(new File(element).toURI().toURL());
-            }
-
-            project.setArtifactFilter(new CumulativeScopeArtifactFilter(Arrays.asList("compile",
-                                                                                      "runtime")));
-            for (Artifact artifact : project.getArtifacts()) {
-                File file = artifact.getFile();
-                if (file != null) {
-                    urls.add(file.toURI().toURL());
-                }
-            }
-            urls.add(outputDirectory.toURI().toURL());
-
-            ClassLoader projectClassLoader = URLClassLoader.newInstance(urls.toArray(new URL[0]),
-                                                                        getClass().getClassLoader());
-
-            Thread.currentThread().setContextClassLoader(projectClassLoader);
-        } catch (DependencyResolutionRequiredException | MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+        Thread.currentThread().setContextClassLoader(projectClassLoader);
 
         try {
             setSystemProperties(properties);
@@ -128,38 +103,23 @@ public class GenerateANCMojo extends AbstractDMNValidationAwareMojo {
                                                                              project.getArtifactId(),
                                                                              project.getVersion()));
 
+            Map<String, String> classNameSourceMap = new HashMap<>();
+
             for (String kbase : kieContainer.getKieBaseNames()) {
                 InternalKnowledgeBase kieBase = (InternalKnowledgeBase) kieContainer.getKieBase(kbase);
 
-                List<CompiledNetworkSource> ancSourceFiles = ObjectTypeNodeCompiler.compiledNetworkSources(kieBase.getRete());
+                List<CompiledNetworkSources> ancSourceFiles = ObjectTypeNodeCompiler.compiledNetworkSources(kieBase.getRete());
 
                 getLog().info(String.format("Found %d generated files in Knowledge Base %s", ancSourceFiles.size(), kbase));
 
-                final String alphaNetworkCompilerPath = ALPHA_NETWORK_COMPILER_PATH;
-                final String newCompileSourceRoot = targetDirectory.getPath() + alphaNetworkCompilerPath;
-                project.addCompileSourceRoot(newCompileSourceRoot);
-
-                for (CompiledNetworkSource generatedFile : ancSourceFiles) {
-                    final Path newFile = Paths.get(targetDirectory.getPath(),
-                                                   alphaNetworkCompilerPath,
-                                                   generatedFile.getSourceName());
-
-                    try {
-                        Files.deleteIfExists(newFile);
-                        Files.createDirectories(newFile.getParent());
-                        byte[] bytes = generatedFile.getSource().getBytes(StandardCharsets.UTF_8);
-                        Files.write(newFile,
-                                    bytes,
-                                    StandardOpenOption.CREATE,
-                                    StandardOpenOption.TRUNCATE_EXISTING);
-
-                        getLog().info("Written Compiled Alpha Network: " + newFile);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        throw new MojoExecutionException("Unable to write file", e);
-                    }
+                for (CompiledNetworkSources generatedFile : ancSourceFiles) {
+                    String className = toClassName(generatedFile.getSourceName());
+                    classNameSourceMap.put(className, generatedFile.getSource());
+                    getLog().info("Generated Alpha Network class: " + className);
                 }
             }
+
+            compileAndWriteClasses(targetDirectory, projectClassLoader, javaCompilerSettings, getCompilerType(), classNameSourceMap, dumpKieSourcesFolder);
 
             // generate the ANC file
             String ancFile = CanonicalKieModule.getANCFile(new ReleaseIdImpl(
@@ -182,6 +142,13 @@ public class GenerateANCMojo extends AbstractDMNValidationAwareMojo {
             }
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
+            if (projectClassLoader != null) {
+                try {
+                    projectClassLoader.close();
+                } catch (IOException e) {
+                    getLog().warn(e);
+                }
+            }
         }
 
         getLog().info("Compiled Alpha Network successfully generated");

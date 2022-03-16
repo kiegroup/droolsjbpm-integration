@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-spring-boot-autoconfiguration</artifactId>
-    <version>7.54.0-SNAPSHOT</version>
+    <version>7.68.0-SNAPSHOT</version>
   </parent>
   <artifactId>kie-server-spring-boot-autoconfiguration-drools</artifactId>
   <name>KIE :: Spring :: Boot :: KIE Server Auto Configuration :: Drools</name>
@@ -38,12 +38,16 @@
       <artifactId>kie-server-services-common</artifactId>
       <exclusions>
         <exclusion>
+          <groupId>jakarta.servlet</groupId>
+          <artifactId>jakarta.servlet-api</artifactId>
+        </exclusion>
+        <exclusion>
           <groupId>aopalliance</groupId>
           <artifactId>aopalliance</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.jboss.spec.javax.ws.rs</groupId>
-          <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+          <groupId>jakarta.ws.rs</groupId>
+          <artifactId>jakarta.ws.rs-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.jboss.resteasy</groupId>
@@ -154,8 +158,8 @@
           <artifactId>jcl-over-slf4j</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.jboss.spec.javax.el</groupId>
-          <artifactId>jboss-el-api_3.0_spec</artifactId>
+          <groupId>jakarta.el</groupId>
+          <artifactId>jakarta.el-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

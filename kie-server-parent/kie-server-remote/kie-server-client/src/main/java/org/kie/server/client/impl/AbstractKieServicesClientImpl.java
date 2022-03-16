@@ -164,12 +164,16 @@ public abstract class AbstractKieServicesClientImpl {
     }
 
     protected void sendTaskOperation(String containerId, Long taskId, String operation, String queryString) {
+        this.sendTaskOperation(containerId, taskId, operation, queryString, null);
+    }
+
+    protected void sendTaskOperation(String containerId, Long taskId, String operation, String queryString, Object data) {
         Map<String, Object> valuesMap = new HashMap<String, Object>();
         valuesMap.put(CONTAINER_ID, containerId);
         valuesMap.put(TASK_INSTANCE_ID, taskId);
 
         makeHttpPutRequestAndCreateCustomResponse(
-                build(loadBalancer.getUrl(), operation, valuesMap) + queryString, null, String.class, getHeaders(null));
+                build(loadBalancer.getUrl(), operation, valuesMap) + queryString, data, String.class, getHeaders(null));
     }
 
     @SuppressWarnings("unchecked")
@@ -474,7 +478,6 @@ public abstract class AbstractKieServicesClientImpl {
                 KieServerHttpRequest.newRequest( uri ).followRedirects( true ).timeout( config.getTimeout() );
         httpRequest.accept( getMediaType( config.getMarshallingFormat() ) );
         httpRequest.header(KieServerConstants.KIE_CONTENT_TYPE_HEADER, config.getMarshallingFormat().toString());
-
         if (config.getHeaders() != null) {
             for (Map.Entry<String, String> header : config.getHeaders().entrySet()) {
                 httpRequest.header(header.getKey(), header.getValue());
@@ -489,6 +492,7 @@ public abstract class AbstractKieServicesClientImpl {
                 httpRequest.header(config.getCredentialsProvider().getHeaderName(), authorization);
             }
         }
+        httpRequest.clientCertificate(config.getClientCertificate());
         // apply conversationId
         if (owner.getConversationId() != null) {
             httpRequest.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER, owner.getConversationId());
@@ -693,13 +697,16 @@ public abstract class AbstractKieServicesClientImpl {
 
         return headers;
     }
+    
+    protected String getUserQueryStr(String userId, char prefix) {
+        if (BYPASS_AUTH_USER && userId != null) {
+            return prefix + "user=" + userId;
+        }
+        return "";
+    }
 
     protected String getUserQueryStr(String userId) {
-        if (BYPASS_AUTH_USER && userId != null) {
-            return "?user=" + userId;
-        }
-
-        return "";
+        return getUserQueryStr(userId, '?');
     }
 
     protected String getUserAndPagingQueryString(String userId, Integer page, Integer pageSize) {

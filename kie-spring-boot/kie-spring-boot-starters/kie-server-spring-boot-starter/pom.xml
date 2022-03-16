@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-spring-boot-starters</artifactId>
-    <version>7.54.0-SNAPSHOT</version>
+    <version>7.68.0-SNAPSHOT</version>
   </parent>
   <artifactId>kie-server-spring-boot-starter</artifactId>
 
@@ -25,10 +25,6 @@
         <exclusion>
           <groupId>jakarta.validation</groupId>
           <artifactId>jakarta.validation-api</artifactId>
-        </exclusion>
-        <exclusion>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.el</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -62,35 +58,15 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-server-spring-boot-autoconfiguration</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
-        </exclusion>
-        <exclusion>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.el</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-server-spring-boot-autoconfiguration-drools</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-server-spring-boot-autoconfiguration-jbpm</artifactId>
       <exclusions>
-        <exclusion>
-          <groupId>org.jboss.spec.javax.transaction</groupId>
-          <artifactId>jboss-transaction-api_1.2_spec</artifactId>
-        </exclusion>
         <exclusion>
           <groupId>com.zaxxer</groupId>
           <artifactId>HikariCP-java7</artifactId>

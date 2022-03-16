@@ -229,10 +229,10 @@ abstract public class AbstractKarafIntegrationTest {
         options.add(editConfigurationFilePut("etc/system.properties", "patching.disabled", "true"));
         if (!"features-fuse".equals(System.getProperty("kie.features.classifier"))) {
             // when not running on Fuse, we have to configure overrides and add some missing features
-            options.add(editConfigurationFilePut("etc/startup.properties", "mvn:org.ops4j.pax.url/pax-url-wrap/2.6.1/jar/uber", "5"));
+            options.add(editConfigurationFilePut("etc/startup.properties", "mvn:org.ops4j.pax.url/pax-url-wrap/2.6.10/jar/uber", "5"));
             // Camel 2.21 requires Spring 4.3, so it has to be spring-legacy
             options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg",
-                    "featuresRepositories", "mvn:org.apache.karaf.features/spring-legacy/" + karafVersion + "/xml/features"));
+                    "featuresRepositories", "mvn:org.apache.karaf.features/spring/" + karafVersion + "/xml/features"));
             options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg",
                     "featuresRepositories", "mvn:org.apache.cxf.karaf/apache-cxf/" + cxfVersion + "/xml/features"));
             options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg",
@@ -241,6 +241,8 @@ abstract public class AbstractKarafIntegrationTest {
             options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg", "featuresBoot", "aries-blueprint/" + karafVersion));
             options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg", "featuresBoot", "pax-http-jetty"));
             options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg", "featuresBoot", "cxf-http"));
+            // this feature ensures single Servlet API bundle + fragment bundle adding Servlet API 3 version exports (for Jetty)
+            options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg", "featuresBoot", "servlet-api-kie"));
             options.add(editConfigurationFilePut("etc/org.apache.karaf.features.repos.cfg", "cxf", "mvn:org.apache.cxf.karaf/apache-cxf/" + cxfVersion + "/xml/features"));
             options.add(editConfigurationFilePut("etc/org.apache.karaf.features.repos.cfg", "camel", "mvn:org.apache.camel.karaf/apache-camel/" + camelVersion + "/xml/features"));
         }

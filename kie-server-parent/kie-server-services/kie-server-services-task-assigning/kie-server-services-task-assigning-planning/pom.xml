@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-services-task-assigning</artifactId>
-    <version>7.54.0-SNAPSHOT</version>
+    <version>7.68.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-services-task-assigning-planning</artifactId>
@@ -40,12 +40,6 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-api</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -54,12 +48,6 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-common</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -91,4 +79,20 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <forkCount>1</forkCount>
+            <reuseForks>false</reuseForks>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
 </project>

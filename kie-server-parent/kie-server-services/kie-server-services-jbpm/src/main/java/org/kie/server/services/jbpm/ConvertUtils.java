@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
@@ -594,7 +595,11 @@ public class ConvertUtils {
     }
 
     public static List<org.jbpm.services.api.query.model.QueryParam> convertToServiceApiQueryParam(List<QueryParam> param) {
-        return param.stream().map(e -> new org.jbpm.services.api.query.model.QueryParam(e.getColumn(), e.getOperator(), e.getValue())).collect(toList());
+        return param.stream().map(ConvertUtils::convertToServiceApiQueryParam).collect(toList());
+    }
+
+    public static org.jbpm.services.api.query.model.QueryParam convertToServiceApiQueryParam(QueryParam param) {
+        return new org.jbpm.services.api.query.model.QueryParam(param.getColumn(), param.getOperator(), param.getValue());
     }
 
     public static String nullEmpty(String value) {
@@ -603,5 +608,9 @@ public class ConvertUtils {
         }
 
         return value;
+    }
+
+    public static List<Long> convert(Collection<? extends Number> input) {
+        return input.stream().map(Number::longValue).collect(Collectors.toList());
     }
 }

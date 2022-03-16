@@ -15,6 +15,23 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.jbpm.services.api.AdvanceRuntimeDataService.PROCESS_ATTR_DEFINITION_ID;
+import static org.jbpm.services.api.AdvanceRuntimeDataService.PROCESS_ATTR_DEPLOYMENT_ID;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeFalse;
+import static org.kie.server.api.util.QueryParamFactory.equalsTo;
+import static org.kie.server.api.util.QueryParamFactory.history;
+import static org.kie.server.api.util.QueryParamFactory.list;
+import static org.kie.server.api.util.QueryParamFactory.onlyActiveTasks;
+import static org.kie.server.api.util.QueryParamFactory.onlyCompletedTasks;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,23 +71,6 @@ import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.jbpm.services.api.AdvanceRuntimeDataService.PROCESS_ATTR_DEFINITION_ID;
-import static org.jbpm.services.api.AdvanceRuntimeDataService.PROCESS_ATTR_DEPLOYMENT_ID;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeFalse;
-import static org.kie.server.api.util.QueryParamFactory.equalsTo;
-import static org.kie.server.api.util.QueryParamFactory.history;
-import static org.kie.server.api.util.QueryParamFactory.list;
-import static org.kie.server.api.util.QueryParamFactory.onlyActiveTasks;
-import static org.kie.server.api.util.QueryParamFactory.onlyCompletedTasks;
 
 
 
@@ -1462,12 +1462,12 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
                     .type(TaskEvent.TaskEventType.ADDED.toString())
                     .processInstanceId(processInstanceId)
                     .taskId(taskInstance.getId())
-                    .user(PROCESS_ID_USERTASK)      // is this really correct to set process id as user for added task
+                    .assignedOwner(USER_YODA)
+                    .user(TestConfig.getUsername())
                     .build();
 
             TaskEventInstance event = events.get(0);
             assertTaskEventInstance(expectedTaskEventInstance, event);
-            //assertEquals(PROCESS_ID_USERTASK, event.getUserId());   // is this really correct to set process id as user for added task
 
             // now let's start it
             taskClient.startTask(CONTAINER_ID, taskInstance.getId(), USER_YODA);
@@ -1492,7 +1492,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
             event = getTaskEventInstanceFromListByType(events, TaskEvent.TaskEventType.ADDED.toString());
             expectedTaskEventInstance.setType(TaskEvent.TaskEventType.ADDED.toString());
-            expectedTaskEventInstance.setUserId(PROCESS_ID_USERTASK);  // is this really correct to set process id as user for added task
+            expectedTaskEventInstance.setUserId(USER_YODA);
             assertTaskEventInstance(expectedTaskEventInstance, event);
 
             event = getTaskEventInstanceFromListByType(events, TaskEvent.TaskEventType.STARTED.toString());
@@ -1854,9 +1854,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         parameters.put("personData", createPersonInstance(USER_JOHN));
 
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
-
-
-
+        
         List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
         Assertions.assertThat(tasks).hasSize(1);
 
@@ -1867,13 +1865,13 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
         SearchQueryFilterSpec specHistory = new SearchQueryFilterSpec();
         specHistory.setAttributesQueryParams(list(history(), equalsTo(PROCESS_ATTR_DEPLOYMENT_ID, CONTAINER_ID)));
-        List<ProcessInstanceCustomVars> listHistoryProcesses = queryClient.queryProcessesByVariables(specHistory, 0, 2);
+        List<ProcessInstanceCustomVars> listHistoryProcesses = queryClient.queryProcessesByVariables(specHistory, 0, 2, "processInstanceId" , false);
         assertNotNull(listHistoryProcesses);
         listHistoryProcesses.stream().forEach(e -> assertEquals(CONTAINER_ID, e.getContainerId()));
         
         spec = new SearchQueryFilterSpec();
         spec.setAttributesQueryParams(list(onlyActiveTasks(), equalsTo(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
-        List<ProcessInstanceUserTaskWithVariables> listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
+        List<ProcessInstanceUserTaskWithVariables> listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2, "processInstanceId", true);
         Assertions.assertThat(listTasks).hasSize(1).extracting(ProcessInstanceUserTaskWithVariables::getProcessDefinitionId).containsOnly(PROCESS_ID_USERTASK);
 
         this.taskClient.startTask(CONTAINER_ID, listTasks.get(0).getId(), "yoda");
@@ -1882,13 +1880,13 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         spec = new SearchQueryFilterSpec();
         spec.setAttributesQueryParams(list(onlyCompletedTasks(), equalsTo(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
 
-        listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
+        listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2, "task.id", false);
         Assertions.assertThat(listTasks).hasSize(1);
 
         spec = new SearchQueryFilterSpec();
         spec.setAttributesQueryParams(list(onlyActiveTasks(), equalsTo(PROCESS_ATTR_DEFINITION_ID, PROCESS_ID_USERTASK)));
 
-        listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2);
+        listTasks = queryClient.queryUserTaskByVariables(spec, 0, 2, "task.id", true);
         Assertions.assertThat(listTasks).hasSize(1);
 
         this.taskClient.startTask(CONTAINER_ID, listTasks.get(0).getId(), "yoda");
@@ -1961,6 +1959,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         assertEquals(expected.getProcessInstanceId(), actual.getProcessInstanceId());
         assertEquals(expected.getTaskId(), actual.getTaskId());
         assertEquals(expected.getUserId(), actual.getUserId());
+        assertEquals(expected.getAssignedOwner(), actual.getAssignedOwner());
         assertNotNull(actual.getId());
         assertNotNull(actual.getLogTime());
         assertNotNull(actual.getWorkItemId());

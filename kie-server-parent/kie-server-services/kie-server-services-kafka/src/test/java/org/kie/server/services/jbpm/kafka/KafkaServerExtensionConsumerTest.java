@@ -15,12 +15,33 @@
  */
 package org.kie.server.services.jbpm.kafka;
 
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.KAFKA_EXTENSION_PREFIX;
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.MESSAGE_MAPPING_PROPERTY;
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.SIGNAL_MAPPING_PROPERTY;
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.TOPIC_PREFIX;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -52,23 +73,13 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.jbpm.kafka.KafkaServerUtils.Mapping;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.assertTrue;
-import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.KAFKA_EXTENSION_PREFIX;
-import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.MESSAGE_MAPPING_PROPERTY;
-import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.SIGNAL_MAPPING_PROPERTY;
-import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.TOPIC_PREFIX;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
+
 
 public class KafkaServerExtensionConsumerTest {
 
@@ -80,6 +91,7 @@ public class KafkaServerExtensionConsumerTest {
             this.consumer = consumer;
         }
 
+        @Override
         protected Consumer<String, byte[]> getKafkaConsumer() {
             return consumer;
         }
@@ -95,11 +107,14 @@ public class KafkaServerExtensionConsumerTest {
     private MockKafkaServerExtension extension;
     private KieServerImpl server;
     private KieServerRegistry registry;
-    private DeployedUnit deployedUnit;
     private ProcessDefinition processDefinition;
     private MockConsumer<String, byte[]> mockConsumer;
     private static Logger logger = LoggerFactory.getLogger(KafkaServerExtensionConsumerTest.class);
     private InternalRegisterableItemsFactory itemsFactory;
+
+    private InternalRuntimeManager runtimeManager;
+
+    private KieContainer kieContainer;
 
 
     @Before
@@ -117,19 +132,13 @@ public class KafkaServerExtensionConsumerTest {
                 DeploymentService.class));
         processService = mock(ProcessService.class);
         when(serverExtension.getServices()).thenReturn(Arrays.asList(deployService, processService));
-        deployedUnit = mock(DeployedUnit.class);
-        InternalRuntimeManager runtimeManager = mock(InternalRuntimeManager.class);
-        when(deployedUnit.getRuntimeManager()).thenReturn(runtimeManager);
+        runtimeManager = mock(InternalRuntimeManager.class);
         RuntimeEnvironment runtimeEngine = mock(RuntimeEnvironment.class);
         when(runtimeManager.getEnvironment()).thenReturn(runtimeEngine);
         when(runtimeEngine.getRegisterableItemsFactory()).thenReturn(itemsFactory);
         processDefinition = mock(ProcessDefinition.class);
-        when(deployedUnit.getDeployedAssets()).thenReturn(Collections.singletonList(processDefinition));
         extension.init(server, registry);
-        KModuleDeploymentUnit deploymentUnit = mock(KModuleDeploymentUnit.class);
-        when(deployedUnit.getDeploymentUnit()).thenReturn(deploymentUnit);
-        KieContainer kieContainer = mock(KieContainer.class);
-        when(deploymentUnit.getKieContainer()).thenReturn(kieContainer);
+        kieContainer = mock(KieContainer.class);
         when(kieContainer.getClassLoader()).thenReturn(Thread.currentThread().getContextClassLoader());
         extension.serverStarted();
     }
@@ -146,14 +155,44 @@ public class KafkaServerExtensionConsumerTest {
         signal.addIncomingNode(mock(Node.class));
         return SignalDescImpl.from(signal);
     }
+    
+    private DeploymentEvent getDeploymentEvent (String artifactId) {
+        return getDeploymentEvent (null, artifactId, null);
+    }
+
+    private DeploymentEvent getDeploymentEvent(String groupId, String artifactId, String version) {
+        String deploymentId = buildId(groupId, artifactId, version);
+        DeployedUnit deployedUnit = mock(DeployedUnit.class);
+        when(deployedUnit.getRuntimeManager()).thenReturn(runtimeManager);
+        when(deployedUnit.getDeployedAssets()).thenReturn(Collections.singletonList(processDefinition));
+        KModuleDeploymentUnit deploymentUnit = mock(KModuleDeploymentUnit.class);
+        when(deployedUnit.getDeploymentUnit()).thenReturn(deploymentUnit);
+        when(deploymentUnit.getKieContainer()).thenReturn(kieContainer);
+        when(deploymentUnit.getGroupId()).thenReturn(groupId);
+        when(deploymentUnit.getArtifactId()).thenReturn(artifactId);
+        when(deploymentUnit.getVersion()).thenReturn(version);
+        return new DeploymentEvent(deploymentId, deployedUnit);
+    }
+
+    private String buildId(String groupId, String artifactId, String version) {
+        StringBuilder sb = new StringBuilder();
+        if (groupId != null) {
+            sb.append(groupId).append(":");
+        }
+        sb.append(artifactId);
+        if (version != null) {
+            sb.append(":").append(version);
+        }
+        return sb.toString();
+    }
 
     @Test
     public void testKafkaServerExecutorSignal() {
         when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("MySignal",
                 "String")));
-        extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
+        extension.onDeploy(getDeploymentEvent("test", "MyDeploy1", "1_0"));
         publishEvent("MySignal", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"javierito\"}");
-        verify(processService, getTimeout()).signalEvent("MyDeploy1", "MySignal", "javierito");
+        verify(processService, getTimeout()).signalEvent("test:MyDeploy1:1_0", "MySignal", "javierito");
     }
 
 
@@ -161,10 +200,10 @@ public class KafkaServerExtensionConsumerTest {
     private void testStructRefEvent(String clazzName) {
         when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("MySignal",
                 clazzName)));
-        extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
+        extension.onDeploy(getDeploymentEvent("test", "MyDeploy1", "1_0"));
         publishEvent("MySignal",
                 "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":{\"name\":\"javierito\"}}");
-        verify(processService, getTimeout()).signalEvent("MyDeploy1", "MySignal", new Person("javierito"));
+        verify(processService, getTimeout()).signalEvent("test:MyDeploy1:1_0", "MySignal", new Person("javierito"));
     }
 
     @Test
@@ -181,30 +220,50 @@ public class KafkaServerExtensionConsumerTest {
     public void testKafkaSubscriptionChange() {
         when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("MySignal",
                 "String")));
-        extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
+        extension.onDeploy(getDeploymentEvent("MyDeploy1"));
         publishEvent("MySignal", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"javierito\"}");
         verify(processService, getTimeout()).signalEvent("MyDeploy1", "MySignal", "javierito");
         when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("ChangedSignal",
                 "String")));
-        extension.onActivate(new DeploymentEvent("MyDeploy1", deployedUnit));
+        extension.onActivate(getDeploymentEvent("MyDeploy1"));
         publishEvent("ChangedSignal", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"javierito\"}");
         verify(processService, getTimeout()).signalEvent("MyDeploy1", "ChangedSignal", "javierito");
+    }
+    
+    @Test
+    public void testMultiDeployment () throws InterruptedException, ExecutionException {
+        when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("MySignal",
+                "String")));
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        Future<?> future1 = executorService.submit(() -> extension.onDeploy(getDeploymentEvent("MyDeploy1")));
+        Future<?> future2 = executorService.submit(() -> extension.onDeploy(getDeploymentEvent("MyDeploy2")));
+        future1.get();
+        future2.get();
+        publishEvent("MySignal", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"javierito\"}");
+        ArgumentCaptor<String> deploymentCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> signalCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> dataCaptor = ArgumentCaptor.forClass(String.class);
+        verify(processService, getTimeout(2, 2)).signalEvent(deploymentCaptor.capture(), signalCaptor.capture(),
+                dataCaptor.capture());
+        assertEquals("MySignal", signalCaptor.getValue());
+        assertEquals("javierito", dataCaptor.getValue());
+        assertThat(deploymentCaptor.getValue(), anyOf(is("MyDeploy1"),is("MyDeploy2")));
     }
 
     @Test
     public void testKafkaSubscriptionEmpty() {
         when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("MySignal",
                 "String")));
-        extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
+        extension.onDeploy(getDeploymentEvent("MyDeploy1"));
         publishEvent("MySignal", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"javierito\"}");
         verify(processService, getTimeout()).signalEvent("MyDeploy1", "MySignal", "javierito");
-        extension.onUnDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
+        extension.onUnDeploy(getDeploymentEvent("MyDeploy1"));
         when(processDefinition.getSignalsDesc()).thenReturn(Collections.emptyList());
-        extension.onActivate(new DeploymentEvent("MyDeploy1", deployedUnit));
+        extension.onActivate(getDeploymentEvent("MyDeploy1"));
         assertTrue(mockConsumer.assignment().isEmpty());
         when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("NewSignal",
                 "String")));
-        extension.onDeploy(new DeploymentEvent("MyDeploy1", deployedUnit));
+        extension.onDeploy(getDeploymentEvent("MyDeploy1"));
         publishEvent("NewSignal", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"javierito\"}");
         verify(processService, getTimeout()).signalEvent("MyDeploy1", "NewSignal", "javierito");
     }
@@ -216,7 +275,7 @@ public class KafkaServerExtensionConsumerTest {
         msg.setType("String");
         msg.addIncomingNode(mock(Node.class));
         when(processDefinition.getMessagesDesc()).thenReturn(Collections.singletonList(MessageDescImpl.from(msg)));
-        extension.onDeploy(new DeploymentEvent("MyDeploy2", deployedUnit));
+        extension.onDeploy(getDeploymentEvent("MyDeploy2"));
         publishEvent("Hello", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"pepe\"}");
         verify(processService, getTimeout()).signalEvent("MyDeploy2", "Message-Hello", "pepe");
     }
@@ -232,7 +291,7 @@ public class KafkaServerExtensionConsumerTest {
             msg.addIncomingNode(mock(Node.class));
             when(processDefinition.getMessagesDesc()).thenReturn(Collections.singletonList(MessageDescImpl.from(
                     msg)));
-            extension.onDeploy(new DeploymentEvent("MyDeploy3", deployedUnit));
+            extension.onDeploy(getDeploymentEvent("MyDeploy3"));
             publishEvent("MyTopic", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"pepe\"}");
             verify(processService, getTimeout()).signalEvent("MyDeploy3", "Message-Hello", "pepe");
         } finally {
@@ -245,7 +304,7 @@ public class KafkaServerExtensionConsumerTest {
         extension = spy(extension);
         when(processDefinition.getMessagesDesc()).thenReturn(Collections.emptyList());
         when(processDefinition.getSignalsDesc()).thenReturn(Collections.emptyList());
-        extension.onDeploy(new DeploymentEvent("EmptyDeploy", deployedUnit));
+        extension.onDeploy(getDeploymentEvent("EmptyDeploy"));
         verify(extension, never()).getKafkaConsumer();
     }
 
@@ -257,7 +316,7 @@ public class KafkaServerExtensionConsumerTest {
         msg.setName("Hello2");
         msg.setType("String");
         msg.addIncomingNode(mock(Node.class));
-        extension.onDeploy(new DeploymentEvent("MyDeploy4", deployedUnit));
+        extension.onDeploy(getDeploymentEvent("MyDeploy4"));
         publishEvent("MySignal2", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"javierito\"}");
         verify(processService, getTimeout()).signalEvent("MyDeploy4", "MySignal2", "javierito");
         extension.destroy(server, registry);
@@ -267,7 +326,7 @@ public class KafkaServerExtensionConsumerTest {
                 msg)));
         extension.setKafkaConsumer(mockConsumer);
         extension.init(server, registry);
-        extension.onDeploy(new DeploymentEvent("MyDeploy5", deployedUnit));
+        extension.onDeploy(getDeploymentEvent("MyDeploy5"));
         publishEvent("Hello2", "{\"id\":\"javi\",\"type\":\"one\",\"source\":\"pepe\",\"data\":\"pepe\"}");
         verify(processService, getTimeout()).signalEvent("MyDeploy5", "Message-Hello2", "pepe");
     }
@@ -277,7 +336,7 @@ public class KafkaServerExtensionConsumerTest {
         when(processDefinition.getSignalsDesc()).thenReturn(Collections.singletonList(createSignal("MySignal2",
                 "String")));
         System.clearProperty(SIGNAL_MAPPING_PROPERTY);
-        extension.onDeploy(new DeploymentEvent("MyDeploy4", deployedUnit));
+        extension.onDeploy(getDeploymentEvent("MyDeploy4"));
         verify(processDefinition, never()).getSignalsDesc();
     }
 
@@ -286,7 +345,7 @@ public class KafkaServerExtensionConsumerTest {
         when(processDefinition.getMessagesDesc()).thenReturn(Collections.singletonList(MessageDescImpl.from(new Message(
                 "MyMessage"))));
         System.setProperty(MESSAGE_MAPPING_PROPERTY, Mapping.NONE.toString());
-        extension.onDeploy(new DeploymentEvent("MyDeploy4", deployedUnit));
+        extension.onDeploy(getDeploymentEvent("MyDeploy4"));
         verify(processDefinition, never()).getMessagesDesc();
     }
 
@@ -296,7 +355,11 @@ public class KafkaServerExtensionConsumerTest {
     }
 
     private VerificationMode getTimeout(int times) {
-        return timeout(TIMEOUT * 1000).times(times);
+        return getTimeout(times, TIMEOUT);
+    }
+
+    private VerificationMode getTimeout(int times, long timeout) {
+        return timeout(timeout * 1000).times(times);
     }
 
     private void publishEvent(String topic, String cloudEventText) {

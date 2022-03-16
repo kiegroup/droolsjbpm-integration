@@ -16,14 +16,16 @@
 
 package org.kie.server.router.handlers;
 
+import org.kie.server.router.ConfigurationManager;
+
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
 
 public class OptionsHttpHandler extends AbstractAggregateHttpHandler {
 
-    public OptionsHttpHandler(HttpHandler httpHandler, AdminHttpHandler adminHandler) {
-        super(httpHandler, adminHandler);
+    public OptionsHttpHandler(HttpHandler httpHandler, ConfigurationManager configurationManager) {
+        super(httpHandler, configurationManager);
     }
 
     @Override

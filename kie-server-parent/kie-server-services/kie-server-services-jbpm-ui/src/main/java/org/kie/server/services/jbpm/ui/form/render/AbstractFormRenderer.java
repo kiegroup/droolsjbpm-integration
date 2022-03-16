@@ -29,10 +29,10 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.LinkedHashMap;
-import java.util.Optional;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -63,7 +63,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     
     private static final Logger logger = LoggerFactory.getLogger(AbstractFormRenderer.class);
     
-    public static final String MASTER_LAYOUT_TEMPLATE = "master";
+    public static final String MAIN_LAYOUT_TEMPLATE = "main";
     public static final String HEADER_LAYOUT_TEMPLATE = "header";
     public static final String FORM_GROUP_LAYOUT_TEMPLATE = "form-group";
     public static final String CASE_LAYOUT_TEMPLATE = "case-layout";
@@ -96,7 +96,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         this.inputTypes.put("ListBox", "select");
         this.inputTypes.put("RadioGroup", "radio");
         this.inputTypes.put("Document", "file");
-        this.inputTypes.put("DatePicker", "date");
+        this.inputTypes.put("DatePicker", "Date");
         this.inputTypes.put("Slider", "slider");
         this.inputTypes.put("DocumentCollection", "documentCollection");
         this.inputTypes.put("MultipleSelector", "multipleSelector");
@@ -179,7 +179,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         parameters.put("body", output);        
         parameters.put("scriptData", buildScriptData(scriptDataList));
         parameters.put("serverPath", resourcePath);
-        String finalOutput = renderTemplate(MASTER_LAYOUT_TEMPLATE, parameters);
+        String finalOutput = renderTemplate(MAIN_LAYOUT_TEMPLATE, parameters);
         
         return finalOutput;
     }
@@ -230,7 +230,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         parameters.put("body", output);        
         parameters.put("scriptData", buildScriptData(scriptDataList));
         parameters.put("serverPath", resourcePath);
-        String finalOutput = renderTemplate(MASTER_LAYOUT_TEMPLATE, parameters);
+        String finalOutput = renderTemplate(MAIN_LAYOUT_TEMPLATE, parameters);
         
         return finalOutput;
     }
@@ -283,7 +283,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         parameters.put("body", output);
         parameters.put("scriptData", buildScriptData(scriptDataList));
         parameters.put("serverPath", resourcePath);
-        String finalOutput = renderTemplate(MASTER_LAYOUT_TEMPLATE, parameters);
+        String finalOutput = renderTemplate(MAIN_LAYOUT_TEMPLATE, parameters);
         
         return finalOutput;
     }
@@ -383,10 +383,10 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                         }
                         
                         // handle regular fields in the form 
-                        String fieldType = inputTypes.get(field.getCode());
+                        String fieldType = getFieldType(field);
                         if (fieldType != null) {
                                                     
-                            String jsType = getFieldType(field.getType());
+                            String jsType = getJSFieldType(field.getType());
                             
                             item.setId(field.getId());
                             item.setName(nonNull(field.getName()));
@@ -492,7 +492,31 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                 .append(",");
         }        
     }
-    
+
+    private String getFieldType(FormField field) {
+        String type = inputTypes.get(field.getCode());
+        switch (type) {
+            case "documentCollection":
+            case "multipleSelector":
+            case "multipleInput":
+                return type;
+             default: 
+                 switch (field.getType()) {
+                     case "java.time.LocalDateTime":
+                     case "java.util.Date":
+                     case "java.sql.Date":
+                     case "java.sql.Timestamp":
+                         return "datetime-local";
+                     case "java.time.LocalTime":
+                         return "time";
+                     case "java.time.OffsetDateTime":
+                         return "datetime";
+                     default: 
+                         return type;
+                 }
+        }
+    }
+
     protected void handleSubForm(FormInstance topLevelForm, 
             FormField field, 
             Map<String, Object> inputs, 
@@ -552,7 +576,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         for (TableInfo tableInfo : field.getTableInfo()) {
         
             FormField nestedField = nestedForm.getFieldByBinding(tableInfo.getProperty());
-            String jsType = getFieldType(nestedField.getType());
+            String jsType = getJSFieldType(nestedField.getType());
             tableInfo.setType(jsType);
         }
                                     
@@ -670,14 +694,14 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         jsonTemplate.append("'")
                     .append(name)
                     .append("' : ")
-                    .append(getFieldType(type))
+                    .append(getJSFieldType(type))
                     .append(appendExtractionExpression(type, name, id, jsType))
                     .append(wrapEndFieldType(type))
                     .append(",");
 
     }
 
-    protected String getFieldType(String type) {
+    protected String getJSFieldType(String type) {
 
         if (type.contains("Integer") || type.contains("Double") || type.contains("Float")) {
             return "Number(";
@@ -685,7 +709,11 @@ public abstract class AbstractFormRenderer implements FormRenderer {
             return "Boolean(";
         } else if (type.contains("Date")) {
             return "Object(";
-        } else if (type.contains("Document") || type.contains("documentCollection") || type.contains("multipleSelector") || type.contains("multipleInput")) {
+        } else if (type.contains("file")
+                || type.contains("Document")
+                || type.contains("documentCollection")
+                || type.contains("multipleSelector")
+                || type.contains("multipleInput")) {
             return "Object(";
         } else if (type.contains("slider")) {
             return " { \"java.lang.Double\" : Number(";

@@ -65,6 +65,7 @@ public class RestURI {
     public static final String SVG_NODE_COMPLETED_COLOR = "svgCompletedColor";
     public static final String SVG_NODE_COMPLETED_BORDER_COLOR = "svgCompletedBorderColor";
     public static final String SVG_NODE_ACTIVE_COLOR = "svgActiveBorderColor";
+    public static final String SVG_INSTANCE_BADGES_SHOW = "svgInstanceBadgesShow";
 
     public static final String PROCESS_URI = "containers/{" + CONTAINER_ID + "}/processes";
     public static final String PROCESS_DEF_URI = "containers/{" + CONTAINER_ID + "}/processes/definitions";
@@ -157,6 +158,7 @@ public class RestURI {
     // task related prefixed by TASK_URI
     public static final String TASK_INSTANCE_ACTIVATE_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/activated";
     public static final String TASK_INSTANCE_CLAIM_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/claimed";
+    public static final String TASK_INSTANCE_CLAIM_BULK_URI = "states/claimed";
     public static final String TASK_INSTANCE_START_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/started";
     public static final String TASK_INSTANCE_STOP_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/stopped";
     public static final String TASK_INSTANCE_COMPLETE_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/completed";

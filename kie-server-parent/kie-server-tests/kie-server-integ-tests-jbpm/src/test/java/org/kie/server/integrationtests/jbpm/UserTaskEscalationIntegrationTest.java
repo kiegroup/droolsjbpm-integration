@@ -33,6 +33,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.assertj.core.api.Assertions;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -57,7 +58,6 @@ import org.subethamail.wiser.WiserMessage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @Category(Email.class)
@@ -87,7 +87,7 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
 
     private Wiser wiser;
 
-    @Parameterized.Parameters(name = "{index}: {0} {1}")
+    @Parameterized.Parameters(name = "{0} {1}")
     public static Collection<Object[]> data() {
         KieServicesConfiguration configuration = createKieServicesRestConfiguration();
 
@@ -122,6 +122,11 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
 
         createContainer(CONTAINER_ID, releaseId, PPI_RUNTIME_STRATEGY);
         createContainer(CONTAINER_ID_NOTIFICATION, releaseNotificationId, PPI_RUNTIME_STRATEGY);
+    }
+    
+    @AfterClass
+    public static void disposeAndCleanUp() {
+        disposeAllContainers();
     }
 
     @Test

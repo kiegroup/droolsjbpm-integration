@@ -24,6 +24,7 @@ public final class MessageType {
 
     public static final int PROCESS_START_EVENT_TYPE = 100;
     public static final int PROCESS_COMPLETED_EVENT_TYPE = 101;
+    public static final int NODE_SCHEDULED_EVENT_TYPE = 107;
     public static final int NODE_ENTER_EVENT_TYPE = 102;
     public static final int NODE_LEFT_EVENT_TYPE = 103;
     public static final int VAR_CHANGE_EVENT_TYPE = 104;

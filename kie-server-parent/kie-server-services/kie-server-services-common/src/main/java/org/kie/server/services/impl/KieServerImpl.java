@@ -17,6 +17,7 @@
 package org.kie.server.services.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -72,6 +73,7 @@ import org.kie.server.services.api.StartupStrategy;
 import org.kie.server.services.impl.controller.DefaultRestControllerImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.policy.PolicyManager;
+import org.kie.server.services.impl.security.ElytronIdentityProvider;
 import org.kie.server.services.impl.security.JACCIdentityProvider;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
@@ -150,7 +152,11 @@ public class KieServerImpl implements KieServer {
         logger.info("Configured '{}' server state repository", this.repository.getClass().getSimpleName());
         
         this.context = new KieServerRegistryImpl();
-        this.context.registerIdentityProvider(new JACCIdentityProvider());
+        if (ElytronIdentityProvider.available()) {
+            this.context.registerIdentityProvider(new ElytronIdentityProvider());
+        } else {
+            this.context.registerIdentityProvider(new JACCIdentityProvider());
+        }
         this.context.registerStateRepository(repository);
         // load available container locators
         ContainerLocatorProvider.get();
@@ -158,6 +164,12 @@ public class KieServerImpl implements KieServer {
         ContainerManager containerManager = getContainerManager();
 
         KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
+
+        // we sync env with state just in case for some env entries only
+        // if there is an update we just need to store it again
+        if (updateMutableEnvironmentState(currentState)) {
+            repository.store(KieServerEnvironment.getServerId(), currentState);
+        }
 
         List<KieServerExtension> extensions = sortKnownExtensions();
 
@@ -194,6 +206,39 @@ public class KieServerImpl implements KieServer {
         startupStrategy.startup(this, containerManager, currentState, kieServerActive);
         
         eventSupport.fireAfterServerStarted(this);
+    }
+
+    /**
+     * we allow some config items to be overwritten by properties
+     * @param currentState
+     */
+    private boolean updateMutableEnvironmentState(KieServerState currentState) {
+        boolean updated = false;
+        for (String key : Arrays.asList(KieServerConstants.CFG_KIE_CONTROLLER_USER, KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, KieServerConstants.CFG_KIE_CONTROLLER_TOKEN)) {
+            updated |= updateConfigItemFromEnv(currentState, key);
+        }
+        return updated;
+    }
+
+    private boolean updateConfigItemFromEnv(KieServerState state, String key) {
+        String envValue = System.getProperty(key);
+        KieServerConfigItem item = state.getConfiguration().getConfigItem(key);
+
+        if (envValue == null && item == null) {
+            return false;
+        } else if (envValue != null && item != null && envValue.equals(state.getConfiguration().getConfigItem(key).getValue())) {
+            return false;
+        }
+
+        // the only cases left is when one of them is null and the other one not or both are different (value is changed)
+        if (envValue != null) {
+            logger.info("Property {} has a value different from environment. Updating current server state config item to {}", key, envValue);
+            state.getConfiguration().addConfigItem(new KieServerConfigItem(key, envValue, String.class.getName()));
+        } else {
+            logger.info("Property {} has null value from environment. Removing current server state config item", key);
+            state.getConfiguration().removeConfigItem(new KieServerConfigItem(key, item.getValue(), String.class.getName()));
+        }
+        return true;
     }
 
     public KieServerRegistry getServerRegistry() {
@@ -259,10 +304,8 @@ public class KieServerImpl implements KieServer {
         Optional<ServiceResponse<KieContainerResource>> optional = Optional.ofNullable(validateContainerReleaseAndMode("Error creating container.", container));
 
         if (optional.isPresent()) {
-            ServiceResponse response = optional.get();
-
+            ServiceResponse<KieContainerResource> response = optional.get();
             logger.error(response.getMsg());
-
             return optional.get();
         }
 
@@ -322,7 +365,7 @@ public class KieServerImpl implements KieServer {
                                     currentState.getContainers().add(container);
                                 });
                                 eventSupport.fireAfterContainerStarted(this, ci);
-                                getDefaultController().update(getInternalServerState());
+                                notifyStatusToControllers();
                                 return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully deployed with module " + releaseId + ".", ci.getResource());
                             } else {
                                 ci.getResource().setStatus(KieContainerStatus.FAILED);
@@ -432,7 +475,7 @@ public class KieServerImpl implements KieServer {
                     });
 
                     eventSupport.fireAfterContainerActivated(this, kci);
-                    getDefaultController().update(getInternalServerState());
+                    notifyStatusToControllers();
                     messages.add(new Message(Severity.INFO, "Container " + containerId + " activated successfully."));
                     return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " activated successfully.", kci.getResource());
                 }
@@ -481,7 +524,7 @@ public class KieServerImpl implements KieServer {
                     });
 
                     eventSupport.fireAfterContainerDeactivated(this, kci);
-                    getDefaultController().update(getInternalServerState());
+                    notifyStatusToControllers();
                     messages.add(new Message(Severity.INFO, "Container " + containerId + " deactivated successfully."));
                     return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " deactivated successfully.", kci.getResource());
                 }
@@ -614,7 +657,7 @@ public class KieServerImpl implements KieServer {
                         messages.add(new Message(Severity.INFO, "Container " + containerId + " successfully stopped."));
 
                         eventSupport.fireAfterContainerStopped(this, kci);
-                        getDefaultController().update(getInternalServerState());
+                        notifyStatusToControllers();
                         return new ServiceResponse<Void>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully disposed.");
                     } else {
                         messages.add(new Message(Severity.INFO, "Container " + containerId + " was not instantiated."));
@@ -678,7 +721,7 @@ public class KieServerImpl implements KieServer {
                             }
                         });
                     });
-                    getDefaultController().update(getInternalServerState());
+                    notifyStatusToControllers();
                     return scannerResponse;
                 }
             } else {
@@ -879,10 +922,8 @@ public class KieServerImpl implements KieServer {
         Optional<ServiceResponse<ReleaseId>> optional = Optional.ofNullable(validateReleaseAndMode("Error updating releaseId for container '" + containerId + "'.", releaseId));
 
         if (optional.isPresent()) {
-            ServiceResponse response = optional.get();
-
+            ServiceResponse<ReleaseId> response = optional.get();
             logger.error(response.getMsg());
-
             return optional.get();
         }
 
@@ -955,7 +996,7 @@ public class KieServerImpl implements KieServer {
 
                 logger.info("Container {} successfully updated to release id {}", containerId, releaseId);
                 ks.getRepository().removeKieModule(originalReleaseId);
-                getDefaultController().update(getInternalServerState());
+                notifyStatusToControllers();
                 messages.add(new Message(Severity.INFO, "Release id successfully updated for container " + containerId));
                 return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfully updated.", kci.getResource().getReleaseId());
             } else {
@@ -1106,6 +1147,10 @@ public class KieServerImpl implements KieServer {
         }
 
         return controller;
+    }
+
+    protected void notifyStatusToControllers() {
+        getDefaultController().update(getInternalServerState());
     }
 
     protected KieServerController getDefaultController() {

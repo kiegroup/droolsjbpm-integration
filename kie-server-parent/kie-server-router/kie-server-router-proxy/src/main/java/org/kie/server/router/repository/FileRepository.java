@@ -18,29 +18,23 @@ package org.kie.server.router.repository;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.PrintWriter;
 
+import org.jboss.logging.Logger;
 import org.kie.server.router.Configuration;
-import org.kie.server.router.KieServerRouterConstants;
+import org.kie.server.router.KieServerRouterEnvironment;
 import org.kie.server.router.spi.ConfigRepository;
 
 public class FileRepository implements ConfigRepository {
-    
+
+    private static final Logger log = Logger.getLogger(FileRepository.class);
+
     private final File repositoryDir; 
     private ConfigurationMarshaller marshaller = new ConfigurationMarshaller();
-    
-    private Configuration configuration;
-    
-    private ConfigFileWatcher watcher;
-    private boolean configWatcherEnabled = Boolean.parseBoolean(System.getProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED, "false"));
-    
-    public FileRepository() {
-        this(new File(System.getProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR, ".")));
-    }
-    
-    public FileRepository(File repositoryDir) {
-        this.repositoryDir = repositoryDir;   
+
+
+    public FileRepository(KieServerRouterEnvironment env) {
+        this.repositoryDir = new File(env.getRepositoryDir());
     }
 
     @Override
@@ -58,41 +52,27 @@ public class FileRepository implements ConfigRepository {
             configFile.setLastModified(System.currentTimeMillis());
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error("Could not persist configuration {0}", configFile, ex);
         }
     }
 
     @Override
     public Configuration load() {
-        this.configuration = new Configuration();
-        File serverStateFile = new File(repositoryDir, "kie-server-router" + ".json");
+        Configuration configuration = new Configuration();
+        File serverStateFile = new File(repositoryDir, "kie-server-router.json");
         if (serverStateFile.exists()) {
             try (FileReader reader = new FileReader(serverStateFile)){
-                
-                this.configuration = marshaller.unmarshall(reader);
-
+                configuration = marshaller.unmarshall(reader);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("configuration file could not be read {0}", serverStateFile, e);
             }
         }
-        // setup config file watcher to be updated when changes are discovered
-        if (configWatcherEnabled ) {
-            this.watcher = new ConfigFileWatcher(serverStateFile.getParentFile().getAbsolutePath(), marshaller, configuration);
-            Thread watcherThread = new Thread(watcher, "Kie Router Config Watch Thread");
-            watcherThread.start();
-        }
-        return this.configuration;
+        return configuration;
     }
 
     @Override
     public void clean() {
         persist(new Configuration());
     }
-    
-    @Override
-    public void close() {
-        if (watcher != null) {
-            watcher.stop();
-        }
-    }
+
 }

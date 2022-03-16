@@ -36,15 +36,17 @@ import org.kie.server.api.model.definition.ProcessStartSpec;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.model.instance.WorkItemInstanceList;
+import org.kie.server.services.api.ContainerLocator;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.locator.LatestContainerLocator;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
-import org.kie.server.services.jbpm.locator.ByProcessInstanceIdContainerLocator;
+import org.kie.server.services.jbpm.locator.ProcessContainerLocatorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
+import static org.kie.server.services.jbpm.ConvertUtils.convert;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstance;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceList;
 
@@ -172,23 +174,12 @@ public class ProcessServiceBase {
 
     public Object abortProcessInstance(String containerId, Number processInstanceId) {
         try {
-            containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
+            containerId = context.getContainerId(containerId, ProcessContainerLocatorProvider.get().getLocator(processInstanceId));
             processService.abortProcessInstance(containerId, processInstanceId.longValue());
             return null;
         } catch (IllegalArgumentException e) {
             throw new DeploymentNotFoundException(e.getMessage());
         }
-    }
-
-
-    protected List<Long> convert(List<? extends Number> input) {
-        List<Long> result = new ArrayList<Long>();
-
-        for (Number n : input) {
-            result.add(n.longValue());
-        }
-
-        return result;
     }
 
     public Object abortProcessInstances(String containerId, List<Long> processInstanceIds) {
@@ -200,7 +191,7 @@ public class ProcessServiceBase {
 
     public void signalProcessInstance(String containerId, Number processInstanceId, String signalName, String marshallingType) {
 
-        containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
+        containerId = context.getContainerId(containerId, ProcessContainerLocatorProvider.get().getLocator(processInstanceId));
         logger.debug("Calling signal '{}' process instance with id {} on container {} and event {}", signalName, processInstanceId, containerId, null);
         processService.signalProcessInstance(containerId, processInstanceId.longValue(), signalName, null);
 
@@ -208,7 +199,7 @@ public class ProcessServiceBase {
 
     public void signalProcessInstance(String containerId, Number processInstanceId, String signalName, String eventPayload, String marshallingType) {
 
-        containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
+        containerId = context.getContainerId(containerId, ProcessContainerLocatorProvider.get().getLocator(processInstanceId));
         logger.debug("About to unmarshal event from payload: '{}'", eventPayload);
         Object event = marshallerHelper.unmarshal(containerId, eventPayload, marshallingType, Object.class);
 
@@ -222,7 +213,7 @@ public class ProcessServiceBase {
         if (ids.isEmpty()) {
             return;
         }
-        containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(ids.get(0)));
+        containerId = context.getContainerId(containerId, ProcessContainerLocatorProvider.get().getLocator(ids.get(0)));
         logger.debug("Calling signal '{}' process instances with id {} on container {} and event {}", signalName, processInstanceIds, containerId, null);
         processService.signalProcessInstances(containerId, convert(processInstanceIds), signalName, null);
 
@@ -234,7 +225,7 @@ public class ProcessServiceBase {
         if (ids.isEmpty()) {
             return;
         }
-        containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(ids.get(0)));
+        containerId = context.getContainerId(containerId, ProcessContainerLocatorProvider.get().getLocator(ids.get(0)));
         logger.debug("About to unmarshal event from payload: '{}'", eventPayload);
         Object event = marshallerHelper.unmarshal(containerId, eventPayload, marshallingType, Object.class);
 
@@ -296,7 +287,8 @@ public class ProcessServiceBase {
         if (instanceDesc == null) {
             throw new IllegalStateException("Unable to find process instance with id " + processInstanceId);
         }
-        containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
+        ContainerLocator locator = ProcessContainerLocatorProvider.get().getLocator(processInstanceId);
+        containerId = context.getContainerId(containerId, locator);
         org.kie.server.api.model.instance.ProcessInstance processInstance = convertToProcessInstance(instanceDesc);
 
         if (Boolean.TRUE.equals(withVars) && processInstance.getState().equals(ProcessInstance.STATE_ACTIVE)) {
@@ -305,14 +297,11 @@ public class ProcessServiceBase {
         }
 
         logger.debug("About to marshal process instance with id '{}' {}", processInstanceId, processInstance);
-        String response = marshallerHelper.marshal(containerId, marshallingType, processInstance, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
-
-        return response;
-
+        return marshallerHelper.marshal(containerId, marshallingType, processInstance, locator);
     }
 
     public void setProcessVariable(String containerId, Number processInstanceId, String varName, String variablePayload, String marshallingType) {
-        containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
+        containerId = context.getContainerId(containerId, ProcessContainerLocatorProvider.get().getLocator(processInstanceId));
         logger.debug("About to unmarshal variable from payload: '{}'", variablePayload);
         Object variable = marshallerHelper.unmarshal(containerId, variablePayload, marshallingType, Object.class);
 
@@ -322,7 +311,7 @@ public class ProcessServiceBase {
     }
 
     public void setProcessVariables(String containerId, Number processInstanceId, String variablePayload, String marshallingType) {
-        containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
+        containerId = context.getContainerId(containerId, ProcessContainerLocatorProvider.get().getLocator(processInstanceId));
         logger.debug("About to unmarshal variables from payload: '{}'", variablePayload);
         Map<String, Object> variables = marshallerHelper.unmarshal(containerId, variablePayload, marshallingType, Map.class);
 
@@ -332,7 +321,7 @@ public class ProcessServiceBase {
 
 
     public String getProcessInstanceVariable(String containerId, Number processInstanceId, String varName, String marshallingType) {
-        containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
+        containerId = context.getContainerId(containerId, ProcessContainerLocatorProvider.get().getLocator(processInstanceId));
         Object variable = processService.getProcessInstanceVariable(containerId, processInstanceId.longValue(), varName);
 
         if (variable == null) {
@@ -347,7 +336,7 @@ public class ProcessServiceBase {
     }
 
     public String getProcessInstanceVariables(String containerId, Number processInstanceId, String marshallingType) {
-        containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
+        containerId = context.getContainerId(containerId, ProcessContainerLocatorProvider.get().getLocator(processInstanceId));
         Map<String, Object> variables = processService.getProcessInstanceVariables(containerId, processInstanceId.longValue());
 
         logger.debug("About to marshal process variables {}", variables);
@@ -359,7 +348,7 @@ public class ProcessServiceBase {
 
 
     public String getAvailableSignals(String containerId, Number processInstanceId, String marshallingType) {
-        containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
+        containerId = context.getContainerId(containerId, ProcessContainerLocatorProvider.get().getLocator(processInstanceId));
         Collection<String> signals = processService.getAvailableSignals(containerId, processInstanceId.longValue());
 
         logger.debug("About to marshal available signals {}", signals);
@@ -370,7 +359,7 @@ public class ProcessServiceBase {
 
 
     public void completeWorkItem(String containerId, Number processInstanceId, Number workItemId, String resultPayload, String marshallingType) {
-        containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
+        containerId = context.getContainerId(containerId, ProcessContainerLocatorProvider.get().getLocator(processInstanceId));
         logger.debug("About to unmarshal work item result from payload: '{}'", resultPayload);
         Map<String, Object> results = marshallerHelper.unmarshal(containerId, resultPayload, marshallingType, Map.class);
 
@@ -381,14 +370,14 @@ public class ProcessServiceBase {
 
 
     public void abortWorkItem(String containerId, Number processInstanceId, Number workItemId) {
-        containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
+        containerId = context.getContainerId(containerId, ProcessContainerLocatorProvider.get().getLocator(processInstanceId));
         logger.debug("Aborting work item '{}' on process instance id {}", workItemId, processInstanceId);
         processService.abortWorkItem(containerId, processInstanceId.longValue(), workItemId.longValue());
     }
 
 
     public String getWorkItem(String containerId, Number processInstanceId, Number workItemId, String marshallingType) {
-        containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
+        containerId = context.getContainerId(containerId, ProcessContainerLocatorProvider.get().getLocator(processInstanceId));
         WorkItem workItem = processService.getWorkItem(containerId, processInstanceId.longValue(), workItemId.longValue());
 
         if (workItem == null) {
@@ -407,15 +396,12 @@ public class ProcessServiceBase {
                 .build();
 
         logger.debug("About to marshal work item {}", workItemInstance);
-        String response = marshallerHelper.marshal(containerId, marshallingType, workItemInstance, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
-
-        return response;
-
+        return marshallerHelper.marshal(containerId, marshallingType, workItemInstance, ProcessContainerLocatorProvider.get().getLocator(processInstanceId));
     }
 
     public String getWorkItemByProcessInstance(String containerId, Number processInstanceId, String marshallingType) {
 
-        containerId = context.getContainerId(containerId, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
+        containerId = context.getContainerId(containerId, ProcessContainerLocatorProvider.get().getLocator(processInstanceId));
         List<WorkItem> workItems = processService.getWorkItemByProcessInstance(containerId, processInstanceId.longValue());
 
         WorkItemInstance[] instances = new WorkItemInstance[workItems.size()];
@@ -458,9 +444,4 @@ public class ProcessServiceBase {
 
         return processInstanceList;
     }
-
-
-
-
-
 }

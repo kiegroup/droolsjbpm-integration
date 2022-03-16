@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-services</artifactId>
-    <version>7.54.0-SNAPSHOT</version>
+    <version>7.68.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-services-common</artifactId>
@@ -73,10 +73,15 @@
       <scope>runtime</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.wildfly.security</groupId>
+      <artifactId>wildfly-elytron</artifactId>
+    </dependency>
+
     <!-- security -->
     <dependency>
-      <groupId>org.jboss.spec.javax.security.jacc</groupId>
-      <artifactId>jboss-jacc-api_1.5_spec</artifactId>
+      <groupId>jakarta.security.jacc</groupId>
+      <artifactId>jakarta.security.jacc-api</artifactId>
     </dependency>
 
     <!-- Needed by aether-http stuff, but mistakenly excluded in assemblies so adding it here explicitly -->
@@ -103,18 +108,14 @@
           <artifactId>javassist</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>javax.annotation</groupId>
-          <artifactId>jsr250-api</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>net.jcip</groupId>
           <artifactId>jcip-annotations</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.jboss.spec.javax.ws.rs</groupId>
-      <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
@@ -187,16 +188,6 @@
     <dependency>
     	<groupId>org.xmlunit</groupId>
     	<artifactId>xmlunit-core</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>jakarta.xml.bind</groupId>
-          <artifactId>jakarta.xml.bind-api</artifactId>
-        </exclusion>
-      </exclusions>
     	<scope>test</scope>
     </dependency>
     <dependency>

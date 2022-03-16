@@ -15,28 +15,30 @@
 
 package org.kie.server.router.proxy.aggregate;
 
-import io.undertow.protocols.ssl.UndertowXnioSsl;
-import io.undertow.server.handlers.proxy.LoadBalancingProxyClient;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
-import org.kie.server.router.Configuration;
-import org.kie.server.router.handlers.AdminHttpHandler;
-import org.kie.server.router.proxy.CaptureHostLoadBalancingProxyClient;
-import org.kie.server.router.proxy.KieServerProxyClient;
-import org.kie.server.router.repository.FileRepository;
-import org.kie.server.router.spi.ConfigRepository;
-import org.kie.server.router.utils.SSLContextBuilder;
-import org.xnio.ssl.XnioSsl;
-
-import static org.kie.server.router.utils.TrustStoreHelper.getCurrentTrustStore;
-
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Test;
+import org.kie.server.router.Configuration;
+import org.kie.server.router.ConfigurationManager;
+import org.kie.server.router.KieServerRouterEnvironment;
+import org.kie.server.router.handlers.AdminHttpHandler;
+import org.kie.server.router.proxy.CaptureHostLoadBalancingProxyClient;
+import org.kie.server.router.proxy.KieServerProxyClient;
+import org.kie.server.router.repository.FileRepository;
+import org.kie.server.router.spi.ConfigRepository;
+import org.xnio.ssl.XnioSsl;
+
+import io.undertow.protocols.ssl.UndertowXnioSsl;
+import io.undertow.server.handlers.proxy.LoadBalancingProxyClient;
+
+import static org.kie.server.router.utils.TrustStoreHelper.getCurrentTrustStore;
 
 public class KieServerProxyClientTest {
 
@@ -47,7 +49,7 @@ public class KieServerProxyClientTest {
 
     private static final String TRUSTSTORE_PASSWORD = "mykeystorepass";
 
-    private ConfigRepository repository = new FileRepository();
+    private ConfigRepository repository = new FileRepository(new KieServerRouterEnvironment());
     private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
     @After
@@ -59,10 +61,10 @@ public class KieServerProxyClientTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testAddHost() throws URISyntaxException, NoSuchFieldException, IllegalAccessException {
+        KieServerRouterEnvironment kieServerRouterEnvironment = new KieServerRouterEnvironment();
+        ConfigurationManager configurationManager = new ConfigurationManager(kieServerRouterEnvironment, repository, executorService);
 
-        Configuration configuration = repository.load();
-        AdminHttpHandler adminHandler = new AdminHttpHandler(configuration, repository, executorService);
-        KieServerProxyClient proxyClient = new KieServerProxyClient(configuration, adminHandler);
+        KieServerProxyClient proxyClient = new KieServerProxyClient(configurationManager);
 
         // clean ssl properties
         String containerId = "my-container";
@@ -92,9 +94,10 @@ public class KieServerProxyClientTest {
         System.setProperty("javax.net.ssl.trustStore", TRUSTSTORE_PATH);
         System.setProperty("javax.net.ssl.trustStorePassword", TRUSTSTORE_PASSWORD);
 
-        Configuration configuration = repository.load();
-        AdminHttpHandler adminHandler = new AdminHttpHandler(configuration, repository, executorService);
-        KieServerProxyClient proxyClient = new KieServerProxyClient(configuration, adminHandler);
+        KieServerRouterEnvironment kieServerRouterEnvironment = new KieServerRouterEnvironment();
+        ConfigurationManager configurationManager = new ConfigurationManager(kieServerRouterEnvironment, repository, executorService);
+
+        KieServerProxyClient proxyClient = new KieServerProxyClient(configurationManager);
 
         String containerId = "my-container-ssl";
         URI uri = new URI("https://localhost:9443");

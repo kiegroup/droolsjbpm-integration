@@ -36,6 +36,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.assertj.core.util.Arrays;
 import org.assertj.core.util.Files;
+import org.drools.core.command.runtime.BatchExecutionCommandImpl;
+import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.junit.After;
 import org.junit.Test;
@@ -43,6 +45,7 @@ import org.kie.server.api.marshalling.json.JSONMarshaller;
 import org.kie.server.api.marshalling.objects.DateObject;
 import org.kie.server.api.marshalling.objects.DateObjectUnannotated;
 import org.kie.server.api.model.definition.QueryParam;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -50,6 +53,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.skyscreamer.jsonassert.JSONCompareMode.STRICT;
 
 public class JSONMarshallerTest {
 
@@ -171,6 +175,25 @@ public class JSONMarshallerTest {
             this.r = r;
         }
     }
+    
+    public static class Order {
+
+        private String ORDER_ID;
+        
+        public Order() {}
+        
+        public Order(String o){
+            this.ORDER_ID = o;
+        }
+
+        public String getORDER_ID() {
+            return ORDER_ID;
+        }
+
+        public void setORDER_ID(String o) {
+            this.ORDER_ID = o;
+        }
+    }
 
     @Test
     public void testRecursiveMap() {
@@ -230,5 +253,68 @@ public class JSONMarshallerTest {
         assertEquals(1, params.length);
         assertThat(Arrays.asList(params), everyItem(instanceOf(QueryParam.class)));
     }
+    
+    @Test
+    public void testCapitalizedFieldnames() throws Exception {
+        Marshaller marshaller = new JSONMarshaller(new HashSet<>(),getClass().getClassLoader(), false, true); 
 
+        Order order = new Order("all");
+        String converted = marshaller.marshall(order);
+        String expectedMarshalled = "{\"ORDER_ID\" : \"all\"}";
+
+        JSONAssert.assertEquals(expectedMarshalled, converted, STRICT);
+        
+        Order unconverted = marshaller.unmarshall(converted, Order.class);
+        assertEquals("all", unconverted.getORDER_ID());
+    }
+
+    @Test
+    public void testLegacyFieldnames() throws Exception {
+        Marshaller marshaller = new JSONMarshaller(new HashSet<>(),getClass().getClassLoader(), false, false); 
+
+        Order order = new Order("all");
+        String converted = marshaller.marshall(order);
+        String expectedMarshalled = "{\"order_ID\" : \"all\"}";
+
+        JSONAssert.assertEquals(expectedMarshalled, converted, STRICT);
+        
+        Order unconverted = marshaller.unmarshall(converted, Order.class);
+        assertEquals("all", unconverted.getORDER_ID());
+    }
+
+    @Test
+    public void testCapitalizedWrapObjectFieldnames() throws Exception {
+        Marshaller marshaller = new JSONMarshaller(new HashSet<>(),getClass().getClassLoader(), false, true); 
+
+        BatchExecutionCommandImpl batch = new BatchExecutionCommandImpl();
+        batch.addCommand(new InsertObjectCommand(new Order("all")));
+
+        String converted = marshaller.marshall(batch);
+        String expectedMarshalled = "{ \"lookup\" : null, \"commands\" : [ { \"insert\" : " +
+                                    "{ \"object\" : {\"org.kie.server.api.marshalling.JSONMarshallerTest$Order\":{ \"ORDER_ID\" : \"all\" }}, " +
+                                    "\"out-identifier\" : null, \"return-object\" : true, \"entry-point\" : \"DEFAULT\", \"disconnected\" : false } } ] }";
+        
+        JSONAssert.assertEquals(expectedMarshalled, converted, STRICT);
+
+        BatchExecutionCommandImpl unconverted = marshaller.unmarshall(converted, BatchExecutionCommandImpl.class);
+        assertEquals("all", ((Order) ((InsertObjectCommand) unconverted.getCommands().get(0)).getObject()).getORDER_ID());
+    }
+
+    @Test
+    public void testLegalizeWrapObjectFieldnames() throws Exception {
+        Marshaller marshaller = new JSONMarshaller(new HashSet<>(),getClass().getClassLoader(), false, false); 
+
+        BatchExecutionCommandImpl batch = new BatchExecutionCommandImpl();
+        batch.addCommand(new InsertObjectCommand(new Order("all")));
+
+        String converted = marshaller.marshall(batch);
+        String expectedMarshalled = "{ \"lookup\" : null, \"commands\" : [ { \"insert\" : " +
+                "{ \"object\" : {\"org.kie.server.api.marshalling.JSONMarshallerTest$Order\":{ \"order_ID\" : \"all\" }}, " +
+                "\"out-identifier\" : null, \"return-object\" : true, \"entry-point\" : \"DEFAULT\", \"disconnected\" : false } } ] }";
+
+        JSONAssert.assertEquals(expectedMarshalled, converted, STRICT);
+
+        BatchExecutionCommandImpl unconverted = marshaller.unmarshall(converted, BatchExecutionCommandImpl.class);
+        assertEquals("all", ((Order) ((InsertObjectCommand) unconverted.getCommands().get(0)).getObject()).getORDER_ID());
+    }
 }

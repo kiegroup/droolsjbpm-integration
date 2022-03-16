@@ -63,6 +63,7 @@ public class LocalStorageStreamingKieSessionTest {
         Bootstrap.stopEngine();
     }
 
+    @Ignore("https://issues.redhat.com/browse/DROOLS-6459")
     @Test(timeout = 10000)
     public void insertTest() throws ExecutionException, InterruptedException {
 
@@ -111,6 +112,7 @@ public class LocalStorageStreamingKieSessionTest {
                 .stream().filter(stock -> !stock.isProcessed()).count());
     }
 
+    @Ignore("https://issues.redhat.com/browse/DROOLS-6424")
     @Test(timeout = 10000)
     public void getCommandsTest() throws ExecutionException, InterruptedException {
 

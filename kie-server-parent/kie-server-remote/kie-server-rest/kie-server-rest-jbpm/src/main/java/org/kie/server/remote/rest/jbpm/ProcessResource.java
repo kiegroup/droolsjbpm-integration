@@ -96,12 +96,14 @@ import static org.kie.server.api.rest.RestURI.START_PROCESS_WITH_CORRELATION_KEY
 import static org.kie.server.api.rest.RestURI.COMPUTE_PROCESS_OUTCOME_POST_URI;
 import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.conflict;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
 import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.common.util.RestUtils.forbidden;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.isCorrelationKeyAlreadyExists;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
@@ -295,7 +297,8 @@ public class ProcessResource  {
                                                                      @ExampleProperty(mediaType = XML, value = LONG_RESPONSE_XML)})),
                            @ApiResponse(code = 500, message = "Unexpected error"),
                            @ApiResponse(code = 404, message = "Process ID or Container Id not found"),
-                           @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
+                           @ApiResponse(code = 403, message = "User does not have permission to access this asset"),
+                           @ApiResponse(code = 409, message = "Duplicate correlation key")})
     @POST
     @Path(START_PROCESS_FROM_NODES_WITH_CORRELATION_KEY_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -328,9 +331,12 @@ public class ProcessResource  {
         } catch (SecurityException e) {
             return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
+            if (isCorrelationKeyAlreadyExists(e)) {
+                return conflict(errorMessage(e, e.getMessage()), v, conversationIdHeader);
+            }
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(
-                                       MessageFormat.format(CREATE_RESPONSE_ERROR, e.getMessage()), v);
+                    MessageFormat.format(CREATE_RESPONSE_ERROR, e.getMessage()), v);
         }
     }
 
@@ -340,7 +346,8 @@ public class ProcessResource  {
             @ExampleProperty(mediaType=XML, value=LONG_RESPONSE_XML)})),
             @ApiResponse(code = 500, message = "Unexpected error"),
             @ApiResponse(code = 404, message = "Process ID or Container Id not found"),
-            @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset"),
+            @ApiResponse(code = 409, message = "Duplicate correlation key")})
     @POST
     @Path(START_PROCESS_WITH_CORRELATION_KEY_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -373,6 +380,9 @@ public class ProcessResource  {
         } catch (SecurityException e) {
             return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
         } catch (Exception e) {
+            if (isCorrelationKeyAlreadyExists(e)) {
+                return conflict(errorMessage(e, e.getMessage()), v, conversationIdHeader);
+            }
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(
                     MessageFormat.format(CREATE_RESPONSE_ERROR, e.getMessage()), v);

@@ -41,6 +41,9 @@ public class SearchQueryFilterSpec {
     @XmlElement(name = "case-query-params")
     private List<QueryParam> caseVariablesQueryParams;
 
+    @XmlElement(name = "pot-owners-query-param")
+    private QueryParam ownersQueryParam;
+
     @XmlElement(name = "pot-owners")
     private List<String> owners;
 
@@ -88,6 +91,14 @@ public class SearchQueryFilterSpec {
         this.caseVariablesQueryParams = caseVariablesQueryParams;
     }
 
+    public QueryParam getOwnersQueryParam() {
+        return ownersQueryParam;
+    }
+
+    public void setOwnersQueryParam(QueryParam ownersQueryParam) {
+        this.ownersQueryParam = ownersQueryParam;
+    }
+
     public void setOwners(List<String> owners) {
         this.owners = owners;
     }
@@ -106,6 +117,8 @@ public class SearchQueryFilterSpec {
                " TaskVariablesQueryParams=" + (taskVariablesQueryParams) +
                " ProcessVariablesQueryParams=" + (processVariablesQueryParams) +
                " CaseVariablesQueryParams=" + (caseVariablesQueryParams) +
+               " PotOwnersQueryParam=" + (ownersQueryParam) +
+               " PotOwners=" + (owners) +
                '}';
     }
 

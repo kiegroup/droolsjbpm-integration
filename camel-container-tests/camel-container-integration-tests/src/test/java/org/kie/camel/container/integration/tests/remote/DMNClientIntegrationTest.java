@@ -10,8 +10,6 @@ import org.kie.camel.container.api.ExecutionServerCommand;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNResult;
 
-import static org.junit.Assert.assertThat;
-
 public class DMNClientIntegrationTest extends AbstractRemoteIntegrationTest {
 
     @Test

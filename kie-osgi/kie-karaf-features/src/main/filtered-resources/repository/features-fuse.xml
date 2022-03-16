@@ -56,6 +56,8 @@
     <feature version="${project.version}">drools-module</feature>
     <feature version="${project.version}">drools-jpa</feature>
     <feature version="${project.version}">jbpm-commons</feature>
+    <feature version="${project.version}">kie-dmn</feature>
+    <feature version="${project.version}">jackson</feature>
     <bundle>mvn:org.jbpm/jbpm-flow/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-query-jpa/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-audit/${version.org.jbpm}</bundle>
@@ -71,6 +73,7 @@
     <feature version="${project.version}">drools-jpa</feature>
     <feature version="${project.version}">jbpm-commons</feature>
     <feature version="${project.version}">jbpm-human-task</feature>
+    <feature version="${project.version}">jackson</feature>
     <bundle>mvn:org.jbpm/jbpm-flow-builder/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-flow/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-bpmn2/${version.org.jbpm}</bundle>
@@ -103,9 +106,18 @@
     <bundle>mvn:com.h2database/h2/${fuse.version.com.h2database}</bundle>
   </feature>
 
+  <feature name="jackson" version="${project.version}">
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${version.com.fasterxml.jackson}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${version.com.fasterxml.jackson}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${version.com.fasterxml.jackson.databind}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/${version.com.fasterxml.jackson.annotations}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/${version.com.fasterxml.jackson}</bundle>
+  </feature>
+
   <feature name="kie-server-client" version="${project.version}" description="KIE Server Client">
     <feature version="${project.version}">drools-module</feature>
     <feature version="${project.version}">optaplanner-engine</feature>
+    <feature version="${project.version}">jackson</feature>
     <feature>kie7-remote-dependencies</feature>
     <bundle>mvn:org.drools/kie-pmml/${version.org.kie}</bundle>
     <bundle>mvn:org.kie.server/kie-server-api/${version.org.drools.droolsjbpm-integration}</bundle>
@@ -113,13 +125,8 @@
     <bundle>mvn:org.kie.server/kie-server-client/${version.org.drools.droolsjbpm-integration}</bundle>
     <bundle>mvn:org.kie/kie-dmn-model/${version.org.kie}</bundle> <!-- needed as the kie-server contains DMN client, which uses the kie-dmn-api, which needs kie-dmn-model -->
     <bundle>mvn:org.kie/kie-dmn-api/${version.org.kie}</bundle>   <!-- needed as the kie-server contains DMN client, which uses the kie-dmn-api -->
-    <!-- these are jackson dependencies with version 2.10, but Fuse-Karaf 7.8 uses 2.9, so they should stay here -->
-    <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/${version.com.fasterxml.jackson}</bundle>
-    <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${version.com.fasterxml.jackson}</bundle>
-    <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${version.com.fasterxml.jackson}</bundle>
-    <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${version.com.fasterxml.jackson.databind}</bundle>
-    <bundle>mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/${version.com.fasterxml.jackson.annotations}</bundle>
-    <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/${version.com.fasterxml.jackson}</bundle>
+    <!-- This bundle will be part of Fuse's kie7-remote-dependencies feature in Fuse 7.11 -->
+    <bundle dependency="true">mvn:org.apache.httpcomponents/httpcore-osgi/${version.org.apache.httpcomponents.httpcore}</bundle>
   </feature>
 
   <feature name="servlet-api-kie" version="${project.version}">

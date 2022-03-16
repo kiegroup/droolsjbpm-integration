@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-wars</artifactId>
-    <version>7.54.0-SNAPSHOT</version>
+    <version>7.68.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server</artifactId>
@@ -25,11 +25,6 @@
       <artifactId>kie-server-services-common</artifactId>
       <exclusions>
         <exclusion>
-          <!-- Collides with 'xml-apis:xml-apis' -->
-          <groupId>javax.xml.stream</groupId>
-          <artifactId>stax-api</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
         </exclusion>
@@ -42,16 +37,16 @@
           <artifactId>javax.servlet-api</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.jboss.spec.javax.security.jacc</groupId>
-          <artifactId>jboss-jacc-api_1.5_spec</artifactId>
+          <groupId>jakarta.security.jacc</groupId>
+          <artifactId>jakarta.security.jacc-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>jcl-over-slf4j</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
+          <groupId>jakarta.activation</groupId>
+          <artifactId>jakarta.activation-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -60,8 +55,8 @@
       <artifactId>kie-server-services-drools</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
+          <groupId>jakarta.activation</groupId>
+          <artifactId>jakarta.activation-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -70,16 +65,16 @@
       <artifactId>kie-server-services-jbpm</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.jboss.spec.javax.transaction</groupId>
-          <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+          <groupId>jakarta.transaction</groupId>
+          <artifactId>jakarta.transaction-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.jboss.spec.javax.el</groupId>
-          <artifactId>jboss-el-api_3.0_spec</artifactId>
+          <groupId>jakarta.el</groupId>
+          <artifactId>jakarta.el-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -88,16 +83,16 @@
       <artifactId>kie-server-services-jbpm-ui</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.jboss.spec.javax.transaction</groupId>
-          <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+          <groupId>jakarta.transaction</groupId>
+          <artifactId>jakarta.transaction-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.jboss.spec.javax.el</groupId>
-          <artifactId>jboss-el-api_3.0_spec</artifactId>
+          <groupId>jakarta.el</groupId>
+          <artifactId>jakarta.el-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -106,16 +101,16 @@
       <artifactId>kie-server-services-case-mgmt</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.jboss.spec.javax.transaction</groupId>
-          <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+          <groupId>jakarta.transaction</groupId>
+          <artifactId>jakarta.transaction-api</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.jboss.spec.javax.el</groupId>
-          <artifactId>jboss-el-api_3.0_spec</artifactId>
+          <groupId>jakarta.el</groupId>
+          <artifactId>jakarta.el-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -176,8 +171,8 @@
           <artifactId>javassist</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>activation</artifactId>
+          <groupId>jakarta.activation</groupId>
+          <artifactId>jakarta.activation-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -288,10 +283,6 @@
           <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
         </exclusion>
-        <exclusion>
-          <groupId>org.apache.geronimo.specs</groupId>
-          <artifactId>geronimo-jta_1.1_spec</artifactId>
-        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -302,10 +293,6 @@
         <exclusion>
           <groupId>org.glassfish.jaxb</groupId>
           <artifactId>jaxb-runtime</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.geronimo.specs</groupId>
-          <artifactId>geronimo-jta_1.1_spec</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -322,8 +309,8 @@
       <artifactId>dom4j</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jboss.spec.javax.jms</groupId>
-      <artifactId>jboss-jms-api_2.0_spec</artifactId>
+      <groupId>jakarta.jms</groupId>
+      <artifactId>jakarta.jms-api</artifactId>
     </dependency>
     <dependency>
       <groupId>xerces</groupId>
@@ -354,12 +341,6 @@
           <artifactId>guice</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-
-    <!-- Needed for correct functionality of JMS authentication when KieLoginModule is set as login-module in EAP. -->
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-security</artifactId>
     </dependency>
 
     <dependency>

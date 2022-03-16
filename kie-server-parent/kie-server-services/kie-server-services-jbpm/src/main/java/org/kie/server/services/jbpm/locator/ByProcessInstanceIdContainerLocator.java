@@ -15,18 +15,9 @@
 
 package org.kie.server.services.jbpm.locator;
 
-import java.util.List;
-
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
 
-import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
-import org.kie.server.api.KieServerConstants;
 import org.kie.server.services.api.ContainerLocator;
-import org.kie.server.services.api.KieContainerInstance;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Locates container id for given process instance id.
@@ -34,43 +25,34 @@ import org.slf4j.LoggerFactory;
  * and stored as part of the instance of this class so in case of multiple method calls will require it
  * single instance of this class should be used to avoid too many look ups.
  */
-public class ByProcessInstanceIdContainerLocator implements ContainerLocator {
-
-    private static final Logger logger = LoggerFactory.getLogger(ByProcessInstanceIdContainerLocator.class);
-
+public class ByProcessInstanceIdContainerLocator extends ProcessContainerLocator {
     private static final String CONTAINER_ID_QUERY = "select log.externalId from ProcessInstanceLog log where log.processInstanceId = :piId";
-    private Long processInstanceId;
 
-    private String containerId;
-
-    public ByProcessInstanceIdContainerLocator(Long processInstanceId) {
-        this.processInstanceId = processInstanceId;
+    private ByProcessInstanceIdContainerLocator(final Long processInstanceId) {
+        super(processInstanceId);
     }
 
     @Override
-    public String locateContainer(String alias, List<? extends KieContainerInstance> containerInstances) {
-        if (containerId != null) {
-            logger.debug("Container id has already be found for process instance {} and is {}", processInstanceId, containerId);
-            return containerId;
-        }
-        logger.debug("Searching for container id for process instance id {} and alias {}", processInstanceId, alias);
-        EntityManager em = EntityManagerFactoryManager.get().getOrCreate(KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME).createEntityManager();
+    protected String invokeQuery(final EntityManager em, final Long processInstanceId) {
+        return (String) em.createQuery(CONTAINER_ID_QUERY)
+            .setParameter("piId", processInstanceId)
+            .getSingleResult();
+    }
 
-        try {
+    private static ByProcessInstanceIdContainerLocator get(final Number processInstanceId) {
+        return new ByProcessInstanceIdContainerLocator(processInstanceId.longValue());
+    }
 
-            containerId = (String)em.createQuery(CONTAINER_ID_QUERY)
-                    .setParameter("piId", processInstanceId)
-                    .getSingleResult();
-            logger.debug("Found container id '{}' for process instance id {}", containerId, processInstanceId);
-            return containerId;
+    public static class Factory implements ContainerLocatorFactory{
+        private static final Factory INSTANCE = new Factory();
 
-        } catch (NoResultException e) {
-            throw new IllegalArgumentException("ProcessInstance with id " + processInstanceId + " not found");
-        } catch (NonUniqueResultException e) {
-            throw new IllegalArgumentException("Multiple containerIds found for processInstanceId " + processInstanceId);
-        } finally {
-            em.close();
+        public static Factory get() {
+            return INSTANCE;
         }
 
+        @Override
+        public ContainerLocator create(final Number processInstanceId) {
+            return ByProcessInstanceIdContainerLocator.get(processInstanceId);
+        }
     }
 }

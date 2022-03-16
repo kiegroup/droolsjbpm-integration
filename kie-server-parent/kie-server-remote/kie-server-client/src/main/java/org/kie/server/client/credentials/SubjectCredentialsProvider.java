@@ -11,16 +11,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.client.credentials;
 
-import java.security.Principal;
-import java.util.Set;
-import javax.security.auth.Subject;
-import javax.security.jacc.PolicyContext;
+import java.io.UnsupportedEncodingException;
+import java.util.Base64;
+
+import javax.security.jacc.PolicyContextException;
 
 import org.kie.server.client.CredentialsProvider;
+import org.wildfly.security.auth.server.IdentityCredentials;
+import org.wildfly.security.auth.server.SecurityDomain;
+import org.wildfly.security.auth.server.SecurityIdentity;
+import org.wildfly.security.credential.PasswordCredential;
+import org.wildfly.security.password.interfaces.ClearPassword;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 
@@ -34,35 +39,32 @@ public class SubjectCredentialsProvider implements CredentialsProvider {
     @Override
     public String getAuthorization() {
 
-        Subject subject = getSubjectFromContainer();
-        if (subject != null && subject.getPrincipals() != null) {
+        try {
+            SecurityIdentity securityIdentity = null;
+            ClearPassword password = null;
 
-            Set<Principal> principals = subject.getPrincipals();
-            for (Principal principal : principals) {
-
-                if (match(principal)) {
-                    return principal.getName();
+            SecurityDomain securityDomain = SecurityDomain.getCurrent();
+            if (securityDomain != null) {
+                securityIdentity = securityDomain.getCurrentSecurityIdentity();
+                IdentityCredentials credentials = securityIdentity.getPrivateCredentials();
+                if (credentials != null) {
+                    ClearPassword clearPassword = getClearPassword(credentials);
+                    if (clearPassword != null) {
+                        String basicAuthHeader = "Basic " + Base64.getEncoder().encodeToString((securityIdentity.getPrincipal().getName() + ":" + String.valueOf(clearPassword.getPassword())).getBytes("UTF-8"));
+                        return basicAuthHeader;
+                    }
                 }
             }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
-
         return null;
     }
 
-    // TODO make sure this can be taken out for all supported containers
-    protected Subject getSubjectFromContainer() {
-        try {
-            return (Subject) PolicyContext.getContext("javax.security.auth.Subject.container");
-        } catch (Exception e) {
-            return null;
+    private ClearPassword getClearPassword(final IdentityCredentials credentials) {
+        if (credentials.contains(PasswordCredential.class)) {
+            return credentials.getCredential(PasswordCredential.class).getPassword(ClearPassword.class);
         }
-    }
-
-    protected boolean match(Principal principal) {
-        if (principal.getClass().getName().endsWith("BasicAuthorizationPrincipal")) {
-            return true;
-        }
-
-        return false;
+        return null;
     }
 }
