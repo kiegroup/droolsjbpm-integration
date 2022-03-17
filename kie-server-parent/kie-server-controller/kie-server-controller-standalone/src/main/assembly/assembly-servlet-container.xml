@@ -50,7 +50,7 @@
         <include>com.sun.xml.bind:jaxb-core</include>
         <include>com.sun.xml.bind:jaxb-impl</include>
         <include>org.slf4j:slf4j-sdk14</include>
-        <include>javax.enterprise:cdi-api</include>
+        <include>jakarta.enterprise:jakarta.enterprise.cdi-api</include>
       </includes>
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <useTransitiveFiltering>true</useTransitiveFiltering>

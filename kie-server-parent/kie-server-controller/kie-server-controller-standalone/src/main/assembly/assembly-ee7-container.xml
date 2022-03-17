@@ -43,6 +43,7 @@
       <excludes>
         <exclude>org.jboss.resteasy:resteasy-jaxrs</exclude>
         <exclude>jakarta.ws.rs:*</exclude>
+        <exclude>jakarta.enterprise:jakarta.enterprise.cdi-api</exclude>
       </excludes>
       <includes>
         <include>org.kie.server:kie-server-controller-api</include>
