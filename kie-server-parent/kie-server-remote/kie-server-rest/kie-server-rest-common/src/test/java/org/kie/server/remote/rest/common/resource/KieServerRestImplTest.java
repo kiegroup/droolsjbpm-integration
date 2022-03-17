@@ -97,7 +97,7 @@ public class KieServerRestImplTest {
 
         KieServerRestImpl restServer = new KieServerRestImpl(kieServer);
 
-        Response response = restServer.disposeContainer(headers, "test");
+        Response response = restServer.disposeContainer(headers, "test", false);
         assertForbiddenResponse(response);
     }
 

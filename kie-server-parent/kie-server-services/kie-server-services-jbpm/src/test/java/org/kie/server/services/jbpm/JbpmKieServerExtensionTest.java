@@ -75,12 +75,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyList;
-import static org.mockito.Mockito.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -213,15 +212,25 @@ public class JbpmKieServerExtensionTest {
 
     @Test
     public void testDisposePRODUCTIONContainer() throws IOException {
-        testDispose(KieServerMode.PRODUCTION);
+        testDispose(KieServerMode.PRODUCTION, false);
     }
 
     @Test
     public void testDisposeSNAPSHOTContainer() throws IOException {
-        testDispose(KieServerMode.DEVELOPMENT);
+        testDispose(KieServerMode.DEVELOPMENT, false);
     }
 
-    private void testDispose(KieServerMode mode) throws IOException {
+    @Test
+    public void testDisposePRODUCTIONContainerWithAbort() throws IOException {
+        testDispose(KieServerMode.PRODUCTION, true);
+    }
+
+    @Test
+    public void testDisposeSNAPSHOTContainerWithAbort() throws IOException {
+        testDispose(KieServerMode.DEVELOPMENT, true);
+    }
+
+    private void testDispose(KieServerMode mode, boolean abort) throws IOException {
         this.mode = mode;
 
         String version;
@@ -241,14 +250,13 @@ public class JbpmKieServerExtensionTest {
         params.put(KieServerConstants.KIE_SERVER_PARAM_MODULE_METADATA, metaData);
         params.put(KieServerConstants.KIE_SERVER_PARAM_MESSAGES, messages);
         params.put(KieServerConstants.KIE_SERVER_PARAM_RESET_BEFORE_UPDATE, Boolean.FALSE);
+        params.put(KieServerConstants.IS_DISPOSE_CONTAINER_PARAM, abort);
 
         extension.disposeContainer(CONTAINER_ID, new KieContainerInstanceImpl(CONTAINER_ID, KieContainerStatus.STARTED, kieContainer), params);
 
-        if(mode.equals(KieServerMode.DEVELOPMENT)) {
+        if (abort) {
             verify(deploymentService).undeploy(any(), beforeUndeployCaptor.capture());
-
             Function<DeploymentUnit, Boolean> function = beforeUndeployCaptor.getValue();
-
             function.apply(deploymentUnit);
 
             verify(runtimeDataService).getProcessInstancesByDeploymentId(eq(CONTAINER_ID), anyList(), any());
@@ -259,6 +267,7 @@ public class JbpmKieServerExtensionTest {
         } else {
             verify(deploymentService).undeploy(any());
         }
+
     }
 
     @Test
@@ -442,13 +451,8 @@ public class JbpmKieServerExtensionTest {
         if (mode.equals(KieServerMode.PRODUCTION)) {
             verify(deploymentService).undeploy(any());
         } else {
-            verify(deploymentService).undeploy(any(), beforeUndeployCaptor.capture());
+            verify(deploymentService).undeploy(any());
 
-            Function<DeploymentUnit, Boolean> function = beforeUndeployCaptor.getValue();
-
-            assertNotNull(function);
-
-            assertTrue(function.apply(deploymentUnit));
 
             verify(runtimeDataService, never()).getProcessInstancesByDeploymentId(eq(CONTAINER_ID), anyList(), any());
             verify(runimeManager, never()).getRuntimeEngine(any());
