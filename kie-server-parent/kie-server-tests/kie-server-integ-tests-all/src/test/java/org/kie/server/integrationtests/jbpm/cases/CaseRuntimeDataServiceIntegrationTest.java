@@ -555,6 +555,39 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     }
 
     @Test
+    public void testByPassAuthCaseTasksAssignedAsPotentialOwnerWithEmptyUser() throws Exception {
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+        try {
+            List<TaskSummary> tasks = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, 0, 10);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+            assertEquals("Hello1", tasks.get(0).getName());
+
+            tasks = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, "", 0, 10);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+            assertEquals("Hello1", tasks.get(0).getName());
+
+            tasks = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_JOHN, 0, 10);
+            assertNotNull(tasks);
+            assertEquals(0, tasks.size());
+
+            changeUser(USER_JOHN);
+
+            tasks = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, "", 0, 10);
+            assertNotNull(tasks);
+            assertEquals(0, tasks.size());
+
+        } finally {
+            changeUser(USER_YODA);
+            caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
+        }
+
+    }
+
+    @Test
     public void testFindCaseTasksAssignedAsPotentialOwnerByPassAuth() throws Exception {
         String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
         assertNotNull(caseId);
