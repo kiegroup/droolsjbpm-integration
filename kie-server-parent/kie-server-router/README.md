@@ -1,8 +1,8 @@
 KIE Server Router
 ==========================
 
-## TSL support
-To start the router with TSL support, start it with following command: 
+## TLS support
+To start the router with TLS support, start it with following command: 
 ```
 java -Dorg.kie.server.router.tls.keystore=PATH_TO_YOUR_KEYSTORE 
      -Dorg.kie.server.router.tls.keystore.password=YOUR_KEYSTORE_PASSWD 

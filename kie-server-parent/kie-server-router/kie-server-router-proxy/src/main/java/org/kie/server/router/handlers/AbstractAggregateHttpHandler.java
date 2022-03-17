@@ -31,6 +31,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import javax.net.ssl.SSLException;
+
 import org.jboss.logging.Logger;
 import org.kie.server.router.ConfigurationManager;
 import org.kie.server.router.proxy.aggragate.ResponseAggregator;
@@ -252,7 +254,7 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
     }
 
     protected void removeHostOnException(String url, Exception e) {
-        if (e instanceof SocketException || e instanceof UnknownHostException) {
+        if (e instanceof SocketException || e instanceof UnknownHostException || e instanceof SSLException) {
             configurationManager.disconnectFailedHost(url);
             log.warn("Removed host '" + url + "' due to its unavailability (cause " + e.getMessage() + ")");
         }
