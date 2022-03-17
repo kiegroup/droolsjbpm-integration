@@ -82,6 +82,8 @@ import org.kie.server.services.impl.util.KieServerUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.Collections.singletonMap;
+
 public class KieServerImpl implements KieServer {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerImpl.class);
@@ -593,6 +595,10 @@ public class KieServerImpl implements KieServer {
     }
 
     public ServiceResponse<Void> disposeContainer(String containerId) {
+        return this.disposeContainer(containerId, null);
+    }
+
+    public ServiceResponse<Void> disposeContainer(String containerId, Boolean abortInstances) {
         List<Message> messages = new CopyOnWriteArrayList<Message>();
         try {
             KieContainerInstanceImpl kci = context.unregisterContainer(containerId);
@@ -609,7 +615,7 @@ public class KieServerImpl implements KieServer {
                             // process server extensions
                             List<KieServerExtension> extensions = context.getServerExtensions();
                             for (KieServerExtension extension : extensions) {
-                                extension.disposeContainer(containerId, kci, new HashMap<String, Object>());
+                                extension.disposeContainer(containerId, kci, singletonMap(KieServerConstants.IS_DISPOSE_CONTAINER_PARAM, abortInstances));
                                 logger.debug("Container {} (for release id {}) {} shutdown: DONE", containerId, kci.getResource().getReleaseId(), extension);
                                 disposedExtensions.add(extension);
                             }

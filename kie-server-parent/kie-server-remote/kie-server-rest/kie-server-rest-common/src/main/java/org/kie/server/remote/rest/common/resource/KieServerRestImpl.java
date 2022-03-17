@@ -235,14 +235,15 @@ public class KieServerRestImpl {
     @Path("containers/{" + CONTAINER_ID + "}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response disposeContainer( @Context HttpHeaders headers, 
-            @ApiParam(value = "Container id to be disposed (undeployed)", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String id ) {
+            @ApiParam(value = "Container id to be disposed (undeployed)", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String id,
+            @ApiParam(value = "optional abortProcessInstances flag to abort process instances when container is disposed", required = false) @QueryParam("abortProcessInstances") Boolean abortProcessInstances) {
         ServiceResponse<?> forbidden = this.server.checkAccessability();
         if (forbidden != null) {                       
             return createCorrectVariant( forbidden, headers, Status.BAD_REQUEST );
         }
         
         Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
-        return createCorrectVariant(server.disposeContainer(id), headers, conversationIdHeader);
+        return createCorrectVariant(server.disposeContainer(id, abortProcessInstances), headers, conversationIdHeader);
     }
 
     @ApiOperation(value="Returns information about the KIE scanner used for automatic updates in a specified KIE container, if applicable.")
