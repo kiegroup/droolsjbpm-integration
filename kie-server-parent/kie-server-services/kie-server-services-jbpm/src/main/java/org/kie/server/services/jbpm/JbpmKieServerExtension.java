@@ -101,7 +101,6 @@ import org.kie.internal.runtime.conf.MergeMode;
 import org.kie.internal.runtime.conf.NamedObjectModel;
 import org.kie.internal.runtime.conf.ObjectModel;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
-import org.kie.internal.runtime.manager.deploy.DeploymentDescriptorImpl;
 import org.kie.internal.runtime.manager.deploy.DeploymentDescriptorManager;
 import org.kie.internal.task.api.UserInfo;
 import org.kie.scanner.KieModuleMetaData;
@@ -137,7 +136,6 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     public static final String EXTENSION_NAME = "jBPM";
     private static final String PERSISTENCE_XML_LOCATION = "/jpa/META-INF/persistence.xml";
-    private static final String IS_DISPOSE_CONTAINER_PARAM = "jBPMExtensionIsDisposeContainer";
 
     private static final Logger logger = LoggerFactory.getLogger(JbpmKieServerExtension.class);
 
@@ -539,7 +537,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
     public void updateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
         // essentially it's a redeploy to make sure all components are up to date,
         // though update of kie base is done only once on kie server level and KieContainer is reused across all extensions
-        parameters.put(IS_DISPOSE_CONTAINER_PARAM, Boolean.FALSE);
+        parameters.put(KieServerConstants.IS_DISPOSE_CONTAINER_PARAM, Boolean.FALSE);
 
         disposeContainer(id, kieContainerInstance, parameters);
 
@@ -565,17 +563,16 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
         KModuleDeploymentUnit unit = (KModuleDeploymentUnit) deploymentService.getDeployedUnit(id).getDeploymentUnit();
 
-        if (kieServer.getInfo().getResult().getMode().equals(KieServerMode.PRODUCTION)) {
-            deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()));
+        // Checking if we are disposing or updating the container. We must only keep process instances only when updating.
+        Boolean isDispose = (Boolean) parameters.get(KieServerConstants.IS_DISPOSE_CONTAINER_PARAM);
+        if (isDispose == null) {
+            isDispose = isDevelopmentMode() ? Boolean.TRUE : Boolean.FALSE;
+        }
+        
+        if (isDispose) {
+            deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), PreUndeployOperations.abortUnitActiveProcessInstances(runtimeDataService, deploymentService));
         } else {
-            // Checking if we are disposing or updating the container. We must only keep process instances only when updating.
-            Boolean isDispose = (Boolean) parameters.getOrDefault(IS_DISPOSE_CONTAINER_PARAM, Boolean.TRUE);
-
-            if (isDispose) {
-                deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), PreUndeployOperations.abortUnitActiveProcessInstances(runtimeDataService, deploymentService));
-            } else {
-                deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()), PreUndeployOperations.doNothing());
-            }
+            deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()));
         }
 
         // remove any query result mappers for container

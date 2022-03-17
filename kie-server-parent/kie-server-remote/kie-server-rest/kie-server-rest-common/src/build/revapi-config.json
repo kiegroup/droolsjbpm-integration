@@ -121,6 +121,31 @@
           "methodName": "updateReleaseId",
           "elementKind": "method",
           "justification": "[JBPM-9610] Fix typos in successful call messages"
+        },
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.common.resource.KieServerRestImpl::disposeContainer(javax.ws.rs.core.HttpHeaders, java.lang.String)",
+          "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.common.resource.KieServerRestImpl::disposeContainer(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Boolean)",
+          "package": "org.kie.server.remote.rest.common.resource",
+          "classSimpleName": "KieServerRestImpl",
+          "methodName": "disposeContainer",
+          "elementKind": "method",
+          "justification":  "[JBPM-10040] Cleanup Orphan Process Instances in RHPAM DB"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",
+          "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.common.resource.KieServerRestImpl::disposeContainer(javax.ws.rs.core.HttpHeaders, java.lang.String)",
+          "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.common.resource.KieServerRestImpl::disposeContainer(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Boolean)",
+          "annotationType": "io.swagger.annotations.ApiResponses",
+          "annotation": "@io.swagger.annotations.ApiResponses({@io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\"), @io.swagger.annotations.ApiResponse(code = 200, message = \"Successful response\", examples = @io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"{\n  \"response\": [\n    {\n      \"type\": \"SUCCESS\",\n      \"msg\": \"Container MyProjectContainer successfully disposed.\",\n      \"result\": null\n    }\n  ]\n}\")}))})",
+          "attribute": "value",
+          "oldValue": "{@io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\"), @io.swagger.annotations.ApiResponse(code = 200, message = \"Successfull response\", examples = @io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"{\n  \"response\": [\n    {\n      \"type\": \"SUCCESS\",\n      \"msg\": \"Container MyProjectContainer successfully disposed.\",\n      \"result\": null\n    }\n  ]\n}\")}))}",
+          "newValue": "{@io.swagger.annotations.ApiResponse(code = 500, message = \"Unexpected error\"), @io.swagger.annotations.ApiResponse(code = 200, message = \"Successful response\", examples = @io.swagger.annotations.Example({@io.swagger.annotations.ExampleProperty(mediaType = \"application\/json\", value = \"{\n  \"response\": [\n    {\n      \"type\": \"SUCCESS\",\n      \"msg\": \"Container MyProjectContainer successfully disposed.\",\n      \"result\": null\n    }\n  ]\n}\")}))}",
+          "package": "org.kie.server.remote.rest.common.resource",
+          "classSimpleName": "KieServerRestImpl",
+          "methodName": "disposeContainer",
+          "elementKind": "method",
+          "justification": "[JBPM-10040] Cleanup Orphan Process Instances in RHPAM DB"
         }
       ]
     }
