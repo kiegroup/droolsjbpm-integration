@@ -411,7 +411,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
                 assertTrue(processInstanceIds.contains(instance.getId()));
                 assertEquals(PROCESS_ID_USERTASK, instance.getProcessId());
             }
-
+            
             instances = queryClient.findProcessInstancesByContainerId(CONTAINER_ID, null, 0, 10, SORT_BY_PROCESS_ID, false);
             assertNotNull(instances);
             assertEquals(5, instances.size());
@@ -422,6 +422,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
                     assertEquals(PROCESS_ID_SIGNAL_PROCESS, instances.get(i).getProcessId());
                 }
             }
+            assertEquals(Long.valueOf(5), queryClient.countProcessInstancesByContainerId(CONTAINER_ID, null));
         } finally {
             abortProcessInstances(processInstanceIds);
         }
