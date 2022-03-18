@@ -70,6 +70,7 @@ import org.kie.internal.query.QueryFilter;
 import org.kie.internal.task.api.AuditTask;
 import org.kie.internal.task.api.model.TaskEvent;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.model.definition.CountDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.definition.SearchQueryFilterSpec;
 import org.kie.server.api.model.instance.NodeInstance;
@@ -189,7 +190,19 @@ public class RuntimeDataServiceBase {
         return processInstanceList;
     }
 
+    public CountDefinition countProcessInstancesByDeploymentId(String containerId, List<Integer> status) {
+        if (status == null || status.isEmpty()) {
+            status = new ArrayList<>();
+            status.add(ProcessInstance.STATE_ACTIVE);
+        }
+        logger.debug("About to search for process instance belonging to container '{}'", containerId);
 
+        Long instances = runtimeDataService.countProcessInstancesByDeploymentId(containerId, status);
+        logger.debug("Found {} process instance for container '{}', statuses '{}'", instances, containerId, status);
+
+        return new CountDefinition(instances);
+    }
+    
     public ProcessInstanceList getProcessInstancesByCorrelationKey(String correlationKey, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         if (sort == null || sort.isEmpty()) {
             sort = "ProcessInstanceId";

@@ -43,6 +43,7 @@ import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.TaskNotFoundException;
 import org.kie.api.runtime.query.QueryContext;
+import org.kie.server.api.model.definition.CountDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.instance.NodeInstance;
@@ -72,6 +73,7 @@ import static org.kie.server.api.rest.RestURI.PROCESS_DEFINITIONS_BY_CONTAINER_I
 import static org.kie.server.api.rest.RestURI.PROCESS_DEFINITIONS_BY_ID_GET_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_DEFINITIONS_GET_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_ID;
+import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_BY_CONTAINER_ID_COUNT_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_BY_CONTAINER_ID_GET_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_BY_CORRELATION_KEY_GET_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_BY_PROCESS_ID_GET_URI;
@@ -100,6 +102,7 @@ import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.COUNT_PROCESS_INSTANCES_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_DEFS_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_DEF_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCES_RESPONSE_JSON;
@@ -217,6 +220,35 @@ public class RuntimeDataResource {
         }
     }
 
+    @ApiOperation(value="Returns the count of all process instances for a specified KIE container.")
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Container Id not found"),
+            @ApiResponse(code = 200, response = CountDefinition.class, message = "Successful response", examples=@Example(value= {
+                    @ExampleProperty(mediaType=JSON, value=COUNT_PROCESS_INSTANCES_RESPONSE_JSON)}))})
+    @GET
+    @Path(PROCESS_INSTANCES_BY_CONTAINER_ID_COUNT_URI)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response countProcessInstancesByDeploymentId(@Context HttpHeaders headers,
+                                                      @ApiParam(value = "container id to filter process instance", required = true) @PathParam(CONTAINER_ID) String containerId,
+                                                      @ApiParam(value = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, allowableValues="1,2,3") @QueryParam("status")List<Integer> status) {
+
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+        Variant v = getVariant(headers);
+        try {
+            CountDefinition count = runtimeDataServiceBase.countProcessInstancesByDeploymentId(containerId, status);
+            logger.debug("Returning result of process instance count: {}", count);
+
+            return createCorrectVariant(count, headers, Response.Status.OK, conversationIdHeader);
+
+        } catch (DeploymentNotFoundException e) {
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
+        }
+    }
+    
     @ApiOperation(value="Returns information about a single process instance with a specified correlation key.")
     @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
             @ApiResponse(code = 200, response = ProcessInstance.class, message = "Successful response", examples=@Example(value= {

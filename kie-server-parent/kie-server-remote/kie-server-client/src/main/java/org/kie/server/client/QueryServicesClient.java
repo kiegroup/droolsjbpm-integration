@@ -81,6 +81,8 @@ public interface QueryServicesClient {
 
     List<ProcessInstance> findProcessInstancesByContainerId(String containerId, List<Integer> status, Integer page, Integer pageSize);
 
+    Long countProcessInstancesByContainerId(String containerId, List<Integer> status);
+
     List<ProcessInstance> findProcessInstancesByStatus(List<Integer> status, Integer page, Integer pageSize);
 
     List<ProcessInstance> findProcessInstancesByInitiator(String initiator, List<Integer> status, Integer page, Integer pageSize);
