@@ -15,23 +15,39 @@
  */
 package org.kie.hacep;
 
+import kafka.server.KafkaServer;
 import org.junit.After;
 import org.junit.Before;
 import org.kie.remote.TopicsConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class KafkaFullTopicsTests {
+
+    private Logger logger = LoggerFactory.getLogger(KafkaFullTopicsTests.class);
 
     protected final String TEST_KAFKA_LOGGER_TOPIC = "testlogs";
     protected KafkaUtils kafkaServerTest;
     protected EnvConfig envConfig;
     protected TopicsConfig topicsConfig;
 
+    private final int MAX_RETRY = 5;
+    private final long RETRY_INTERVAL = 500L;
+
     @Before
     public void setUp() throws Exception {
         envConfig = KafkaUtils.getEnvConfig();
         topicsConfig = TopicsConfig.getDefaultTopicsConfig();
         kafkaServerTest = new KafkaUtils();
-        kafkaServerTest.startServer();
+        KafkaServer server = kafkaServerTest.startServer();
+        for (int i = 0; i < MAX_RETRY; i++) {
+            if (server.kafkaController().kafkaScheduler().isStarted()) {
+                break;
+            } else {
+                logger.warn("*** scheduler waiting retry *** : i = {}", i);
+                Thread.sleep(RETRY_INTERVAL);
+            }
+        }
     }
 
     @After
