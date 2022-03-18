@@ -83,6 +83,7 @@ public class TimerIntegrationTest extends JbpmKieServerBaseIntegrationTest {
         List<ProcessInstance> startedInstances = queryClient.findProcessInstancesByContainerId(containerId, completedOnly, 0, 10, "log.processInstanceId", false);
 
         assertEquals(3, startedInstances.size());
+        assertEquals(Long.valueOf(3), queryClient.countProcessInstancesByContainerId(containerId, completedOnly));
 
         long thirdInstance = startedInstances.get(0).getDate().getTime();
         long secondInstance = startedInstances.get(1).getDate().getTime();
