@@ -18,19 +18,24 @@ public class JBPMDesignerSVGProcessor extends AbstractSVGProcessor {
     }
 
     @Override
-    public void defaultCompletedTransformation(String nodeId,String completedNodeColor, String completedBorderColor) {
+    public void defaultCompletedTransformation(String nodeId, String completedNodeColor, String completedBorderColor) {
         transform(new SetBackgroundColorTransformation(nodeId, completedNodeColor));
         transform(new SetBorderColorTransformation(nodeId, completedBorderColor));
     }
 
     @Override
-    public void defaultActiveTransformation(String nodeId,String activeNodeBorderColor) {
+    public void defaultActiveTransformation(String nodeId, String activeNodeBorderColor) {
         transform(new SetBorderColorTransformation(nodeId, activeNodeBorderColor));
     }
 
     @Override
     public void defaultSubProcessLinkTransformation(String nodeId, String link) {
         transform(new SetSubProcessLinkTransformation(nodeId, link));
+    }
+
+    @Override
+    public void defaultActiveAsyncTransformation(String nodeId, String activeAsyncNodeBorderColor) {
+        transform(new SetBorderColorTransformation(nodeId, activeAsyncNodeBorderColor));
     }
 
     @Override
