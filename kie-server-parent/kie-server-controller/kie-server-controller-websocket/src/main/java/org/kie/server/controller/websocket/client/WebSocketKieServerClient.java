@@ -367,6 +367,11 @@ public class WebSocketKieServerClient implements KieServicesClient {
                 public List<ProcessInstanceUserTaskWithVariables> queryUserTaskByVariables(SearchQueryFilterSpec spec, Integer page, Integer pageSize) {
                     return throwUnsupportedException();
                 }
+
+                @Override
+                public Long countProcessInstancesByContainerId(String containerId, List<Integer> status) {
+                    return throwUnsupportedException();
+                }
             };
         }
 

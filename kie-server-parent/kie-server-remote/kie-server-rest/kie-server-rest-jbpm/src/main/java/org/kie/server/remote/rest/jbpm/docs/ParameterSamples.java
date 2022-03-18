@@ -710,6 +710,12 @@ public class ParameterSamples {
             "  ]\n" + 
             "}";
     
+    public static final String COUNT_PROCESS_INSTANCES_RESPONSE_JSON = "{\n" +
+            "  \"count\": {\n" +
+            "      \"count\": 150\n" +
+            "  }\n" +
+            "}";
+    
     public static final String QUERY_DEF_LIST_RESPONSE_JSON = "{\n" + 
             "  \"queries\": [\n" + 
             "    {\n" + 
