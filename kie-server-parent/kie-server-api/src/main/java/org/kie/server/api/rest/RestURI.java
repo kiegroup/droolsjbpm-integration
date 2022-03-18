@@ -129,6 +129,7 @@ public class RestURI {
     public static final String PROCESS_INSTANCES_GET_URI = "processes/instances";
     public static final String PROCESS_INSTANCES_BY_PROCESS_ID_GET_URI = "processes/{" + PROCESS_ID + "}/instances";
     public static final String PROCESS_INSTANCES_BY_CONTAINER_ID_GET_URI = "containers/{" + CONTAINER_ID + "}/process/instances";
+    public static final String PROCESS_INSTANCES_BY_CONTAINER_ID_COUNT_URI = "containers/{" + CONTAINER_ID + "}/process/instances/count";
     public static final String PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI = "processes/instance/correlation/{" + CORRELATION_KEY + "}";
     public static final String PROCESS_INSTANCES_BY_CORRELATION_KEY_GET_URI = "processes/instances/correlation/{" + CORRELATION_KEY + "}";
     public static final String PROCESS_INSTANCE_BY_INSTANCE_ID_GET_URI = "processes/instances/{" + PROCESS_INST_ID + "}";

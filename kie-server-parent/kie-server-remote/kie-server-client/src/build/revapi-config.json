@@ -105,6 +105,15 @@
               "methodName": "getProcessInstanceImageCustomColor",
               "elementKind": "method",
               "justification": "JBPM-9979 Mark async active nodes and change default active node border color"
+            },
+            {
+              "code": "java.method.addedToInterface",
+              "new": "method java.lang.Long org.kie.server.client.QueryServicesClient::countProcessInstancesByContainerId(java.lang.String, java.util.List<java.lang.Integer>)",
+              "package": "org.kie.server.client",
+              "classSimpleName": "QueryServicesClient",
+              "methodName": "countProcessInstancesByContainerId",
+              "elementKind": "method",
+              "justification": "[RHPAM-4028] Allow count process instances by ContainerId and Status"
             }
          ]
         }
