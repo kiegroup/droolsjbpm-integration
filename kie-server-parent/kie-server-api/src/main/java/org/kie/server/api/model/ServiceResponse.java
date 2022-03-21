@@ -65,6 +65,7 @@ import org.kie.server.api.model.cases.CaseStage;
 import org.kie.server.api.model.cases.CaseStageDefinition;
 import org.kie.server.api.model.cases.CaseStageList;
 import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
+import org.kie.server.api.model.definition.CountDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.definition.QueryDefinition;
@@ -201,7 +202,8 @@ public class ServiceResponse<T> implements KieServiceResponse<T> {
             @XmlElement(name = "query-definitions", type = QueryDefinitionList.class),
             @XmlElement(name = "document-instance", type = DocumentInstance.class),
             @XmlElement(name = "document-instance-list", type = DocumentInstanceList.class),
-
+            @XmlElement(name =  "count-definition", type = CountDefinition.class),
+            
             // optaplanner entities
             @XmlElement(name = "solver-instance", type = SolverInstance.class),
             @XmlElement(name = "solver-instance-list", type = SolverInstanceList.class),
