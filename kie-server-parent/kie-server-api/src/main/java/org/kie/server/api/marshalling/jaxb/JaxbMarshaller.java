@@ -138,6 +138,7 @@ import org.kie.server.api.model.cases.CaseStage;
 import org.kie.server.api.model.cases.CaseStageDefinition;
 import org.kie.server.api.model.cases.CaseStageList;
 import org.kie.server.api.model.cases.CaseUserTaskWithVariablesList;
+import org.kie.server.api.model.definition.CountDefinition;
 import org.kie.server.api.model.definition.NodeDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
@@ -328,6 +329,7 @@ public class JaxbMarshaller implements Marshaller {
                                                  QueryDefinitionList.class,
                                                  QueryFilterSpec.class,
                                                  QueryParam.class,
+                                                 CountDefinition.class,
 
                                                  ProcessInstanceQueryFilterSpec.class,
                                                  TaskQueryFilterSpec.class,
