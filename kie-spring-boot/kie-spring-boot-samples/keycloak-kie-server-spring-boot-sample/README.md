@@ -7,6 +7,8 @@ This sample requires KeyCloak to be installed and configured with following defa
 - keycloak.auth-server-url=http://localhost:8100/auth
 - keycloak.realm=master
 - keycloak.resource=springboot-app
+- keycloak-identity.admin.user=admin
+- keycloak-identity.admin.pwd=admin
 
 all keycloak configuration is present in src/main/resources/application.properties file.
 
