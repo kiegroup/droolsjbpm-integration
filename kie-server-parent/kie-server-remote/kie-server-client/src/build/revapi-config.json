@@ -40,62 +40,8 @@
     },
     "ignores": {
         "revapi": {
-            "_comment": "Changes between 7.52.0.Final and the current branch. These changes are desired and thus ignored.",
+            "_comment": "Changes between 7.67.0.Final and the current branch. These changes are desired and thus ignored.",
             "ignore": [
-            {
-              "code": "java.method.addedToInterface",
-              "new": "method void org.kie.server.client.UserTaskServicesClient::claimTasks(java.lang.String, java.util.List<java.lang.Long>, java.lang.String)",
-              "package": "org.kie.server.client",
-              "classSimpleName": "UserTaskServicesClient",
-              "methodName": "claimTasks",
-              "elementKind": "method",
-              "justification":"https://issues.redhat.com/browse/JBPM-9786"
-            },
-            {
-              "code": "java.method.addedToInterface",
-              "new": "method org.kie.server.common.rest.ClientCertificate org.kie.server.client.KieServicesConfiguration::getClientCertificate()",
-              "package": "org.kie.server.client",
-              "classSimpleName": "KieServicesConfiguration",
-              "methodName": "getClientCertificate",
-              "elementKind": "method",
-              "justification": "[RHPAM-4038] Certificate based authentication"
-            },
-            {
-              "code": "java.method.addedToInterface",
-              "new": "method org.kie.server.client.KieServicesConfiguration org.kie.server.client.KieServicesConfiguration::setClientCertificate(org.kie.server.common.rest.ClientCertificate)",
-              "package": "org.kie.server.client",
-              "classSimpleName": "KieServicesConfiguration",
-              "methodName": "setClientCertificate",
-              "elementKind": "method",
-              "justification": "[RHPAM-4038] Certificate based authentication"
-            },
-            {
-              "code": "java.method.removed",
-              "old": "method boolean org.kie.server.client.KieServicesConfiguration::getUseUssl()",
-              "package": "org.kie.server.client",
-              "classSimpleName": "KieServicesConfiguration",
-              "methodName": "getUseUssl",
-              "elementKind": "method",
-              "justification": "Fixed typo in method signature"
-            },
-            {
-              "code": "java.method.addedToInterface",
-              "new": "method boolean org.kie.server.client.KieServicesConfiguration::getUseSsl()",
-              "package": "org.kie.server.client",
-              "classSimpleName": "KieServicesConfiguration",
-              "methodName": "getUseSsl",
-              "elementKind": "method",
-              "justification": "Fixed typo in method signature"
-            },
-            {
-              "code": "java.method.addedToInterface",
-              "new": "method void org.kie.server.client.UserTaskServicesClient::suspendTask(java.lang.String, java.lang.Long, java.lang.String, java.util.Map<java.lang.String, java.lang.Object>)",
-              "package": "org.kie.server.client",
-              "classSimpleName": "UserTaskServicesClient",
-              "methodName": "suspendTask",
-              "elementKind": "method",
-              "justification": "[JBPM-10015] Allow to set suspendUntil during user task suspend operation as parameter."
-            },
             {
               "code": "java.method.numberOfParametersChanged",
               "old": "method java.lang.String org.kie.server.client.UIServicesClient::getProcessInstanceImageCustomColor(java.lang.String, java.lang.Long, java.lang.String, java.lang.String, java.lang.String)",
