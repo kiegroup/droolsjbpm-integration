@@ -42,6 +42,7 @@ import org.jbpm.services.api.model.DeploymentUnit;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.api.query.QueryService;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -75,6 +76,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -257,6 +259,7 @@ public class JbpmKieServerExtensionTest {
         if (abort) {
             verify(deploymentService).undeploy(any(), beforeUndeployCaptor.capture());
             Function<DeploymentUnit, Boolean> function = beforeUndeployCaptor.getValue();
+            Assert.assertNotNull(function);
             function.apply(deploymentUnit);
 
             verify(runtimeDataService).getProcessInstancesByDeploymentId(eq(CONTAINER_ID), anyList(), any());
@@ -265,7 +268,14 @@ public class JbpmKieServerExtensionTest {
             verify(session, times(activeProcessInstances.size())).abortProcessInstance(eq(new Long(1)));
             verify(runimeManager, times(activeProcessInstances.size())).disposeRuntimeEngine(any());
         } else {
-            verify(deploymentService).undeploy(any());
+            if (mode.equals(KieServerMode.PRODUCTION)) {
+                verify(deploymentService).undeploy(any());
+            } else {
+                verify(deploymentService).undeploy(any(), beforeUndeployCaptor.capture());
+                Function<DeploymentUnit, Boolean> function = beforeUndeployCaptor.getValue();
+                assertNotNull(function);
+                function.apply(deploymentUnit);
+            }
         }
 
     }
@@ -451,8 +461,13 @@ public class JbpmKieServerExtensionTest {
         if (mode.equals(KieServerMode.PRODUCTION)) {
             verify(deploymentService).undeploy(any());
         } else {
-            verify(deploymentService).undeploy(any());
+            verify(deploymentService).undeploy(any(), beforeUndeployCaptor.capture());
 
+            Function<DeploymentUnit, Boolean> function = beforeUndeployCaptor.getValue();
+
+            assertNotNull(function);
+
+            assertTrue(function.apply(deploymentUnit));
 
             verify(runtimeDataService, never()).getProcessInstancesByDeploymentId(eq(CONTAINER_ID), anyList(), any());
             verify(runimeManager, never()).getRuntimeEngine(any());
