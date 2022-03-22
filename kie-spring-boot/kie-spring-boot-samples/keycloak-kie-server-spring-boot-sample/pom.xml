@@ -109,7 +109,7 @@
     <dependency>
       <groupId>org.keycloak</groupId>
       <artifactId>keycloak-admin-client</artifactId>
-      <scope>test</scope>
+      <scope>compile</scope>
       <exclusions>
         <exclusion>
           <groupId>org.keycloak</groupId>

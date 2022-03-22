@@ -46,7 +46,7 @@ public class SpringSecurityUserGroupCallback implements UserGroupCallback {
 
     @Override
     public List<String> getGroupsForUser(String userId) {
-        return identityProvider.getRoles();
+        return identityProvider.getRolesFor(userId);
     }
 
 }

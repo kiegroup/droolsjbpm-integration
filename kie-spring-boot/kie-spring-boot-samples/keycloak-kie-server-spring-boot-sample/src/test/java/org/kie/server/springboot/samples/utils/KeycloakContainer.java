@@ -58,6 +58,7 @@ public class KeycloakContainer extends GenericContainer<KeycloakContainer> {
 
     @Override
     protected void configure() {
+        logger.info("with user {} and pwd {}", KEYCLOAK_ADMIN_USER, KEYCLOAK_ADMIN_PASSWORD);
         if (isLatestImage) {
             withCommand("start-dev"); // Required from 17.0.0 version onwards
             withEnv("KEYCLOAK_ADMIN", KEYCLOAK_ADMIN_USER);

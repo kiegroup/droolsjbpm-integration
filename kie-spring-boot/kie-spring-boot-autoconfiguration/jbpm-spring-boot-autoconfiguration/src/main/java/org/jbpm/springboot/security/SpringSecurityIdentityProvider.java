@@ -16,22 +16,30 @@
 
 package org.jbpm.springboot.security;
 
-import static java.util.Collections.emptyList;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 
 import org.kie.internal.identity.IdentityProvider;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.provisioning.UserDetailsManager;
+
+import static java.util.Collections.emptyList;
 
 public class SpringSecurityIdentityProvider implements IdentityProvider {
 
     private Stack<String> contextUsers;
+    private ApplicationContext context;
     
-    public SpringSecurityIdentityProvider() {
+    public SpringSecurityIdentityProvider(ApplicationContext context) {
+        this.context = context;
         contextUsers = new Stack<>();
     }
     @Override
@@ -56,27 +64,46 @@ public class SpringSecurityIdentityProvider implements IdentityProvider {
         return UNKNOWN_USER_IDENTITY;
     }
 
+    @Override
+    public List<String> getRolesFor(String userId) {
+        if (getName().equals(userId)) {
+            return getRoles();
+        } else {
+            try {
+                UserDetailsManager manager = context.getBean(UserDetailsManager.class);
+                UserDetails userDetails = manager.loadUserByUsername(userId);
+                return toRoles(userDetails.getAuthorities());
+            } catch (NoSuchBeanDefinitionException | UsernameNotFoundException e) {
+                return emptyList();
+            }
+        }
+    }
+
     public List<String> getRoles() {
         if(!contextUsers.isEmpty()) {
-            return emptyList();
+            return getRolesFor(contextUsers.peek());
         }
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated()) {
-            List<String> roles = new ArrayList<String>();
-
-            for (GrantedAuthority ga : auth.getAuthorities()) {
-                String roleName = ga.getAuthority();
-                if (roleName.startsWith("ROLE_")) {
-                    roleName = roleName.replaceFirst("ROLE_", "");
-                }
-                roles.add(roleName);
-            }
-
-            return roles;
+            return toRoles(auth.getAuthorities());
         }
 
         return emptyList();
+    }
+
+    private List<String> toRoles(Collection<? extends GrantedAuthority> authorities) {
+        List<String> roles = new ArrayList<String>();
+
+        for (GrantedAuthority ga : authorities) {
+            String roleName = ga.getAuthority();
+            if (roleName.startsWith("ROLE_")) {
+                roleName = roleName.replaceFirst("ROLE_", "");
+            }
+            roles.add(roleName);
+        }
+
+        return roles;
     }
 
     public boolean hasRole(String role) {

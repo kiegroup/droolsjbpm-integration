@@ -188,9 +188,8 @@ public class JBPMAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(name = "identityProvider")
-    public IdentityProvider identityProvider() {
-
-        return new SpringSecurityIdentityProvider();
+    public IdentityProvider identityProvider(ApplicationContext context) {
+        return new SpringSecurityIdentityProvider(context);
     }
 
     @Bean
