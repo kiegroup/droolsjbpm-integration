@@ -84,6 +84,9 @@
         <include>org.dom4j:dom4j</include>
         <include>xerces:xercesImpl</include>
 
+        <include>org.glassfish.jaxb:jaxb-runtime</include>
+        <include>org.glassfish.jaxb:jaxb-xjc</include>
+
         <include>jakarta.jms:jakarta.jms-api</include>
 
         <include>org.quartz-scheduler:quartz</include>

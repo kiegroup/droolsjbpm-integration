@@ -93,7 +93,8 @@
         
         <include>xerces:xercesImpl</include>
 
-	<include>com.sun.xml.bind:jaxb-xjc</include>
+        <include>org.glassfish.jaxb:jaxb-runtime</include>
+        <include>org.glassfish.jaxb:jaxb-xjc</include>
 
         <include>org.yaml:snakeyaml</include>
       </includes>
