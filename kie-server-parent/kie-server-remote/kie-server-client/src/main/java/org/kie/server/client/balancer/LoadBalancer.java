@@ -24,6 +24,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.balancer.impl.RandomBalancerStrategy;
 import org.kie.server.client.balancer.impl.RoundRobinBalancerStrategy;
 import org.kie.server.common.rest.KieServerHttpRequest;
@@ -42,6 +43,9 @@ public class LoadBalancer {
 
     private final BalancerStrategy balancerStrategy;
     private CopyOnWriteArraySet<String> failedEndpoints = new CopyOnWriteArraySet<String>();
+
+    private String userName;
+    private String password;
 
     protected LoadBalancer(BalancerStrategy balancerStrategy) {
         this.balancerStrategy = balancerStrategy;
@@ -101,6 +105,13 @@ public class LoadBalancer {
      * factory methods
      */
 
+    public static LoadBalancer getDefault(KieServicesConfiguration config) {
+        LoadBalancer loadBalancer = getDefault(config.getServerUrl());
+        loadBalancer.userName = config.getUserName();
+        loadBalancer.password = config.getPassword();
+        return loadBalancer;
+    }
+
     public static LoadBalancer getDefault(String urls) {
         String[] endpoints = new String[0];
         if (urls != null) {
@@ -136,6 +147,22 @@ public class LoadBalancer {
         return new LoadBalancer(strategy);
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     /*
      * Runnable for checks on failed endpoints
      */
@@ -153,7 +180,7 @@ public class LoadBalancer {
                 String failedEndpoint = iterator.next();
                 try {
                     KieServerHttpRequest httpRequest =
-                            KieServerHttpRequest.newRequest(failedEndpoint).followRedirects(true).timeout(1000);
+                            KieServerHttpRequest.newRequest(failedEndpoint, userName, password).followRedirects(true).timeout(1000);
                     httpRequest.get();
 
                     logger.debug("Url '{}' is back online, adding it to load balancer", failedEndpoint);
