@@ -11,6 +11,10 @@
       <resolver>mvel</resolver>
       <identifier>new org.kie.server.services.prometheus.PrometheusCaseEventListener()</identifier>
     </event-listener>
+    <event-listener>
+      <resolver>mvel</resolver>
+      <identifier>new org.kie.server.services.prometheus.PrometheusMetricsRuleTaskListener(runtimeManager, kieContainer)</identifier>
+    </event-listener>
   </event-listeners>
   <task-event-listeners>
     <task-event-listener>
