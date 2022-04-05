@@ -81,7 +81,7 @@ public abstract class AbstractKieServicesClientImpl {
 
     public AbstractKieServicesClientImpl(KieServicesConfiguration config) {
         this.config = config.clone();
-        this.loadBalancer = config.getLoadBalancer() == null ? LoadBalancer.getDefault(config.getServerUrl()) : config.getLoadBalancer();
+        this.loadBalancer = config.getLoadBalancer() == null ? LoadBalancer.getDefault(config) : config.getLoadBalancer();
         this.classLoader = Thread.currentThread().getContextClassLoader() != null ? Thread.currentThread().getContextClassLoader() : CommandScript.class.getClassLoader();
         this.marshaller = MarshallerFactory.getMarshaller(config.getExtraClasses(), config.getMarshallingFormat(), classLoader);
         this.responseHandler = config.getResponseHandler();
@@ -89,7 +89,7 @@ public abstract class AbstractKieServicesClientImpl {
 
     public AbstractKieServicesClientImpl(KieServicesConfiguration config, ClassLoader classLoader) {
         this.config = config.clone();
-        this.loadBalancer = config.getLoadBalancer() == null ? LoadBalancer.getDefault(config.getServerUrl()) : config.getLoadBalancer();
+        this.loadBalancer = config.getLoadBalancer() == null ? LoadBalancer.getDefault(config) : config.getLoadBalancer();
         this.classLoader = classLoader;
         this.marshaller = MarshallerFactory.getMarshaller( config.getExtraClasses(), config.getMarshallingFormat(), classLoader );
         this.responseHandler = config.getResponseHandler();
