@@ -2553,7 +2553,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         tasks = caseClient.findCaseTasksAssignedAsBusinessAdministrator(caseId, USER_ADMINISTRATOR, 0, 10);
         assertNotNull(tasks);
         assertEquals(2, tasks.size()); // 1 for Yoda and 1 for John
-        assertTaskByActualOwner(tasks, USER_YODA, "Hello1", Reserved, "");
+        assertTaskByActualOwner(tasks, USER_YODA, "Hello1", Reserved, "Simple description");
         assertTaskByActualOwner(tasks, USER_JOHN, "Hello2", Reserved, "User's comment");
 
         changeUser(caseOwner);
@@ -2568,7 +2568,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(2, tasks.stream()
                 .filter(taskSummary -> USER_JOHN.equals(taskSummary.getActualOwner()))
                 .count());
-        assertTaskByActualOwner(tasks, USER_YODA, "Hello1", Reserved, "");
+        assertTaskByActualOwner(tasks, USER_YODA, "Hello1", Reserved, "Simple description");
         assertTaskByActualOwner(tasks, USER_JOHN, "Hello2", Reserved, "User's comment");
     }
 
