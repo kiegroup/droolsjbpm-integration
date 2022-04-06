@@ -185,7 +185,9 @@ public class FileRepositoryTest {
     public void testWatchServiceOnLatelyCreatedConfigFile() throws Exception {
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(8);
         // Start watcher service with not existing config file
-        File repositoryDirectory = new File("target" + File.separator + UUID.randomUUID().toString());
+        String fileDir = "target" + File.separator + UUID.randomUUID().toString();
+        System.setProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR, fileDir);
+        File repositoryDirectory = new File(fileDir);
         repositoryDirectory.mkdirs();
 
         System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED, "true");
@@ -219,9 +221,7 @@ public class FileRepositoryTest {
         ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
         config.addContainerInfo(containerInfo);
 
-        synchronized (configurationManager) {
-            repoWithWatcher.persist(config);
-        }
+        repoWithWatcher.persist(config);
 
         // delay it a bit for the watcher to be triggered
         latch.await(5, TimeUnit.SECONDS);
@@ -294,10 +294,7 @@ public class FileRepositoryTest {
         ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
         config.addContainerInfo(containerInfo);
 
-        synchronized (configurationManager) {
-            repoWithWatcher.persist(config);
-        }
-
+        repoWithWatcher.persist(config);
 
         File serverStateFile = new File(repositoryDirectory, "kie-server-router" + ".json");
 
