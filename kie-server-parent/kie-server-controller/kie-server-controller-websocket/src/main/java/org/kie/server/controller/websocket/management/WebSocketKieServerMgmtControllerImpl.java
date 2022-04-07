@@ -51,6 +51,11 @@ public class WebSocketKieServerMgmtControllerImpl {
     @PostConstruct
     public void configure() {
         LOGGER.info("Kie Server Controller Management WebSocket service initialized");
+        if (templateStorage == null && notificationService == null) {
+            // @PostConstruct can be called in Tomcat
+            LOGGER.info("templateStorage and notificationService are not injected but work with default implementations or loaded by ServiceLoader");
+            return;
+        }
         if(templateStorage.isUnsatisfied()){
             LOGGER.warn("Unable to find template storage implementation, using in memory");
         } else {
