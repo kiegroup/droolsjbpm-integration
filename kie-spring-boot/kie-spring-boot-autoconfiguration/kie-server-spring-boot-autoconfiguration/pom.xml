@@ -155,6 +155,10 @@
           <groupId>org.jboss.resteasy</groupId>
           <artifactId>resteasy-jackson-provider</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>jakarta.el</groupId>
+          <artifactId>jakarta.el-api</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
