@@ -77,13 +77,14 @@ public class WebSocketKieServerControllerImpl extends KieServerControllerImpl {
     
     @PostConstruct
     public void configure() {
-        if(templateStorage.isUnsatisfied()){
-            logger.warn("Unable to find template storage implementation, using in memory");
+        // @PostConstruct can be called in Tomcat so could be null
+        if(templateStorage == null || templateStorage.isUnsatisfied()){
+            logger.warn("Unable to find template storage implementation, using in memory or loaded by ServiceLoader");
         } else {
             setTemplateStorage(templateStorage.get());
         }
-        if(notificationService.isUnsatisfied()) {
-            logger.warn("Unable to find notification service implementation, using logging only");
+        if(notificationService == null || notificationService.isUnsatisfied()) {
+            logger.warn("Unable to find notification service implementation, using logging only or loaded by ServiceLoader");
         } else {
             setNotificationService(notificationService.get());
         }
