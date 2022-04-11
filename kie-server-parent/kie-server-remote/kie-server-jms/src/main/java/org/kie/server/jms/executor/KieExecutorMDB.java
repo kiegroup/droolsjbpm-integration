@@ -74,7 +74,7 @@ public class KieExecutorMDB extends JmsAvailableJobsExecutor {
         setQueryService(((ExecutorServiceImpl) executorService).getQueryService());
         setExecutorStoreService(((ExecutorImpl) ((ExecutorServiceImpl) executorService).getExecutor()).getExecutorStoreService());
         setExecutor(((ExecutorServiceImpl) executorService).getExecutor());
-
+        setEventSupport(((ExecutorServiceImpl) executorService).getEventSupport());
     }
 
     @Override
