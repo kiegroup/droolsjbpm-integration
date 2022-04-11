@@ -232,11 +232,9 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 		Long jobId = jobServicesClient.scheduleRequest(jobRequestErrorInstanceNow);
 		KieServerSynchronization.waitForJobToFinish(jobServicesClient, jobId);
 
-		assertThat(getMetrics()).contains(
-				"kie_server_job_in_retry_total{container_id=\"\",failed=\"true\",command_name=\""
-						+ JOB_EXECUTION_ERROR_COMMAND + "\",} 0.0",
-				"kie_server_job_error_total{container_id=\"\",failed=\"true\",command_name=\""
-						+ JOB_EXECUTION_ERROR_COMMAND + "\",} ");
+		assertThat(getMetrics()).containsPattern(
+                "kie_server_job_in_retry_total\\{container_id=\"\",failed=\"true\",command_name=\""
+                        + JOB_EXECUTION_ERROR_COMMAND + "\",\\} [1-9]\\.0");
 	}
 	
 	@Test
