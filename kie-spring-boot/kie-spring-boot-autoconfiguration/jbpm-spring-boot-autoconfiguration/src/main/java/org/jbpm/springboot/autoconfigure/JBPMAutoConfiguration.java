@@ -479,13 +479,14 @@ public class JBPMAutoConfiguration {
     @Bean
     @ConditionalOnClass({ CaseRuntimeDataServiceImpl.class })
     @ConditionalOnMissingBean(name = "caseRuntimeService")
-    public CaseRuntimeDataService caseRuntimeService(CaseIdGenerator caseIdGenerator, RuntimeDataService runtimeDataService, DeploymentService deploymentService, TransactionalCommandService transactionalCommandService, IdentityProvider identityProvider) {
+    public CaseRuntimeDataService caseRuntimeService(CaseIdGenerator caseIdGenerator, RuntimeDataService runtimeDataService, DeploymentService deploymentService, TransactionalCommandService transactionalCommandService, IdentityProvider identityProvider, UserGroupCallback userGroupCallback) {
 
         CaseRuntimeDataServiceImpl caseRuntimeDataService = new CaseRuntimeDataServiceImpl();
         caseRuntimeDataService.setCaseIdGenerator(caseIdGenerator);
         caseRuntimeDataService.setRuntimeDataService(runtimeDataService);
         caseRuntimeDataService.setCommandService(transactionalCommandService);
         caseRuntimeDataService.setIdentityProvider(identityProvider);
+        caseRuntimeDataService.setUserGroupCallback(userGroupCallback);
 
         // configure case mgmt services as listeners
         ((KModuleDeploymentService)deploymentService).addListener(caseRuntimeDataService);
