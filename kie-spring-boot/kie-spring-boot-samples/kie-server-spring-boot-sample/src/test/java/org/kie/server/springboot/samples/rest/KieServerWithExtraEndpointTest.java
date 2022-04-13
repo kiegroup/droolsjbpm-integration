@@ -40,17 +40,16 @@ public class KieServerWithExtraEndpointTest {
     @LocalServerPort
     private int port;    
    
-    private String user = "john";
-    private String password = "john@pwd1";
+    private static final String JOHN = "john";
+    private static final String PASSWORD = "usetheforce123@";
 
-    
     @Test
     public void testExtraEndpoint() {
         
         String extraEndpoint = "http://localhost:" + port + "/rest/extra";
         
         KieServerHttpRequest httpRequest =
-                KieServerHttpRequest.newRequest(extraEndpoint, user, password)
+                KieServerHttpRequest.newRequest(extraEndpoint, JOHN, PASSWORD)
                 .followRedirects(true)
                 .timeout(5000)
                 .contentType("application/json")

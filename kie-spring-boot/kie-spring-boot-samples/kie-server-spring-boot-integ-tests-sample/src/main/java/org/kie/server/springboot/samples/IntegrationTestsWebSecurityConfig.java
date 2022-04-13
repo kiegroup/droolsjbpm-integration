@@ -16,22 +16,32 @@
 
 package org.kie.server.springboot.samples;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 
 @Configuration("kieServerSecurity")
 @EnableWebSecurity
 public class IntegrationTestsWebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private static final String USER_PASSWORD = "usetheforce123@";
+    private static final String KIE_SERVER_ROLE = "kie-server";
+    private static final String GUEST_ROLE = "guest";
+    private static final String ADMIN_ROLE = "Administrators";
+    private static final String ENGINEERING_ROLE = "engineering";
+    private static final String HR_ROLE = "HR";
+    private static final String IT_ROLE = "IT";
+    private static final String ACCOUNTING_ROLE = "HR";
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -57,17 +67,15 @@ public class IntegrationTestsWebSecurityConfig extends WebSecurityConfigurerAdap
         return firewall;
     }
 
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    @Bean
+    @Override
+    public UserDetailsManager userDetailsService() {
+        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
         PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        // Configuration is the same as in the kie-server-tests module
-        auth.inMemoryAuthentication().withUser("yoda").password(encoder.encode("usetheforce123@")).roles("kie-server", "guest")
-        .and()        
-        .withUser("administrator").password(encoder.encode("usetheforce123@")).roles("kie-server", "guest", "Administrators")
-        .and()        
-        .withUser("john").password(encoder.encode("usetheforce123@")).roles("kie-server", "guest", "engineering", "HR", "IT", "Accounting")
-        .and()        
-        .withUser("mary").password(encoder.encode("usetheforce123@")).roles("kie-server", "guest", "engineering", "HR", "IT", "Accounting");
+        manager.createUser(User.withUsername("yoda").password(encoder.encode(USER_PASSWORD)).roles(KIE_SERVER_ROLE, GUEST_ROLE).build());
+        manager.createUser(User.withUsername("administrator").password(encoder.encode(USER_PASSWORD)).roles(KIE_SERVER_ROLE, GUEST_ROLE, ADMIN_ROLE).build());
+        manager.createUser(User.withUsername("john").password(encoder.encode(USER_PASSWORD)).roles(KIE_SERVER_ROLE, GUEST_ROLE, ENGINEERING_ROLE, HR_ROLE, IT_ROLE, ACCOUNTING_ROLE).build());
+        manager.createUser(User.withUsername("mary").password(encoder.encode(USER_PASSWORD)).roles(KIE_SERVER_ROLE, GUEST_ROLE, ENGINEERING_ROLE, HR_ROLE, IT_ROLE, ACCOUNTING_ROLE).build());
+        return manager;
     }
-    
 }
