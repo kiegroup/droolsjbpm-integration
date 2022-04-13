@@ -106,8 +106,8 @@ public class KafkaProducerHappyPathTest extends AbstractKafkaBaseTest {
     @LocalServerPort
     private int port;
 
-    private String user = "john";
-    private String password = "john@pwd1";
+    private static final String JOHN = "john";
+    private static final String PASSWORD = "usetheforce123@";
 
     @Rule
     public TestRule watcher = new TestWatcher() {
@@ -165,7 +165,7 @@ public class KafkaProducerHappyPathTest extends AbstractKafkaBaseTest {
     public void setupRestClient() {
         ReleaseId releaseId = new ReleaseId(GROUP_ID, SEND_PROJECT, VERSION);
         String serverUrl = "http://localhost:" + port + "/rest/server";
-        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(serverUrl, user, password);
+        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(serverUrl, JOHN, PASSWORD);
         configuration.setTimeout(60000);
         configuration.setMarshallingFormat(MarshallingFormat.JSON);
         this.kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration);
