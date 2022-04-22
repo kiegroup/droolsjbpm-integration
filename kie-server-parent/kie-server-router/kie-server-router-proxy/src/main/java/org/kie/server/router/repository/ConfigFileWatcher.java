@@ -50,12 +50,11 @@ public class ConfigFileWatcher implements Runnable {
 
         this.toWatch = Paths.get(toWatch.toString(), "kie-server-router.json");
         try {
-            if(toWatch.toFile().exists()) {
-                lastUpdate = Files.getLastModifiedTime(toWatch).toMillis();
-            } else {
+            if (!toWatch.toFile().exists()) {
                 log.warnv("configuration file does not exist {0} , creating...", this.toWatch);
                 configuration.persist();
             }
+            lastUpdate = Files.getLastModifiedTime(toWatch).toMillis();
         } catch (IOException e) {
             log.error("Unable to read last modified date of routers config file", e);
         } catch (final Exception e) {
