@@ -16,20 +16,17 @@
 
 package org.kie.spring.tests.persistence;
 
-import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Collection;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import org.drools.compiler.builder.impl.KnowledgeBuilderImpl;
-import org.drools.core.util.DroolsStreamUtils;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
-import org.jbpm.compiler.ProcessBuilderImpl;
+import org.jbpm.compiler.xml.XmlRuleFlowProcessDumper;
 import org.jbpm.process.core.Work;
 import org.jbpm.process.core.impl.WorkImpl;
 import org.jbpm.process.core.timer.Timer;
@@ -52,7 +49,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieBase;
-import org.kie.api.definition.KiePackage;
 import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieSession;
@@ -65,7 +61,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class JPASingleSessionCommandServiceFactoryEnvTest {
     private static String TMPDIR = System.getProperty("java.io.tmpdir");
@@ -84,24 +82,28 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         try {
             TMPDIR = JPASingleSessionCommandServiceFactoryEnvTest.class.getResource("/kb_persistence").getFile();
             log.debug("creating: {}",
-                    TMPDIR + "/processWorkItems.pkg");
-            writePackage(getProcessWorkItems(),
-                    new File(TMPDIR + "/processWorkItems.pkg"));
+                    TMPDIR + "/processWorkItems.rf");
+            writeRuleflow(getProcessWorkItems(),
+                    new File(TMPDIR + "/processWorkItems.rf"));
 
             log.debug("creating: {}",
-                    TMPDIR + "/processSubProcess.pkg");
-            writePackage(getProcessSubProcess(),
-                    new File(TMPDIR + "/processSubProcess.pkg"));
+                    TMPDIR + "/processSubProcess1.rf");
+            writeRuleflow(getProcessSubProcess1(),
+                    new File(TMPDIR + "/processSubProcess1.rf"));
+            log.debug("creating: {}",
+                    TMPDIR + "/processSubProcess2.rf");
+            writeRuleflow(getProcessSubProcess2(),
+                    new File(TMPDIR + "/processSubProcess2.rf"));
 
             log.debug("creating: {}",
-                    TMPDIR + "/processTimer.pkg");
-            writePackage(getProcessTimer(),
-                    new File(TMPDIR + "/processTimer.pkg"));
+                    TMPDIR + "/processTimer.rf");
+            writeRuleflow(getProcessTimer(),
+                    new File(TMPDIR + "/processTimer.rf"));
 
             log.debug("creating: {}",
-                    TMPDIR + "/processTimer2.pkg");
-            writePackage(getProcessTimer2(),
-                    new File(TMPDIR + "/processTimer2.pkg"));
+                    TMPDIR + "/processTimer2.rf");
+            writeRuleflow(getProcessTimer2(),
+                    new File(TMPDIR + "/processTimer2.rf"));
         } catch (Exception e) {
             log.error("can't create packages!",
                     e);
@@ -317,7 +319,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         service.dispose();
     }
 
-    private static KiePackage getProcessWorkItems() {
+    private static String getProcessWorkItems() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.TestProcess");
         process.setName("TestProcess");
@@ -380,31 +382,14 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                 end,
                 Node.CONNECTION_DEFAULT_TYPE);
 
-        KnowledgeBuilderImpl packageBuilder = new KnowledgeBuilderImpl();
-        ProcessBuilderImpl processBuilder = new ProcessBuilderImpl(packageBuilder);
-        processBuilder.buildProcess(process,
-                null);
-
-        return packageBuilder.getPackage("org.drools.test");
+        return new XmlRuleFlowProcessDumper().dumpProcess(process);
     }
 
-    public static void writePackage(KiePackage pkg,
-                                    File dest) {
-        dest.deleteOnExit();
-        OutputStream out = null;
-        try {
-            out = new BufferedOutputStream(new FileOutputStream(dest));
-            DroolsStreamUtils.streamOut(out,
-                    pkg);
-        } catch (Exception e) {
+    public static void writeRuleflow(String ruleflow, File dest) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(dest))) {
+            writer.write(ruleflow);
+        } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                }
-            }
         }
     }
 
@@ -471,7 +456,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     }
 
     @SuppressWarnings("unused")
-    private static KiePackage getProcessSubProcess() {
+    private static String getProcessSubProcess1() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.ProcessSubProcess");
         process.setName("ProcessSubProcess");
@@ -510,23 +495,22 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                 end,
                 Node.CONNECTION_DEFAULT_TYPE);
 
-        KnowledgeBuilderImpl packageBuilder = new KnowledgeBuilderImpl();
-        ProcessBuilderImpl processBuilder = new ProcessBuilderImpl(packageBuilder);
-        processBuilder.buildProcess(process,
-                null);
+        return new XmlRuleFlowProcessDumper().dumpProcess(process);
+    }
 
-        process = new RuleFlowProcess();
+    private static String getProcessSubProcess2() {
+        RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.SubProcess");
         process.setName("SubProcess");
         process.setPackageName("org.drools.test");
-        start = new StartNode();
+        StartNode start = new StartNode();
         start.setId(1);
         start.setName("Start");
         process.addNode(start);
-        actionNode = new ActionNode();
+        ActionNode actionNode = new ActionNode();
         actionNode.setId(2);
         actionNode.setName("Action");
-        action = new DroolsConsequenceAction();
+        DroolsConsequenceAction action = new DroolsConsequenceAction();
         action.setDialect("java");
         action.setConsequence("System.out.println(\"Executed action\");");
         actionNode.setAction(action);
@@ -546,7 +530,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                 Node.CONNECTION_DEFAULT_TYPE,
                 workItemNode,
                 Node.CONNECTION_DEFAULT_TYPE);
-        end = new EndNode();
+        EndNode end = new EndNode();
         end.setId(6);
         end.setName("End");
         process.addNode(end);
@@ -555,9 +539,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                 end,
                 Node.CONNECTION_DEFAULT_TYPE);
 
-        processBuilder.buildProcess(process,
-                null);
-        return packageBuilder.getPackage("org.drools.test");
+        return new XmlRuleFlowProcessDumper().dumpProcess(process);
     }
 
     @Test
@@ -618,7 +600,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     }
 
     @SuppressWarnings("unused")
-    private static KiePackage getProcessTimer() {
+    private static String getProcessTimer() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.ProcessTimer");
         process.setName("ProcessTimer");
@@ -659,11 +641,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                 end,
                 Node.CONNECTION_DEFAULT_TYPE);
 
-        KnowledgeBuilderImpl packageBuilder = new KnowledgeBuilderImpl();
-        ProcessBuilderImpl processBuilder = new ProcessBuilderImpl(packageBuilder);
-        processBuilder.buildProcess(process,
-                null);
-        return packageBuilder.getPackage("org.drools.test");
+        return new XmlRuleFlowProcessDumper().dumpProcess(process);
     }
 
     @Test
@@ -700,7 +678,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     }
 
     @SuppressWarnings("unused")
-    private static KiePackage getProcessTimer2() {
+    private static String getProcessTimer2() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.ProcessTimer2");
         process.setName("ProcessTimer2");
@@ -741,11 +719,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                 end,
                 Node.CONNECTION_DEFAULT_TYPE);
 
-        KnowledgeBuilderImpl packageBuilder = new KnowledgeBuilderImpl();
-        ProcessBuilderImpl processBuilder = new ProcessBuilderImpl(packageBuilder);
-        processBuilder.buildProcess(process,
-                null);
-        return packageBuilder.getPackage("org.drools.test");
+        return new XmlRuleFlowProcessDumper().dumpProcess(process);
     }
     
     private static CyclicBarrier cyclicBarrier = new CyclicBarrier(2);
