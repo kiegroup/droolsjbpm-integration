@@ -389,6 +389,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
     }
 
     public static void writeRuleflow(String ruleflow, File dest) {
+        dest.deleteOnExit();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(dest))) {
             writer.write(ruleflow);
         } catch (IOException e) {
