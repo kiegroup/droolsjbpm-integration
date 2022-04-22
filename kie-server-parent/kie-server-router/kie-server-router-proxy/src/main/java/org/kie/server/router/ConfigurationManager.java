@@ -125,7 +125,7 @@ public class ConfigurationManager {
         return environment;
     }
 
-    public  synchronized FailedHostInfo disconnectFailedHost(String url) {
+    public synchronized FailedHostInfo disconnectFailedHost(String url) {
         log.info("Server at " + url+ " is now offline");
         FailedHostInfo failedHost = configuration.removeUnavailableServer(url);
         log.debug("Scheduling host checks..."+ failedHost);

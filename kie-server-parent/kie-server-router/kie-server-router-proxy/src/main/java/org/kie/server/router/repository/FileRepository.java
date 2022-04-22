@@ -38,7 +38,7 @@ public class FileRepository implements ConfigRepository {
     }
 
     @Override
-    public void persist(Configuration configuration) {
+    public synchronized void persist(Configuration configuration) {
 
         File configFile = new File(repositoryDir, "kie-server-router.json");
         try (FileOutputStream fos = new FileOutputStream(configFile)) {

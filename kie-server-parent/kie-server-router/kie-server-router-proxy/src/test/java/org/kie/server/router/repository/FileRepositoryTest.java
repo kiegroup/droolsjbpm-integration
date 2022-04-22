@@ -44,7 +44,7 @@ public class FileRepositoryTest {
 
     @Before
     public void init () {
-        System.setProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR, "target");
+        System.setProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR, "target" + File.separator + UUID.randomUUID());
     }
 
     @After
@@ -105,7 +105,7 @@ public class FileRepositoryTest {
         repo.clean();
     }
     
-    @Test
+    @Test(timeout = 30000)
     public void testWatchServiceOnConfigFile() throws Exception {
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(8);
 
@@ -120,7 +120,7 @@ public class FileRepositoryTest {
         ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
         config.addContainerInfo(containerInfo);
 
-        File repositoryDirectory = new File("target" + File.separator + UUID.randomUUID().toString());
+        File repositoryDirectory = new File(System.getProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR));
         repositoryDirectory.mkdirs();
 
         System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED, "true");
@@ -142,7 +142,7 @@ public class FileRepositoryTest {
             public void onConfigurationReloaded() {
                 latch.countDown();
             }
-            
+
         });
 
         manager.startWatcher();
@@ -158,36 +158,30 @@ public class FileRepositoryTest {
         
         config.removeContainerHost("container2", "http://localhost:8180/server");
         config.removeServerHost("server2", "http://localhost:8180/server");
-        // delay it a bit from the creation of the file
-        Thread.sleep(3000);
         
         repo.persist(config);
         
-        boolean reloaded = latch.await(20, TimeUnit.SECONDS);
+        latch.await();
         
-        if (reloaded) {
-            assertNotNull(loaded);
-            assertNotNull(loaded.getHostsPerContainer());
-            assertNotNull(loaded.getHostsPerServer());
-            assertEquals(2, loaded.getHostsPerContainer().size());
-            assertEquals(2, loaded.getHostsPerServer().size());
-            assertEquals(2, loaded.getContainerInfosPerContainer().size());
-            
-            assertEquals(1, loaded.getHostsPerContainer().get("container1").size());
-            assertEquals(0, loaded.getHostsPerContainer().get("container2").size());
-        }
+        assertNotNull(loaded);
+        assertNotNull(loaded.getHostsPerContainer());
+        assertNotNull(loaded.getHostsPerServer());
+        assertEquals(2, loaded.getHostsPerContainer().size());
+        assertEquals(2, loaded.getHostsPerServer().size());
+        assertEquals(2, loaded.getContainerInfosPerContainer().size());
+
+        assertEquals(1, loaded.getHostsPerContainer().get("container1").size());
+        assertEquals(0, loaded.getHostsPerContainer().get("container2").size());
 
         manager.close();
         executorService.shutdownNow();
     }
 
-    @Test
+    @Test(timeout = 30000)
     public void testWatchServiceOnLatelyCreatedConfigFile() throws Exception {
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(8);
         // Start watcher service with not existing config file
-        String fileDir = "target" + File.separator + UUID.randomUUID().toString();
-        System.setProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR, fileDir);
-        File repositoryDirectory = new File(fileDir);
+        File repositoryDirectory = new File(System.getProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR));
         repositoryDirectory.mkdirs();
 
         System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED, "true");
@@ -224,7 +218,7 @@ public class FileRepositoryTest {
         repoWithWatcher.persist(config);
 
         // delay it a bit for the watcher to be triggered
-        latch.await(5, TimeUnit.SECONDS);
+        latch.await();
 
         assertNotNull(loaded);
         assertNotNull(loaded.getHostsPerContainer());
@@ -248,9 +242,7 @@ public class FileRepositoryTest {
         ConfigurationMarshaller marshaller = new ConfigurationMarshaller();
         Configuration configuration = new Configuration();
         
-        String fileDir = "target" + File.separator + UUID.randomUUID().toString();
-        System.setProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR, fileDir);
-        File repositoryDirectory = new File(fileDir);
+        File repositoryDirectory = new File(System.getProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR));
         repositoryDirectory.mkdirs();
 
         System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED, "true");
@@ -319,11 +311,9 @@ public class FileRepositoryTest {
     @Test
     public void testConfigurationFileStartStop() throws Exception {
 
-        String fileDir = "target" + File.separator + UUID.randomUUID().toString();
-        File repositoryDirectory = new File(fileDir);
+        File repositoryDirectory = new File(System.getProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR));
         repositoryDirectory.mkdirs();
 
-        System.setProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR, fileDir);
         System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED, "true");
         System.setProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_INTERVAL, "1000");
 
