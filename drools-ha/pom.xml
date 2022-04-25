@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.drools</groupId>
     <artifactId>droolsjbpm-integration</artifactId>
-    <version>7.69.0-SNAPSHOT</version>
+    <version>7.69.0.Final</version>
   </parent>
 
   <name>Drools :: High Availability</name>
