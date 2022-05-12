@@ -1,0 +1,205 @@
+{
+  "id": "c9bf4562-7732-4d20-b64b-55e57f74450d",
+  "name": "com__3145275__3145275_Person",
+  "model": {
+    "source": "INTERNAL",
+    "className": "com._3145275._3145275.Person",
+    "name": "Person",
+    "properties": [
+      {
+        "name": "fullname",
+        "typeInfo": {
+          "type": "BASE",
+          "className": "java.lang.String",
+          "multiple": false
+        },
+        "metaData": {
+          "entries": [
+            {
+              "name": "field-label",
+              "value": "Full Name"
+            },
+            {
+              "name": "field-placeHolder",
+              "value": "Full Name"
+            }
+          ]
+        }
+      },
+      {
+        "name": "dateBirth",
+        "typeInfo": {
+          "type": "BASE",
+          "className": "java.time.LocalDateTime",
+          "multiple": false
+        },
+        "metaData": {
+          "entries": [
+            {
+              "name": "field-label",
+              "value": "Date Birth"
+            },
+            {
+              "name": "field-placeHolder",
+              "value": "Date Birth"
+            }
+          ]
+        }
+      },
+      {
+        "name": "age",
+        "typeInfo": {
+          "type": "BASE",
+          "className": "java.lang.Integer",
+          "multiple": false
+        },
+        "metaData": {
+          "entries": [
+            {
+              "name": "field-label",
+              "value": "Age"
+            },
+            {
+              "name": "field-placeHolder",
+              "value": "Age"
+            }
+          ]
+        }
+      }
+    ],
+    "formModelType": "org.kie.workbench.common.forms.data.modeller.model.DataObjectFormModel"
+  },
+  "fields": [
+    {
+      "maxLength": 100,
+      "placeHolder": "Full Name",
+      "id": "field_3025053797761653E12",
+      "name": "fullname",
+      "label": "Full Name",
+      "required": false,
+      "readOnly": false,
+      "validateOnChange": true,
+      "binding": "fullname",
+      "standaloneClassName": "java.lang.String",
+      "code": "TextBox",
+      "serializedFieldClassName": "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.textBox.definition.TextBoxFieldDefinition"
+    },
+    {
+      "placeHolder": "Age",
+      "maxLength": 100,
+      "id": "field_687187769955383E11",
+      "name": "age",
+      "label": "Age",
+      "required": false,
+      "readOnly": false,
+      "validateOnChange": true,
+      "helpMessage": "",
+      "binding": "age",
+      "standaloneClassName": "java.lang.Integer",
+      "code": "IntegerBox",
+      "serializedFieldClassName": "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.integerBox.definition.IntegerBoxFieldDefinition"
+    },
+    {
+      "placeHolder": "Date Birth",
+      "showTime": false,
+      "id": "field_1703386699666296E12",
+      "name": "dateBirth",
+      "label": "Date Birth",
+      "required": false,
+      "readOnly": false,
+      "validateOnChange": true,
+      "helpMessage": "",
+      "binding": "dateBirth",
+      "standaloneClassName": "java.time.LocalDateTime",
+      "code": "DatePicker",
+      "serializedFieldClassName": "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.datePicker.definition.DatePickerFieldDefinition"
+    }
+  ],
+  "layoutTemplate": {
+    "version": 3,
+    "style": "FLUID",
+    "layoutProperties": {},
+    "rows": [
+      {
+        "height": "12",
+        "properties": {},
+        "layoutColumns": [
+          {
+            "span": "12",
+            "height": "12",
+            "properties": {},
+            "rows": [],
+            "layoutComponents": [
+              {
+                "dragTypeName": "org.kie.workbench.common.forms.editor.client.editor.rendering.EditorFieldLayoutComponent",
+                "properties": {
+                  "field_id": "field_3025053797761653E12",
+                  "form_id": "c9bf4562-7732-4d20-b64b-55e57f74450d"
+                },
+                "parts": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "height": "12",
+        "properties": {},
+        "layoutColumns": [
+          {
+            "span": "12",
+            "height": "12",
+            "properties": {},
+            "rows": [],
+            "layoutComponents": [
+              {
+                "dragTypeName": "org.kie.workbench.common.forms.editor.client.editor.rendering.EditorFieldLayoutComponent",
+                "properties": {
+                  "field_id": "field_1703386699666296E12",
+                  "form_id": "c9bf4562-7732-4d20-b64b-55e57f74450d"
+                },
+                "parts": [
+                  {
+                    "partId": "Field Label",
+                    "cssProperties": {}
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "height": "12",
+        "properties": {},
+        "layoutColumns": [
+          {
+            "span": "12",
+            "height": "12",
+            "properties": {},
+            "rows": [],
+            "layoutComponents": [
+              {
+                "dragTypeName": "org.kie.workbench.common.forms.editor.client.editor.rendering.EditorFieldLayoutComponent",
+                "properties": {
+                  "field_id": "field_687187769955383E11",
+                  "form_id": "c9bf4562-7732-4d20-b64b-55e57f74450d"
+                },
+                "parts": [
+                  {
+                    "partId": "IntegerBox",
+                    "cssProperties": {}
+                  },
+                  {
+                    "partId": "Field Label",
+                    "cssProperties": {}
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

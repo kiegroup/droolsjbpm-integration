@@ -65,6 +65,16 @@ public class FormField {
     private String creationForm;
     private String editionForm;
 
+    private boolean showTime;
+
+    public boolean isShowTime() {
+        return showTime;
+    }
+
+    public void setShowTime(boolean showTime) {
+        this.showTime = showTime;
+    }
+
     public String getId() {
         return id;
     }

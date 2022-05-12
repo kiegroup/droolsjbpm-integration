@@ -82,8 +82,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     
     private String serverPath;
     private String resourcePath;
-    
-    
+
     public AbstractFormRenderer(String serverPath, String resources) {
         this.serverPath = serverPath;
         this.resourcePath = serverPath + resources;
@@ -401,6 +400,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                             item.setMax(field.getMax());
                             item.setPrecision(field.getPrecision());
                             item.setStep(field.getStep());
+                            item.setShowTime(field.isShowTime());
 
                             Object value = "";
                             if (inputs.get(field.getBinding()) != null) {
@@ -409,9 +409,14 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                             if (outputs.get(field.getBinding()) != null) {
                                 value = outputs.get(field.getBinding());
                             }
-                            
-                            
+
                             switch(fieldType) {
+                                case "datetime-local":
+                                    if (value != null && value.toString().length() >= 10 && !field.isShowTime()) {
+                                        value = value.toString().substring(0, 10);
+                                    }
+                                    item.setValue((value != null) ? value.toString() : "");
+                                    break;
                                 case "documentCollection":
                                     if (value instanceof DocumentCollection) {
                                         DocumentCollection<Document> docCollection = (DocumentCollection<Document>) value;
@@ -471,9 +476,9 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                             String output = renderTemplate(FORM_GROUP_LAYOUT_TEMPLATE, parameters);
                             // append rendered content to the column content
                             content.append(output);
-                            
+
                             // add the field to json template
-                            appendFieldJSON(jsonTemplate, fieldType, field.getBinding(), field.getId(), jsType);
+                            appendFieldJSON(jsonTemplate, fieldType, field, jsType);
                         } else {
                             logger.warn("Field type {} is not supported, skipping it...", field.getCode());
                         }
@@ -500,20 +505,21 @@ public abstract class AbstractFormRenderer implements FormRenderer {
             case "multipleSelector":
             case "multipleInput":
                 return type;
-             default: 
-                 switch (field.getType()) {
-                     case "java.time.LocalDateTime":
-                     case "java.util.Date":
-                     case "java.sql.Date":
-                     case "java.sql.Timestamp":
-                         return "datetime-local";
-                     case "java.time.LocalTime":
-                         return "time";
-                     case "java.time.OffsetDateTime":
-                         return "datetime";
-                     default: 
-                         return type;
-                 }
+            default:
+                switch (field.getType()) {
+                    case "java.time.LocalDateTime":
+                        return "datetime-local";
+                    case "java.util.Date":
+                    case "java.sql.Date":
+                    case "java.sql.Timestamp":
+                        return "datetime-local";
+                    case "java.time.LocalTime":
+                        return "time";
+                    case "java.time.OffsetDateTime":
+                        return "datetime";
+                    default:
+                        return type;
+                }
         }
     }
 
@@ -689,16 +695,25 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     /*
      * json processing utilities     
      */
-    
+
     protected void appendFieldJSON(StringBuilder jsonTemplate, String type, String name, String id, String jsType) {
         jsonTemplate.append("'")
-                    .append(name)
-                    .append("' : ")
-                    .append(getJSFieldType(type))
-                    .append(appendExtractionExpression(type, name, id, jsType))
-                    .append(wrapEndFieldType(type))
-                    .append(",");
+                .append(name)
+                .append("' : ")
+                .append(getJSFieldType(type))
+                .append(appendExtractionExpression(type, name, id, jsType, false))
+                .append(wrapEndFieldType(type))
+                .append(",");
+    }
 
+    protected void appendFieldJSON(StringBuilder jsonTemplate, String type, FormField field, String jsType) {
+        jsonTemplate.append("'")
+                .append(field.getBinding())
+                .append("' : ")
+                .append(getJSFieldType(type))
+                .append(appendExtractionExpression(type, field.getBinding(), field.getId(), jsType, field.isShowTime()))
+                .append(wrapEndFieldType(type))
+                .append(",");
     }
 
     protected String getJSFieldType(String type) {
@@ -731,7 +746,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         }
     }
     
-    protected String appendExtractionExpression(String type, String name, String id, String jsType) {
+    protected String appendExtractionExpression(String type, String name, String id, String jsType, boolean isShowTime) {
         StringBuilder jsonTemplate = new StringBuilder();
         if (type.equals("radio")) {
             jsonTemplate
@@ -762,6 +777,19 @@ public abstract class AbstractFormRenderer implements FormRenderer {
             jsonTemplate.append("getMultipleInputData('")
                         .append(id)
                         .append("')");
+        } else if (type.equals("datetime-local")) {
+            if (isShowTime) {
+                jsonTemplate.append("document.getElementById('")
+                        .append(id)
+                        .append("')")
+                        .append(getExtractionValue(jsType));
+            } else {
+                jsonTemplate.append("document.getElementById('")
+                        .append(id)
+                        .append("') ")
+                        .append(getExtractionValue(jsType))
+                        .append(" + 'T00:00'");
+            }
         } else {
             jsonTemplate.append("document.getElementById('")
                         .append(id)
