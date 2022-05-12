@@ -39,10 +39,19 @@ public class LayoutItem {
 
     private boolean required;
     private boolean readOnly;
+    private boolean showTime;
 
     private String pattern;
 
     private List<ItemOption> options;
+
+    public boolean isShowTime() {
+        return showTime;
+    }
+
+    public void setShowTime(boolean showTime) {
+        this.showTime = showTime;
+    }
 
     public String getFormId() {
         return formId;
