@@ -34,8 +34,8 @@ public class BootstrapFormRendererTest {
 
         BootstrapFormRenderer bootstrapFormRenderer = new BootstrapFormRenderer();
         String outString = bootstrapFormRenderer.renderProcess("test-containerId", processAssetDesc, form);
-        assertThat(outString).contains("'dateBirth' : String(document.getElementById('field_1703386699666296E12') .value + 'T00:00')");
-        assertThat(outString).contains("<input id=\"field_1703386699666296E12\" name=\"dateBirth\" type=\"date\" class=\"form-control\" value=\"\"  pattern=\"(\\d+)(-|\\/)(\\d+)(?:-|\\/)(?:(\\d+)\\s+(\\d+):(\\d+)(?::(\\d+))?(?:\\.(\\d+))?)?\"/>");
+        assertThat(outString).contains("'dateBirth' : String(getLocalDateWithoutTime('field_1703386699666296E12') )");
+        assertThat(outString).contains("<input id=\"field_1703386699666296E12\" name=\"dateBirth\" type=\"date\" class=\"form-control\" value=");
     }
 
     @Test
@@ -49,7 +49,7 @@ public class BootstrapFormRendererTest {
         BootstrapFormRenderer bootstrapFormRenderer = new BootstrapFormRenderer();
         String outString = bootstrapFormRenderer.renderProcess("test-containerId", processAssetDesc, form);
 
-        assertThat(outString).contains("'dateBirth' : String(document.getElementById('field_1703386699666296E12').value");
-        assertThat(outString).contains("<input id=\"field_1703386699666296E12\" name=\"dateBirth\" type=\"datetime-local\" class=\"form-control\" value=\"\"  pattern=\"(\\d+)(-|\\/)(\\d+)(?:-|\\/)(?:(\\d+)\\s+(\\d+):(\\d+)(?::(\\d+))?(?:\\.(\\d+))?)?\"/>");
+        assertThat(outString).contains("'dateBirth' : String(document.getElementById('field_1703386699666296E12').value)");
+        assertThat(outString).contains("<input id=\"field_1703386699666296E12\" name=\"dateBirth\" type=\"datetime-local\" class=\"form-control\" value=");
     }
 }

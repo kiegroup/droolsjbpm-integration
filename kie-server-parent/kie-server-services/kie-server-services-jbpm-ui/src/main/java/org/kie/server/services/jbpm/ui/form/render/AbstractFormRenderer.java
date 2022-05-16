@@ -183,7 +183,6 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         return finalOutput;
     }
 
-
     public String renderProcess(String containerId, ProcessDefinition processDesc, FormInstance form) {
         
         List<String> scriptDataList = new ArrayList<>();        
@@ -784,11 +783,9 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                         .append("')")
                         .append(getExtractionValue(jsType));
             } else {
-                jsonTemplate.append("document.getElementById('")
+                jsonTemplate.append("getLocalDateWithoutTime('")
                         .append(id)
-                        .append("') ")
-                        .append(getExtractionValue(jsType))
-                        .append(" + 'T00:00'");
+                        .append("') ");
             }
         } else {
             jsonTemplate.append("document.getElementById('")
