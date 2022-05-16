@@ -556,3 +556,11 @@ function closeCreationForm(fieldId) {
 	currentRow = null;
 }
 
+function getLocalDateWithoutTime(elementId) {
+	var value = document.getElementById(elementId).value;
+	if (value === '') {
+		return value;
+	} else {
+		return value + 'T00:00';
+	}
+}
