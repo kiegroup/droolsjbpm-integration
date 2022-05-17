@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
@@ -70,6 +72,17 @@ public abstract class AbstractFormRenderer implements FormRenderer {
     public static final String PROCESS_LAYOUT_TEMPLATE = "process-layout";
     public static final String TASK_LAYOUT_TEMPLATE = "task-layout";
     public static final String TABLE_LAYOUT_TEMPLATE = "table";
+
+    public static final Map<String,String> FUNCTION_MAPPING = new HashMap<>();
+
+    static {
+        FUNCTION_MAPPING.put("java.time.LocalDateTime","getFormattedLocalDateTime");
+        FUNCTION_MAPPING.put("java.time.LocalDate","getFormattedLocalDate");
+        FUNCTION_MAPPING.put("java.util.Date","getFormattedUtilDate");
+        FUNCTION_MAPPING.put("java.time.LocalTime","getFormattedLocalTime");
+        FUNCTION_MAPPING.put("java.time.OffsetDateTime","getFormattedOffsetDateTime");
+
+    }
 
     private Map<String, String> inputTypes;
     private StringTemplateLoader stringLoader = new StringTemplateLoader();
@@ -410,6 +423,17 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                             }
 
                             switch(fieldType) {
+                                case "Date":
+                                    if ("java.util.Date".equals(field.getType())) {
+                                        if (value != null && value instanceof java.util.Date) {
+                                            LocalDate utilDate = ((java.util.Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                                            value = utilDate.toString();
+                                        } else if (value != null && value.toString().length() >= 10) {
+                                            value = value.toString().substring(0, 10);
+                                        }
+                                    }
+                                    item.setValue((value != null) ? value.toString() : "");
+                                    break;
                                 case "datetime-local":
                                     if (value != null && value.toString().length() >= 10 && !field.isShowTime()) {
                                         value = value.toString().substring(0, 10);
@@ -499,6 +523,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
 
     private String getFieldType(FormField field) {
         String type = inputTypes.get(field.getCode());
+
         switch (type) {
             case "documentCollection":
             case "multipleSelector":
@@ -509,6 +534,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                     case "java.time.LocalDateTime":
                         return "datetime-local";
                     case "java.util.Date":
+                        return "Date";
                     case "java.sql.Date":
                     case "java.sql.Timestamp":
                         return "datetime-local";
@@ -700,19 +726,32 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                 .append(name)
                 .append("' : ")
                 .append(getJSFieldType(type))
-                .append(appendExtractionExpression(type, name, id, jsType, false))
+                .append(appendExtractionExpression(type, name, id, jsType, false,""))
                 .append(wrapEndFieldType(type))
                 .append(",");
     }
 
     protected void appendFieldJSON(StringBuilder jsonTemplate, String type, FormField field, String jsType) {
-        jsonTemplate.append("'")
-                .append(field.getBinding())
-                .append("' : ")
-                .append(getJSFieldType(type))
-                .append(appendExtractionExpression(type, field.getBinding(), field.getId(), jsType, field.isShowTime()))
-                .append(wrapEndFieldType(type))
-                .append(",");
+        if (isDate(type)) {
+            jsonTemplate.append("'")
+                    .append(field.getBinding())
+                    .append("' : ")
+                    .append(appendExtractionExpression(type, field.getBinding(), field.getId(), jsType, field.isShowTime(), field.getType()))
+                    .append(",");
+        } else {
+            jsonTemplate.append("'")
+                    .append(field.getBinding())
+                    .append("' : ")
+                    .append(getJSFieldType(type))
+                    .append(appendExtractionExpression(type, field.getBinding(), field.getId(), jsType, field.isShowTime(), field.getType()))
+                    .append(wrapEndFieldType(type))
+                    .append(",");
+        }
+    }
+
+    private boolean isDate(String type) {
+        return "datetime-local".equals(type) || "Date".equals(type)
+                || "time".equals(type) || "datetime".equals(type);
     }
 
     protected String getJSFieldType(String type) {
@@ -745,7 +784,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         }
     }
     
-    protected String appendExtractionExpression(String type, String name, String id, String jsType, boolean isShowTime) {
+    protected String appendExtractionExpression(String type, String name, String id, String jsType, boolean isShowTime, String formFieldType) {
         StringBuilder jsonTemplate = new StringBuilder();
         if (type.equals("radio")) {
             jsonTemplate
@@ -760,10 +799,10 @@ public abstract class AbstractFormRenderer implements FormRenderer {
             jsonTemplate.append("getDocumentData('")
                         .append(id)
                         .append("')");
-        } else if (type.equals("date")) {
+        } else if (type.equals("Date") && !formFieldType.equals("java.util.Date") && !formFieldType.equals("java.time.LocalDate")) {
             jsonTemplate.append("getDateFormated('")
-                        .append(id)
-                        .append("')");
+                    .append(id)
+                    .append("')");
         } else if (type.equals("documentCollection")) {
             jsonTemplate.append("getDocumentCollectionData('")
                         .append(id)
@@ -776,22 +815,25 @@ public abstract class AbstractFormRenderer implements FormRenderer {
             jsonTemplate.append("getMultipleInputData('")
                         .append(id)
                         .append("')");
-        } else if (type.equals("datetime-local")) {
-            if (isShowTime) {
-                jsonTemplate.append("document.getElementById('")
+        } else if (isDate(type)) {
+            if (type.equals("datetime-local") && !isShowTime) {
+                jsonTemplate.append("getDateWithoutTime('")
                         .append(id)
-                        .append("')")
-                        .append(getExtractionValue(jsType));
+                        .append("',")
+                        .append(FUNCTION_MAPPING.get(formFieldType))
+                        .append(") ");
             } else {
-                jsonTemplate.append("getLocalDateWithoutTime('")
+                jsonTemplate.append("getDate('")
                         .append(id)
-                        .append("') ");
+                        .append("',")
+                        .append(FUNCTION_MAPPING.get(formFieldType))
+                        .append(") ");
             }
         } else {
             jsonTemplate.append("document.getElementById('")
-                        .append(id)
-                        .append("')")
-                        .append(getExtractionValue(jsType));
+                    .append(id)
+                    .append("')")
+                    .append(getExtractionValue(jsType));
         }
         
         return jsonTemplate.toString();
@@ -861,8 +903,6 @@ public abstract class AbstractFormRenderer implements FormRenderer {
             return "^\\d+$";
         } else if (type.contains("Double") || type.contains("Float")) {
             return "^\\d+(\\.\\d+)?$";
-        } else if (type.contains("Date")) {
-            return "(\\d+)(-|\\/)(\\d+)(?:-|\\/)(?:(\\d+)\\s+(\\d+):(\\d+)(?::(\\d+))?(?:\\.(\\d+))?)?";
         } else {
             return "";
         }
