@@ -309,7 +309,7 @@ public class FormRendererTest {
         assertThat(renderedForm).isNotNull()
                                 .containsIgnoringCase("value=\"2020-12-01T23:11:00\"")
                                 .containsIgnoringCase("value=\"2020-12-01\"")
-                                .containsIgnoringCase("value=\"2020-12-01T00:00:00.000\"")
+                                .containsIgnoringCase("value=\"2020-12-01\"")
                                 .containsIgnoringCase("value=\"12:01:00\"");
 
         writeToFile("testRenderOfBasicTaskFormWithSelectRadioGroupAndData.html", renderedForm);

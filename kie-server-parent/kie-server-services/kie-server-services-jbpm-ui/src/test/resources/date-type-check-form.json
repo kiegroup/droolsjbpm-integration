@@ -1,0 +1,286 @@
+{
+  "id": "430f9ea2-c461-4c97-b5e5-fe14b0cc629a",
+  "name": "sqlDateForm",
+  "model": {
+    "source": "INTERNAL",
+    "className": "com.asf.date_test.SqlDate",
+    "name": "SqlDate",
+    "properties": [
+      {
+        "name": "utildate",
+        "typeInfo": {
+          "type": "BASE",
+          "className": "java.util.Date",
+          "multiple": false
+        },
+        "metaData": {
+          "entries": []
+        }
+      },
+      {
+        "name": "localdate",
+        "typeInfo": {
+          "type": "BASE",
+          "className": "java.time.LocalDate",
+          "multiple": false
+        },
+        "metaData": {
+          "entries": []
+        }
+      },
+      {
+        "name": "localdatetime",
+        "typeInfo": {
+          "type": "BASE",
+          "className": "java.time.LocalDateTime",
+          "multiple": false
+        },
+        "metaData": {
+          "entries": []
+        }
+      },
+      {
+        "name": "localtime",
+        "typeInfo": {
+          "type": "BASE",
+          "className": "java.time.LocalTime",
+          "multiple": false
+        },
+        "metaData": {
+          "entries": []
+        }
+      },
+      {
+        "name": "offsetdatetime",
+        "typeInfo": {
+          "type": "BASE",
+          "className": "java.time.OffsetDateTime",
+          "multiple": false
+        },
+        "metaData": {
+          "entries": []
+        }
+      }
+    ],
+    "formModelType": "org.kie.workbench.common.forms.data.modeller.model.DataObjectFormModel"
+  },
+  "fields": [
+    {
+      "placeHolder": "utildate",
+      "showTime": true,
+      "id": "field_6682",
+      "name": "a",
+      "label": "utildate",
+      "required": false,
+      "readOnly": false,
+      "validateOnChange": true,
+      "helpMessage": "",
+      "binding": "utildate",
+      "standaloneClassName": "java.util.Date",
+      "code": "DatePicker",
+      "serializedFieldClassName": "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.datePicker.definition.DatePickerFieldDefinition"
+    },
+    {
+      "placeHolder": "localdatetime",
+      "showTime": true,
+      "id": "field_778156",
+      "name": "localdatetime",
+      "label": "C",
+      "required": false,
+      "readOnly": false,
+      "validateOnChange": true,
+      "helpMessage": "",
+      "binding": "localdatetime",
+      "standaloneClassName": "java.time.LocalDateTime",
+      "code": "DatePicker",
+      "serializedFieldClassName": "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.datePicker.definition.DatePickerFieldDefinition"
+    },
+    {
+      "placeHolder": "localdate",
+      "showTime": true,
+      "id": "field_1147",
+      "name": "localdate",
+      "label": "B",
+      "required": false,
+      "readOnly": false,
+      "validateOnChange": true,
+      "helpMessage": "",
+      "binding": "localdate",
+      "standaloneClassName": "java.time.LocalDate",
+      "code": "DatePicker",
+      "serializedFieldClassName": "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.datePicker.definition.DatePickerFieldDefinition"
+    },
+    {
+      "placeHolder": "localtime",
+      "showTime": true,
+      "id": "field_032",
+      "name": "localtime",
+      "label": "D",
+      "required": false,
+      "readOnly": false,
+      "validateOnChange": true,
+      "helpMessage": "",
+      "binding": "localtime",
+      "standaloneClassName": "java.time.LocalTime",
+      "code": "DatePicker",
+      "serializedFieldClassName": "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.datePicker.definition.DatePickerFieldDefinition"
+    },
+    {
+      "placeHolder": "offsetdatetime",
+      "showTime": true,
+      "id": "field_9077",
+      "name": "offsetdatetime",
+      "label": "E",
+      "required": false,
+      "readOnly": false,
+      "validateOnChange": true,
+      "helpMessage": "",
+      "binding": "offsetdatetime",
+      "standaloneClassName": "java.time.OffsetDateTime",
+      "code": "DatePicker",
+      "serializedFieldClassName": "org.kie.workbench.common.forms.fields.shared.fieldTypes.basic.datePicker.definition.DatePickerFieldDefinition"
+    }
+  ],
+  "layoutTemplate": {
+    "version": 3,
+    "style": "FLUID",
+    "layoutProperties": {},
+    "rows": [
+      {
+        "height": "12",
+        "properties": {},
+        "layoutColumns": [
+          {
+            "span": "12",
+            "height": "12",
+            "properties": {},
+            "rows": [],
+            "layoutComponents": [
+              {
+                "dragTypeName": "org.kie.workbench.common.forms.editor.client.editor.rendering.EditorFieldLayoutComponent",
+                "properties": {
+                  "field_id": "field_6682",
+                  "form_id": "430f9ea2-c461-4c97-b5e5-fe14b0cc629a"
+                },
+                "parts": [
+                  {
+                    "partId": "Field Label",
+                    "cssProperties": {}
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "height": "12",
+        "properties": {},
+        "layoutColumns": [
+          {
+            "span": "12",
+            "height": "12",
+            "properties": {},
+            "rows": [],
+            "layoutComponents": [
+              {
+                "dragTypeName": "org.kie.workbench.common.forms.editor.client.editor.rendering.EditorFieldLayoutComponent",
+                "properties": {
+                  "field_id": "field_1147",
+                  "form_id": "430f9ea2-c461-4c97-b5e5-fe14b0cc629a"
+                },
+                "parts": [
+                  {
+                    "partId": "Field Label",
+                    "cssProperties": {}
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "height": "12",
+        "properties": {},
+        "layoutColumns": [
+          {
+            "span": "12",
+            "height": "12",
+            "properties": {},
+            "rows": [],
+            "layoutComponents": [
+              {
+                "dragTypeName": "org.kie.workbench.common.forms.editor.client.editor.rendering.EditorFieldLayoutComponent",
+                "properties": {
+                  "field_id": "field_778156",
+                  "form_id": "430f9ea2-c461-4c97-b5e5-fe14b0cc629a"
+                },
+                "parts": [
+                  {
+                    "partId": "Field Label",
+                    "cssProperties": {}
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "height": "12",
+        "properties": {},
+        "layoutColumns": [
+          {
+            "span": "12",
+            "height": "12",
+            "properties": {},
+            "rows": [],
+            "layoutComponents": [
+              {
+                "dragTypeName": "org.kie.workbench.common.forms.editor.client.editor.rendering.EditorFieldLayoutComponent",
+                "properties": {
+                  "field_id": "field_032",
+                  "form_id": "430f9ea2-c461-4c97-b5e5-fe14b0cc629a"
+                },
+                "parts": [
+                  {
+                    "partId": "Field Label",
+                    "cssProperties": {}
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "height": "12",
+        "properties": {},
+        "layoutColumns": [
+          {
+            "span": "12",
+            "height": "12",
+            "properties": {},
+            "rows": [],
+            "layoutComponents": [
+              {
+                "dragTypeName": "org.kie.workbench.common.forms.editor.client.editor.rendering.EditorFieldLayoutComponent",
+                "properties": {
+                  "field_id": "field_9077",
+                  "form_id": "430f9ea2-c461-4c97-b5e5-fe14b0cc629a"
+                },
+                "parts": [
+                  {
+                    "partId": "Field Label",
+                    "cssProperties": {}
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -556,11 +556,36 @@ function closeCreationForm(fieldId) {
 	currentRow = null;
 }
 
-function getLocalDateWithoutTime(elementId) {
+function getFormattedLocalDateTime(jsondate) {
+	return {'java.time.LocalDateTime': jsondate};
+}
+
+function getFormattedUtilDate(jsondate) {
+	return {'java.util.Date': jsondate};
+}
+
+function getFormattedLocalDate(jsondate) {
+	return {'java.time.LocalDate': jsondate};
+}
+
+function getFormattedLocalTime(jsondate) {
+	return {'java.time.LocalTime': jsondate};
+}
+
+function getFormattedOffsetDateTime(jsondate) {
+	return {'java.time.OffsetDateTime': jsondate};
+}
+
+function getDate(elementId, getDateValueByType) {
+	var value = document.getElementById(elementId).value;
+	return getDateValueByType(value);
+}
+
+function getDateWithoutTime(elementId, getDateValueByType) {
 	var value = document.getElementById(elementId).value;
 	if (value === '') {
-		return value;
+		return getDateValueByType(value);
 	} else {
-		return value + 'T00:00';
+		return getDateValueByType(value + 'T00:00');
 	}
 }
