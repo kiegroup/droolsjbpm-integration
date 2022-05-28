@@ -254,10 +254,16 @@ public class JSONMarshaller implements Marshaller {
         if (classes == null) {
             classes = new HashSet<Class<?>>();
         }
+
         // add byte array handling support to allow byte[] to be send as payload
         classes.add(JaxbByteArray.class);
+
         if (!formatDate) {
             classes.add(Date.class);
+            classes.add(java.time.LocalDateTime.class);
+            classes.add(java.time.LocalTime.class);
+            classes.add(java.time.OffsetDateTime.class);
+            classes.add(java.time.LocalDate.class);
         }
 
         List<NamedType> customClasses = prepareCustomClasses(classes);

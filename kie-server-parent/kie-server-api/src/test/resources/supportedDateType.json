@@ -1,0 +1,40 @@
+{
+  "bbdate": {
+    "java.time.LocalDateTime": "2022-05-19T10:00"
+  },
+  "bdate": {
+    "java.time.LocalDateTime": "2022-05-19T00:00"
+  },
+  "localdate": {
+    "java.time.LocalDate": "2022-05-19"
+  },
+  "localtime": {
+    "java.time.LocalTime": "17:32"
+  },
+  "name": "",
+  "offsetDateTime": {
+    "java.time.OffsetDateTime": "2007-12-03T10:15:30+01:00"
+  },
+  "sqldate": {
+    "org.kie.server.api.marshalling.SupportedlDate": {
+      "utildate": {
+        "java.util.Date": "2022-05-21"
+      },
+      "localDate": {
+        "java.time.LocalDate": "2022-05-19T00:00"
+      },
+      "localDateTime": {
+        "java.time.LocalDateTime": "2022-05-19T10:00"
+      },
+      "localTime": {
+        "java.time.LocalTime": "17:32"
+      },
+      "offsetDateTime": {
+        "java.time.OffsetDateTime": "2007-12-03T10:15:30+01:00"
+      }
+    }
+  },
+  "utildate": {
+    "java.util.Date": "2022-05-21"
+  }
+}

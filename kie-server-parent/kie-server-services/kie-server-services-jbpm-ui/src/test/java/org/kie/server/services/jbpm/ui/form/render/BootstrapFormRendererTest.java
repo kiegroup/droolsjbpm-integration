@@ -34,7 +34,7 @@ public class BootstrapFormRendererTest {
 
         BootstrapFormRenderer bootstrapFormRenderer = new BootstrapFormRenderer();
         String outString = bootstrapFormRenderer.renderProcess("test-containerId", processAssetDesc, form);
-        assertThat(outString).contains("'dateBirth' : String(getLocalDateWithoutTime('field_1703386699666296E12') )");
+        assertThat(outString).contains("'dateBirth' : getDateWithoutTime('field_1703386699666296E12',getFormattedLocalDateTime)");
         assertThat(outString).contains("<input id=\"field_1703386699666296E12\" name=\"dateBirth\" type=\"date\" class=\"form-control\" value=");
     }
 
@@ -49,7 +49,24 @@ public class BootstrapFormRendererTest {
         BootstrapFormRenderer bootstrapFormRenderer = new BootstrapFormRenderer();
         String outString = bootstrapFormRenderer.renderProcess("test-containerId", processAssetDesc, form);
 
-        assertThat(outString).contains("'dateBirth' : String(document.getElementById('field_1703386699666296E12').value)");
+        assertThat(outString).contains("getDate('field_1703386699666296E12',getFormattedLocalDateTime)");
         assertThat(outString).contains("<input id=\"field_1703386699666296E12\" name=\"dateBirth\" type=\"datetime-local\" class=\"form-control\" value=");
+    }
+
+    @Test
+    public void testProcessFormRendererWithSupportedDateType() {
+        FormReader reader = new FormReader();
+
+        FormInstance form = reader.readFromStream(this.getClass().getResourceAsStream("/date-type-check-form.json"));
+        ProcessAssetDesc processAssetDesc = new ProcessAssetDesc();
+        processAssetDesc.setId("test-id");
+
+        BootstrapFormRenderer bootstrapFormRenderer = new BootstrapFormRenderer();
+        String outString = bootstrapFormRenderer.renderProcess("test-containerId", processAssetDesc, form);
+        assertThat(outString).contains("'utildate' : getDate('field_6682',getFormattedUtilDate)");
+        assertThat(outString).contains("'localdate' : getDate('field_1147',getFormattedLocalDate)");
+        assertThat(outString).contains("'localdatetime' : getDate('field_778156',getFormattedLocalDateTime)");
+        assertThat(outString).contains("'localtime' : getDate('field_032',getFormattedLocalTime)");
+        assertThat(outString).contains("'offsetdatetime' : getDate('field_9077',getFormattedOffsetDateTime)");
     }
 }
