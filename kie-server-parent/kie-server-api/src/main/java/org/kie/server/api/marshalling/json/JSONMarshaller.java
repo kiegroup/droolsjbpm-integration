@@ -76,6 +76,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 import com.fasterxml.jackson.databind.jsontype.impl.AsWrapperTypeDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.databind.util.ClassUtil;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
@@ -111,6 +112,9 @@ public class JSONMarshaller implements Marshaller {
     private boolean fallbackClassLoaderEnabled = Boolean.parseBoolean(System.getProperty("org.kie.server.json.fallbackClassLoader.enabled", "false"));
 
     private boolean findDeserializerFirst = Boolean.parseBoolean(System.getProperty("org.kie.server.json.findDeserializerFirst.enabled", "true"));
+
+    private boolean typeFactoryPerMarshaller = Boolean.parseBoolean(System.getProperty("org.kie.server.json.typeFactoryPerMarshaller.enabled", "true"));
+    private TypeFactory typeFactory; // only used when typeFactoryPerMarshaller is true
 
     public enum CNFEBehavior {
         IGNORE,
@@ -225,13 +229,28 @@ public class JSONMarshaller implements Marshaller {
     }
 
     protected void buildMarshaller(Set<Class<?>> classes, final ClassLoader classLoader) {
+        objectMapper = createObjectMapper();
+        deserializeObjectMapper = createObjectMapper();
+    }
 
-        objectMapper = new ObjectMapper();
-        deserializeObjectMapper = new ObjectMapper();
+    private ObjectMapper createObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        if (typeFactoryPerMarshaller) { // if not, typeFactory is shared singleton
+            if (typeFactory == null) {
+                typeFactory = mapper.getTypeFactory().withCache(null); // null means default size cache
+            }
+            mapper.setTypeFactory(typeFactory); // this typeFactory is shared in this JSONMashaller instance
+        }
+        return mapper;
+    }
+
+    // test purpose
+    TypeFactory getTypeFactory() {
+        return typeFactory;
     }
 
     protected void configureMarshaller(Set<Class<?>> classes, final ClassLoader classLoader) {
-        ObjectMapper customSerializationMapper = new ObjectMapper();
+        ObjectMapper customSerializationMapper = createObjectMapper();
         if (classes == null) {
             classes = new HashSet<Class<?>>();
         }
@@ -273,7 +292,7 @@ public class JSONMarshaller implements Marshaller {
         // in case there are custom classes register module to deal with them both for serialization and deserialization
         // this module makes sure that only custom classes are equipped with type information
         if (classes != null && !classes.isEmpty()) {
-            ObjectMapper customObjectMapper = new ObjectMapper();
+            ObjectMapper customObjectMapper = createObjectMapper();
             TypeResolverBuilder<?> typer = new ObjectMapper.DefaultTypeResolverBuilder(ObjectMapper.DefaultTyping.NON_FINAL) {
                 @Override
                 public boolean useForType(JavaType t) {
@@ -442,7 +461,9 @@ public class JSONMarshaller implements Marshaller {
 
     @Override
     public void dispose() {
-
+        if (typeFactoryPerMarshaller) {
+            typeFactory.clearCache();
+        }
     }
 
     @Override
