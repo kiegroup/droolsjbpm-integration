@@ -36,8 +36,6 @@ public class KieServerConstants {
     public static final String KIE_KAFKA_SERVER_EXT_DISABLED = "org.kie.kafka.server.ext.disabled";
     public static final String KIE_PROMETHEUS_SERVER_EXT_DISABLED = "org.kie.prometheus.server.ext.disabled";
     public static final String KIE_SCENARIO_SIMULATION_SERVER_EXT_DISABLED = "org.kie.scenariosimulation.server.ext.disabled";
-    public static final String KIE_TASK_ASSIGNING_PLANNING_EXT_DISABLED = "org.kie.server.taskAssigning.planning.ext.disabled";
-    public static final String KIE_TASK_ASSIGNING_RUNTIME_EXT_DISABLED = "org.kie.server.taskAssigning.runtime.ext.disabled";
     public static final String KIE_JBPM_CLUSTER_SERVER_EXT_DISABLED = "org.kie.jbpm.cluster.server.ext.disabled";
 
     public static final String KIE_DROOLS_FILTER_REMOTEABLE_CLASSES = "org.drools.server.filter.classes";

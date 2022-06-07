@@ -229,32 +229,6 @@
       <artifactId>kie-server-controller-websocket-common</artifactId>
     </dependency>
 
-    <!-- KIE Server OptaPlanner & jBPM task assigning -->
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services-task-assigning-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services-task-assigning-planning</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services-task-assigning-runtime</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services-task-assigning-user-system-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services-task-assigning-user-system-simple</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-rest-task-assigning-runtime</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-services-ejb-timer</artifactId>
