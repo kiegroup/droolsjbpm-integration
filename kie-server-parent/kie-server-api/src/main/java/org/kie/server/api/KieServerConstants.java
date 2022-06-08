@@ -145,7 +145,6 @@ public class KieServerConstants {
     public static final String CAPABILITY_BPM_KAFKA = "BPM-KAFKA"; // Business Process Management Kafka
     public static final String CAPABILITY_PROMETHEUS = "Prometheus"; // Prometheus
     public static final String CAPABILITY_SCENARIO_SIMULATION = "Scenario Simulation"; // Scenario Simulation
-    public static final String CAPABILITY_TASK_ASSIGNING_RUNTIME = "TaskAssigningRuntime"; //Task Assigning Runtime
     public static final String CAPABILITY_JBPM_CLUSTER = "BPM-Cluster"; // Business Process Management cluster support
     
     public static final String FAILURE_REASON_PROP = "failure-reason";

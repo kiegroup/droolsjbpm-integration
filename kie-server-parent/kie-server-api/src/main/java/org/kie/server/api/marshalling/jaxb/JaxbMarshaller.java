@@ -194,13 +194,6 @@ import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.VariableInstanceList;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.model.instance.WorkItemInstanceList;
-import org.kie.server.api.model.taskassigning.OrganizationalEntity;
-import org.kie.server.api.model.taskassigning.PlanningExecutionResult;
-import org.kie.server.api.model.taskassigning.PlanningItem;
-import org.kie.server.api.model.taskassigning.PlanningItemList;
-import org.kie.server.api.model.taskassigning.PlanningTask;
-import org.kie.server.api.model.taskassigning.TaskData;
-import org.kie.server.api.model.taskassigning.TaskDataList;
 import org.kie.server.api.model.type.JaxbByteArray;
 import org.kie.server.api.model.type.JaxbDate;
 import org.kie.server.api.model.type.JaxbList;
@@ -413,14 +406,6 @@ public class JaxbMarshaller implements Marshaller {
                                                  StringFieldOutput.class,
                                                  ScoreCard.class,
 
-                                                 //TaskAssigning
-                                                 PlanningExecutionResult.class,
-                                                 OrganizationalEntity.class,
-                                                 PlanningItem.class,
-                                                 PlanningItemList.class,
-                                                 PlanningTask.class,
-                                                 TaskDataList.class,
-                                                 TaskData.class,
                                                  SearchQueryFilterSpec.class,
                                                  ProcessInstanceUserTaskWithVariablesList.class,
                                                  CaseUserTaskWithVariablesList.class,
