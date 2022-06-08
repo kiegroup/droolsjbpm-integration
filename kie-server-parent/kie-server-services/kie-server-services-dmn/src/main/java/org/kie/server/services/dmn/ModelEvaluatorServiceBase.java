@@ -209,7 +209,6 @@ public class ModelEvaluatorServiceBase {
                     "OK from container '" + containerId + "'",
                     res );
         } catch ( Exception e ) {
-            e.printStackTrace();
             LOG.error( "Error from container '" + containerId + "'", e );
             return new ServiceResponse<DMNResultKS>(
                     ServiceResponse.ResponseType.FAILURE,
