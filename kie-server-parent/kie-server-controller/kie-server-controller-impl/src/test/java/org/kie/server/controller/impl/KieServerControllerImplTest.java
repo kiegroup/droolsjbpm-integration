@@ -81,7 +81,7 @@ public class KieServerControllerImplTest {
         assertFalse(kieServerSetup.hasNoErrors());
         assertEquals(1, kieServerSetup.getMessages().size());
         assertEquals(Severity.ERROR, kieServerSetup.getMessages().iterator().next().getSeverity());
-        assertEquals("Expected capabilities were [RULE, PROCESS, PLANNING]", kieServerSetup.getMessages().iterator().next().getMessages().iterator().next());
+        assertEquals("Expected capabilities were [RULE, PROCESS]", kieServerSetup.getMessages().iterator().next().getMessages().iterator().next());
 
         assertFalse(controller.getTemplateStorage().load(DEFAULT_KIE_SERVER_ID).hasServerInstance(DEFAULT_KIE_SERVER_LOCATION));
     }

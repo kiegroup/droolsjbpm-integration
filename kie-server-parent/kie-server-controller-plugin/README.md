@@ -140,7 +140,7 @@ In the former example we can see that:
 
 Use this goal to define a new server template. Parameter __templateId__ is mandatory.
 If not specified template name will be the same value of template id.
-By default template capabilities are all possible capabilities: "RULE", "PROCESS", "PLANNING".
+By default template capabilities are all possible capabilities: "RULE", "PROCESS".
 You can also define a list of templates you want to create at the same time.
 Goal does not require project.
 
@@ -148,7 +148,7 @@ Goal does not require project.
 | ------------------ |:-----------------------------:|:---------:|:----------------------------:|:---------------:|
 | templateId         | null                          | true      | kie-ctrl.template-id         | String          |
 | templateName       | ${templateId}                 | false     | kie-ctrl.template-name       | String          |
-| capabilities       | "RULE", "PROCESS", "PLANNING" | false     | kie-ctrl.capabilities        | List<String>    |
+| capabilities       | "RULE", "PROCESS"             | false     | kie-ctrl.capabilities        | List<String>    |
 | containers         | null                          | false     | kie-ctrl.containers          | List<Container> |
 
 Container nested properties are:

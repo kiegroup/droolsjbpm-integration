@@ -123,21 +123,6 @@ public class KieClientServicesIntegrationTest extends BaseKieComponentTest {
     }
 
     @Test
-    public void testSolverServiceCamelProducer() throws Exception {
-        MockEndpoint mockEndpoint = getMockEndpoint("mock:result");
-        mockEndpoint.expectedMessageCount(1);
-
-        Map<String, Object> headers = new HashMap<>();
-        headers.put(KIE_CLIENT, "solver");
-        headers.put(KIE_OPERATION, "getSolvers");
-        headers.put(asCamelKieName("containerId"), "my-container");
-        template.sendBodyAndHeaders("direct:start", null, headers);
-        assertMockEndpointsSatisfied();
-        List<NodeInstance> nodeInstanceList = getResultMessage(mockEndpoint.getExchanges().get(0)).getBody(List.class);
-        assertCollectionSize(nodeInstanceList, 0);
-    }
-
-    @Test
     public void testUiServiceCamelProducer() throws Exception {
         MockEndpoint mockEndpoint = getMockEndpoint("mock:result");
         mockEndpoint.expectedMessageCount(1);

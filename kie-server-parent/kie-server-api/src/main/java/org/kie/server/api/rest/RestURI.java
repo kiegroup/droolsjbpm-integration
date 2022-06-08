@@ -41,7 +41,6 @@ public class RestURI {
     public static final String JOB_CMD_NAME = "cmd";
     public static final String JOB_KEY = "key";
     public static final String QUERY_NAME = "queryName";
-    public static final String SOLVER_ID = "solverId";
     public static final String MODEL_ID = "modelId";
     public static final String DECISIONSERVICE_ID = "decisionServiceId";
     public static final String OPENAPI = "openapi";

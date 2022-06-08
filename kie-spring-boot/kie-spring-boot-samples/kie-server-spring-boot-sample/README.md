@@ -3,7 +3,7 @@ KIE Server with all capabilities
 
 KIE Server SpringBoot sample application that uses Spring Security for securing access to KIE Server resources.
 This is a complete (fully featured KIE Server - includes all capabilities) KIE Server that can be used to leverage 
-business process management, rules management and planning solutions in single runtime.
+business process management and rules management solutions in single runtime.
 
 How to configure it
 ------------------------------
