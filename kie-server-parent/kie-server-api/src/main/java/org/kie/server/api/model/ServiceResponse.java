@@ -93,8 +93,6 @@ import org.kie.server.api.model.instance.ProcessInstanceCustomVarsList;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.RequestInfoInstanceList;
-import org.kie.server.api.model.instance.SolverInstance;
-import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.api.model.instance.TaskEventInstance;
 import org.kie.server.api.model.instance.TaskEventInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
@@ -196,10 +194,6 @@ public class ServiceResponse<T> implements KieServiceResponse<T> {
             @XmlElement(name = "document-instance", type = DocumentInstance.class),
             @XmlElement(name = "document-instance-list", type = DocumentInstanceList.class),
             @XmlElement(name =  "count-definition", type = CountDefinition.class),
-            
-            // optaplanner entities
-            @XmlElement(name = "solver-instance", type = SolverInstance.class),
-            @XmlElement(name = "solver-instance-list", type = SolverInstanceList.class),
 
             @XmlElement(name = "execution-results", type = ExecutionResultImpl.class),
 

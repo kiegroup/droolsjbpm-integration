@@ -71,16 +71,6 @@ import org.kie.server.api.commands.GetServerStateCommand;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
-import org.kie.server.api.commands.optaplanner.AddProblemFactChangeCommand;
-import org.kie.server.api.commands.optaplanner.AddProblemFactChangesCommand;
-import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
-import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
-import org.kie.server.api.commands.optaplanner.GetSolverCommand;
-import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
-import org.kie.server.api.commands.optaplanner.GetSolversCommand;
-import org.kie.server.api.commands.optaplanner.IsEveryProblemFactChangeProcessedCommand;
-import org.kie.server.api.commands.optaplanner.SolvePlanningProblemCommand;
-import org.kie.server.api.commands.optaplanner.TerminateSolverEarlyCommand;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -175,9 +165,6 @@ import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.ProcessInstanceUserTaskWithVariablesList;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.RequestInfoInstanceList;
-import org.kie.server.api.model.instance.ScoreWrapper;
-import org.kie.server.api.model.instance.SolverInstance;
-import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskAttachmentList;
 import org.kie.server.api.model.instance.TaskComment;
@@ -329,23 +316,7 @@ public class JaxbMarshaller implements Marshaller {
 
                                                  ArrayList.class,
 
-                                                 // OptaPlanner
-                                                 SolverInstance.class,
-                                                 SolverInstanceList.class,
                                                  Message.class,
-                                                 ScoreWrapper.class,
-
-                                                 // Optaplanner commands
-                                                 CreateSolverCommand.class,
-                                                 DisposeSolverCommand.class,
-                                                 GetSolverWithBestSolutionCommand.class,
-                                                 GetSolversCommand.class,
-                                                 GetSolverCommand.class,
-                                                 SolvePlanningProblemCommand.class,
-                                                 TerminateSolverEarlyCommand.class,
-                                                 AddProblemFactChangeCommand.class,
-                                                 AddProblemFactChangesCommand.class,
-                                                 IsEveryProblemFactChangeProcessedCommand.class,
 
                                                  // admin section
                                                  MigrationReportInstance.class,

@@ -26,7 +26,6 @@ import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.DMNServicesClient;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.client.SolverServicesClient;
 import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
 
 public abstract class DMNKieServerBaseIntegrationTest

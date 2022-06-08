@@ -46,7 +46,6 @@ import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.RuleServicesClient;
-import org.kie.server.client.SolverServicesClient;
 import org.kie.server.client.UIServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 import org.slf4j.Logger;
@@ -320,13 +319,6 @@ public class KieProducer extends DefaultProducer {
 
         public QueryProducer(KieServicesClient client, String clientName, KieEndpoint endpoint) {
             super(client.getServicesClient(QueryServicesClient.class), clientName, endpoint);
-        }
-    }
-
-    static class SolverProducer extends AbstractReflectiveProducer<SolverServicesClient> {
-
-        public SolverProducer(KieServicesClient client, String clientName, KieEndpoint endpoint) {
-            super(client.getServicesClient(SolverServicesClient.class), clientName, endpoint);
         }
     }
 

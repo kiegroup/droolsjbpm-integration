@@ -1,1 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.kie.server.springboot.autoconfiguration.optaplanner.OptaPlannerKieServerAutoConfiguration

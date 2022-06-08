@@ -41,16 +41,6 @@ import org.kie.server.api.commands.GetServerInfoCommand;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
-import org.kie.server.api.commands.optaplanner.AddProblemFactChangeCommand;
-import org.kie.server.api.commands.optaplanner.AddProblemFactChangesCommand;
-import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
-import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
-import org.kie.server.api.commands.optaplanner.GetSolverCommand;
-import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
-import org.kie.server.api.commands.optaplanner.GetSolversCommand;
-import org.kie.server.api.commands.optaplanner.IsEveryProblemFactChangeProcessedCommand;
-import org.kie.server.api.commands.optaplanner.SolvePlanningProblemCommand;
-import org.kie.server.api.commands.optaplanner.TerminateSolverEarlyCommand;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
@@ -74,8 +64,6 @@ import org.kie.server.api.model.dmn.DMNModelInfo;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
 import org.kie.server.api.model.dmn.DMNNodeStub;
 import org.kie.server.api.model.dmn.DMNResultKS;
-import org.kie.server.api.model.instance.SolverInstance;
-import org.optaplanner.persistence.xstream.api.score.AbstractScoreXStreamConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -185,8 +173,6 @@ public class XStreamMarshaller implements Marshaller {
         String[] classWildcards = {"org.kie.api.pmml.*", "org.kie.pmml.pmml_4_2.model.*"};
         this.xstream.allowTypesByWildcard(classWildcards);
 
-        AbstractScoreXStreamConverter.registerScoreConverters(xstream);
-
         this.xstream.processAnnotations(CommandScript.class);
         this.xstream.processAnnotations(CallContainerCommand.class);
         this.xstream.processAnnotations(CreateContainerCommand.class);
@@ -210,18 +196,6 @@ public class XStreamMarshaller implements Marshaller {
         this.xstream.processAnnotations(ReleaseIdFilter.class);
         this.xstream.processAnnotations(KieContainerStatusFilter.class);
         this.xstream.processAnnotations(KieContainerResourceFilter.class);
-
-        this.xstream.processAnnotations(SolverInstance.class);
-        this.xstream.processAnnotations(CreateSolverCommand.class);
-        this.xstream.processAnnotations(DisposeSolverCommand.class);
-        this.xstream.processAnnotations(GetSolverWithBestSolutionCommand.class);
-        this.xstream.processAnnotations(GetSolversCommand.class);
-        this.xstream.processAnnotations(GetSolverCommand.class);
-        this.xstream.processAnnotations(SolvePlanningProblemCommand.class);
-        this.xstream.processAnnotations(TerminateSolverEarlyCommand.class);
-        this.xstream.processAnnotations(AddProblemFactChangeCommand.class);
-        this.xstream.processAnnotations(AddProblemFactChangesCommand.class);
-        this.xstream.processAnnotations(IsEveryProblemFactChangeProcessedCommand.class);
 
         this.xstream.processAnnotations(DMNContextKS.class);
         this.xstream.processAnnotations(DMNResultKS.class);

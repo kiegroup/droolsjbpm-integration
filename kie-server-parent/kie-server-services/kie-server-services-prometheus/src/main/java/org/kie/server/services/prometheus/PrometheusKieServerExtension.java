@@ -49,7 +49,6 @@ import org.kie.server.services.casemgmt.CaseKieServerExtension;
 import org.kie.server.services.casemgmt.CaseManagementRuntimeDataServiceBase;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.jbpm.JbpmKieServerExtension;
-import org.optaplanner.core.impl.phase.event.PhaseLifecycleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -161,10 +160,6 @@ public class PrometheusKieServerExtension implements KieServerExtension {
 
     public List<AgendaEventListener> getDroolsListeners(String kieSessionId, KieContainerInstance kieContainer) {
         return customMetrics.getAgendaEventListener(kieSessionId, kieContainer);
-    }
-
-    public List<PhaseLifecycleListener> getOptaPlannerListeners(String solverId) {
-        return customMetrics.getPhaseLifecycleListener(solverId);
     }
 
     protected void registerDefaultDescriptor() {

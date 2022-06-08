@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<solver>
-  <!-- minimal solver configuration file for checking a successful parsing and getting a SolverConfig with an empty
-       scanAnnotatedClasses configuration part set -->
-  <scanAnnotatedClasses>
-  </scanAnnotatedClasses>
-</solver>

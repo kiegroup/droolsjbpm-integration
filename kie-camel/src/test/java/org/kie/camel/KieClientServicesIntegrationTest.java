@@ -41,7 +41,6 @@ import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.RequestInfoInstanceList;
-import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.TaskSummaryList;
 
@@ -177,7 +176,7 @@ public class KieClientServicesIntegrationTest extends BaseKieComponentTest {
 
         KieServerInfo info = new KieServerInfo("mock", "1.2.3");
         List<String> capabilities = Arrays.asList(KieServerConstants.CAPABILITY_BPM, KieServerConstants.CAPABILITY_BPM_UI,
-                                                  KieServerConstants.CAPABILITY_BRM, KieServerConstants.CAPABILITY_BRP,
+                                                  KieServerConstants.CAPABILITY_BRM,
                                                   KieServerConstants.CAPABILITY_CASE, KieServerConstants.CAPABILITY_DMN);
         info.setCapabilities(capabilities);
         ServiceResponse<KieServerInfo> response = new ServiceResponse<KieServerInfo>(ResponseType.SUCCESS, "Kie Server info");
@@ -226,14 +225,6 @@ public class KieClientServicesIntegrationTest extends BaseKieComponentTest {
                                                                                                              .withHeader("Content-Type", "application/xml")
                                                                                                              .withBody(toXML(queryResponse,
                                                                                                                              NodeInstanceList.class))));
-        // solver service mock response
-        SolverInstanceList solverResponse = new SolverInstanceList();
-        stubFor(get(urlMatching("/containers/my-container/solvers"))
-                                                                    .willReturn(aResponse()
-                                                                                           .withStatus(200)
-                                                                                           .withHeader("Content-Type", "application/xml")
-                                                                                           .withBody(toXML(solverResponse,
-                                                                                                           SolverInstanceList.class))));
 
         // ui service mock response
         stubFor(get(urlMatching("/containers/my-container/forms/processes/my-process.*"))

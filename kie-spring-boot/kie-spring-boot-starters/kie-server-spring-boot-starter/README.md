@@ -23,7 +23,6 @@ In case you don't need to have all capabilities consider using other starters th
 
 - Rules and Decisions KIE Server (Drools, DMN) - kie-server-spring-boot-starter-drools
 - Rules and Decisions, Process and Cases KIE Server (Drools, DMN, jBPM, Case mgmt) - kie-server-spring-boot-starter-jbpm
-- Planning KIE Server (Optaplanner) - kie-server-spring-boot-starter-optaplanner
 
 How to configure it
 ------------------------------
@@ -84,7 +83,6 @@ kieserver.dmn.enabled=true
 kieserver.jbpm.enabled=true
 kieserver.jbpmui.enabled=true
 kieserver.casemgmt.enabled=true
-kieserver.optaplanner.enabled=true
 kieserver.prometheus.enabled=true
 kieserver.scenariosimulation.enabled=true
 ```
