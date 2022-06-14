@@ -39,7 +39,7 @@ function startProcess(button) {
 		
 		$.ajax({
 		    method: 'POST',
-		    url: getProcessEndpoint() + '?' + endpointSuffix(),
+			url: getProcessEndpoint() + '?' + endpointSuffix() + "&correlationKey=" + getParentCorrelationKey(),
 		    data: JSON.stringify(getData())
 		}).done(function( msg ) {
 			console.log('Process started with data ' + JSON.stringify(getData()) +  ' process instance id ' + msg );
@@ -57,6 +57,16 @@ function startProcess(button) {
 			showFailure('Something went wrong ' + error + ' ( ' + xhr.responseText + ')');
 			button.disabled = false;
 		});
+	}
+}
+
+function getParentCorrelationKey() {
+	if(typeof getCorrelationKey === "function") {
+		return getCorrelationKey();
+	}
+
+	if(typeof parent.getCorrelationKey === "function") {
+		return parent.getCorrelationKey();
 	}
 }
 
