@@ -25,11 +25,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.junit.Test;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.objects.DateObject;
 import org.kie.server.api.model.definition.QueryParam;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
@@ -112,4 +114,21 @@ public class JAXBMarshallerTest {
         }
     }
 
+    @Test
+    public void testXMLExternalEntity() {
+        String payload = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                         "<!DOCTYPE foo\n" +
+                         "[<!ENTITY xxe SYSTEM \"file:///etc/hostname\">]>\n" +
+                         "<batch-execution lookup=\"myStatelessKsession\">\n" +
+                         "    <insert out-identifier=\"fact-str\" return-object=\"true\" entry-point=\"DEFAULT\" disconnected=\"false\">\n" +
+                         "        <object xsi:type=\"xs:string\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">&xxe;</object>\n" +
+                         "    </insert>\n" +
+                         "</batch-execution>";
+
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<>(), MarshallingFormat.JAXB, getClass().getClassLoader());
+        assertThatThrownBy(() -> {
+            marshaller.unmarshall(payload, BatchExecutionCommandImpl.class);
+        }).isInstanceOf(MarshallingException.class)
+          .hasStackTraceContaining("DOCTYPE is disallowed");
+    }
 }
