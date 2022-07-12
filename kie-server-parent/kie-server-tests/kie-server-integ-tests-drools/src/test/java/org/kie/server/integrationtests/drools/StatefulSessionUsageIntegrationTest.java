@@ -424,4 +424,25 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
         assertEquals("Expected surname to be set to 'Lord Vader'",
                      PERSON_EXPECTED_SURNAME_AFTER_UPDATE, KieServerReflections.valueOf(returnedPerson, PERSON_SURNAME_FIELD));
     }
+
+    @Test
+    public void testInsertDisposeDelete() {
+        // DROOLS-7056
+        // Insert
+        Object person = createInstance(PERSON_CLASS_NAME, PERSON_NAME, "");
+        Command<?> insertCommand = commandsFactory.newInsert(person, PERSON_1_OUT_IDENTIFIER);
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, insertCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+        FactHandle factHandle = (FactHandle) reply.getResult().getFactHandle(PERSON_1_OUT_IDENTIFIER);
+
+        // Dispose
+        Command<?> disposeCommand = commandsFactory.newDispose();
+        reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, disposeCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
+        // Delete : It means creating a new ksession and deleting a non-existing factHandle
+        Command<?> deleteCommand = commandsFactory.newDelete(factHandle);
+        reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, deleteCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType()); // No error
+    }
 }
