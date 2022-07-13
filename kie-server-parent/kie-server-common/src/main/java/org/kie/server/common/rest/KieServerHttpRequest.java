@@ -869,27 +869,27 @@ public class KieServerHttpRequest {
                         return false;
                     }
                 });
-            }
-            if (getRequestInfo().clientCertificate != null) {
-                ClientCertificate clientCertificate = getRequestInfo().clientCertificate;
-                try {
-                    final KeyStore identityKeyStore = KeyStore.getInstance(IDENTITY_KEYSTORE_TYPE);
-                    identityKeyStore.load(new FileInputStream(clientCertificate.getKeystore()),
-                            clientCertificate.getKeystorePassword().toCharArray());
-                    SSLContextBuilder contextBuilder = SSLContexts.custom()
-                            .loadKeyMaterial(identityKeyStore,
-                                    clientCertificate.getCertPassword().toCharArray(),
-                                    (map, socket) -> clientCertificate.getCertName());
-                    if (clientCertificate.getTruststore() != null) {
-                        final KeyStore trustStore = KeyStore.getInstance(IDENTITY_KEYSTORE_TYPE);
-                        trustStore.load(new FileInputStream(clientCertificate.getTruststore()),
-                                clientCertificate.getTruststorePassword().toCharArray());
-                        contextBuilder.loadTrustMaterial(trustStore, null);
+                if (getRequestInfo().clientCertificate != null) {
+                    ClientCertificate clientCertificate = getRequestInfo().clientCertificate;
+                    try {
+                        final KeyStore identityKeyStore = KeyStore.getInstance(IDENTITY_KEYSTORE_TYPE);
+                        identityKeyStore.load(new FileInputStream(clientCertificate.getKeystore()),
+                                clientCertificate.getKeystorePassword().toCharArray());
+                        SSLContextBuilder contextBuilder = SSLContexts.custom()
+                                .loadKeyMaterial(identityKeyStore,
+                                        clientCertificate.getCertPassword().toCharArray(),
+                                        (map, socket) -> clientCertificate.getCertName());
+                        if (clientCertificate.getTruststore() != null) {
+                            final KeyStore trustStore = KeyStore.getInstance(IDENTITY_KEYSTORE_TYPE);
+                            trustStore.load(new FileInputStream(clientCertificate.getTruststore()),
+                                    clientCertificate.getTruststorePassword().toCharArray());
+                            contextBuilder.loadTrustMaterial(trustStore, null);
+                        }
+                        SSLSocketFactory socketFactory = contextBuilder.build().getSocketFactory();
+                        ((HttpsURLConnection) connection).setSSLSocketFactory(socketFactory);
+                    } catch (GeneralSecurityException | IOException e) {
+                        throw new RuntimeException("Unable to create SSLSocketFactory", e);
                     }
-                    SSLSocketFactory socketFactory = contextBuilder.build().getSocketFactory();
-                    ((HttpsURLConnection) connection).setSSLSocketFactory(socketFactory);
-                } catch (GeneralSecurityException | IOException e) {
-                    throw new RuntimeException("Unable to create SSLSocketFactory", e);
                 }
             }
 
