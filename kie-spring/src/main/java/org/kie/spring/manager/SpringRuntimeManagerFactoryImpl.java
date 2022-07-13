@@ -27,22 +27,30 @@ import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.task.UserGroupCallback;
 import org.kie.internal.task.api.UserInfo;
 import org.kie.spring.persistence.KieSpringTransactionManagerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 
 public class SpringRuntimeManagerFactoryImpl extends RuntimeManagerFactoryImpl {
-	
-	private AbstractPlatformTransactionManager transactionManager;
-	
-	private UserGroupCallback userGroupCallback;
 
+    private AbstractPlatformTransactionManager transactionManager;
+    private UserGroupCallback userGroupCallback;
     private EntityManager entityManager;
-
     private UserInfo userInfo;
-
     private boolean pessimisticLocking = false;
-
     private GlobalSchedulerService schedulerService;
+    private static final String TX_FACTORY_CLASS = "org.kie.txm.factory.class";
+    private static final String SPRING_TX_FACTORY_CLASS = "org.kie.spring.persistence.KieSpringTransactionManagerFactory";
+    private ApplicationContext applicationContext;
 
+    public SpringRuntimeManagerFactoryImpl(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+        System.setProperty(TX_FACTORY_CLASS, SPRING_TX_FACTORY_CLASS);
+        TransactionManagerFactory.resetInstance();
+        TransactionManagerFactory transactionManagerFactory = TransactionManagerFactory.get();
+        if (transactionManagerFactory instanceof KieSpringTransactionManagerFactory) {
+            ((KieSpringTransactionManagerFactory) transactionManagerFactory).setGlobalTransactionManager(applicationContext.getBean(AbstractPlatformTransactionManager.class));
+        }
+    }
 
 	@Override
 	public RuntimeManager newSingletonRuntimeManager(RuntimeEnvironment environment, String identifier) {
