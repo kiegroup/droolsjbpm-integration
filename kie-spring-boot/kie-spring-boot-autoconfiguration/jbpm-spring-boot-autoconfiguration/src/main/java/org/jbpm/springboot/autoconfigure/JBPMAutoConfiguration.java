@@ -231,7 +231,7 @@ public class JBPMAutoConfiguration {
     @ConditionalOnMissingBean(name = "runtimeManagerFactory")
     public RuntimeManagerFactory runtimeManagerFactory(UserGroupCallback userGroupCallback, UserInfo userInfo) {
 
-        SpringRuntimeManagerFactoryImpl runtimeManager = new SpringRuntimeManagerFactoryImpl();
+        SpringRuntimeManagerFactoryImpl runtimeManager = new SpringRuntimeManagerFactoryImpl(this.applicationContext);
         runtimeManager.setTransactionManager((AbstractPlatformTransactionManager) transactionManager);
         runtimeManager.setUserGroupCallback(userGroupCallback);
         runtimeManager.setUserInfo(userInfo);
