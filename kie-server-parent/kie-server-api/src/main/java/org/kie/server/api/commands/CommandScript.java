@@ -29,16 +29,6 @@ import javax.xml.bind.annotation.XmlType;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.kie.server.api.commands.optaplanner.AddProblemFactChangeCommand;
-import org.kie.server.api.commands.optaplanner.AddProblemFactChangesCommand;
-import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
-import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
-import org.kie.server.api.commands.optaplanner.GetSolverCommand;
-import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
-import org.kie.server.api.commands.optaplanner.GetSolversCommand;
-import org.kie.server.api.commands.optaplanner.IsEveryProblemFactChangeProcessedCommand;
-import org.kie.server.api.commands.optaplanner.SolvePlanningProblemCommand;
-import org.kie.server.api.commands.optaplanner.TerminateSolverEarlyCommand;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerConfigItem;
@@ -70,18 +60,6 @@ public class CommandScript implements Serializable {
             // TODO can this be added somewhere else? if not here JAXRS cannot deserialize content
             @XmlElement(name = "kie-server-config", type = KieServerConfig.class),
             @XmlElement(name = "kie-server-config-item", type = KieServerConfigItem.class),
-
-            // optaplanner commands
-            @XmlElement(name = "create-solver", type = CreateSolverCommand.class),
-            @XmlElement(name = "dispose-solver", type = DisposeSolverCommand.class),
-            @XmlElement(name = "get-solver-with-best-solution", type = GetSolverWithBestSolutionCommand.class),
-            @XmlElement(name = "get-solvers", type = GetSolversCommand.class),
-            @XmlElement(name = "get-solver", type = GetSolverCommand.class),
-            @XmlElement(name = "start-solver", type = SolvePlanningProblemCommand.class),
-            @XmlElement(name = "terminate-solver", type = TerminateSolverEarlyCommand.class),
-            @XmlElement(name = "add-problem-fact-change", type = AddProblemFactChangeCommand.class),
-            @XmlElement(name = "add-problem-fact-changes", type = AddProblemFactChangesCommand.class),
-            @XmlElement(name = "is-every-problem-fact-change-processed", type = IsEveryProblemFactChangeProcessedCommand.class)
     })
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
     protected List<KieServerCommand> commands;

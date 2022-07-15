@@ -41,7 +41,6 @@ public class RestURI {
     public static final String JOB_CMD_NAME = "cmd";
     public static final String JOB_KEY = "key";
     public static final String QUERY_NAME = "queryName";
-    public static final String SOLVER_ID = "solverId";
     public static final String MODEL_ID = "modelId";
     public static final String DECISIONSERVICE_ID = "decisionServiceId";
     public static final String OPENAPI = "openapi";
@@ -231,15 +230,6 @@ public class RestURI {
     public static final String RUN_QUERY_DEF_GET_URI = "{" + QUERY_NAME + "}/data";
     public static final String RUN_FILTERED_QUERY_DEF_POST_URI = "{" + QUERY_NAME + "}/filtered-data";
     public static final String RUN_FILTERED_QUERY_DEF_BY_CONTAINER_POST_URI = "containers/{" + CONTAINER_ID + "}/query/{" + QUERY_NAME + "}/filtered-data";
-
-    // optaplanner URI
-    public static final String SOLVER_URI = "containers/{" + CONTAINER_ID + "}/solvers";
-    public static final String SOLVER_ID_URI = "{" + SOLVER_ID + "}";
-    public static final String SOLVER_BEST_SOLUTION = "bestsolution";
-    public static final String SOLVER_PROBLEM_FACT_CHANGES = "problemfactchanges";
-    public static final String SOLVER_PROBLEM_FACTS_CHANGES_PROCESSED = SOLVER_PROBLEM_FACT_CHANGES + "/processed";
-    public static final String SOLVER_STATE_RUNNING = "state/solving";
-    public static final String SOLVER_STATE_TERMINATING = "state/terminating-early";
 
     // DMN URI
     public static final String DMN_URI = "containers/{" + CONTAINER_ID + "}/dmn";

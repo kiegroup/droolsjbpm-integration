@@ -46,7 +46,6 @@ import org.slf4j.LoggerFactory;
 import static org.kie.server.api.KieServerConstants.CAPABILITY_BPM;
 import static org.kie.server.api.KieServerConstants.KIE_DROOLS_SERVER_EXT_DISABLED;
 import static org.kie.server.api.KieServerConstants.KIE_JBPM_SERVER_EXT_DISABLED;
-import static org.kie.server.api.KieServerConstants.KIE_OPTAPLANNER_SERVER_EXT_DISABLED;
 import static org.kie.server.api.KieServerConstants.KIE_SERVER_ID;
 import static org.kie.server.api.KieServerConstants.KIE_SERVER_LOCATION;
 import static org.kie.server.api.KieServerConstants.KIE_SERVER_MODE;
@@ -130,9 +129,6 @@ public class ServerTemplateConverter {
         if (kcfg.getConfigItem(KIE_DROOLS_SERVER_EXT_DISABLED) != null) {
             capabilities.remove(Capability.RULE.name());
         }
-        if (kcfg.getConfigItem(KIE_OPTAPLANNER_SERVER_EXT_DISABLED) != null) {
-            capabilities.remove(Capability.PLANNING.name());
-        }
 
         template.setCapabilities(capabilities);
         //https://issues.jboss.org/projects/RHPAM/issues/RHPAM-1975
@@ -170,12 +166,6 @@ public class ServerTemplateConverter {
                     if (!capabilities.contains(cap.name()))
                         config.addConfigItem(
                                              new KieServerConfigItem(KIE_DROOLS_SERVER_EXT_DISABLED,
-                                                                     "true", String.class.getName()));
-                    break;
-                case PLANNING:
-                    if (!capabilities.contains(cap.name()))
-                        config.addConfigItem(
-                                             new KieServerConfigItem(KIE_OPTAPLANNER_SERVER_EXT_DISABLED,
                                                                      "true", String.class.getName()));
                     break;
 

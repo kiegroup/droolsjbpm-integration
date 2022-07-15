@@ -61,18 +61,6 @@
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.optaplanner</groupId>
-      <artifactId>optaplanner-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.optaplanner</groupId>
-      <artifactId>optaplanner-persistence-xstream</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.optaplanner</groupId>
-      <artifactId>optaplanner-persistence-jaxb</artifactId>
-    </dependency>
 
     <!-- Needed only for the DMNResult, DMNContext, etc and FEELEvent so should be possible later to migrate to kie-dmn-API -->
     <dependency>
