@@ -297,10 +297,6 @@ public class ServerTemplateConverterTest {
                 fail("Server Template can not specify disabled capability: [" + Capability.RULE + "].");
             }
 
-            if (kcfg.getConfigItem(KieServerConstants.KIE_OPTAPLANNER_SERVER_EXT_DISABLED) != null && template.getCapabilities().contains(Capability.PLANNING.name())) {
-                fail("Server Template can not specify disabled capability: [" + Capability.PLANNING + "].");
-            }
-
         } catch (Exception e) {
             e.printStackTrace();
             fail();

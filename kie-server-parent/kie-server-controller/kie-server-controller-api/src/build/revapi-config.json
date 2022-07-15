@@ -17,7 +17,17 @@
   "ignores": {
     "revapi": {
       "_comment": "Changes between 7.59.0.Final and the current branch. These changes are desired and thus ignored.",
-      "ignore": []
+      "ignore": [
+        {
+          "code": "java.field.removed",
+          "old": "field org.kie.server.controller.api.model.spec.Capability.PLANNING",
+          "package": "org.kie.server.controller.api.model.spec",
+          "classSimpleName": "Capability",
+          "fieldName": "PLANNING",
+          "elementKind": "enumConstant",
+          "justification": "OptaPlanner extension removed."
+        }
+      ]
     }
   }
 }

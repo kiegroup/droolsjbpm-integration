@@ -54,7 +54,6 @@ public class JaxbXMLResponseAggregator extends XMLResponseAggregator {
             "node-instance",
             "process-instance",
             "request-info-instance",
-            "solver",
             "task-attachment",
             "task-comment",
             "task-event-instance",

@@ -45,7 +45,7 @@ import org.kie.server.controller.validate.ViolationHelper;
 @Mojo( name = "create-template", defaultPhase = LifecyclePhase.DEPLOY, threadSafe = true, requiresProject = false)
 public class CreateTemplateMojo extends KieControllerMojo {
 
-    public final static String[] TEMPLATE_CAPABILITIES = { "RULE", "PROCESS", "PLANNING" };
+    public final static String[] TEMPLATE_CAPABILITIES = { "RULE", "PROCESS" };
 
     @Parameter(property = "kie-ctrl.template-id", required = true)
     private String templateId;
@@ -54,7 +54,7 @@ public class CreateTemplateMojo extends KieControllerMojo {
     private String templateName;
 
     @Parameter(property = "kie-ctrl.capabilities")
-    @NotDuplicateValidStrings(admittedValues = { "RULE", "PROCESS", "PLANNING" }, message = "Capabilities not valid")
+    @NotDuplicateValidStrings(admittedValues = { "RULE", "PROCESS" }, message = "Capabilities not valid")
     private List<String> capabilities;
 
     @Parameter(property = "kie-ctrl.containers")

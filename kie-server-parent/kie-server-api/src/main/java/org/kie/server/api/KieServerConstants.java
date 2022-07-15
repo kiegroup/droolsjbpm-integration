@@ -29,15 +29,12 @@ public class KieServerConstants {
     public static final String KIE_DROOLS_SERVER_EXT_DISABLED = "org.drools.server.ext.disabled";
     public static final String KIE_JBPM_SERVER_EXT_DISABLED = "org.jbpm.server.ext.disabled";
     public static final String KIE_JBPM_UI_SERVER_EXT_DISABLED = "org.jbpm.ui.server.ext.disabled";
-    public static final String KIE_OPTAPLANNER_SERVER_EXT_DISABLED = "org.optaplanner.server.ext.disabled";
     public static final String KIE_CASE_SERVER_EXT_DISABLED = "org.jbpm.case.server.ext.disabled";
     public static final String KIE_DMN_SERVER_EXT_DISABLED = "org.kie.dmn.server.ext.disabled";
     public static final String KIE_SWAGGER_SERVER_EXT_DISABLED = "org.kie.swagger.server.ext.disabled";
     public static final String KIE_KAFKA_SERVER_EXT_DISABLED = "org.kie.kafka.server.ext.disabled";
     public static final String KIE_PROMETHEUS_SERVER_EXT_DISABLED = "org.kie.prometheus.server.ext.disabled";
     public static final String KIE_SCENARIO_SIMULATION_SERVER_EXT_DISABLED = "org.kie.scenariosimulation.server.ext.disabled";
-    public static final String KIE_TASK_ASSIGNING_PLANNING_EXT_DISABLED = "org.kie.server.taskAssigning.planning.ext.disabled";
-    public static final String KIE_TASK_ASSIGNING_RUNTIME_EXT_DISABLED = "org.kie.server.taskAssigning.runtime.ext.disabled";
     public static final String KIE_JBPM_CLUSTER_SERVER_EXT_DISABLED = "org.kie.jbpm.cluster.server.ext.disabled";
 
     public static final String KIE_DROOLS_FILTER_REMOTEABLE_CLASSES = "org.drools.server.filter.classes";
@@ -129,8 +126,6 @@ public class KieServerConstants {
 
     public static final String KIE_SERVER_ROUTER_ATTEMPT_INTERVAL = "org.kie.server.router.connect";
 
-    public static final String KIE_OPTAPLANNER_THREAD_POOL_QUEUE_SIZE = "org.optaplanner.server.ext.thread.pool.queue.size";
-
     // ProcessConfig configuration item constants
     public static final String PCFG_RUNTIME_STRATEGY = "RuntimeStrategy";
     public static final String PCFG_KIE_BASE = "KBase";
@@ -140,14 +135,12 @@ public class KieServerConstants {
     public static final String CAPABILITY_BRM = "BRM"; // Business Rules Management
     public static final String CAPABILITY_BPM = "BPM"; // Business Process Management
     public static final String CAPABILITY_BPM_UI = "BPM-UI"; // Business Process Management UI
-    public static final String CAPABILITY_BRP = "BRP"; // Business Resource Planning
     public static final String CAPABILITY_CASE = "CaseMgmt"; // Case Management
     public static final String CAPABILITY_DMN = "DMN"; // DMN
     public static final String CAPABILITY_SWAGGER = "Swagger"; // Swagger
     public static final String CAPABILITY_BPM_KAFKA = "BPM-KAFKA"; // Business Process Management Kafka
     public static final String CAPABILITY_PROMETHEUS = "Prometheus"; // Prometheus
     public static final String CAPABILITY_SCENARIO_SIMULATION = "Scenario Simulation"; // Scenario Simulation
-    public static final String CAPABILITY_TASK_ASSIGNING_RUNTIME = "TaskAssigningRuntime"; //Task Assigning Runtime
     public static final String CAPABILITY_JBPM_CLUSTER = "BPM-Cluster"; // Business Process Management cluster support
     
     public static final String FAILURE_REASON_PROP = "failure-reason";

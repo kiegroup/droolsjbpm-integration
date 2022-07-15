@@ -15,15 +15,11 @@
  */
 package org.kie.camel.container.module;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.kie.camel.KieServicesConfigurationCustomizer;
 import org.kie.camel.container.api.model.Person;
-import org.kie.camel.container.api.model.cloudbalance.CloudBalance;
-import org.kie.camel.container.api.model.cloudbalance.CloudComputer;
-import org.kie.camel.container.api.model.cloudbalance.CloudProcess;
 import org.kie.server.client.KieServicesConfiguration;
 
 
@@ -35,9 +31,6 @@ public class CamelKieServiceConfigurationCustomizer implements KieServicesConfig
     public KieServicesConfiguration apply(KieServicesConfiguration configuration) {
         final Set<Class<?>> additionalClasses = new HashSet<>();
         additionalClasses.add(Person.class);
-        additionalClasses.add(CloudBalance.class);
-        additionalClasses.add(CloudComputer.class);
-        additionalClasses.add(CloudProcess.class);
 
         final KieServicesConfiguration conf = configuration.clone();
         conf.addExtraClasses(additionalClasses);

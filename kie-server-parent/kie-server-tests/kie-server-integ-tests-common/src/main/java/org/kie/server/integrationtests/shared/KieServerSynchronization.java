@@ -39,7 +39,6 @@ import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
-import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
@@ -48,7 +47,6 @@ import org.kie.server.api.model.Message;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.RuleServicesClient;
-import org.kie.server.client.SolverServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.client.KieServerControllerClient;
@@ -170,39 +168,6 @@ public class KieServerSynchronization {
                 }
             }
             return false;
-        });
-    }
-
-    public static void waitForSolver(final SolverServicesClient client, final String containerId, final String solverId) throws Exception {
-        waitForCondition(() -> {
-            List<SolverInstance> solverInstanceList = client.getSolvers(containerId);
-            for (SolverInstance solver : solverInstanceList) {
-                if (solverId.equals(solver.getSolverId())) {
-                    return true;
-                }
-            }
-            return false;
-        });
-    }
-
-    public static void waitForSolverDispose(final SolverServicesClient client, final String containerId, final String solverId) throws Exception {
-        waitForCondition(() -> {
-            List<SolverInstance> solverInstanceList = client.getSolvers(containerId);
-            for (SolverInstance solver : solverInstanceList) {
-                if (solverId.equals(solver.getSolverId())) {
-                    return false;
-                }
-            }
-            return true;
-        });
-    }
-
-    public static void waitForSolverStatus(final SolverServicesClient client, final String containerId, final String solverId,
-            final SolverInstance.SolverStatus status) throws Exception {
-        waitForCondition(() -> {
-            SolverInstance solverInstance = client.getSolver(containerId,
-                                                             solverId);
-            return status.equals(solverInstance.getStatus());
         });
     }
 

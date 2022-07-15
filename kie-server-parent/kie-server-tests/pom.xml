@@ -85,7 +85,6 @@
     <module>kie-server-integ-tests-common</module>
     <module>kie-server-integ-tests-drools</module>
     <module>kie-server-integ-tests-jbpm</module>
-    <module>kie-server-integ-tests-optaplanner</module>
     <module>kie-server-integ-tests-all</module>
     <module>kie-server-integ-tests-controller</module>
     <module>kie-server-integ-tests-policy</module>
@@ -94,7 +93,6 @@
     <module>kie-server-integ-tests-dmn</module>
     <module>kie-server-integ-tests-scenario-simulation</module>
     <module>kie-server-integ-tests-custom-extension</module>
-    <module>kie-server-integ-tests-task-assigning</module>
     <module>kie-server-integ-tests-dmn-pmml</module>
     <module>kie-server-integ-tests-dmn-pmml-trusty</module>
     <module>kie-server-integ-tests-pmml</module>
@@ -116,11 +114,6 @@
       <dependency>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-integ-tests-jbpm</artifactId>
-        <version>${version.org.kie}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.kie.server</groupId>
-        <artifactId>kie-server-integ-tests-optaplanner</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
       <dependency>
@@ -1383,10 +1376,7 @@
         <kieserver.jbpm.enabled>false</kieserver.jbpm.enabled>
         <kieserver.jbpmui.enabled>false</kieserver.jbpmui.enabled>
         <kieserver.casemgmt.enabled>false</kieserver.casemgmt.enabled>
-        <kieserver.optaplanner.enabled>false</kieserver.optaplanner.enabled>
         <kieserver.swagger.enabled>false</kieserver.swagger.enabled>
-        <kieserver.taskAssigning.runtime.enabled>false</kieserver.taskAssigning.runtime.enabled>
-        <kieserver.taskAssigning.planning.enabled>false</kieserver.taskAssigning.planning.enabled>
         <jbpm.executor.enabled>false</jbpm.executor.enabled>
         <kieserver.prometheus.enabled>false</kieserver.prometheus.enabled>
         <kieserver.scenariosimulation.enabled>false</kieserver.scenariosimulation.enabled>

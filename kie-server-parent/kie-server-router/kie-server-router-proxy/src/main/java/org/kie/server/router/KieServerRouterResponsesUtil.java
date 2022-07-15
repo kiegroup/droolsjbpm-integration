@@ -27,7 +27,7 @@ public final class KieServerRouterResponsesUtil {
                 "      \"version\" : \"LATEST\",\n" +
                 "      \"name\" : \"" + environment.getRouterName() + "\",\n" +
                 "      \"location\" : \"" + environment.getRouterExternalUrl() + "\",\n" +
-                "      \"capabilities\" : [ \"KieServer\", \"BRM\", \"BPM\", \"CaseMgmt\", \"BPM-UI\", \"BRP\" ],\n" +
+                "      \"capabilities\" : [ \"KieServer\", \"BRM\", \"BPM\", \"CaseMgmt\", \"BPM-UI\" ],\n" +
                 "      \"id\" : \"" + environment.getRouterId() + "\"\n" +
                 "}";
     }
@@ -40,7 +40,6 @@ public final class KieServerRouterResponsesUtil {
                "    <capabilities>BPM</capabilities>\n"+
                "    <capabilities>CaseMgmt</capabilities>\n"+
                "    <capabilities>BPM-UI</capabilities>\n"+
-               "    <capabilities>BRP</capabilities>\n"+
                "    <location>" + environment.getRouterExternalUrl() + "</location>\n"+
                "    <messages/>\n"+            
                "    <name>" + environment.getRouterName() + "</name>\n"+
@@ -59,7 +58,7 @@ public final class KieServerRouterResponsesUtil {
                 "      \"version\" : \"LATEST\",\n"+
                 "      \"name\" : \"" + environment.getRouterName() + "\",\n"+
                 "      \"location\" : \"" + environment.getRouterExternalUrl() + "\",\n"+
-                "      \"capabilities\" : [ \"KieServer\", \"BRM\", \"BPM\", \"CaseMgmt\", \"BPM-UI\", \"BRP\" ],\n"+     
+                "      \"capabilities\" : [ \"KieServer\", \"BRM\", \"BPM\", \"CaseMgmt\", \"BPM-UI\" ],\n"+
                 "      \"id\" : \"" + environment.getRouterId() + "\"\n"+
                 "    }\n"+
                 "  }\n"+
@@ -81,7 +80,6 @@ public final class KieServerRouterResponsesUtil {
                 "        <string>BPM</string>\n"+
                 "        <string>CaseMgmt</string>\n"+
                 "        <string>BPM-UI</string>\n"+
-                "        <string>BRP</string>\n"+
                 "    </capabilities>\n" +
                 "    </result>\n"+
                 "</org.kie.server.api.model.ServiceResponse>"; 

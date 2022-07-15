@@ -28,7 +28,6 @@ import org.jbpm.services.api.DeploymentEventListener;
 import org.kie.api.event.rule.AgendaEventListener;
 import org.kie.dmn.api.core.event.DMNRuntimeEventListener;
 import org.kie.server.services.api.KieContainerInstance;
-import org.optaplanner.core.impl.phase.event.PhaseLifecycleListener;
 
 class PrometheusCustomMetricsSupport {
 
@@ -36,7 +35,6 @@ class PrometheusCustomMetricsSupport {
 
     private final Map<MultiKey, List<AgendaEventListener>> agendaEventListeners;
     private final Map<String, List<DMNRuntimeEventListener>> dmnRuntimeEventListeners;
-    private final Map<String, List<PhaseLifecycleListener>> phaseLifecycleListeners;
 
     private ServiceLoader<PrometheusMetricsProvider> loader;
 
@@ -45,7 +43,6 @@ class PrometheusCustomMetricsSupport {
         customMetricsInstances = new HashMap<>();
         agendaEventListeners = new HashMap<>();
         dmnRuntimeEventListeners = new HashMap<>();
-        phaseLifecycleListeners = new HashMap<>();
     }
 
     boolean hasCustomMetrics() {
@@ -100,24 +97,6 @@ class PrometheusCustomMetricsSupport {
                 KieContainerInstance kieContainerInstanceKey = (KieContainerInstance) entry.getKey().getKey(1);
                 return kieContainerInstanceKey.equals(kieContainerInstanceId);
             });
-        }
-    }
-
-
-    List<PhaseLifecycleListener> getPhaseLifecycleListener(String solverId) {
-        synchronized (phaseLifecycleListeners) {
-            if (!phaseLifecycleListeners.containsKey(solverId)) {
-                List<PhaseLifecycleListener> customListeners = new ArrayList<>();
-                //customer listeners, if any
-                loader.forEach(p -> {
-                    PhaseLifecycleListener l = p.createPhaseLifecycleListener(solverId);
-                    if (l != null) {
-                        customListeners.add(l);
-                    }
-                });
-                phaseLifecycleListeners.put(solverId, customListeners);
-            }
-            return phaseLifecycleListeners.get(solverId);
         }
     }
 

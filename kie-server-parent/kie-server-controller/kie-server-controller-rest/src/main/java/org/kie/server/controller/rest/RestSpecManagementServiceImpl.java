@@ -56,7 +56,7 @@ public class RestSpecManagementServiceImpl {
     public Response saveContainerSpec(@Context HttpHeaders headers,
                                       @ApiParam(name = "serverTemplateId", value = "ID of the KIE Server template associated with the new KIE container", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
                                       @ApiParam(name = "containerId", value = "ID of the new KIE container", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam("containerId") String containerId,
-                                      @ApiParam(name = "body", value = "A map containing the container-name, relevant release-id (group ID, artifact ID, and version), configuration specifications (rule, process, planning), and other components of the new KIE container",
+                                      @ApiParam(name = "body", value = "A map containing the container-name, relevant release-id (group ID, artifact ID, and version), configuration specifications (rule, process), and other components of the new KIE container",
                                               required = true, examples =
                                                     @Example(value = {
                                                           @ExampleProperty(mediaType = JSON, value = CONTAINER_SPEC_JSON),
@@ -373,7 +373,7 @@ public class RestSpecManagementServiceImpl {
     public Response updateContainerConfig(@Context HttpHeaders headers,
                                           @ApiParam(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
                                           @ApiParam(name = "containerId", value = "ID of the KIE container to be updated", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam("containerId") String containerSpecId,
-                                          @ApiParam(name = "capability", value = "KIE container capability to be applied (RULE, PROCESS, or PLANNING, case sensitive)", required = true, example = "PROCESS") @PathParam("capability") String capabilityStr,
+                                          @ApiParam(name = "capability", value = "KIE container capability to be applied (RULE, or PROCESS, case sensitive)", required = true, example = "PROCESS") @PathParam("capability") String capabilityStr,
                                           @ApiParam(name = "body", value = "An org.kie.server.controller.api.model.spec.<capability>Config map containing the configurations for the specified KIE container capability, such as runtimeStrategy, kbase, ksession, and mergeMode for process configuration", required = true, examples =
                                           @Example(value = {
                                                   @ExampleProperty(mediaType = JSON, value = CONTAINER_CONFIG_JSON),

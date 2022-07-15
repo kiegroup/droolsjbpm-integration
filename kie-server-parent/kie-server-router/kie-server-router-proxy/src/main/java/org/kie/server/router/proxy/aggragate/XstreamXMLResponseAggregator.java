@@ -53,7 +53,6 @@ public class XstreamXMLResponseAggregator extends XMLResponseAggregator {
             "nodeInstances",
             "processInstances",
             "requestInfoInstances",
-            "solver",
             "taskAttachments",
             "taskComments",
             "taskEvents",

@@ -21,7 +21,6 @@ import org.kie.api.event.rule.AgendaEventListener;
 import org.kie.dmn.api.core.event.DMNRuntimeEventListener;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.prometheus.PrometheusMetricsProvider;
-import org.optaplanner.core.impl.phase.event.PhaseLifecycleListener;
 
 public class MyPrometheusMetricsProvider implements PrometheusMetricsProvider {
 
@@ -31,10 +30,6 @@ public class MyPrometheusMetricsProvider implements PrometheusMetricsProvider {
 
     public AgendaEventListener createAgendaEventListener(String kieSessionId, KieContainerInstance kContainer) {
         return new AgendaEventCustomPrometheusMetricListener(kContainer);
-    }
-
-    public PhaseLifecycleListener createPhaseLifecycleListener(String solverId) {
-        return new PhaseLifecycleCustomPrometheusMetricListener(solverId);
     }
 
     public AsynchronousJobListener createAsynchronousJobListener() {

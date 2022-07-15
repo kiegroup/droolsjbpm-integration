@@ -49,9 +49,9 @@ public class KieServerControllerImplTest {
 
     @Test
     public void testConnectWithAllCapabilities() {
-        storeDefaultServerTemplate(Capability.RULE, Capability.PROCESS, Capability.PLANNING);
+        storeDefaultServerTemplate(Capability.RULE, Capability.PROCESS);
 
-        KieServerInfo kieServerInfo = createDefaultKieServerInfo(KieServerConstants.CAPABILITY_BRM, KieServerConstants.CAPABILITY_BPM, KieServerConstants.CAPABILITY_BRP);
+        KieServerInfo kieServerInfo = createDefaultKieServerInfo(KieServerConstants.CAPABILITY_BRM, KieServerConstants.CAPABILITY_BPM);
 
         KieServerSetup kieServerSetup = controller.connect(kieServerInfo);
         assertTrue(kieServerSetup.hasNoErrors());
@@ -61,9 +61,9 @@ public class KieServerControllerImplTest {
 
     @Test
     public void testConnectServerTemplateMissingProcessCapability() {
-        storeDefaultServerTemplate(Capability.RULE, Capability.PLANNING);
+        storeDefaultServerTemplate(Capability.RULE);
 
-        KieServerInfo kieServerInfo = createDefaultKieServerInfo(KieServerConstants.CAPABILITY_BRM, KieServerConstants.CAPABILITY_BPM, KieServerConstants.CAPABILITY_BRP);
+        KieServerInfo kieServerInfo = createDefaultKieServerInfo(KieServerConstants.CAPABILITY_BRM, KieServerConstants.CAPABILITY_BPM);
 
         KieServerSetup kieServerSetup = controller.connect(kieServerInfo);
         assertTrue(kieServerSetup.hasNoErrors());
@@ -73,15 +73,15 @@ public class KieServerControllerImplTest {
 
     @Test
     public void testConnectKieServerMissingProcessCapability() {
-        storeDefaultServerTemplate(Capability.RULE, Capability.PROCESS, Capability.PLANNING);
+        storeDefaultServerTemplate(Capability.RULE, Capability.PROCESS);
 
-        KieServerInfo kieServerInfo = createDefaultKieServerInfo(KieServerConstants.CAPABILITY_BRM, KieServerConstants.CAPABILITY_BRP);
+        KieServerInfo kieServerInfo = createDefaultKieServerInfo(KieServerConstants.CAPABILITY_BRM);
 
         KieServerSetup kieServerSetup = controller.connect(kieServerInfo);
         assertFalse(kieServerSetup.hasNoErrors());
         assertEquals(1, kieServerSetup.getMessages().size());
         assertEquals(Severity.ERROR, kieServerSetup.getMessages().iterator().next().getSeverity());
-        assertEquals("Expected capabilities were [RULE, PROCESS, PLANNING]", kieServerSetup.getMessages().iterator().next().getMessages().iterator().next());
+        assertEquals("Expected capabilities were [RULE, PROCESS]", kieServerSetup.getMessages().iterator().next().getMessages().iterator().next());
 
         assertFalse(controller.getTemplateStorage().load(DEFAULT_KIE_SERVER_ID).hasServerInstance(DEFAULT_KIE_SERVER_LOCATION));
     }
