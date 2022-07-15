@@ -100,7 +100,7 @@ public class ParameterSamples {
             "                       \"server-template-id\" : \"test-kie-server\",\n" +
             "                       \"server-url\" : \"http://localhost:8080/kie-server/services/rest/server\"\n" +
             "               } ],\n" +
-            "       \"capabilities\" : [ \"RULE\", \"PROCESS\", \"PLANNING\" ]\n" +
+            "       \"capabilities\" : [ \"RULE\", \"PROCESS\" ]\n" +
             "   } ]\n" +
             "}";
 
@@ -144,7 +144,7 @@ public class ParameterSamples {
             "                       \"server-template-id\" : \"test-kie-server\",\n" +
             "                       \"server-url\" : \"http://localhost:8080/kie-server/services/rest/server\"\n" +
             "               } ],\n" +
-            "       \"capabilities\" : [ \"RULE\", \"PROCESS\", \"PLANNING\" ]\n" +
+            "       \"capabilities\" : [ \"RULE\", \"PROCESS\" ]\n" +
             "}";
 
     public static final String SERVER_INSTANCE_GET_JSON = "{\n" +
@@ -199,8 +199,7 @@ public class ParameterSamples {
             "  \"server-name\" : \"sample-server\",\n" +
             "  \"capabilities\" : [\n" +
             "       \"RULE\"," +
-            "       \"PROCESS\"," +
-            "       \"PLANNING\"" +
+            "       \"PROCESS\"" +
             "    ],\n" +
             "  \"container-specs\" : [ ],\n" +
             "  \"server-config\" : { }\n" +
@@ -320,7 +319,6 @@ public class ParameterSamples {
             "        </server-instances>\n" +
             "        <capabilities>RULE</capabilities>\n" +
             "        <capabilities>PROCESS</capabilities>\n" +
-            "        <capabilities>PLANNING</capabilities>\n" +
             "    </server-template>\n" +
             "</server-template-list>";
 
@@ -404,7 +402,6 @@ public class ParameterSamples {
             "   </server-instances>\n" +
             "   <capabilities>RULE</capabilities>\n" +
             "   <capabilities>PROCESS</capabilities>\n" +
-            "   <capabilities>PLANNING</capabilities>\n" +
             "</server-template>";
 
     public static final String CONTAINER_CONFIG_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
@@ -420,7 +417,6 @@ public class ParameterSamples {
             "  <configs/>\n" +
             "  <capabilities>RULE</capabilities>\n" +
             "  <capabilities>PROCESS</capabilities>\n" +
-            "  <capabilities>PLANNING</capabilities>\n" +
             "</server-template-details>";
 
     public static final String CONTAINER_SPEC_GET_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +

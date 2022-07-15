@@ -75,16 +75,6 @@ import org.kie.server.api.commands.GetServerStateCommand;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
-import org.kie.server.api.commands.optaplanner.AddProblemFactChangeCommand;
-import org.kie.server.api.commands.optaplanner.AddProblemFactChangesCommand;
-import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
-import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
-import org.kie.server.api.commands.optaplanner.GetSolverCommand;
-import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
-import org.kie.server.api.commands.optaplanner.GetSolversCommand;
-import org.kie.server.api.commands.optaplanner.IsEveryProblemFactChangeProcessedCommand;
-import org.kie.server.api.commands.optaplanner.SolvePlanningProblemCommand;
-import org.kie.server.api.commands.optaplanner.TerminateSolverEarlyCommand;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -179,9 +169,6 @@ import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.ProcessInstanceUserTaskWithVariablesList;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.RequestInfoInstanceList;
-import org.kie.server.api.model.instance.ScoreWrapper;
-import org.kie.server.api.model.instance.SolverInstance;
-import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskAttachmentList;
 import org.kie.server.api.model.instance.TaskComment;
@@ -198,13 +185,6 @@ import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.VariableInstanceList;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.model.instance.WorkItemInstanceList;
-import org.kie.server.api.model.taskassigning.OrganizationalEntity;
-import org.kie.server.api.model.taskassigning.PlanningExecutionResult;
-import org.kie.server.api.model.taskassigning.PlanningItem;
-import org.kie.server.api.model.taskassigning.PlanningItemList;
-import org.kie.server.api.model.taskassigning.PlanningTask;
-import org.kie.server.api.model.taskassigning.TaskData;
-import org.kie.server.api.model.taskassigning.TaskDataList;
 import org.kie.server.api.model.type.JaxbByteArray;
 import org.kie.server.api.model.type.JaxbDate;
 import org.kie.server.api.model.type.JaxbList;
@@ -342,23 +322,7 @@ public class JaxbMarshaller implements Marshaller {
 
                                                  ArrayList.class,
 
-                                                 // OptaPlanner
-                                                 SolverInstance.class,
-                                                 SolverInstanceList.class,
                                                  Message.class,
-                                                 ScoreWrapper.class,
-
-                                                 // Optaplanner commands
-                                                 CreateSolverCommand.class,
-                                                 DisposeSolverCommand.class,
-                                                 GetSolverWithBestSolutionCommand.class,
-                                                 GetSolversCommand.class,
-                                                 GetSolverCommand.class,
-                                                 SolvePlanningProblemCommand.class,
-                                                 TerminateSolverEarlyCommand.class,
-                                                 AddProblemFactChangeCommand.class,
-                                                 AddProblemFactChangesCommand.class,
-                                                 IsEveryProblemFactChangeProcessedCommand.class,
 
                                                  // admin section
                                                  MigrationReportInstance.class,
@@ -419,14 +383,6 @@ public class JaxbMarshaller implements Marshaller {
                                                  StringFieldOutput.class,
                                                  ScoreCard.class,
 
-                                                 //TaskAssigning
-                                                 PlanningExecutionResult.class,
-                                                 OrganizationalEntity.class,
-                                                 PlanningItem.class,
-                                                 PlanningItemList.class,
-                                                 PlanningTask.class,
-                                                 TaskDataList.class,
-                                                 TaskData.class,
                                                  SearchQueryFilterSpec.class,
                                                  ProcessInstanceUserTaskWithVariablesList.class,
                                                  CaseUserTaskWithVariablesList.class,

@@ -28,7 +28,6 @@
     <module>kie-server-spring-boot-starter</module>
     <module>kie-server-spring-boot-starter-drools</module>
     <module>kie-server-spring-boot-starter-jbpm</module>
-    <module>kie-server-spring-boot-starter-optaplanner</module>
   </modules>
 </project>
 

@@ -16,7 +16,6 @@ kieserver.dmn.enabled=false
 kieserver.jbpm.enabled=true
 kieserver.jbpmui.enabled=true
 kieserver.casemgmt.enabled=true
-kieserver.optaplanner.enabled=false
 kieserver.prometheus.enabled=false
 kieserver.scenariosimulation.enabled=false
 ```

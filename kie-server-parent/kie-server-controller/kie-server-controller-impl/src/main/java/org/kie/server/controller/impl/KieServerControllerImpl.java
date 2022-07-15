@@ -416,9 +416,6 @@ public abstract class KieServerControllerImpl implements KieServerController {
         if (Objects.equals(KieServerConstants.CAPABILITY_BPM, serverInstanceCapability)) {
             return Capability.PROCESS.toString();
         }
-        if (Objects.equals(KieServerConstants.CAPABILITY_BRP, serverInstanceCapability)) {
-            return Capability.PLANNING.toString();
-        }
 
         return null;
     }

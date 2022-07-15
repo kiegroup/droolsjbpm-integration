@@ -29,7 +29,6 @@
                             "org.kie.server.client.helper.DroolsServicesClientBuilder",
                             "org.kie.server.client.helper.JBPMServicesClientBuilder",
                             "org.kie.server.client.helper.JBPMUIServicesClientBuilder",
-                            "org.kie.server.client.helper.OptaplannerServicesClientBuilder",
                             "org.kie.server.client.KieServicesException",
                             "org.kie.server.client.KieServicesFactory"
                         ]
@@ -60,8 +59,56 @@
               "methodName": "countProcessInstancesByContainerId",
               "elementKind": "method",
               "justification": "[RHPAM-4028] Allow count process instances by ContainerId and Status"
+            },
+            {
+              "code": "java.class.removed",
+              "old": "interface org.kie.server.client.SolverServicesClient",
+              "package": "org.kie.server.client",
+              "classSimpleName": "SolverServicesClient",
+              "elementKind": "interface",
+              "justification": "OptaPlanner extension removed."
+            },
+            {
+              "code": "java.class.removed",
+              "old": "interface org.kie.server.client.TaskAssigningRuntimeClient",
+              "package": "org.kie.server.client",
+              "classSimpleName": "TaskAssigningRuntimeClient",
+              "elementKind": "interface",
+              "justification": "Task Assigning extension removed."
+            },
+            {
+              "code": "java.class.removed",
+              "old": "class org.kie.server.client.TaskAssigningRuntimeClientFactory",
+              "package": "org.kie.server.client",
+              "classSimpleName": "TaskAssigningRuntimeClientFactory",
+              "elementKind": "class",
+              "justification": "Task Assigning extension removed."
+            },
+            {
+              "code": "java.class.removed",
+              "old": "class org.kie.server.client.helper.OptaplannerServicesClientBuilder",
+              "package": "org.kie.server.client.helper",
+              "classSimpleName": "OptaplannerServicesClientBuilder",
+              "elementKind": "class",
+              "justification": "OptaPlanner extension removed."
+            },
+            {
+              "code": "java.class.removed",
+              "old": "class org.kie.server.client.helper.TaskAssigningRuntimeServicesClientBuilder",
+              "package": "org.kie.server.client.helper",
+              "classSimpleName": "TaskAssigningRuntimeServicesClientBuilder",
+              "elementKind": "class",
+              "justification": "Task Assigning extension removed."
+            },
+            {
+              "code": "java.class.removed",
+              "old": "class org.kie.server.client.util.TaskDataReader",
+              "package": "org.kie.server.client.util",
+              "classSimpleName": "TaskDataReader",
+              "elementKind": "class",
+              "justification": "Task Assigning extension removed."
             }
-         ]
+          ]
         }
     }
 }
