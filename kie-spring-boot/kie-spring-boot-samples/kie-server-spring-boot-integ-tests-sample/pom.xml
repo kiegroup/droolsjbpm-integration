@@ -13,6 +13,7 @@
 
   <properties>
     <start-class>org.kie.server.springboot.samples.KieServerIntegrationTestsApplication</start-class>
+    <sonar.exclusions>**/IntegrationTestsWebSecurityConfig.java</sonar.exclusions>
   </properties>
 
   <dependencies>
