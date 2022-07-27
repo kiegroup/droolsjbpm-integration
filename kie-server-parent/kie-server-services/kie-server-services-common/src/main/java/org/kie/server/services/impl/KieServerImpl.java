@@ -644,6 +644,7 @@ public class KieServerImpl implements KieServer {
                         }
                         InternalKieContainer kieContainer = kci.getKieContainer();
                         kci.setKieContainer(null); // helps reduce concurrent access issues
+                        kci.disposeMarshallers();
                         // this may fail, but we already removed the container from the registry
                         kieContainer.dispose();
                         ks.getRepository().removeKieModule(releaseId);
