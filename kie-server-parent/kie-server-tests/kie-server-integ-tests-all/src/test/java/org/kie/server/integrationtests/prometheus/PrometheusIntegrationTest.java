@@ -41,6 +41,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.kie.api.KieServices;
+import org.kie.api.runtime.KieContainer;
 import org.kie.api.task.model.Status;
 import org.kie.internal.executor.api.STATUS;
 import org.kie.server.api.model.ReleaseId;
@@ -65,8 +67,10 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
     private static final String CONTAINER_ID = "prometheus";
     private static final String CONTAINER_ID_CASE = "prometheus-case";
-    private static final String PROCESS_ID = "per-process-instance-project.usertask";
+    private static final String USERTASK_PROCESS_ID = "per-process-instance-project.usertask";
     private static final String USER_ID = "yoda";
+    private static final String RULETASK_PROCESS_ID = "ruletask";
+    private static KieContainer perProcessInstanceProjectkieContainer;
 
     private static final String CASE_DEF_ID = "UserTaskCase";
     private static final String CASE_OWNER_ROLE = "owner";
@@ -94,8 +98,15 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/per-process-instance-project");
         KieServerDeployer.buildAndDeployMavenProjectFromResource("/kjars-sources/case-insurance");
 
+        perProcessInstanceProjectkieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+
         createContainer(CONTAINER_ID, releaseId);
         createContainer(CONTAINER_ID_CASE, caseReleaseId);
+    }
+
+    @Override
+    protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
+        extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, perProcessInstanceProjectkieContainer.getClassLoader()));
     }
 
     protected String getMetrics() {
@@ -126,9 +137,9 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
     }
 
     @Test
-    public void testPrometheusProcessAndTaskMetrics() {
-        processClient.startProcess(CONTAINER_ID, PROCESS_ID);
-        Long instanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID);
+    public void testPrometheusProcessAndUserTaskMetrics() {
+        processClient.startProcess(CONTAINER_ID, USERTASK_PROCESS_ID);
+        Long instanceId = processClient.startProcess(CONTAINER_ID, USERTASK_PROCESS_ID);
         processClient.abortProcessInstance(CONTAINER_ID, instanceId);
 
         taskClient.findTasksAssignedAsPotentialOwner(USER_ID, 0, 100).forEach(task -> {
@@ -136,7 +147,7 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
             taskClient.completeTask(CONTAINER_ID, task.getId(), USER_ID, null);
         });
 
-        List<ProcessInstance> instances = queryClient.findProcessInstancesByProcessId(PROCESS_ID, Arrays.asList(STATE_COMPLETED, STATE_ABORTED), 0, 100);
+        List<ProcessInstance> instances = queryClient.findProcessInstancesByProcessId(USERTASK_PROCESS_ID, Arrays.asList(STATE_COMPLETED, STATE_ABORTED), 0, 100);
 
         int totalInstances = instances.size();
         long completedInstances = instances.stream().filter(pi -> pi.getState() == STATE_COMPLETED).count();
@@ -272,6 +283,20 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         jobRequestInstance.setCommand(JOB_EXECUTION_ERROR_COMMAND);
         jobRequestInstance.setData(data);
         return jobRequestInstance;
-    }    
-  
+    }
+
+    @Test
+    public void testPrometheusProcessAndRuleTaskMetrics() {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("person", createPersonInstance("John"));
+        processClient.startProcess(CONTAINER_ID, RULETASK_PROCESS_ID, parameters);
+
+        assertThat(getMetrics()).contains("kie_server_process_instance_started_total{container_id=\"prometheus\",process_id=\"ruletask\",}",
+                                          "kie_server_process_instance_completed_total{container_id=\"prometheus\",process_id=\"ruletask\",status=\"2\",}",
+                                          "kie_server_process_instance_duration_seconds_count{container_id=\"prometheus\",process_id=\"ruletask\",}",
+                                          "kie_server_process_instance_duration_seconds_sum{container_id=\"prometheus\",process_id=\"ruletask\",}",
+                                          "kie_server_process_instance_running_total{container_id=\"prometheus\",process_id=\"ruletask\",} 0.0",
+                                          "drl_match_fired_nanosecond_count{container_id=\"prometheus\",ksessionId=\"default\",group_id=\"org.kie.server.testing\",artifact_id=\"per-process-instance-project\",version=\"1.0.0.Final\",rule_name=\"is John\",}",
+                                          "drl_match_fired_nanosecond_sum{container_id=\"prometheus\",ksessionId=\"default\",group_id=\"org.kie.server.testing\",artifact_id=\"per-process-instance-project\",version=\"1.0.0.Final\",rule_name=\"is John\",}");
+    }
 }

@@ -1,0 +1,11 @@
+package org.jbpm;
+
+import org.jbpm.data.Person;
+
+rule "is John"
+  ruleflow-group "group1"
+  when
+    $p : Person(name == "John")
+  then
+    System.out.println("Hello, " + $p.getName());
+end
