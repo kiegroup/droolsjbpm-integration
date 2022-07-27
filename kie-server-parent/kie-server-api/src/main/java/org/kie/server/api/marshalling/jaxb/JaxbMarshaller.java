@@ -29,6 +29,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.util.ValidationEventCollector;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.sax.SAXSource;
 
 import org.drools.core.command.GetVariableCommand;
 import org.drools.core.command.runtime.AdvanceSessionTimeCommand;
@@ -187,6 +191,8 @@ import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.model.type.JaxbMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import static javax.xml.bind.ValidationEvent.ERROR;
 import static javax.xml.bind.ValidationEvent.FATAL_ERROR;
@@ -436,10 +442,19 @@ public class JaxbMarshaller implements Marshaller {
     public <T> T unmarshall(String input, Class<T> type) {
         try {
             Unmarshaller unmarshaller = getUnmarshaller();
+
+            //Disable XXE
+            SAXParserFactory spf = SAXParserFactory.newInstance();
+            spf.setNamespaceAware(true);
+            spf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+
+            Source xmlSource = new SAXSource(spf.newSAXParser().getXMLReader(),
+                                            new InputSource(new StringReader(input)));
+
             ValidationEventCollector vec = new ValidationEventCollector();
             boolean strict = Boolean.getBoolean(KIE_SERVER_STRICT_JAXB_FORMAT);
             unmarshaller.setEventHandler(vec);
-            Object result = unmarshaller.unmarshal(new StringReader(input));
+            Object result = unmarshaller.unmarshal(xmlSource);
             if (strict || logger.isWarnEnabled()) {
                 String errorMessage = Arrays.stream(vec.getEvents())
                         .filter(ve -> ve.getSeverity() == ERROR || ve.getSeverity() == FATAL_ERROR)
@@ -453,7 +468,7 @@ public class JaxbMarshaller implements Marshaller {
                 }
             }
             return (T) unwrap(result);
-        } catch (JAXBException e) {
+        } catch (JAXBException | SAXException | ParserConfigurationException e) {
             throw new MarshallingException("Can't unmarshall input string: " + input, e);
         }
     }
