@@ -89,6 +89,7 @@ public class UserTaskServiceBase {
     }
 
     public void claim(String containerId, Number taskId, String userId) {
+        containerId = context.getContainerId(containerId, new ByTaskIdContainerLocator(taskId.longValue()));
         userId = getUser(userId);
         logger.debug("About to claim task with id '{}' as user '{}'", taskId, userId);
         userTaskService.claim(containerId, taskId.longValue(), userId);
