@@ -73,7 +73,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
-        createContainer(CONTAINER_ID, releaseId);
+        createContainer(CONTAINER_ID, releaseId, CONTAINER_ID_ALIAS);
     }
 
     @Override
@@ -293,6 +293,44 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         } finally {
             changeUser(TestConfig.getUsername());
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    @Test
+    public void testClaimUsingAlias() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID_ALIAS, PROCESS_ID_USERTASK);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            checkTaskNameAndStatus(taskSummary, "First task", Status.Reserved);
+
+            // release task
+            taskClient.releaseTask(CONTAINER_ID_ALIAS, taskSummary.getId(), USER_YODA);
+
+            taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            checkTaskNameAndStatus(taskSummary, "First task", Status.Ready);
+
+            taskClient.claimTask(CONTAINER_ID_ALIAS, taskSummary.getId(), USER_YODA);
+
+            taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            checkTaskNameAndStatus(taskSummary, "First task", Status.Reserved);
+
+        } finally {
+            changeUser(TestConfig.getUsername());
+            processClient.abortProcessInstance(CONTAINER_ID_ALIAS, processInstanceId);
         }
     }
 
