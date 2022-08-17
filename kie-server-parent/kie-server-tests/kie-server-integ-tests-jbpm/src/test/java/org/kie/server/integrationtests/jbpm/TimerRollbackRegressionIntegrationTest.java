@@ -25,6 +25,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runners.Parameterized;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -33,10 +34,13 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesConfiguration;
+import org.kie.server.integrationtests.category.JEEOnly;
+import org.kie.server.integrationtests.category.WildflyOnly;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 import static org.junit.Assert.assertEquals;
 
+@Category({JEEOnly.class, WildflyOnly.class})
 public class TimerRollbackRegressionIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "timer-rollback-project",
