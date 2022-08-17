@@ -53,7 +53,7 @@ public class RuntimeDataServiceBaseTest {
         String containerId = "container_id";
         when(context.getContainerId(anyString(), any(ContainerLocator.class))).thenReturn(containerId);
         List<ProcessDefinition> definitions = new ArrayList<>();
-        definitions.add( mock(ProcessDefinition.class));
+        definitions.add(mock(ProcessDefinition.class));
         when(runtimeDataService.getProcessesByDeploymentId(anyString(), any())).thenReturn(definitions);
 
         ProcessDefinitionList result = svc.getProcessesByDeploymentId(containerId, 0, 100, null, true);
@@ -68,7 +68,6 @@ public class RuntimeDataServiceBaseTest {
         String containerId = "container_id";
         when(context.getContainerId(anyString(), any(ContainerLocator.class))).thenReturn(containerId);
         List<ProcessDefinition> definitions = new ArrayList<>();
-        definitions.add( mock(ProcessDefinition.class));
         when(runtimeDataService.getProcessesByDeploymentId(anyString(), any())).thenThrow(new DeploymentNotFoundException("not found"));
 
         ProcessDefinitionList result = svc.getProcessesByDeploymentId(containerId, 0, 100, null, true);
@@ -83,8 +82,7 @@ public class RuntimeDataServiceBaseTest {
         String containerId = "container_id";
         when(context.getContainerId(anyString(), any(ContainerLocator.class))).thenReturn(containerId);
         List<ProcessDefinition> definitions = new ArrayList<>();
-        definitions.add( mock(ProcessDefinition.class));
-        when(runtimeDataService.getProcessesByDeploymentId(anyString(), any())).thenThrow(new IllegalArgumentException("not found"));
+        when(runtimeDataService.getProcessesByDeploymentId(anyString(), any())).thenThrow(new IllegalArgumentException("client error"));
 
         ProcessDefinitionList result = svc.getProcessesByDeploymentId(containerId, 0, 100, null, true);
 
