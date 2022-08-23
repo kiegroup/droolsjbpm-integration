@@ -39,7 +39,9 @@ import org.kie.server.api.model.admin.TaskNotification;
 import org.kie.server.api.model.admin.TaskReassignment;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.integrationtests.category.JEEOnly;
 import org.kie.server.integrationtests.category.Unstable;
+import org.kie.server.integrationtests.category.WildflyOnly;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -565,6 +567,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
     }
 
     @Test
+    @Category({JEEOnly.class, WildflyOnly.class})
     public void testAddRemovePotOwnersByDifferentUser() throws Exception {
         // Different user cannot be used for JMS as security adapter holds just information about current user
         assumeFalse(configuration.isJms());
@@ -696,6 +699,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
     }
 
     @Test
+    @Category({JEEOnly.class, WildflyOnly.class})
     public void testAddRemoveExcludedOwnersByDifferentUser() throws Exception {
         // Different user cannot be used for JMS as security adapter holds just information about current user
         assumeFalse(configuration.isJms());
@@ -827,6 +831,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
     }
 
     @Test
+    @Category({JEEOnly.class, WildflyOnly.class})
     public void testAddRemoveBusinessAdminsByDifferentUser() throws Exception {
         // Different user cannot be used for JMS as security adapter holds just information about current user
         assumeFalse(configuration.isJms());
