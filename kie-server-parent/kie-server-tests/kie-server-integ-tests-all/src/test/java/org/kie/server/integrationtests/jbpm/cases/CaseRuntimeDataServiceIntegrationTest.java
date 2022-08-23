@@ -32,6 +32,7 @@ import org.junit.After;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.api.task.model.Status;
 import org.kie.server.api.exception.KieServicesException;
@@ -50,6 +51,8 @@ import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.CaseServicesClient;
+import org.kie.server.integrationtests.category.JEEOnly;
+import org.kie.server.integrationtests.category.WildflyOnly;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerAssert;
@@ -588,6 +591,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     }
 
     @Test
+    @Category({JEEOnly.class, WildflyOnly.class})
     public void testFindCaseTasksAssignedAsPotentialOwnerByPassAuth() throws Exception {
         String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
         assertNotNull(caseId);
@@ -607,6 +611,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     }
 
     @Test
+    @Category({JEEOnly.class, WildflyOnly.class})
     public void testFindCaseTasksAssignedAsBusinessAdminByPassAuth() throws Exception {
         CaseFile caseFile = CaseFile.builder()
                 .addUserAssignments(CASE_OWNER_ROLE, USER_YODA)
@@ -630,6 +635,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     }
 
     @Test
+    @Category({JEEOnly.class, WildflyOnly.class})
     public void testFindCaseTasksAssignedAsStakeHolderByPassAuth() throws Exception {
         assertEquals(USER_YODA, configuration.getUserName()); // Check current authenticated user is yoda
         String caseId = startUserTaskCase(CaseFile.builder()
