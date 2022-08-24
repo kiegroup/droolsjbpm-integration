@@ -352,7 +352,7 @@ public class RuntimeDataServiceBase {
     public ProcessDefinitionList getProcessesByDeploymentId(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         try {
             return getProcessesByDeploymentIdUncatch(containerId, page, pageSize, sort, sortOrder);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | DeploymentNotFoundException e) {
             // container was not found by locator
             return new ProcessDefinitionList();
         }
