@@ -45,6 +45,12 @@
             <parameters/>
             <name>Rest</name>
         </work-item-handler>
+        <work-item-handler>
+            <resolver>mvel</resolver>
+            <identifier>new org.jbpm.data.CustomAbortWorkItemHandler()</identifier>
+            <parameters/>
+            <name>CustomAbortWorkItemHandler</name>
+        </work-item-handler>
     </work-item-handlers>
     <environment-entries/>
     <configurations/>

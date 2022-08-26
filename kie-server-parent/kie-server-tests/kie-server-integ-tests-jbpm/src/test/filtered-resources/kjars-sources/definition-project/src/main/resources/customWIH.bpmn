@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- origin at X=0.0 Y=0.0 -->
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:bpsim="http://www.bpsim.org/schemas/1.0" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:drools="http://www.jboss.org/drools" xmlns="http://www.jboss.org/drools" xmlns:ns="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd http://www.jboss.org/drools drools.xsd http://www.bpsim.org/schemas/1.0 bpsim.xsd" id="_k_Ht4DEYEDqmXsCgxeAPiQ" exporter="org.eclipse.bpmn2.modeler.core" exporterVersion="1.5.3.Final-v20210519-2007-B1" targetNamespace="http://www.omg.org/bpmn20">
+  <bpmn2:itemDefinition id="ItemDefinition_2" isCollection="false" structureRef="java.lang.Boolean"/>
+  <bpmn2:process id="customWIH" drools:packageName="org.jbpm.data" drools:version="1.0" drools:adHoc="false" name="customWIH" isExecutable="true" processType="Public">
+    <bpmn2:extensionElements>
+      <drools:import name="java.lang.Boolean"/>
+    </bpmn2:extensionElements>
+    <bpmn2:property id="aborted" itemSubjectRef="ItemDefinition_2" name="aborted"/>
+    <bpmn2:sequenceFlow id="_05DDCDEF-F5EC-4A19-A7C3-C40D500C1043" sourceRef="_7BF5F0D2-43A7-46C2-945E-DDA6E96FD479" targetRef="_0DED842B-155D-4459-BF74-C59EE46C3216">
+      <bpmn2:extensionElements>
+        <drools:metaData name="isAutoConnection.target">
+          <drools:metaValue><![CDATA[true]]></drools:metaValue>
+        </drools:metaData>
+      </bpmn2:extensionElements>
+    </bpmn2:sequenceFlow>
+    <bpmn2:startEvent id="_7BF5F0D2-43A7-46C2-945E-DDA6E96FD479">
+      <bpmn2:extensionElements>
+        <drools:metaData name="elementname">
+          <drools:metaValue><![CDATA[]]></drools:metaValue>
+        </drools:metaData>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>_05DDCDEF-F5EC-4A19-A7C3-C40D500C1043</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:endEvent id="_3046ABFD-DB20-4A16-BDA9-5777DB2ECD84">
+      <bpmn2:extensionElements>
+        <drools:metaData name="elementname">
+          <drools:metaValue><![CDATA[]]></drools:metaValue>
+        </drools:metaData>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:task id="_0DED842B-155D-4459-BF74-C59EE46C3216" drools:taskName="CustomAbortWorkItemHandler" name="CustomAbortWorkItemHandler">
+      <bpmn2:documentation id="Documentation_1"><![CDATA[bpm-work-item-handler/index.html]]></bpmn2:documentation>
+      <bpmn2:extensionElements>
+        <drools:metaData name="elementname">
+          <drools:metaValue><![CDATA[CustomAbortWorkItemHandler]]></drools:metaValue>
+        </drools:metaData>
+        <drools:onEntry-script scriptFormat="http://www.java.com/java">
+          <drools:script>System.out.println(&quot;Process &quot; + kcontext.getProcessInstance().getId() + &quot; enter WIH&quot;);</drools:script>
+        </drools:onEntry-script>
+        <drools:onExit-script scriptFormat="http://www.java.com/java">
+          <drools:script>System.out.println(&quot;Process &quot; + kcontext.getProcessInstance().getId() + &quot; exit WIH&quot;);</drools:script>
+        </drools:onExit-script>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>_05DDCDEF-F5EC-4A19-A7C3-C40D500C1043</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
+      <bpmn2:ioSpecification id="InputOutputSpecification_1">
+        <bpmn2:dataOutput id="DataOutput_1" itemSubjectRef="ItemDefinition_2" name="aborted"/>
+        <bpmn2:inputSet id="InputSet_1"/>
+        <bpmn2:outputSet id="OutputSet_1" name="Output Set 1">
+          <bpmn2:dataOutputRefs>DataOutput_1</bpmn2:dataOutputRefs>
+        </bpmn2:outputSet>
+      </bpmn2:ioSpecification>
+      <bpmn2:dataOutputAssociation id="DataOutputAssociation_1">
+        <bpmn2:sourceRef>DataOutput_1</bpmn2:sourceRef>
+        <bpmn2:targetRef>aborted</bpmn2:targetRef>
+      </bpmn2:dataOutputAssociation>
+    </bpmn2:task>
+    <bpmn2:sequenceFlow id="SequenceFlow_1" drools:priority="1" sourceRef="_0DED842B-155D-4459-BF74-C59EE46C3216" targetRef="_3046ABFD-DB20-4A16-BDA9-5777DB2ECD84"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_Process_1" bpmnElement="customWIH">
+      <bpmndi:BPMNShape id="shape__0DED842B-155D-4459-BF74-C59EE46C3216" bpmnElement="_0DED842B-155D-4459-BF74-C59EE46C3216">
+        <dc:Bounds height="102.0" width="255.0" x="420.0" y="126.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_1">
+          <dc:Bounds height="18.0" width="200.0" x="447.0" y="168.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape__3046ABFD-DB20-4A16-BDA9-5777DB2ECD84" bpmnElement="_3046ABFD-DB20-4A16-BDA9-5777DB2ECD84">
+        <dc:Bounds height="56.0" width="56.0" x="720.0" y="149.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_3"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="shape__7BF5F0D2-43A7-46C2-945E-DDA6E96FD479" bpmnElement="_7BF5F0D2-43A7-46C2-945E-DDA6E96FD479">
+        <dc:Bounds height="56.0" width="56.0" x="320.0" y="149.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_4"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="edge_shape__7BF5F0D2-43A7-46C2-945E-DDA6E96FD479_to_shape__0DED842B-155D-4459-BF74-C59EE46C3216" bpmnElement="_05DDCDEF-F5EC-4A19-A7C3-C40D500C1043" sourceElement="shape__7BF5F0D2-43A7-46C2-945E-DDA6E96FD479" targetElement="shape__0DED842B-155D-4459-BF74-C59EE46C3216">
+        <di:waypoint xsi:type="dc:Point" x="376.0" y="177.0"/>
+        <di:waypoint xsi:type="dc:Point" x="398.0" y="177.0"/>
+        <di:waypoint xsi:type="dc:Point" x="420.0" y="177.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_5"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="shape__0DED842B-155D-4459-BF74-C59EE46C3216" targetElement="shape__3046ABFD-DB20-4A16-BDA9-5777DB2ECD84">
+        <di:waypoint xsi:type="dc:Point" x="675.0" y="177.0"/>
+        <di:waypoint xsi:type="dc:Point" x="697.0" y="177.0"/>
+        <di:waypoint xsi:type="dc:Point" x="720.0" y="177.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_2"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

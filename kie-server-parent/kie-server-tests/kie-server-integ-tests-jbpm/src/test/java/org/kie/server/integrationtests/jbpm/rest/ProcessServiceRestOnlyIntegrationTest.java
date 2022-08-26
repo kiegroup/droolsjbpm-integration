@@ -59,6 +59,7 @@ public class ProcessServiceRestOnlyIntegrationTest extends RestJbpmBaseIntegrati
     protected static final String CONTAINER_ID = "definition-project";
     protected static final String NON_EXISTING_CONTAINER_ID = "non-existing-container";
     protected static final String CORRELATION_KEY= "TestCorrelationKey";
+    protected static final String PROCESS_ID_CUSTOM_WIH = "customWIH";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -423,6 +424,76 @@ public class ProcessServiceRestOnlyIntegrationTest extends RestJbpmBaseIntegrati
 
             assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
             assertThat(message).contains(String.format("Could not find work item instance with id \"%s\"", "1"));
+        } finally {
+            if(response != null) {
+                response.close();
+            }
+        }
+    }
+    
+    @Test
+    public void testAbortWorkItemWithCustomImplementation() {
+        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+        valuesMap.put(RestURI.PROCESS_ID, PROCESS_ID_CUSTOM_WIH);
+
+        Response response = null;
+        try {
+            // start process instance
+            WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap));
+            logger.debug("[POST] " + clientRequest.getUri());
+            response = clientRequest.request(getMediaType()).post(createEntity(""));
+            assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
+
+            Long pid = response.readEntity(JaxbLong.class).unwrap();
+            assertThat(pid).isNotNull();
+            response.close();
+            
+            // find node instances of process instance which is deployed in the given container
+            valuesMap.clear();
+            valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+            valuesMap.put(PROCESS_INST_ID, pid);
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + PROCESS_INSTANCES_NODE_INSTANCES_GET_URI, valuesMap));
+            logger.debug( "[GET] " + clientRequest.getUri());
+
+            response = clientRequest.request(getMediaType()).get();
+            Marshaller marshaller = MarshallerFactory.getMarshaller(marshallingFormat, Thread.currentThread().getContextClassLoader());
+            NodeInstanceList nodeInstanceList = marshaller.unmarshall(response.readEntity(String.class), NodeInstanceList.class);
+
+            assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+            nodeInstanceList.getItems().get(0).getWorkItemId();
+            Long workItemId = nodeInstanceList.getItems().stream().filter(p -> p.getWorkItemId()!=null).findFirst().get().getWorkItemId();
+            response.close();
+
+            // abort work item 
+            valuesMap.clear();
+            valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+            valuesMap.put(PROCESS_INST_ID, pid);
+            valuesMap.put(WORK_ITEM_ID, workItemId);
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI, valuesMap));
+            logger.debug( "[PUT] " + clientRequest.getUri());
+
+            response = clientRequest.request(getMediaType()).put(createEntity(""));
+            assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());
+            response.close();
+            
+            // find process instance variable which belongs to a process instance in a deployed container
+            valuesMap.clear();
+            valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+            valuesMap.put(PROCESS_INST_ID, pid);
+            valuesMap.put(VAR_NAME, "aborted");
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_VAR_INSTANCE_BY_VAR_NAME_GET_URI, valuesMap));
+            logger.debug( "[GET] " + clientRequest.getUri());
+
+            response = clientRequest.request(getMediaType()).get();
+            marshaller = MarshallerFactory.getMarshaller(marshallingFormat, Thread.currentThread().getContextClassLoader());
+            VariableInstanceList variableInstanceList = marshaller.unmarshall(response.readEntity(String.class), VariableInstanceList.class);
+
+            assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+            assertThat(variableInstanceList.getItems()).hasSize(1);
+            assertThat(variableInstanceList.getItems().get(0).getValue()).isEqualTo("true");
+            response.close();
+            
         } finally {
             if(response != null) {
                 response.close();
