@@ -112,7 +112,7 @@ public class KafkaUtils implements AutoCloseable {
         logger.warn("Shutdown kafka server");
         Path tmp = Paths.get(tmpDir);
         try {
-            if (kafkaServer.brokerState().get() != BrokerState.NOT_RUNNING) {
+            if (kafkaServer.brokerState() != BrokerState.NOT_RUNNING) {
                 kafkaServer.shutdown();
                 kafkaServer.awaitShutdown();
             }
