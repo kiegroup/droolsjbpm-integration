@@ -67,7 +67,6 @@
     <module>kie-spring-boot</module>
     <module>camel-container-tests</module>
     <module>optaplanner-workbench-models</module>
-    <module>drools-ha</module>
   </modules>
 
   <dependencyManagement>
