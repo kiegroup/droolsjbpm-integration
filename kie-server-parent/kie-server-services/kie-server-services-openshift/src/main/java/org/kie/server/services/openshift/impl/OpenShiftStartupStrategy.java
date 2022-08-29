@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.services.openshift.impl;
 
@@ -50,12 +50,17 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
     private static final String KIE_SERVER_INSTANCE_ID = "kieserver-" + UUID.randomUUID().toString();
     private static final Logger logger = LoggerFactory.getLogger(OpenShiftStartupStrategy.class);
 
-    private static Supplier<OpenShiftClient> clouldClientHelper = () -> (new CloudClientFactory() {}).createOpenShiftClient();
+    private static Supplier<OpenShiftClient> clouldClientHelper = () -> (new CloudClientFactory() {
+    }).createOpenShiftClient();
 
-    private static class WatchRunner implements Runnable, KieServerOpenShift {
+    private static String namespace;
+
+    private static class WatchRunner implements Runnable,
+                                                KieServerOpenShift {
 
         private boolean isWatchRunning = true;
         private String kieServerId;
+        private Thread currentThread;
 
         public WatchRunner(String serverId) {
             kieServerId = serverId;
@@ -65,19 +70,17 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
         public void run() {
             try (OpenShiftClient client = clouldClientHelper.get()) {
                 logger.info("Watching ConfigMap in namespace: [{}]", client.getNamespace());
-                try (Watch watchable = client.configMaps().withLabel(CFG_MAP_LABEL_SERVER_ID_KEY, kieServerId)
-                                             .watch(new Watcher<ConfigMap>() {
+                try (Watch watch = client.configMaps().inNamespace(namespace).withLabel(CFG_MAP_LABEL_SERVER_ID_KEY, kieServerId).watch(new Watcher<ConfigMap>() {
+
                     @Override
                     public void eventReceived(Action action, ConfigMap kieServerState) {
-                        logger.debug("Event - Action: {}, {} on ConfigMap ",
-                                    action, kieServerState.getMetadata().getLabels()
-                                                          .getOrDefault(CFG_MAP_LABEL_SERVER_ID_KEY, UNKNOWN));
-                        
-                        getKieServerDC(client, kieServerId).ifPresent(dc -> { 
+                        logger.debug("Event - Action: {}, {} on ConfigMap ", action, kieServerState.getMetadata().getLabels().getOrDefault(CFG_MAP_LABEL_SERVER_ID_KEY, UNKNOWN));
+
+                        getKieServerDC(client, kieServerId).ifPresent(dc -> {
                             if (action.equals(Action.MODIFIED) && isRolloutRequired(client, kieServerId, isDCStable(dc))) {
                                 String dcName = dc.getMetadata().getName();
-                                client.deploymentConfigs().withName(dcName).deployLatest();
                                 logger.info("Triggering rollout for DeploymentConfig: {}", dcName);
+                                client.deploymentConfigs().inNamespace(namespace).withName(dcName).deployLatest();
                             } else {
                                 logger.debug("Event - Ignored");
                             }
@@ -86,14 +89,17 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
 
                     @Override
                     public void onClose(KubernetesClientException cause) {
-                        logger.info("Watcher closed.");
-                        if (cause != null) {
-                            logger.info(cause.getMessage());
+                        if (cause != null && cause.getMessage().contains("too old resource version")) {
+                            logger.debug("Watcher should not be closed: {}", cause.getMessage());
+                            currentThread.interrupt();
+                            startWatcherThread(kieServerId);
+                        } else {
+                            logger.debug("Watcher closed.");
                         }
                     }
                 })) {
-                    logger.info("Watcher created");
 
+                    logger.debug("Watcher created");
                     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                         synchronized (this) {
                             isWatchRunning = false;
@@ -104,16 +110,19 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
 
                     synchronized (this) {
                         while (isWatchRunning && !Thread.currentThread().isInterrupted()) {
-                            logger.info("WatchRunner thread run");
+                            logger.debug("WatchRunner thread run");
+                            currentThread = Thread.currentThread();
                             try {
                                 wait();
                             } catch (InterruptedException e) {
-                                Thread.currentThread().interrupt();
-                                logger.error("WatchRunner thread being interrupted", e);
+                                if (!Thread.currentThread().isInterrupted()) {
+                                    Thread.currentThread().interrupt();
+                                }
+                                logger.debug("WatchRunner thread being interrupted", e);
                             }
-                            logger.info("WatchRunner thread being notified");
+                            logger.debug("WatchRunner thread being notified");
                         }
-                        logger.info("WatchRunner thread exits");
+                        logger.debug("WatchRunner thread exits");
                     }
                 }
             } catch (KubernetesClientException kce) {
@@ -131,23 +140,18 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
                 try {
                     if (isDCStable) {
                         // Create temporary rollout-in-progress configmap only if there is no DC activities.
-                        client.configMaps().create(new ConfigMapBuilder()
-                                                   .withNewMetadata()
-                                                     .withName(triggerName)
-                                                     .withLabels(Collections.singletonMap(KIE_SERVER_INSTANCE_ID, kieServerId))
-                                                   .endMetadata()
-                                                   .build());
+                        client.configMaps().inNamespace(namespace).create(new ConfigMapBuilder().withNewMetadata().withName(triggerName).withLabels(Collections.singletonMap(KIE_SERVER_INSTANCE_ID, kieServerId)).endMetadata().build());
                         pullTrigger = true;
                         logger.info("KieServer: {}, DC rollout - Begin", KIE_SERVER_INSTANCE_ID);
                     } else {
                         logger.info("KieServer: {}, DC rollout - In progress", KIE_SERVER_INSTANCE_ID);
                     }
-                    
+
                     /**
                      * Cleanup the configmap annotation related to rollout-in-progress
                      */
                     ann.remove(ROLLOUT_REQUIRED);
-                    client.configMaps().createOrReplace(cm);
+                    client.configMaps().inNamespace(namespace).createOrReplace(cm);
                 } catch (KubernetesClientException kce) {
                     logger.debug("Mark DC rollout failed", kce);
                 }
@@ -157,10 +161,7 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
     }
 
     @Override
-    public void startup(KieServerImpl kieServer,
-                        ContainerManager containerManager,
-                        KieServerState currentState,
-                        AtomicBoolean kieServerActive) {
+    public void startup(KieServerImpl kieServer, ContainerManager containerManager, KieServerState currentState, AtomicBoolean kieServerActive) {
 
         String kieServerId = currentState.getConfiguration().getConfigItemValue(KieServerConstants.KIE_SERVER_ID);
 
@@ -169,20 +170,27 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
             Set<KieContainerResource> containers = prepareContainers(currentState.getContainers());
             containerManager.installContainersSync(kieServer, containers, currentState, new KieServerSetup());
 
-            new Thread(new WatchRunner(kieServerId)).start();
+            namespace = client.getNamespace();
+            startWatcherThread(kieServerId);
 
             clearRollout(client, kieServerId);
         }
+    }
+
+    private static void startWatcherThread(String kieServerId) {
+        new Thread(new WatchRunner(kieServerId)).start();
+        Thread.currentThread().setName("watcher-" + kieServerId);
     }
 
     private static void clearRollout(OpenShiftClient client, String kieServerId) {
         String triggerName = KIE_SERVER_ROLLOUT_IN_PROGRESS + "-" + kieServerId;
 
         // Cleanup the configmap related to rollout-in-progress if needed
-        if (client.configMaps().withName(triggerName).delete())
+        if (client.configMaps().inNamespace(namespace).withName(triggerName).delete()) {
             logger.info("Kie server: {}, DC rollout - End", KIE_SERVER_INSTANCE_ID);
+        }
     }
-    
+
     @Override
     public String getRepositoryType() {
         return KieServerConstants.KIE_SERVER_STATE_REPO_TYPE_OPENSHIFT;
@@ -192,5 +200,4 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
     public String toString() {
         return "OpenShiftStartupStrategy - deploys only kie containers defined from OpenShift ConfigMap, ignores kie containers given by controller";
     }
-
 }
