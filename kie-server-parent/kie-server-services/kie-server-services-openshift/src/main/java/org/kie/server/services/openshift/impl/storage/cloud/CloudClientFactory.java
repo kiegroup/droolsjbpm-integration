@@ -63,6 +63,12 @@ public interface CloudClientFactory {
             logger.debug("Token: [{}]", token);
         }
 
-        return new ConfigBuilder().withMasterUrl(mainUrl).withOauthToken(token).build();
+        return new ConfigBuilder()
+                .withMasterUrl(mainUrl)
+                .withOauthToken(token)
+                .withConnectionTimeout(10000)
+                .withRequestTimeout(10000)
+                .withRollingTimeout(600000)
+                .build();
     }
 }
