@@ -37,7 +37,7 @@ public interface KieServerOpenShift {
     }
 
     default Optional<DeploymentConfig> getKieServerDC(OpenShiftClient client, String serverId) {
-        List<DeploymentConfig> deployments = client.deploymentConfigs()
+        List<DeploymentConfig> deployments = client.deploymentConfigs().inNamespace(client.getNamespace())
                 .withLabel(CFG_MAP_LABEL_SERVER_ID_KEY, serverId).list().getItems();
         if (deployments.isEmpty()) { return Optional.empty();}
         if (deployments.size() == 1) {
@@ -48,7 +48,7 @@ public interface KieServerOpenShift {
     }
     
     default Optional<ConfigMap> getKieServerCM(OpenShiftClient client, String serverId) {
-        List<ConfigMap> configMaps = client.configMaps()
+        List<ConfigMap> configMaps = client.configMaps().inNamespace(client.getNamespace())
                 .withLabel(CFG_MAP_LABEL_SERVER_ID_KEY, serverId).list().getItems();
         if (configMaps.isEmpty()) { return Optional.empty();}
         if (configMaps.size() == 1) { return Optional.ofNullable(configMaps.get(0)); }
