@@ -1,7 +1,6 @@
 package com.jboss.soap.service.acmedemo.impl;
 
 import java.io.StringReader;
-import java.util.List;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
@@ -46,6 +45,8 @@ public class HeaderInInterceptor extends AbstractSoapInterceptor {
        XPathFactory xpathFactory = XPathFactory.newInstance();
        XPath xpath = xpathFactory.newXPath();
 
+       //As it was in the CDATA, it was unescaped, so for xpath we need the transformation
+       headerContent = headerContent.replaceAll("&","&amp;");
        InputSource source = new InputSource(new StringReader(headerContent));
            
        try {
