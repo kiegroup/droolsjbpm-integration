@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- origin at X=0.0 Y=0.0 -->
-<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:bpsim="http://www.bpsim.org/schemas/1.0" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:drools="http://www.jboss.org/drools" xmlns="http://www.jboss.org/drools" xmlns:ns="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd http://www.jboss.org/drools drools.xsd http://www.bpsim.org/schemas/1.0 bpsim.xsd" id="_KI1PANv0EDmAO6Ket8UYSw" exporter="org.eclipse.bpmn2.modeler.core" exporterVersion="1.5.2.SNAPSHOT-v20200602-1600-B1" targetNamespace="http://www.omg.org/bpmn20">
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:bpsim="http://www.bpsim.org/schemas/1.0" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:drools="http://www.jboss.org/drools" xmlns="http://www.jboss.org/drools" xmlns:ns="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd http://www.jboss.org/drools drools.xsd http://www.bpsim.org/schemas/1.0 bpsim.xsd" id="_KI1PANv0EDmAO6Ket8UYSw" exporter="org.eclipse.bpmn2.modeler.core" exporterVersion="1.5.3.Final-v20210519-2007-B1" targetNamespace="http://www.omg.org/bpmn20">
   <bpmn2:itemDefinition id="_serviceUrlItem" isCollection="false" structureRef="String"/>
   <bpmn2:itemDefinition id="_requestFlightItem" isCollection="false" structureRef="com.jboss.soap.service.acmedemo.FlightRequest"/>
   <bpmn2:itemDefinition id="_resultFlightItem" isCollection="false" structureRef="com.jboss.soap.service.acmedemo.Flight"/>
@@ -17,6 +17,7 @@
   <bpmn2:itemDefinition id="ItemDefinition_1" isCollection="false"/>
   <bpmn2:itemDefinition id="ItemDefinition_2" isCollection="false"/>
   <bpmn2:itemDefinition id="ItemDefinition_3" isCollection="false"/>
+  <bpmn2:itemDefinition id="ItemDefinition_4" isCollection="false"/>
   <bpmn2:process id="org.specialtripsagency.travelAgencyHeadersProcess" drools:packageName="org.specialtripsagency" drools:version="1.0" drools:adHoc="false" name="travelAgencyHeadersProcess" isExecutable="true" processType="Public">
     <bpmn2:property id="serviceUrl" itemSubjectRef="_serviceUrlItem" name="serviceUrl"/>
     <bpmn2:property id="requestFlight" itemSubjectRef="_requestFlightItem" name="requestFlight"/>
@@ -25,6 +26,7 @@
     <bpmn2:property id="coupon" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputXItem" name="coupon"/>
     <bpmn2:property id="ns_coupon" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputXItem" name="ns_coupon"/>
     <bpmn2:property id="escape_coupon" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputXItem" name="escape_coupon"/>
+    <bpmn2:property id="cdataElements" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputXItem" name="cdataElements"/>
     <bpmn2:sequenceFlow id="_F62E19E4-6F3B-45FB-8B6B-730D10233A9E" sourceRef="_553B4C08-C4D4-4337-86A7-274F96A12773" targetRef="_3FD70F6B-AD40-4887-A3BA-B02C5093B685"/>
     <bpmn2:sequenceFlow id="_492148F7-AB4F-4064-A972-AAAAF2B0D5A0" sourceRef="_3FD70F6B-AD40-4887-A3BA-B02C5093B685" targetRef="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F"/>
     <bpmn2:sequenceFlow id="_E0F59797-6B00-4B4C-9E74-04FBCD671914" sourceRef="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F" targetRef="_F96CBCA0-9371-42DC-9BEB-56AA9A12F443"/>
@@ -90,6 +92,7 @@ System.out.println(&quot;Leaving &quot; + kcontext.getNodeInstance().getNodeName
         <bpmn2:dataInput id="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputX" drools:dtype="String" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputXItem" name="Header_Param_NS_Coupon"/>
         <bpmn2:dataInput id="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_TaskNameInputX" drools:dtype="Object" name="TaskName"/>
         <bpmn2:dataInput id="DataInput_1" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputXItem" name="Header_Param_ESCAPE_Coupon"/>
+        <bpmn2:dataInput id="DataInput_2" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputXItem" name="CDataElements"/>
         <bpmn2:dataOutput id="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ResultOutputX" drools:dtype="com.jboss.soap.service.acmedemo.Flight" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ResultOutputXItem" name="Result"/>
         <bpmn2:inputSet id="InputSet_1">
           <bpmn2:dataInputRefs>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ParameterInputX</bpmn2:dataInputRefs>
@@ -102,6 +105,7 @@ System.out.println(&quot;Leaving &quot; + kcontext.getNodeInstance().getNodeName
           <bpmn2:dataInputRefs>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputX</bpmn2:dataInputRefs>
           <bpmn2:dataInputRefs>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_TaskNameInputX</bpmn2:dataInputRefs>
           <bpmn2:dataInputRefs>DataInput_1</bpmn2:dataInputRefs>
+          <bpmn2:dataInputRefs>DataInput_2</bpmn2:dataInputRefs>
         </bpmn2:inputSet>
         <bpmn2:outputSet id="OutputSet_1">
           <bpmn2:dataOutputRefs>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ResultOutputX</bpmn2:dataOutputRefs>
@@ -172,6 +176,13 @@ System.out.println(&quot;Leaving &quot; + kcontext.getNodeInstance().getNodeName
         <bpmn2:assignment id="Assignment_9">
           <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="FormalExpression_19">#{escape_coupon}</bpmn2:from>
           <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="FormalExpression_17">DataInput_1</bpmn2:to>
+        </bpmn2:assignment>
+      </bpmn2:dataInputAssociation>
+      <bpmn2:dataInputAssociation id="DataInputAssociation_11">
+        <bpmn2:targetRef>DataInput_2</bpmn2:targetRef>
+        <bpmn2:assignment id="Assignment_10">
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="FormalExpression_21">#{cdataElements}</bpmn2:from>
+          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="FormalExpression_18">DataInput_2</bpmn2:to>
         </bpmn2:assignment>
       </bpmn2:dataInputAssociation>
       <bpmn2:dataOutputAssociation id="DataOutputAssociation_1">
