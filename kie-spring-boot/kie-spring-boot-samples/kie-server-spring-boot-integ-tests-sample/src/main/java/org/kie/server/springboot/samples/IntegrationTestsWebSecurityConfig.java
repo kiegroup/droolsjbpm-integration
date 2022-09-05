@@ -41,7 +41,7 @@ public class IntegrationTestsWebSecurityConfig extends WebSecurityConfigurerAdap
     private static final String ENGINEERING_ROLE = "engineering";
     private static final String HR_ROLE = "HR";
     private static final String IT_ROLE = "IT";
-    private static final String ACCOUNTING_ROLE = "HR";
+    private static final String ACCOUNTING_ROLE = "Accounting";
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
