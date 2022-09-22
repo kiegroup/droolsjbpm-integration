@@ -26,7 +26,7 @@
     <bpmn2:property id="coupon" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputXItem" name="coupon"/>
     <bpmn2:property id="ns_coupon" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputXItem" name="ns_coupon"/>
     <bpmn2:property id="escape_coupon" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputXItem" name="escape_coupon"/>
-    <bpmn2:property id="cdataElements" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputXItem" name="cdataElements"/>
+    <bpmn2:property id="rawElements" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputXItem" name="rawElements"/>
     <bpmn2:sequenceFlow id="_F62E19E4-6F3B-45FB-8B6B-730D10233A9E" sourceRef="_553B4C08-C4D4-4337-86A7-274F96A12773" targetRef="_3FD70F6B-AD40-4887-A3BA-B02C5093B685"/>
     <bpmn2:sequenceFlow id="_492148F7-AB4F-4064-A972-AAAAF2B0D5A0" sourceRef="_3FD70F6B-AD40-4887-A3BA-B02C5093B685" targetRef="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F"/>
     <bpmn2:sequenceFlow id="_E0F59797-6B00-4B4C-9E74-04FBCD671914" sourceRef="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F" targetRef="_F96CBCA0-9371-42DC-9BEB-56AA9A12F443"/>
@@ -92,7 +92,7 @@ System.out.println(&quot;Leaving &quot; + kcontext.getNodeInstance().getNodeName
         <bpmn2:dataInput id="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputX" drools:dtype="String" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputXItem" name="Header_Param_NS_Coupon"/>
         <bpmn2:dataInput id="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_TaskNameInputX" drools:dtype="Object" name="TaskName"/>
         <bpmn2:dataInput id="DataInput_1" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputXItem" name="Header_Param_ESCAPE_Coupon"/>
-        <bpmn2:dataInput id="DataInput_2" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputXItem" name="CDataElements"/>
+        <bpmn2:dataInput id="DataInput_2" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_Header_Param_Coupon_NSInputXItem" name="RawElements"/>
         <bpmn2:dataOutput id="_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ResultOutputX" drools:dtype="com.jboss.soap.service.acmedemo.Flight" itemSubjectRef="__34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ResultOutputXItem" name="Result"/>
         <bpmn2:inputSet id="InputSet_1">
           <bpmn2:dataInputRefs>_34658F5F-BF7B-41BB-99ED-AD655FED5A4F_ParameterInputX</bpmn2:dataInputRefs>
@@ -181,7 +181,7 @@ System.out.println(&quot;Leaving &quot; + kcontext.getNodeInstance().getNodeName
       <bpmn2:dataInputAssociation id="DataInputAssociation_11">
         <bpmn2:targetRef>DataInput_2</bpmn2:targetRef>
         <bpmn2:assignment id="Assignment_10">
-          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="FormalExpression_21">#{cdataElements}</bpmn2:from>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="FormalExpression_21">#{rawElements}</bpmn2:from>
           <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="FormalExpression_18">DataInput_2</bpmn2:to>
         </bpmn2:assignment>
       </bpmn2:dataInputAssociation>
