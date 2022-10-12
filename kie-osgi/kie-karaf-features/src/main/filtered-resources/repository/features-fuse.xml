@@ -84,15 +84,6 @@
     <bundle>mvn:org.jbpm/jbpm-runtime-manager/${version.org.jbpm}</bundle>
   </feature>
 
-  <feature name="optaplanner-engine" version="${project.version}" description="OptaPlanner Engine">
-    <feature>optaplanner-dependencies</feature>
-    <feature version="${project.version}">drools-module</feature>
-    <bundle>mvn:org.optaplanner/optaplanner-core/${version.org.optaplanner}</bundle>
-    <bundle>mvn:org.optaplanner/optaplanner-persistence-common/${version.org.optaplanner}</bundle>
-    <bundle>mvn:org.optaplanner/optaplanner-persistence-xstream/${version.org.optaplanner}</bundle>
-    <bundle>mvn:org.optaplanner/optaplanner-persistence-jaxb/${version.org.optaplanner}</bundle>
-  </feature>
-
   <feature name="droolsjbpm-hibernate" version="${version.org.hibernate}" description="Hibernate 4.2.x JPA persistence engine support">
     <details>Enable Hibernate 5.x as persistence engine.</details>
     <feature>transaction</feature>
@@ -116,7 +107,6 @@
 
   <feature name="kie-server-client" version="${project.version}" description="KIE Server Client">
     <feature version="${project.version}">drools-module</feature>
-    <feature version="${project.version}">optaplanner-engine</feature>
     <feature version="${project.version}">jackson</feature>
     <feature>kie7-remote-dependencies</feature>
     <bundle>mvn:org.drools/kie-pmml/${version.org.kie}</bundle>
