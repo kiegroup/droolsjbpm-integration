@@ -110,21 +110,6 @@
     <bundle>mvn:org.apache.commons/commons-lang3/${version.org.apache.commons.lang3}</bundle>
   </feature>
 
-  <feature name="optaplanner-engine" version="${project.version}" description="OptaPlanner Engine">
-    <feature version="${project.version}">drools-module</feature>
-    <bundle>mvn:org.optaplanner/optaplanner-core/${version.org.optaplanner}</bundle>
-    <bundle>mvn:org.optaplanner/optaplanner-persistence-common/${version.org.optaplanner}</bundle>
-    <bundle>mvn:org.optaplanner/optaplanner-persistence-xstream/${version.org.optaplanner}</bundle>
-    <bundle>mvn:org.optaplanner/optaplanner-persistence-jaxb/${version.org.optaplanner}</bundle>
-    <bundle>mvn:org.mozilla/rhino/${version.org.mozilla.rhino}</bundle>
-    <bundle>mvn:org.apache.commons/commons-lang3/${version.org.apache.commons.lang3}</bundle>
-    <bundle>mvn:org.apache.commons/commons-math3/${version.org.apache.commons.math3}</bundle>
-    <bundle>mvn:commons-io/commons-io/${version.commons-io}</bundle>
-    <bundle>mvn:com.google.guava/guava/${version.com.google.guava}</bundle>
-    <bundle>mvn:com.google.guava/failureaccess/${version.com.google.guava.failureaccess}</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.reflections/${karaf.version.org.apache.servicemix.bundles.reflections}</bundle>
-  </feature>
-
   <feature name="droolsjbpm-hibernate" version="${version.org.hibernate}" description="Hibernate 5.x JPA persistence engine support">
     <details>Enable Hibernate 5.x as persistence engine.</details>
     <feature>transaction</feature>
@@ -165,7 +150,6 @@
 
   <feature name="kie-server-client" version="${project.version}" description="KIE Server Client">
     <feature version="${project.version}">drools-module</feature>
-    <feature version="${project.version}">optaplanner-engine</feature>
     <feature version="${project.version}">jackson</feature>
     <bundle>mvn:org.kie.server/kie-server-api/${version.org.drools.droolsjbpm-integration}</bundle>
     <bundle>mvn:org.kie.server/kie-server-common/${version.org.drools.droolsjbpm-integration}</bundle>
