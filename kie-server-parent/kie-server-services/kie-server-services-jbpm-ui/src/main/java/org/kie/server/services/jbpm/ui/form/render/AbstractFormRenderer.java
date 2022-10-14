@@ -24,7 +24,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -434,6 +436,20 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                                     }
                                     item.setValue((value != null) ? value.toString() : "");
                                     break;
+                                case "util-date":
+                                    if (!field.isShowTime() && value != null && value.toString().length() >= 10) {
+                                        if (value.toString().contains("CST")) {
+                                            LocalDate utilDate = ((java.util.Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                                            value = utilDate.toString();
+                                        }
+                                    } else if (value != null && value.toString().length() >= 1) {
+                                        if (value.toString().contains("CST")) {
+                                            LocalDateTime utilDateTime = ((java.util.Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                                            value = utilDateTime.toString();
+                                        }
+                                    }
+                                    item.setValue((value != null) ? value.toString() : "");
+                                    break;
                                 case "datetime-local":
                                     if (value != null && value.toString().length() >= 10 && !field.isShowTime()) {
                                         value = value.toString().substring(0, 10);
@@ -534,7 +550,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                     case "java.time.LocalDateTime":
                         return "datetime-local";
                     case "java.util.Date":
-                        return "Date";
+                        return "util-date";
                     case "java.sql.Date":
                     case "java.sql.Timestamp":
                         return "datetime-local";
@@ -751,7 +767,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
 
     private boolean isDate(String type) {
         return "datetime-local".equals(type) || "Date".equals(type)
-                || "time".equals(type) || "datetime".equals(type);
+                || "time".equals(type) || "datetime".equals(type) || "util-date".equals(type);
     }
 
     protected String getJSFieldType(String type) {
@@ -816,7 +832,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                         .append(id)
                         .append("')");
         } else if (isDate(type)) {
-            if (type.equals("datetime-local") && !isShowTime) {
+            if ((type.equals("datetime-local") || type.equals("util-date")) && !isShowTime) {
                 jsonTemplate.append("getDateWithoutTime('")
                         .append(id)
                         .append("',")
