@@ -437,18 +437,22 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                                     item.setValue((value != null) ? value.toString() : "");
                                     break;
                                 case "util-date":
-                                    if (!field.isShowTime() && value != null && value.toString().length() >= 10) {
-                                        if (value.toString().contains("CST")) {
+                                    if (value.toString().contains("CST")) {
+                                        if (!field.isShowTime() && value != null && value.toString().length() >= 10) {
                                             LocalDate utilDate = ((java.util.Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                                             value = utilDate.toString();
-                                        }
-                                    } else if (value != null && value.toString().length() >= 1) {
-                                        if (value.toString().contains("CST")) {
+                                        } else if (value != null && value.toString().length() >= 1) {
                                             LocalDateTime utilDateTime = ((java.util.Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
                                             value = utilDateTime.toString();
                                         }
+                                        item.setValue((value != null) ? value.toString() : "");
+                                    } else {
+                                        if (field.isShowTime()) {
+                                            item.setValue((value != null) ? value.toString() : "");
+                                        } else {
+                                            item.setValue((value != null && value.toString().length() > 1) ? value.toString().substring(0, 10) : "");
+                                        }
                                     }
-                                    item.setValue((value != null) ? value.toString() : "");
                                     break;
                                 case "datetime-local":
                                     if (value != null && value.toString().length() >= 10 && !field.isShowTime()) {
