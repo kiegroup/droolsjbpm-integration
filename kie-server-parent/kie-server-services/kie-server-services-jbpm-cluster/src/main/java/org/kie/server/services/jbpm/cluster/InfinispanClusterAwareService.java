@@ -160,7 +160,8 @@ public class InfinispanClusterAwareService implements ClusterAwareService {
         Cache<String, List<T>> cache = cacheManager.<String, List<T>> getCache(key);
 
         synchronized (this) {
-            List<T> values = cache.computeIfAbsent(partition, (k) -> new ArrayList<>());
+            List<T> values = cache.get(partition);
+            values = (values == null) ? new ArrayList<>() : new ArrayList<>(values);
             values.remove(value);
             cache.put(partition, values);
         }
@@ -177,7 +178,8 @@ public class InfinispanClusterAwareService implements ClusterAwareService {
         Cache<String, List<T>> cache = cacheManager.<String, List<T>> getCache(key);
 
         synchronized (this) {
-            List<T> values = cache.computeIfAbsent(partition, (k) -> new ArrayList<>());
+            List<T> values = cache.get(partition);
+            values = (values == null) ? new ArrayList<>() : new ArrayList<>(values);
             values.add(value);
             cache.put(partition, values);
         }
