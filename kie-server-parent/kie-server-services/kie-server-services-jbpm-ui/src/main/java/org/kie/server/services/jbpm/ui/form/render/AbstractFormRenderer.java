@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -339,7 +338,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
             boolean wrapJson,
             List<String> scriptDataList) {
         FormLayout layout = form.getLayout();
-        
+
 
         if (form.getModel().getClassName() != null && wrapJson) {
             Optional<FormField> fieldForm = topLevelForm.getFields().stream()
@@ -437,11 +436,11 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                                     item.setValue((value != null) ? value.toString() : "");
                                     break;
                                 case "util-date":
-                                    if (value.toString().contains("CST")) {
-                                        if (!field.isShowTime() && value != null && value.toString().length() >= 10) {
+                                    if (value instanceof java.util.Date) {
+                                        if (!field.isShowTime()) {
                                             LocalDate utilDate = ((java.util.Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                                             value = utilDate.toString();
-                                        } else if (value != null && value.toString().length() >= 1) {
+                                        } else {
                                             LocalDateTime utilDateTime = ((java.util.Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
                                             value = utilDateTime.toString();
                                         }
@@ -450,8 +449,9 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                                         if (field.isShowTime()) {
                                             item.setValue((value != null) ? value.toString() : "");
                                         } else {
-                                            item.setValue((value != null && value.toString().length() > 1) ? value.toString().substring(0, 10) : "");
+                                            item.setValue((value != null && !"".equals(value.toString())) ? LocalDateTime.parse(value.toString()).toLocalDate().toString() : "");
                                         }
+
                                     }
                                     break;
                                 case "datetime-local":
