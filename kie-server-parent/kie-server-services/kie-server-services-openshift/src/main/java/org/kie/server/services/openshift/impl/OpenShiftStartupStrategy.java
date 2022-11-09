@@ -126,7 +126,8 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
                     }
                 }
             } catch (KubernetesClientException kce) {
-                logger.error("WatchRunner thread failed", kce);
+                logger.debug("WatchRunner thread failed", kce);
+                logger.warn("WatchRunner thread failed, enable debug to see the stack trace");
             }
         }
 
