@@ -21,9 +21,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-
 import org.infinispan.Cache;
 import org.infinispan.CacheCollection;
 import org.infinispan.CacheSet;
@@ -58,6 +55,8 @@ public class InfinispanClusterAwareService implements ClusterAwareService {
     private String kieServerId;
     private String kieServerLocation;
 
+    private EmbeddedCacheManager cacheManager;
+
     public InfinispanClusterAwareService(String kieServerId, String kieServerLocation) {
         this.kieServerId = kieServerId;
         this.kieServerLocation = kieServerLocation;
@@ -74,17 +73,10 @@ public class InfinispanClusterAwareService implements ClusterAwareService {
         return new ClusterNode(kieServerId, kieServerLocation);
     }
 
-    private EmbeddedCacheManager lookup () {
-        try {
-            Context context = new InitialContext();
-            return (EmbeddedCacheManager) context.lookup(EJBCacheInitializer.CACHE_NAME_LOOKUP);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+
     
-    public void init() {
-        EmbeddedCacheManager cacheManager = lookup();
+    public void init(EmbeddedCacheManager cacheManager) {
+        this.cacheManager = cacheManager;
         cacheManager.addListener(this);
         Cache<Address, ClusterNode> nodes = cacheManager.<Address, ClusterNode> getCache(CLUSTER_NODES_KEY);
         nodes.addListener(this);
@@ -117,7 +109,6 @@ public class InfinispanClusterAwareService implements ClusterAwareService {
 
     @ViewChanged
     public void viewChanged(ViewChangedEvent event) {
-        EmbeddedCacheManager cacheManager = lookup();
         logger.info("jBPM cluster view changed. Current active nodes: {}", event.getNewMembers());
         if (Event.Type.VIEW_CHANGED.equals(event.getType()) && isCoordinator()) {
             List<Address> changedAddress = event.getNewMembers();
@@ -141,19 +132,16 @@ public class InfinispanClusterAwareService implements ClusterAwareService {
 
     @Override
     public boolean isCoordinator() {
-        EmbeddedCacheManager cacheManager = lookup();
         return cacheManager.isCoordinator();
     }
 
     @Override
     public Collection<ClusterNode> getActiveClusterNodes() {
-        EmbeddedCacheManager cacheManager = lookup();
         return cacheManager.<Address, ClusterNode> getCache(CLUSTER_NODES_KEY).values();
     }
 
     @Override
     public <T> void removeData(String key, String partition, T value) {
-        EmbeddedCacheManager cacheManager = lookup();
         if (!cacheManager.cacheExists(key)) {
             return;
         }
@@ -170,7 +158,6 @@ public class InfinispanClusterAwareService implements ClusterAwareService {
 
     @Override
     public <T> void addData(String key, String partition, T value) {
-        EmbeddedCacheManager cacheManager = lookup();
         if (!cacheManager.cacheExists(key)) {
             return;
         }
@@ -188,7 +175,6 @@ public class InfinispanClusterAwareService implements ClusterAwareService {
 
     @Override
     public <T> List<T> getData(String key) {
-        EmbeddedCacheManager cacheManager = lookup();
         if (!cacheManager.cacheExists(key)) {
             return emptyList();
         }
@@ -200,7 +186,6 @@ public class InfinispanClusterAwareService implements ClusterAwareService {
 
     @Override
     public <T> List<T> getDataFromPartition(String key, String partition) {
-        EmbeddedCacheManager cacheManager = lookup();
         if (!cacheManager.cacheExists(key)) {
             return emptyList();
         }
