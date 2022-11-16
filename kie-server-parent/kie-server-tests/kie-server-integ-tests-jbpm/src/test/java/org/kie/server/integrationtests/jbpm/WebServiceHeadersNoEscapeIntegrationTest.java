@@ -35,6 +35,7 @@ public class WebServiceHeadersNoEscapeIntegrationTest extends WebServiceBase {
         params.put("serviceUrl", TestConfig.getWebServiceHttpURL());
         params.put("coupon", "<Coupon><Number><![CDATA[AT&T]]></Number></Coupon>");
         params.put("ns_coupon", "http://acme-travel.com");
+        params.put("rawElements", "Coupon");
         
         Map<String, Object> outputParams = processClient.computeProcessOutcome(WS_CONTAINER_ID, "org.specialtripsagency.travelAgencyHeadersProcess", params);
         assertEquals("100", outputParams.get("ratePerPerson"));
