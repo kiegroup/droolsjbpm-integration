@@ -11,7 +11,7 @@ import com.jboss.soap.service.acmedemo.AcmeDemoInterface;
 import com.jboss.soap.service.acmedemo.Flight;
 import com.jboss.soap.service.acmedemo.FlightRequest;
 
-@org.apache.cxf.interceptor.InInterceptors (interceptors = {"com.jboss.soap.service.acmedemo.impl.HeaderInInterceptor"})
+@org.apache.cxf.interceptor.InInterceptors (interceptors = {"com.jboss.soap.service.acmedemo.impl.ReceiveInInterceptor", "com.jboss.soap.service.acmedemo.impl.HeaderInInterceptor"})
 @WebService(serviceName = "AcmeDemoService", endpointInterface = "com.jboss.soap.service.acmedemo.AcmeDemoInterface", targetNamespace = "http://service.soap.jboss.com/AcmeDemo/")
 public class AcmeDemoInterfaceImpl implements AcmeDemoInterface {
 
