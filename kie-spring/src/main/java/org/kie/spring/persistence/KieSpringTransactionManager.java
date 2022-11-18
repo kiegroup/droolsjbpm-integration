@@ -47,6 +47,13 @@ public class KieSpringTransactionManager
 
     public boolean begin() {
         try {
+            // RHBPMS-4621 - transaction can be marked as rollback
+            // and still be associated with current thread
+            // See WFLY-4327
+            if ( getStatus() == TransactionManager.STATUS_ROLLEDBACK ) {
+                logger.debug("Cleanup of transaction that has been rolled back previously");
+                rollback(true);
+            }
             if (getStatus() == TransactionManager.STATUS_NO_TRANSACTION) {
                 // If there is no transaction then start one, we will commit within the same Command
                 // it seems in spring calling getTransaction is enough to begin a new transaction
@@ -64,21 +71,28 @@ public class KieSpringTransactionManager
     }
 
     public void commit(boolean transactionOwner) {
-        if (transactionOwner) {
-            try {
-                // if we didn't begin this transaction, then do nothing
-                this.ptm.commit(currentTransaction);
-                currentTransaction = null;
-                if (TransactionSynchronizationManager.hasResource(KieSpringTransactionManager.RESOURCE_CONTAINER)) {
-                    TransactionSynchronizationManager.unbindResource(KieSpringTransactionManager.RESOURCE_CONTAINER);
-                }
-            } catch (Exception e) {
-                logger.warn("Unable to commit transaction",
-                        e);
-                throw new RuntimeException("Unable to commit transaction",
-                        e);
-            }
+        if (!transactionOwner) {
+            return;
         }
+        if (!TransactionSynchronizationManager.isActualTransactionActive()) {
+            logger.warn("transaction could not be commited as status is {}; check tx reaper timeout", getStatus());
+            return;
+        }
+
+        try {
+            // if we didn't begin this transaction, then do nothing
+            this.ptm.commit(currentTransaction);
+            currentTransaction = null;
+            if (TransactionSynchronizationManager.hasResource(KieSpringTransactionManager.RESOURCE_CONTAINER)) {
+                TransactionSynchronizationManager.unbindResource(KieSpringTransactionManager.RESOURCE_CONTAINER);
+            }
+        } catch (Exception e) {
+            logger.warn("Unable to commit transaction",
+                    e);
+            throw new RuntimeException("Unable to commit transaction",
+                    e);
+        }
+
     }
 
     public void rollback(boolean transactionOwner) {
