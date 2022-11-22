@@ -47,6 +47,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -89,6 +90,7 @@ public class KafkaFixture {
     
     protected static final String PROCESS_TYPE = "process";
     protected static final String CASE_TYPE = "case";
+    protected static final String TASK_TYPE = "task";
 
     protected static final String EVALUATION_PROCESS_ID = "evaluation";
     protected static final String EVALUATION_DESC = "Evaluation";
@@ -98,6 +100,8 @@ public class KafkaFixture {
     
     protected static final String CONTACT = "contact";
     protected static final String OWNER = "owner";
+    protected static final String ACTUAL_OWNER = "actualOwner";
+    protected static final String STATUS = "status";
 
     protected static final String VAR_KEY = "s";
     protected static final String VAR_VALUE= "first case started";
@@ -211,6 +215,20 @@ public class KafkaFixture {
         if (records.iterator().hasNext()) {
             assertRecord(records.iterator().next(), topic, type, state);
         }
+    }
+    
+    protected void consumeAndAssertTaskRecords(String topic, String taskStatus, String firstOwner, String lastOwner) {
+        ConsumerRecords<String, byte[]>  records = consumeMessages(topic);
+        assertEquals(2, records.count());
+        List<ConsumerRecord<String, byte[]>> recordsList = IterableUtils.toList(records);
+        assertEquals(taskStatus, getString(recordsList.get(0),STATUS));
+        assertEquals(firstOwner, getString(recordsList.get(0),ACTUAL_OWNER));
+        assertEquals(taskStatus, getString(recordsList.get(1),STATUS));
+        assertEquals(lastOwner, getString(recordsList.get(1),ACTUAL_OWNER));
+    }
+    
+    protected String getString(final ConsumerRecord<String, byte[]> record, String field) {
+        return ((Map<String, String>) getJsonObject(record).get("data")).get(field);
     }
 
     protected <T> ConsumerRecords<String, T> consumeMessages(String topic) {
