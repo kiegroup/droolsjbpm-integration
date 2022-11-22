@@ -28,7 +28,7 @@ import static org.kie.api.task.model.Status.InProgress;
 import static org.kie.api.task.model.Status.Ready;
 import static org.kie.api.task.model.Status.Reserved;
 
-import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -151,7 +151,7 @@ public class KafkaEmitterHappyPathTest extends KafkaFixture {
         assertNull(pi);
         
         ConsumerRecords<String, byte[]>  records = consumeMessages(TASKS_TOPIC);
-        assertEquals(11, records.count());
+        assertEquals(12, records.count());
         Map<String, Long> taskRecordsByStatus = groupRecordsByField(records, "status");
         
         assertEquals(2, taskRecordsByStatus.get(Ready.name()).intValue());
@@ -160,10 +160,10 @@ public class KafkaEmitterHappyPathTest extends KafkaFixture {
         assertEquals(3, taskRecordsByStatus.get(Completed.name()).intValue());
         
         records = consumeMessages(PROCESSES_TOPIC);
-        assertEquals(4, records.count());
+        assertEquals(6, records.count());
         Map<String, Long> processRecordsByStatus =  groupRecordsByField(records, "state");
         
-        assertEquals(3, processRecordsByStatus.get("1").intValue()); //Active
+        assertEquals(4, processRecordsByStatus.get("1").intValue()); //Active
         assertEquals(1, processRecordsByStatus.get("2").intValue()); //Completed
         
     }
@@ -213,6 +213,26 @@ public class KafkaEmitterHappyPathTest extends KafkaFixture {
         
         ConsumerRecords<String, byte[]>  records = consumeMessages(TASKS_TOPIC);
         assertEquals(2, records.count());
+    }
+    
+    @Test(timeout = 30000)
+    public void testKafkaEmitterProcessTaskDelegate() {
+        deploymentId = setup(deploymentService, EVALUATION_PROCESS_ID);
+        
+        Long processInstanceId = processService.startProcess(deploymentId, EVALUATION_PROCESS_ID, Collections.singletonMap("employee", JOHN));
+
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId > 0);
+        
+        List<TaskSummary> tasks = runtimeDataService.getTasksAssignedAsPotentialOwner(JOHN, new QueryFilter());
+        assertEquals(1, tasks.size());
+        
+        // delegating task to user Yoda (Reserved status)
+        userTaskService.delegate(deploymentId, tasks.get(0).getId(), JOHN, YODA);
+        
+        consumeAndAssertTaskRecords(TASKS_TOPIC, "Reserved", JOHN, YODA);
+        
+        processService.abortProcessInstance(processInstanceId);
     }
 
 }
