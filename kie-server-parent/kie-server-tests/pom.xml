@@ -1438,7 +1438,7 @@
             <plugin>
               <groupId>com.bazaarvoice.maven.plugins</groupId>
               <artifactId>process-exec-maven-plugin</artifactId>
-              <version>0.7</version>
+              <version>0.9</version>
               <executions>
                 <execution>
                   <id>start-springboot</id>
