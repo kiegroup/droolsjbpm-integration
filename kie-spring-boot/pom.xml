@@ -34,7 +34,7 @@
 
   <properties>
     <version.me.snowdrop.narayana>2.6.3</version.me.snowdrop.narayana>
-    <version.org.apache.commons-dbcp2>2.4.0</version.org.apache.commons-dbcp2>
+    <version.org.apache.commons-dbcp2>2.9.0</version.org.apache.commons-dbcp2>
   </properties>
 
   <dependencyManagement>
