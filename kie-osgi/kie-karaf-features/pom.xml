@@ -68,7 +68,7 @@
     <karaf.servicemix.version.com.thoughtworks.xstream>1.4.10_1</karaf.servicemix.version.com.thoughtworks.xstream>
     <karaf.servicemix.version.com.thoughtworks.xmlpull>1.1.4c_7</karaf.servicemix.version.com.thoughtworks.xmlpull>
     <karaf.servicemix.version.javax.xml.bind.jaxb>2.3_3</karaf.servicemix.version.javax.xml.bind.jaxb>
-    <karaf.servicemix.version.org.antlr>3.5_1</karaf.servicemix.version.org.antlr>
+    <karaf.servicemix.version.org.antlr>3.5.3_1</karaf.servicemix.version.org.antlr>
     <karaf.servicemix.version.org.apache.poi>4.1.2_1</karaf.servicemix.version.org.apache.poi>
     <karaf.servicemix.version.org.apache.xmlbeans>3.1.0_2</karaf.servicemix.version.org.apache.xmlbeans>
     <!-- Santurio and xmlresolver needed by POI 3.15+ -->
