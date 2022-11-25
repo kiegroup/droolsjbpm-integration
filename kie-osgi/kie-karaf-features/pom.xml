@@ -36,7 +36,7 @@
     <karaf.version.org.apache.geronimo.specs.jpa>1.0-alpha-1</karaf.version.org.apache.geronimo.specs.jpa>
     <karaf.version.org.apache.geronimo.specs.jta>1.1.1</karaf.version.org.apache.geronimo.specs.jta>
     <karaf.version.org.apache.geronimo.specs.servlet>1.0</karaf.version.org.apache.geronimo.specs.servlet>
-    <karaf.version.org.apache.geronimo.specs.atinject>1.0</karaf.version.org.apache.geronimo.specs.atinject>
+    <karaf.version.org.apache.geronimo.specs.atinject>1.2</karaf.version.org.apache.geronimo.specs.atinject>
 
 
     <!-- used by optaplanner -->
