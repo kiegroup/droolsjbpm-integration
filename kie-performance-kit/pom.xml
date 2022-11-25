@@ -14,7 +14,7 @@
 
   <properties>
     <java.module.name>org.kie.performance.kit</java.module.name>
-    <metrics.version>4.1.18</metrics.version>
+    <metrics.version>4.2.13</metrics.version>
     <perfrepo.version>1.7</perfrepo.version>
   </properties>
 
