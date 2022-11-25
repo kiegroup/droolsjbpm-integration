@@ -76,7 +76,7 @@
     <karaf.version.org.apache.santurio>2.1.7</karaf.version.org.apache.santurio>
     <karaf.servicemix.version.xmlresolver>1.2_5</karaf.servicemix.version.xmlresolver>
     <karaf.servicemix.version.org.codehaus.woodstox>3.2.9_3</karaf.servicemix.version.org.codehaus.woodstox>
-    <karaf.servicemix.version.org.quartz-scheduler>1.8.5_2</karaf.servicemix.version.org.quartz-scheduler>
+    <karaf.servicemix.version.org.quartz-scheduler>2.3.2_1</karaf.servicemix.version.org.quartz-scheduler>
     <!-- Specs -->
     <karaf.servicemix.version.scripting-api>2.4.0</karaf.servicemix.version.scripting-api>
     <!-- Special overwrites -->
