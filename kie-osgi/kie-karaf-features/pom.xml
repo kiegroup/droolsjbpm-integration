@@ -77,7 +77,7 @@
     <karaf.servicemix.version.org.codehaus.woodstox>3.2.9_3</karaf.servicemix.version.org.codehaus.woodstox>
     <karaf.servicemix.version.org.quartz-scheduler>1.8.5_2</karaf.servicemix.version.org.quartz-scheduler>
     <!-- Specs -->
-    <karaf.servicemix.version.scripting-api>2.4.0</karaf.servicemix.version.scripting-api>
+    <karaf.servicemix.version.scripting-api>2.9.0</karaf.servicemix.version.scripting-api>
     <!-- Special overwrites -->
     <karaf.version.org.apache.aries.jpa>1.0.1</karaf.version.org.apache.aries.jpa>
     <h2.version>1.4.178</h2.version>
