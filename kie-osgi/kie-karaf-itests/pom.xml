@@ -20,7 +20,7 @@
     <!-- <version.org.apache.cxf>3.2.8</version.org.apache.cxf> -->
     <!-- version.org.apache.camel>2.21.5</version.org.apache.camel -->
     <version.org.ops4j.pax.exam>4.13.4</version.org.ops4j.pax.exam>
-    <version.org.apache.servicemix.bundles.javax-inject>1_2</version.org.apache.servicemix.bundles.javax-inject>
+    <version.org.apache.servicemix.bundles.javax-inject>1_3</version.org.apache.servicemix.bundles.javax-inject>
 
     <maven.hibernate.dialect>org.hibernate.dialect.H2Dialect</maven.hibernate.dialect>
     <maven.jdbc.driver.class>org.h2.Driver</maven.jdbc.driver.class>
