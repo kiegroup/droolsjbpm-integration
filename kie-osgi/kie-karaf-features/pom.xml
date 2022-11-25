@@ -56,7 +56,7 @@
 
     <karaf.version.org.apache.logging.log4j>2.17.1</karaf.version.org.apache.logging.log4j>
     <!-- used by hibernate-validator -->
-    <karaf.version.org.apache.servicemix.specs.jsr303-api>2.4.0</karaf.version.org.apache.servicemix.specs.jsr303-api>
+    <karaf.version.org.apache.servicemix.specs.jsr303-api>2.9.0</karaf.version.org.apache.servicemix.specs.jsr303-api>
 
     <!-- Overwrites with a different Maven version. Apache POI 3.11+ needs version >=1.9 -->
     <karaf.version.commons-codec>1.10</karaf.version.commons-codec>
