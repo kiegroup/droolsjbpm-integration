@@ -61,6 +61,20 @@
 	</#if>
     <input id="${item.id}" name="${item.name}" type="date" class="form-control" value="${item.value}" ${(item.required)?string('required', '')} ${(item.readOnly)?string('disabled', '')}"/>
 </div>
+<#elseif item.type == "util-date">
+<div class="form-group">
+	<label for="${item.id}">${item.label}</label>
+	<#if item.required>
+	<strong style="color: red">*</strong>
+</#if>
+<#if item.showTime >
+<input id="${item.id}" name="${item.name}" type="datetime-local" class="form-control" value="${item.value}"
+	   ${(item.required)?string('required', '')} ${(item.readOnly)?string('disabled', '')}/>
+<#elseif  !item.showTime >
+<input id="${item.id}" name="${item.name}" type="date" class="form-control" value="${item.value}"
+	   ${(item.required)?string('required', '')} ${(item.readOnly)?string('disabled', '')}/>
+</#if>
+</div>
 <#elseif item.type == "datetime-local">
 <div class="form-group">
 	<label for="${item.id}">${item.label}</label>
