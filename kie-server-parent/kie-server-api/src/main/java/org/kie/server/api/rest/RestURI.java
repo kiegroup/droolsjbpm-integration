@@ -16,6 +16,7 @@
 
 package org.kie.server.api.rest;
 
+import java.net.URLEncoder;
 import java.util.Map;
 
 import org.apache.commons.lang3.text.StrLookup;
@@ -380,7 +381,11 @@ public class RestURI {
             if (obj == null) {
                 throw new IllegalArgumentException("Missing value for " + key);
             }
-            return obj.toString();
+            return encode(obj);
         }
+    }
+    
+    public static String encode (Object obj) {
+        return URLEncoder.encode(obj.toString()).replace("+","%20");
     }
 }

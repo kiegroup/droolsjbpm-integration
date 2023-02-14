@@ -123,6 +123,13 @@ public class KieServerHttpRequestTest extends ServerTestCase {
     public void clearHandler() {
         handler = null;
     }
+    
+    @Test
+    public void encodedUrlTest () {
+        assertEquals("http://pepe.com/var%32name",KieServerHttpRequest.appendQueryParameters("http://pepe.com/var%32name"));
+        assertEquals("http://pepe.com",KieServerHttpRequest.appendQueryParameters("http://pepe.com"));
+        assertEquals("http://pepe.com/?name=pepe%20the%20best",KieServerHttpRequest.appendQueryParameters("http://pepe.com","name","pepe the best"));
+    }
 
     /**
      * Create request with malformed URL
@@ -249,18 +256,8 @@ public class KieServerHttpRequestTest extends ServerTestCase {
     @Test
     public void getUrlEncodedWithSpace() throws Exception {
         String unencoded = "/a resource";
-        final AtomicReference<String> path = new AtomicReference<String>();
-        handler = new RequestHandler() {
-
-            @Override
-            public void handle( Request request, HttpServletResponse response ) {
-                path.set(request.getPathInfo());
-                response.setStatus(HTTP_OK);
-            }
-        };
         KieServerHttpRequest request = newRequest(url + unencoded);
-        assertEquals(200, request.get().response().code());
-        assertEquals(unencoded, path.get());
+        assertEquals(400, request.get().response().code());
     }
 
     /**
@@ -293,18 +290,8 @@ public class KieServerHttpRequestTest extends ServerTestCase {
     @Test
     public void getUrlEncodedWithPercent() throws Exception {
         String unencoded = "/%";
-        final AtomicReference<String> path = new AtomicReference<String>();
-        handler = new RequestHandler() {
-
-            @Override
-            public void handle( Request request, HttpServletResponse response ) {
-                path.set(request.getPathInfo());
-                response.setStatus(HTTP_OK);
-            }
-        };
         KieServerHttpRequest request = newRequest(url + unencoded);
-        assertEquals(200, request.get().response().code());
-        assertEquals(unencoded, path.get());
+        assertEquals(400, request.get().response().code());
     }
 
     /**
