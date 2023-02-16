@@ -601,7 +601,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(VAR_NAME, variableName);
 
-            String statusQueryString = getAdditionalParams("?varValue=" + variableValue + "&sort=" + sort + "&sortOrder=" + sortOrder, "status", status);
+            String statusQueryString = getAdditionalParams("?varValue=" + RestURI.encode(variableValue) + "&sort=" + sort + "&sortOrder=" + sortOrder, "status", status);
             String queryString = getPagingQueryString(statusQueryString, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_URI + "/" + PROCESS_INSTANCE_BY_VAR_NAME_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
@@ -987,7 +987,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(QUERY_NAME, queryName);
 
-            String queryString = getPagingQueryString("?mapper=" + mapper + "&orderBy=" + orderBy, page, pageSize);
+            String queryString = getPagingQueryString("?mapper=" + mapper + "&orderBy=" + RestURI.encode(orderBy), page, pageSize);
             result = makeHttpGetRequestAndCreateCustomResponse(build(loadBalancer.getUrl(), QUERY_DEF_URI + "/" + RUN_QUERY_DEF_GET_URI, valuesMap) + queryString, resultTypeList);
 
         } else {
