@@ -38,6 +38,7 @@ import org.kie.server.api.model.instance.TaskEventInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.TaskSummaryList;
+import org.kie.server.api.rest.RestURI;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.UserTaskServicesClient;
 
@@ -1136,7 +1137,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             String userQuery = getUserQueryStr(userId);
             String statusQuery = getAdditionalParams(userQuery, "status", status);
-            String queryString = getPagingQueryString(statusQuery, page, pageSize)+"&sort="+sort+"&sortOrder="+sortOrder+"&filter="+filter;
+            String queryString = getPagingQueryString(statusQuery, page, pageSize)+"&sort="+sort+"&sortOrder="+sortOrder+"&filter="+RestURI.encode(filter);
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(loadBalancer.getUrl(), QUERY_URI + "/" + TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString , TaskSummaryList.class);
@@ -1394,7 +1395,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String queryString = getPagingQueryString(statusQuery, page, pageSize)+"&sort="+sort+"&sortOrder="+sortOrder;
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASKS_BY_VAR_NAME_GET_URI, valuesMap) + queryString + "&varValue=" + variableValue, TaskSummaryList.class);
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASKS_BY_VAR_NAME_GET_URI, valuesMap) + queryString + "&varValue=" + RestURI.encode(variableValue), TaskSummaryList.class);
 
 
 
