@@ -59,7 +59,7 @@ public class LatestContainerLocator implements ContainerLocator {
                 }
         );
         ComparableVersion latest = Collections.max(comparableVersions);
-        logger.debug("Latest version for alias {} is {}", alias, comparableVersions);
+        logger.debug("Latest version for alias {} is {}", alias, latest);
         return versionToIdentifier.get(latest.toString());
     }
 
