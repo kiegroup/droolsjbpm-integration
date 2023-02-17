@@ -15,8 +15,6 @@
  */
 package org.kie.server.common.rest;
 
-import java.io.IOException;
-
 public class KieServerHttpRequestException extends RuntimeException {
 
     /** generated serial version UID */
@@ -39,15 +37,5 @@ public class KieServerHttpRequestException extends RuntimeException {
      */
     public KieServerHttpRequestException(final String msg) {
         super(msg);
-    }
-    
-    /**
-     * Get {@link IOException} that triggered this request exception
-     *
-     * @return {@link IOException} cause
-     */
-    @Override
-    public IOException getCause() {
-        return (IOException) super.getCause();
     }
 }

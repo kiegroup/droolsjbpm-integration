@@ -100,6 +100,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
+import org.kie.server.api.rest.RestURI;
 
 /**
  * This class is only meant to be used internally by the kie-server code! For interacting with the
@@ -441,7 +442,7 @@ public class KieServerHttpRequest {
         else
             return CHARSET_UTF8;
     }
-
+ 
     private static StringBuilder addPathSeparator( final String baseUrl, final StringBuilder result ) {
         // Add trailing slash if the base URL doesn't have any path segments.
         //
@@ -464,43 +465,6 @@ public class KieServerHttpRequest {
     }
 
     /**
-     * Encode the given URL as an ASCII {@link String}
-     * <p>
-     * This method ensures the path and query segments of the URL are properly encoded such as ' ' characters being encoded to '%20'
-     * or any UTF-8 characters that are non-ASCII. No encoding of URLs is done by default by the {@link KieServerHttpRequest}
-     * constructors and so if URL encoding is needed this method should be called before calling the {@link KieServerHttpRequest}
-     * constructor.
-     *
-     * @param url
-     * @return encoded URL
-     * @throws KieServerHttpRequestException
-     */
-    static String encodeUrlToUTF8( final CharSequence url ) throws KieServerHttpRequestException {
-        URL parsed;
-        try {
-            parsed = new URL(url.toString());
-        } catch( IOException ioe ) {
-            throw new KieServerHttpRequestException("Unable to encode url '" + url.toString() + "'", ioe);
-        }
-
-        String host = parsed.getHost();
-        int port = parsed.getPort();
-        if( port != -1 )
-            host = host + ':' + Integer.toString(port);
-
-        try {
-            String encoded = new URI(parsed.getProtocol(), host, parsed.getPath(), parsed.getQuery(), null).toASCIIString();
-            int paramsStart = encoded.indexOf('?');
-            if( paramsStart > 0 && paramsStart + 1 < encoded.length() )
-                encoded = encoded.substring(0, paramsStart + 1) + encoded.substring(paramsStart + 1).replace("+", "%2B");
-            return encoded;
-        } catch( URISyntaxException e ) {
-            KieServerHttpRequestException krhre = new KieServerHttpRequestException("Unable to parse parse URI", e);
-            throw krhre;
-        }
-    }
-
-    /**
      * Append given map as query parameters to the base URL
      * <p>
      * Each map entry's key will be a parameter name and the value's {@link Object#toString()} will be the parameter value.
@@ -515,28 +479,22 @@ public class KieServerHttpRequest {
             return baseUrl;
 
         final StringBuilder result = new StringBuilder(baseUrl);
-
         addPathSeparator(baseUrl, result);
         addParamPrefix(baseUrl, result);
 
         Entry<?, ?> entry;
-        Object value;
         Iterator<?> iterator = params.entrySet().iterator();
         entry = (Entry<?, ?>) iterator.next();
         result.append(entry.getKey().toString());
         result.append('=');
-        value = entry.getValue();
-        if( value != null )
-            result.append(value);
+        appendValue (result, entry.getValue());
 
         while( iterator.hasNext() ) {
             result.append('&');
             entry = (Entry<?, ?>) iterator.next();
             result.append(entry.getKey().toString());
             result.append('=');
-            value = entry.getValue();
-            if( value != null )
-                result.append(value);
+            appendValue (result, entry.getValue());
         }
 
         return result.toString();
@@ -563,28 +521,27 @@ public class KieServerHttpRequest {
         }
 
         final StringBuilder result = new StringBuilder(baseUrl);
-
         addPathSeparator(baseUrl, result);
         addParamPrefix(baseUrl, result);
 
-        Object value;
         result.append(params[0]);
         result.append('=');
-        value = params[1];
-        if( value != null )
-            result.append(value);
-
+        appendValue (result,params[1]);
+        
         for( int i = 2; i < params.length; i += 2 ) {
             result.append('&');
             result.append(params[i]);
             result.append('=');
-            value = params[i + 1];
-            if( value != null ) {
-                result.append(value);
-            }
+            appendValue (result, params[i + 1]);
         }
 
         return result.toString();
+    }
+    
+    private static void appendValue (StringBuilder result, Object value) {
+        if( value != null ) {
+            result.append(RestURI.encode(value));
+        }
     }
 
     public static void setKeepAlive( final boolean keepAlive ) {
@@ -1233,9 +1190,7 @@ public class KieServerHttpRequest {
             }
             paramList = queryParamList.toArray();
         }
-        String unencodedUrlString = appendQueryParameters(requestInfo.getRequestUrl().toString(), paramList);
-        String urlString = encodeUrlToUTF8(unencodedUrlString);
-        requestInfo.setRequestUrl(urlString);
+        requestInfo.setRequestUrl(appendQueryParameters(requestInfo.getRequestUrl().toString(), paramList));
     }
 
     // Form parameter methods -----------------------------------------------------------------------------------------------------

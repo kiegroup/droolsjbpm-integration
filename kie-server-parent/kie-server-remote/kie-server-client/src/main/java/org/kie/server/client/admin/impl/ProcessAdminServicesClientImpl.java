@@ -37,6 +37,7 @@ import org.kie.server.api.model.admin.TimerInstance;
 import org.kie.server.api.model.admin.TimerInstanceList;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
+import org.kie.server.api.rest.RestURI;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.admin.ProcessAdminServicesClient;
 import org.kie.server.client.impl.AbstractKieServicesClientImpl;
@@ -413,7 +414,7 @@ public class ProcessAdminServicesClientImpl extends AbstractKieServicesClientImp
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
 
-            String queryString = "?includeAck=" + includeAcknowledged +"&node=" + nodeName;
+            String queryString = "?includeAck=" + includeAcknowledged +"&node=" + RestURI.encode(nodeName);
             queryString = getPagingQueryString(queryString, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
