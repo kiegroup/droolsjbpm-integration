@@ -280,9 +280,9 @@ public class RestUtils {
 
         /*
          * 23000 SQLState is used by MySQL, MSSQL,Oracle,Postgres and MariaDB for constraint Violation. 
-         * 'already exists' keyword is used in RuntimeException which is thrown by org.jbpm.persistence.JpaProcessPersistenceContext class to indicate that Correlation key already exists in database. 
+         * 'failed to persist' keyword is used in RuntimeException which is thrown by org.jbpm.persistence.JpaProcessPersistenceContext class to indicate that Correlation key already exists in database. 
          * */
-        if ((constraintViolationException != null && "23000".equals(constraintViolationException.getSQLState())) || e.getMessage().contains("already exists")) {
+        if ((constraintViolationException != null && "23000".equals(constraintViolationException.getSQLState())) || e.getMessage().contains("failed to persist")) {
             return true;
         }
         return false;
