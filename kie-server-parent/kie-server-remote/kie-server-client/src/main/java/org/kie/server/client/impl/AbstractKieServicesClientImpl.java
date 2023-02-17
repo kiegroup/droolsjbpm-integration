@@ -49,6 +49,7 @@ import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
+import org.kie.server.api.rest.RestURI;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.balancer.LoadBalancer;
 import org.kie.server.client.jms.ResponseHandler;
@@ -691,7 +692,7 @@ public abstract class AbstractKieServicesClientImpl {
     protected String buildQueryString(String paramName, List<?> items) {
         StringBuilder builder = new StringBuilder("?");
         for (Object o : items) {
-            builder.append(paramName).append("=").append(o).append("&");
+            builder.append(paramName).append("=").append(RestURI.encode(o)).append("&");
         }
         builder.deleteCharAt(builder.length()-1);
 
@@ -709,7 +710,7 @@ public abstract class AbstractKieServicesClientImpl {
     
     protected String getUserQueryStr(String userId, char prefix) {
         if (BYPASS_AUTH_USER && userId != null) {
-            return prefix + "user=" + userId;
+            return prefix + "user=" + RestURI.encode(userId);
         }
         return "";
     }
@@ -737,7 +738,7 @@ public abstract class AbstractKieServicesClientImpl {
         } else {
             queryString.append("&");
         }
-        queryString.append(name).append("=").append(value);
+        queryString.append(name).append("=").append(RestURI.encode(value));
 
         return queryString.toString();
     }
@@ -751,7 +752,7 @@ public abstract class AbstractKieServicesClientImpl {
                 queryString.append("&");
             }
             for (Object value : values) {
-                queryString.append(name).append("=").append(value).append("&");
+                queryString.append(name).append("=").append(RestURI.encode(value)).append("&");
             }
             queryString.deleteCharAt(queryString.length() - 1);
         }
@@ -792,7 +793,7 @@ public abstract class AbstractKieServicesClientImpl {
                 queryString.append("&");
             }
             for (Object value : values) {
-                queryString.append(name).append("=").append(value).append("&");
+                queryString.append(name).append("=").append(RestURI.encode(value)).append("&");
             }
             queryString.deleteCharAt(queryString.length() - 1);
         }
