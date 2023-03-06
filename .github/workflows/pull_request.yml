@@ -12,7 +12,7 @@ on:
 jobs:
   build-chain:
     concurrency:
-      group: pull_request-${{ github.head_ref }}
+      group: pr-droolsjbpm-integration_${{ matrix.os }}_${{ matrix.java-version }}_${{ matrix.maven-version }}_${{ github.head_ref }}
       cancel-in-progress: true
     strategy:
       matrix:
