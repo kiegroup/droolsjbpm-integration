@@ -136,7 +136,7 @@ public class ImageServiceBase {
             Map<String, String> subProcessLinks = new HashMap<>();
             QueryContext qc = MAX_NODES > 0 ? new QueryContext(0, MAX_NODES) : null;
             Collection<NodeInstanceDesc> activeLogs = dataService.getProcessInstanceHistoryActive(procInstId, qc);
-            Collection<NodeInstanceDesc> completedLogs = dataService.getProcessInstanceHistoryCompleted(procInstId, qc);
+            Collection<NodeInstanceDesc> passedLogs = dataService.getProcessInstanceHistoryPassed(procInstId, qc);
             Collection<NodeInstanceDesc> fullLogs = dataService.getProcessInstanceFullHistory(procInstId, qc);
 
             // Async active nodes don't have any related completed node instance
@@ -155,7 +155,7 @@ public class ImageServiceBase {
                 active.put(activeNode.getId(), activeNode.getNodeId());
             }
 
-            for (NodeInstanceDesc completeNode : completedLogs) {
+            for (NodeInstanceDesc completeNode : passedLogs) {
                 completed.add(completeNode.getNodeId());
 
                 active.remove(completeNode.getId());
@@ -171,7 +171,7 @@ public class ImageServiceBase {
             Map<String, Long> badges = null;
             if (showBadges) {
                 Collection<NodeInstanceDesc> allNodes = new ArrayList<>();
-                allNodes.addAll(completedLogs);
+                allNodes.addAll(passedLogs);
                 allNodes.addAll(activeLogs);
 
                 badges = allNodes.stream().collect(Collectors.groupingBy(NodeInstanceDesc::getNodeId, Collectors.counting()));
