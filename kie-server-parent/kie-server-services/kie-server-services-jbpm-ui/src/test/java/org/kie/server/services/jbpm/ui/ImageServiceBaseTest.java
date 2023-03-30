@@ -174,9 +174,9 @@ public class ImageServiceBaseTest {
                                                                                                          "", 0, 1L, 1L, "", null, 1);
 
         List<NodeInstanceDesc> activeNodes = Arrays.asList(nodeInstanceDescActive1, nodeInstanceDescActive2);
-        List<NodeInstanceDesc> completedNodes = Arrays.asList(nodeInstanceDescCompleted1, nodeInstanceDescCompleted2);
+        List<NodeInstanceDesc> finishedNodes = Arrays.asList(nodeInstanceDescCompleted1, nodeInstanceDescCompleted2);
         List<NodeInstanceDesc> fullLogs = Arrays.asList(nodeInstanceDescCompleted1, nodeInstanceDescCompleted2, nodeInstanceDescActive1, nodeInstanceDescActive2);
-        when(dataService.getProcessInstanceHistoryCompleted(anyLong(), any())).thenReturn(completedNodes);
+        when(dataService.getProcessInstanceHistoryFinished(anyLong(), any())).thenReturn(finishedNodes);
         when(dataService.getProcessInstanceHistoryActive(anyLong(), any())).thenReturn(activeNodes);
         when(dataService.getProcessInstanceFullHistory(anyLong(), any())).thenReturn(fullLogs);
         Map<String, ImageReference> imageReferenceMap = new HashMap<>();
@@ -230,9 +230,9 @@ public class ImageServiceBaseTest {
                                                                                                        "", 6, 1L, 1L, "", null, 1);
 
         List<NodeInstanceDesc> activeNodes = Arrays.asList(nodeInstanceDescActive);
-        List<NodeInstanceDesc> completedNodes = Arrays.asList(nodeInstanceDescCompleted1, nodeInstanceDescCompleted2);
+        List<NodeInstanceDesc> finishedNodes = Arrays.asList(nodeInstanceDescCompleted1, nodeInstanceDescCompleted2);
         List<NodeInstanceDesc> fullLogs = Arrays.asList(nodeInstanceDescActive, nodeInstanceDescCompleted1, nodeInstanceDescCompleted2, nodeInstanceDescError);
-        when(dataService.getProcessInstanceHistoryCompleted(anyLong(), any())).thenReturn(completedNodes);
+        when(dataService.getProcessInstanceHistoryFinished(anyLong(), any())).thenReturn(finishedNodes);
         when(dataService.getProcessInstanceHistoryActive(anyLong(), any())).thenReturn(activeNodes);
         when(dataService.getProcessInstanceFullHistory(anyLong(), any())).thenReturn(fullLogs);
         Map<String, ImageReference> imageReferenceMap = new HashMap<>();
@@ -288,7 +288,7 @@ public class ImageServiceBaseTest {
         NodeInstanceDesc nodeInstanceDescAbort = new org.jbpm.kie.services.impl.model.NodeInstanceDesc("2", abortNodeId, "", "SubProcessNode", "", 1L, null,
                                                                                                        "", 2, 1L, 3L, "", null, 1);
 
-        when(dataService.getProcessInstanceHistoryCompleted(anyLong(), any())).thenReturn(Arrays.asList(nodeInstanceDescCompleted1));
+        when(dataService.getProcessInstanceHistoryFinished(anyLong(), any())).thenReturn(Arrays.asList(nodeInstanceDescCompleted1));
         when(dataService.getProcessInstanceHistoryActive(anyLong(), any())).thenReturn(Collections.EMPTY_LIST);
         List<NodeInstanceDesc> fullLogs = Arrays.asList(nodeInstanceDescAbort, nodeInstanceDescCompleted1);
         when(dataService.getProcessInstanceFullHistory(anyLong(), any())).thenReturn(fullLogs);
@@ -384,14 +384,14 @@ public class ImageServiceBaseTest {
                  "", 0, null, null, "evaluation_1.0.0-SNAPSHOT", null, 1);
 
         List<NodeInstanceDesc> activeNodes = Arrays.asList(nodeInstance7_start);
-        List<NodeInstanceDesc> completedNodes = Arrays.asList(nodeInstance0_end, nodeInstance1_end, nodeInstance3_end,
+        List<NodeInstanceDesc> finishedNodes = Arrays.asList(nodeInstance0_end, nodeInstance1_end, nodeInstance3_end,
                                                               nodeInstance5_end, nodeInstance5_end2, nodeInstance6_end);
         List<NodeInstanceDesc> fullLogs = Arrays.asList(nodeInstance0_end, nodeInstance0_start, nodeInstance1_start,
                                                         nodeInstance1_end, nodeInstance2, nodeInstance3_end,
                                                         nodeInstance3_start, nodeInstance5_end, nodeInstance5_end2,
                                                         nodeInstance5_start, nodeInstance6_end, nodeInstance6_start,
                                                         nodeInstance7_start, nodeInstance8, nodeInstance8_2);
-        when(dataService.getProcessInstanceHistoryCompleted(anyLong(), any())).thenReturn(completedNodes);
+        when(dataService.getProcessInstanceHistoryFinished(anyLong(), any())).thenReturn(finishedNodes);
         when(dataService.getProcessInstanceHistoryActive(anyLong(), any())).thenReturn(activeNodes);
         when(dataService.getProcessInstanceFullHistory(anyLong(), any())).thenReturn(fullLogs);
         Map<String, ImageReference> imageReferenceMap = new HashMap<>();
