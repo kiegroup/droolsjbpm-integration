@@ -28,7 +28,17 @@
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>xalan</artifactId>
+        </exclusion>
       </exclusions>
+    </dependency>
+
+    <!-- due to https://issues.redhat.com/browse/RHPAM-4593 -->
+    <dependency>
+      <groupId>xalan</groupId>
+      <artifactId>xalan</artifactId>
     </dependency>
 
     <!-- Replacement for above excluded 'commons-logging:commons-logging' -->
