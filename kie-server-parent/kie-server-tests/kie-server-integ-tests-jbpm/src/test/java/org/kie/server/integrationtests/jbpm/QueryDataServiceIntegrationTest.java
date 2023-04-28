@@ -775,6 +775,11 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             }
 
             errors = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_ERROR, 0, 10, ExecutionErrorInstance.class);
+            System.out.println("List of errors returned by testErrorHandlingFailedToSignal()");
+            for (ExecutionErrorInstance error : errors) {
+                System.out.println(error);
+            }
+
             errors = filterErrorsByProcessInstanceId(errors, processInstanceId);
             assertNotNull(errors);
             assertEquals(1, errors.size());
