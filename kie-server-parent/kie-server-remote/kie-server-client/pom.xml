@@ -79,6 +79,12 @@
       <groupId>org.wildfly.security</groupId>
       <artifactId>wildfly-elytron</artifactId>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.sshd</groupId>
+          <artifactId>sshd-common</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- jaxb -->
