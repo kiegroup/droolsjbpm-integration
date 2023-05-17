@@ -41,6 +41,12 @@
       <artifactId>xalan</artifactId>
     </dependency>
 
+    <!-- due to https://issues.redhat.com/browse/RHPAM-4702 -->
+    <dependency>
+      <groupId>xalan</groupId>
+      <artifactId>serializer</artifactId>
+    </dependency>
+
     <!-- Replacement for above excluded 'commons-logging:commons-logging' -->
     <dependency>
       <groupId>org.slf4j</groupId>
