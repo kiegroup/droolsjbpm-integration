@@ -173,8 +173,8 @@ public class OASGenerator {
     }
 
     private OpenAPI loadOASTemplate() throws Exception {
-        try (InputStream is = this.getClass().getResourceAsStream("/oasTemplate.yaml");
-                OpenApiStaticFile openApiStaticFile = new OpenApiStaticFile(is, Format.YAML)) {
+        try (InputStream is = this.getClass().getResourceAsStream("/oasTemplate.json");
+                OpenApiStaticFile openApiStaticFile = new OpenApiStaticFile(is, Format.JSON)) {
             return OpenApiProcessor.modelFromStaticFile(openApiStaticFile);
         }
     }
