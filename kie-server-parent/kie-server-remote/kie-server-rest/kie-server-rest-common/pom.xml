@@ -98,6 +98,12 @@
       <artifactId>simpleclient_httpserver</artifactId>
     </dependency>
 
+    <!-- Test - Wildfly Elytron -->
+    <dependency>
+      <groupId>org.wildfly.security</groupId>
+      <artifactId>wildfly-elytron-auth-server</artifactId>
+      <scope>test</scope>
+    </dependency>
 
   </dependencies>
 
