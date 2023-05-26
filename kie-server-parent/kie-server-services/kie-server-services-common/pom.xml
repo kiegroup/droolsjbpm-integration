@@ -76,6 +76,7 @@
     <dependency>
       <groupId>org.wildfly.security</groupId>
       <artifactId>wildfly-elytron</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <!-- security -->
@@ -214,4 +215,21 @@
 
   </dependencies>
 
+  <profiles>
+    <profile>
+      <id>tomcat9</id>
+      <activation>
+        <property>
+          <name>container.profile</name>
+          <value>tomcat9</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.wildfly.security</groupId>
+          <artifactId>wildfly-elytron-auth-server</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 </project>
