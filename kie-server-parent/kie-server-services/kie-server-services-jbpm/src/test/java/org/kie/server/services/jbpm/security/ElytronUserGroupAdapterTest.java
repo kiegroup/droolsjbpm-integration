@@ -16,17 +16,20 @@
 
 package org.kie.server.services.jbpm.security;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.reflect.Whitebox;
 import org.wildfly.security.auth.server.RealmUnavailableException;
+import org.wildfly.security.authz.AuthorizationFailureException;
 
+import java.util.Arrays;
+import java.util.List;
+
+import static org.mockito.Mockito.lenient;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -46,8 +49,9 @@ public class ElytronUserGroupAdapterTest {
 
     @Test
     public void testNoSecurityContext() {
-        when(adapter.isActive()).thenReturn(true);
-        when(adapter.getGroupsForUser(Mockito.anyObject())).thenCallRealMethod();
+        setAuthorizationFailureExceptionClass();
+        when(adapter.isActive()).thenCallRealMethod();
+        when(adapter.getGroupsForUser(Mockito.anyString())).thenCallRealMethod();
         when(adapter.getUserName()).thenReturn(null);
         List<String> roles = adapter.getGroupsForUser(USER_ID);
 
@@ -58,8 +62,9 @@ public class ElytronUserGroupAdapterTest {
 
     @Test
     public void testSecurityContextNoIdentity() {
-        when(adapter.isActive()).thenReturn(true);
-        when(adapter.getGroupsForUser(Mockito.anyObject())).thenCallRealMethod();
+        setAuthorizationFailureExceptionClass();
+        when(adapter.isActive()).thenCallRealMethod();
+        when(adapter.getGroupsForUser(Mockito.anyString())).thenCallRealMethod();
         when(adapter.getUserName()).thenReturn(USER_ID);
 
         List<String> roles = adapter.getGroupsForUser(USER_ID);
@@ -71,8 +76,9 @@ public class ElytronUserGroupAdapterTest {
 
     @Test
     public void testSecurityForWrongUser() throws RealmUnavailableException {
-        when(adapter.isActive()).thenReturn(true);
-        when(adapter.getGroupsForUser(Mockito.anyObject())).thenCallRealMethod();
+        setAuthorizationFailureExceptionClass();
+        when(adapter.isActive()).thenCallRealMethod();
+        when(adapter.getGroupsForUser(Mockito.anyString())).thenCallRealMethod();
         when(adapter.getUserName()).thenReturn(USER_ID);
         when(adapter.runAsPrincipalExists(WRONG_USER_ID)).thenReturn(true);
         when(adapter.toRunAsPrincipalRoles(WRONG_USER_ID, true)).thenReturn(Arrays.asList(ROLE_1, ROLE_2));
@@ -87,10 +93,11 @@ public class ElytronUserGroupAdapterTest {
 
     @Test
     public void testSecurityForLoggedUser() {
-        when(adapter.isActive()).thenReturn(true);
-        when(adapter.getGroupsForUser(Mockito.anyObject())).thenCallRealMethod();
+        setAuthorizationFailureExceptionClass();
+        when(adapter.isActive()).thenCallRealMethod();
+        when(adapter.getGroupsForUser(Mockito.anyString())).thenCallRealMethod();
         when(adapter.getUserName()).thenReturn(USER_ID);
-        when(adapter.toPrincipalRoles(Mockito.anyObject())).thenReturn(Arrays.asList(ROLE_1, ROLE_2, ROLE_3));
+        when(adapter.toPrincipalRoles(Mockito.anyString())).thenReturn(Arrays.asList(ROLE_1, ROLE_2, ROLE_3));
 
         List<String> roles = adapter.getGroupsForUser(USER_ID);
 
@@ -99,4 +106,43 @@ public class ElytronUserGroupAdapterTest {
                 .hasSize(3)
                 .contains(ROLE_1, ROLE_2, ROLE_3);
     }
+
+    @Test
+    public void testSecurityOnRealmUnavailable() throws RealmUnavailableException {
+        setAuthorizationFailureExceptionClass();
+        when(adapter.isActive()).thenCallRealMethod();
+        when(adapter.getGroupsForUser(Mockito.anyString())).thenCallRealMethod();
+        when(adapter.getUserName()).thenReturn(WRONG_USER_ID);
+        when(adapter.runAsPrincipalExists(USER_ID)).thenThrow(new RealmUnavailableException());
+        lenient().when(adapter.toPrincipalRoles(Mockito.anyString())).thenReturn(Arrays.asList(ROLE_1, ROLE_2, ROLE_3));
+        lenient().when(adapter.toRunAsPrincipalRoles(Mockito.anyString(), Mockito.eq(false))).thenReturn(Arrays.asList(ROLE_1, ROLE_2, ROLE_3));
+
+        List<String> roles = adapter.getGroupsForUser(USER_ID);
+
+        Assertions.assertThat(roles)
+                .isNotNull()
+                .hasSize(0);
+    }
+
+    @Test
+    public void testSecurityOnAuthorizationFailure() throws AuthorizationFailureException, RealmUnavailableException {
+        setAuthorizationFailureExceptionClass();
+        when(adapter.isActive()).thenCallRealMethod();
+        when(adapter.getGroupsForUser(Mockito.anyString())).thenCallRealMethod();
+        when(adapter.getUserName()).thenReturn(WRONG_USER_ID);
+        when(adapter.runAsPrincipalExists(USER_ID)).thenThrow(AuthorizationFailureException.class);
+        when(adapter.toRunAsPrincipalRoles(Mockito.anyString(), Mockito.eq(false))).thenReturn(Arrays.asList(ROLE_1, ROLE_2, ROLE_3));
+
+        List<String> roles = adapter.getGroupsForUser(USER_ID);
+
+        Assertions.assertThat(roles)
+                .isNotNull()
+                .hasSize(3)
+                .contains(ROLE_1, ROLE_2, ROLE_3);
+    }
+
+    private void setAuthorizationFailureExceptionClass() {
+        Whitebox.setInternalState(adapter, Class.class, (Object) AuthorizationFailureException.class);
+    }
 }
+
