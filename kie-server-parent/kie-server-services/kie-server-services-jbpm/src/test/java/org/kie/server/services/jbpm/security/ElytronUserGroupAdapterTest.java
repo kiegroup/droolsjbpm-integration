@@ -46,6 +46,7 @@ public class ElytronUserGroupAdapterTest {
 
     @Test
     public void testNoSecurityContext() {
+        when(adapter.isActive()).thenReturn(true);
         when(adapter.getGroupsForUser(Mockito.anyObject())).thenCallRealMethod();
         when(adapter.getUserName()).thenReturn(null);
         List<String> roles = adapter.getGroupsForUser(USER_ID);
@@ -57,6 +58,7 @@ public class ElytronUserGroupAdapterTest {
 
     @Test
     public void testSecurityContextNoIdentity() {
+        when(adapter.isActive()).thenReturn(true);
         when(adapter.getGroupsForUser(Mockito.anyObject())).thenCallRealMethod();
         when(adapter.getUserName()).thenReturn(USER_ID);
 
@@ -69,6 +71,7 @@ public class ElytronUserGroupAdapterTest {
 
     @Test
     public void testSecurityForWrongUser() throws RealmUnavailableException {
+        when(adapter.isActive()).thenReturn(true);
         when(adapter.getGroupsForUser(Mockito.anyObject())).thenCallRealMethod();
         when(adapter.getUserName()).thenReturn(USER_ID);
         when(adapter.runAsPrincipalExists(WRONG_USER_ID)).thenReturn(true);
@@ -84,6 +87,7 @@ public class ElytronUserGroupAdapterTest {
 
     @Test
     public void testSecurityForLoggedUser() {
+        when(adapter.isActive()).thenReturn(true);
         when(adapter.getGroupsForUser(Mockito.anyObject())).thenCallRealMethod();
         when(adapter.getUserName()).thenReturn(USER_ID);
         when(adapter.toPrincipalRoles(Mockito.anyObject())).thenReturn(Arrays.asList(ROLE_1, ROLE_2, ROLE_3));
