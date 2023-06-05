@@ -106,7 +106,7 @@ public class IdentifierJbpmRestIntegrationTest extends RestJbpmBaseIntegrationTe
             } else {
                 try {
                     wrapId = new JSONObject(serialized);
-                    id = ((JSONObject) wrapId).getString("value");
+                    id = ((JSONObject) wrapId).getInt("value");
                 } catch (JSONException ex) {
                     Assert.fail("expected json object from kie server " + ex.getMessage());
                 }
