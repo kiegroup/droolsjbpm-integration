@@ -53,28 +53,24 @@ public class ElytronUserGroupAdapter implements UserGroupAdapter {
         String userName = getUserName();
         logger.debug("Identifier Elytron as {}", userId);
 
-        if (isActive()) {
-            if (userName == null) {
-                return new ArrayList<>();
-            }
+        if (!isActive() || userName == null) {
+            return new ArrayList<>();
+        }
 
-            if (userId.equals(userName)) {
-                logger.debug("User identified as {} but auth as {}", userId, userName);
-                return toPrincipalRoles(userId);
-            } else {
-                try {
-                    if (runAsPrincipalExists(userId)) {
-                        logger.debug("Executing run as {}", userId);
-                        return toRunAsPrincipalRoles(userId, true);
-                    } else {
-                        return new ArrayList<>();
-                    }
-                } catch (Exception e) {
-                    if (e.getClass().isAssignableFrom(authorizationFailureExceptionClass)) {
-                        return toRunAsPrincipalRoles(userId, false);
-                    } else if (e instanceof RealmUnavailableException || e instanceof SecurityException) {
-                        return new ArrayList<>();
-                    }
+        if (userId.equals(userName)) {
+            logger.debug("User identified as {} but auth as {}", userId, userName);
+            return toPrincipalRoles(userId);
+        } else {
+            try {
+                if (runAsPrincipalExists(userId)) {
+                    logger.debug("Executing run as {}", userId);
+                    return toRunAsPrincipalRoles(userId, true);
+                }
+            } catch (Exception e) {
+                logger.debug("Run as {} failed", userId);
+                if (e.getClass().isAssignableFrom(authorizationFailureExceptionClass)) {
+                    logger.debug("Executing run as {} without authorization", userId);
+                    return toRunAsPrincipalRoles(userId, false);
                 }
             }
         }

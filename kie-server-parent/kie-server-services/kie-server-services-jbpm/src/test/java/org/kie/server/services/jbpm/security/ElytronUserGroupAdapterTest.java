@@ -121,7 +121,7 @@ public class ElytronUserGroupAdapterTest {
 
         Assertions.assertThat(roles)
                 .isNotNull()
-                .hasSize(0);
+                .isEmpty();
     }
 
     @Test
@@ -139,6 +139,27 @@ public class ElytronUserGroupAdapterTest {
                 .isNotNull()
                 .hasSize(3)
                 .contains(ROLE_1, ROLE_2, ROLE_3);
+    }
+
+    @Test
+    public void testSecurityElytronDisabled() throws RealmUnavailableException {
+        when(adapter.isActive()).thenCallRealMethod();
+        when(adapter.getGroupsForUser(Mockito.anyString())).thenCallRealMethod();
+        when(adapter.getUserName()).thenReturn(USER_ID);
+
+        List<String> roles = adapter.getGroupsForUser(USER_ID);
+
+        Assertions.assertThat(roles)
+                .isNotNull()
+                .isEmpty();
+    }
+
+    @Test
+    public void testToRolesWithEmptySecurityIdentity() {
+        List<String> roles = adapter.toRoles(null);
+        Assertions.assertThat(roles)
+                .isNotNull()
+                .isEmpty();
     }
 
     private void setAuthorizationFailureExceptionClass() {
