@@ -30,7 +30,13 @@ public class ElytronIdentityProvider
         extends BaseIdentityProvider {
 
     public static boolean available() {
-        return SecurityDomain.getCurrent() != null;
+        try {
+            // ensure SecurityDomain is on classpath, if not directly return false
+            Class.forName("org.wildfly.security.auth.server.SecurityDomain");
+            return SecurityDomain.getCurrent() != null;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
     @Override

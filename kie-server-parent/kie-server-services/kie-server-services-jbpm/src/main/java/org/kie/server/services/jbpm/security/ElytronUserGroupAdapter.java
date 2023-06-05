@@ -23,24 +23,37 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.jbpm.services.task.identity.adapter.UserGroupAdapter;
+import org.kie.server.services.impl.security.ElytronIdentityProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wildfly.security.auth.server.RealmIdentity;
 import org.wildfly.security.auth.server.RealmUnavailableException;
 import org.wildfly.security.auth.server.SecurityDomain;
 import org.wildfly.security.auth.server.SecurityIdentity;
-import org.wildfly.security.authz.AuthorizationFailureException;
 
 public class ElytronUserGroupAdapter implements UserGroupAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ElytronUserGroupAdapter.class);
+    private Class<?> authorizationFailureExceptionClass = null;
+
+    public ElytronUserGroupAdapter() {
+        try {
+            this.authorizationFailureExceptionClass = Class.forName("org.wildfly.security.authz.AuthorizationFailureException");
+        } catch (Exception var2) {
+            logger.info("Unable to find org.wildfly.security.authz.AuthorizationFailureException, disabling elytron adapter");
+        }
+    }
+
+    protected boolean isActive() {
+        return this.authorizationFailureExceptionClass != null;
+    }
 
     @Override
     public List<String> getGroupsForUser(String userId) {
-
         String userName = getUserName();
         logger.debug("Identifier Elytron as {}", userId);
-        if (userName == null) {
+
+        if (!isActive() || userName == null) {
             return new ArrayList<>();
         }
 
@@ -51,16 +64,18 @@ public class ElytronUserGroupAdapter implements UserGroupAdapter {
             try {
                 if (runAsPrincipalExists(userId)) {
                     logger.debug("Executing run as {}", userId);
-                   return toRunAsPrincipalRoles(userId, true);
-                } else {
-                   return new ArrayList<>();
+                    return toRunAsPrincipalRoles(userId, true);
                 }
-            } catch (AuthorizationFailureException ex) {
-                return toRunAsPrincipalRoles(userId, false);
-            } catch (RealmUnavailableException | SecurityException e) {
-                return new ArrayList<>();
+            } catch (Exception e) {
+                logger.debug("Run as {} failed", userId);
+                if (e.getClass().isAssignableFrom(authorizationFailureExceptionClass)) {
+                    logger.debug("Executing run as {} without authorization", userId);
+                    return toRunAsPrincipalRoles(userId, false);
+                }
             }
         }
+
+        return new ArrayList<>();
     }
 
     public List<String> toPrincipalRoles(String userId) {
@@ -87,24 +102,26 @@ public class ElytronUserGroupAdapter implements UserGroupAdapter {
     }
 
     public boolean runAsPrincipalExists(String runAsPrincipal) throws RealmUnavailableException {
-        SecurityDomain securityDomain = SecurityDomain.getCurrent();
-        RealmIdentity realmIdentity = null;
-        try {
-            realmIdentity = securityDomain.getIdentity(runAsPrincipal);
-            return realmIdentity.exists();
-        } finally {
-            if (realmIdentity != null) {
-                realmIdentity.dispose();
+        if (isActive() && ElytronIdentityProvider.available()) {
+            SecurityDomain securityDomain = SecurityDomain.getCurrent();
+            RealmIdentity realmIdentity = null;
+            try {
+                realmIdentity = securityDomain.getIdentity(runAsPrincipal);
+                return realmIdentity.exists();
+            } finally {
+                if (realmIdentity != null) {
+                    realmIdentity.dispose();
+                }
             }
         }
+
+        return false;
     }
 
     public Optional<SecurityIdentity> getCurrentSecurityIdentity() {
-        SecurityDomain securityDomain = SecurityDomain.getCurrent();
-        if (securityDomain == null) {
-            return Optional.empty();
-        } else {
-            return Optional.ofNullable(securityDomain.getCurrentSecurityIdentity());
+        if (isActive() && ElytronIdentityProvider.available()) {
+            return Optional.ofNullable(SecurityDomain.getCurrent().getCurrentSecurityIdentity());
         }
+        return Optional.empty();
     }
 }
