@@ -39,11 +39,9 @@ import org.kie.server.api.security.SecurityAdapter;
 import org.kie.server.services.impl.security.ElytronIdentityProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wildfly.security.auth.server.RealmUnavailableException;
 import org.wildfly.security.auth.server.SecurityDomain;
 import org.wildfly.security.auth.server.SecurityIdentity;
 import org.wildfly.security.evidence.Evidence;
-import org.wildfly.security.evidence.PasswordGuessEvidence;
 
 public class JMSSecurityAdapter implements SecurityAdapter {
     private static final Logger logger = LoggerFactory.getLogger(JMSSecurityAdapter.class);
@@ -53,7 +51,17 @@ public class JMSSecurityAdapter implements SecurityAdapter {
 
     private static ThreadLocal<UserDetails> currentUser = new ThreadLocal<UserDetails>();
 
+    private static boolean isElytronActive;
+    private static Class<?> passwordGuessEvidenceClass = null;
+
     static  {
+        try {
+            passwordGuessEvidenceClass = Class.forName("org.wildfly.security.evidence.PasswordGuessEvidence");
+            isElytronActive = true;
+        } catch (Exception e) {
+            isElytronActive = false;
+        }
+
         for (SecurityAdapter adapter : securityAdapters) {
             adapters.add(adapter);
         }
@@ -96,7 +104,7 @@ public class JMSSecurityAdapter implements SecurityAdapter {
             logger.debug( "Unable to login via JAAS with message supplied user and password", e);
         }
     }
-    private static UserDetails getUserDetails(final String user, final String pass) throws LoginException, RealmUnavailableException {
+    private static UserDetails getUserDetails(final String user, final String pass) throws LoginException {
 
         if (ElytronIdentityProvider.available()) {
             return getElytronUserDetails(user, pass);
@@ -105,14 +113,22 @@ public class JMSSecurityAdapter implements SecurityAdapter {
         }
     }
 
-    private static UserDetails getElytronUserDetails(final String user, final String password) throws RealmUnavailableException {
+    private static UserDetails getElytronUserDetails(final String user, final String password) {
         final UserDetails userDetails = new UserDetails();
         final List<String> roles = new ArrayList<>();
 
-        final SecurityIdentity identity = SecurityDomain.getCurrent().authenticate(user, new PasswordGuessEvidence(password.toCharArray()));
-        userDetails.setName(identity.getPrincipal().getName());
-        for (String role : identity.getRoles()) {
-            roles.add(role);
+        if (isElytronActive) {
+            try {
+                final SecurityIdentity identity = SecurityDomain.getCurrent().authenticate(user,
+                        (Evidence) passwordGuessEvidenceClass.getDeclaredConstructor(char[].class).newInstance(password.toCharArray()));
+
+                userDetails.setName(identity.getPrincipal().getName());
+                for (String role : identity.getRoles()) {
+                    roles.add(role);
+                }
+            } catch (Exception e) {
+                logger.error("Error getting Elytron user details", e);
+            }
         }
 
         userDetails.setRoles(roles);
