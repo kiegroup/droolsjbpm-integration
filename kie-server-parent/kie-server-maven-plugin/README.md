@@ -16,7 +16,7 @@ On pom.xml of local project add plugin:
         <plugin>
             <groupId>org.kie.server</groupId>
             <artifactId>kie-server-maven-plugin</artifactId>
-            <version>7.74.0-SNAPSHOT</version>
+            <version>7.75.0-SNAPSHOT</version>
             <configuration>
                 <username>${kieserver.username}</username>
                 <password>${kieserver.password}</password>
@@ -78,7 +78,7 @@ Alternatively every parameter could be set in configuration plugin
 <plugin>
 	<groupId>org.kie.server</groupId>
 	<artifactId>kie-server-maven-plugin</artifactId>
-	<version>7.74.0-SNAPSHOT</version>
+	<version>7.75.0-SNAPSHOT</version>
 	<configuration>
 		<username>${kieserver.username}</username>
 		<password>${kieserver.password}</password>
