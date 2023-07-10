@@ -20,19 +20,19 @@
       <groupId>org.optaplanner</groupId>
       <artifactId>optaplanner-core</artifactId>
       <scope>provided</scope>
-      <version>${version.org.kie}</version>
+      <version>${version.org.optaplanner}</version>
     </dependency>
     <dependency>
       <groupId>org.optaplanner</groupId>
       <artifactId>optaplanner-persistence-xstream</artifactId>
       <scope>provided</scope>
-      <version>${version.org.kie}</version>
+      <version>${version.org.optaplanner}</version>
     </dependency>
     <dependency>
       <groupId>org.optaplanner</groupId>
       <artifactId>optaplanner-persistence-jaxb</artifactId>
       <scope>provided</scope>
-      <version>${version.org.kie}</version>
+      <version>${version.org.optaplanner}</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
