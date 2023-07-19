@@ -46,7 +46,7 @@ public class DBExternalResource extends ExternalResource {
             Properties driverProperties = new Properties();
             driverProperties.setProperty("user", "sa");
             driverProperties.setProperty("password", "");
-            driverProperties.setProperty("url", "jdbc:h2:mem:jbpm-db;MVCC=true");
+            driverProperties.setProperty("url", "jdbc:h2:mem:jbpm-db;MVCC=true;MODE=LEGACY;OLD_INFORMATION_SCHEMA=TRUE");
             driverProperties.setProperty("className", "org.h2.jdbcx.JdbcDataSource");
             driverProperties.setProperty("driverClassName", "org.h2.Driver");
 

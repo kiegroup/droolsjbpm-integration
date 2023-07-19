@@ -30,8 +30,8 @@
     <maven.jdbc.driver.jar/>
     <maven.jdbc.username>sa</maven.jdbc.username>
     <maven.jdbc.password>sa</maven.jdbc.password>
-    <maven.jdbc.url>jdbc:h2:mem:test_mem;MVCC=TRUE</maven.jdbc.url>
-    <maven.jdbc.tcp.url>jdbc:h2:tcp://localhost/${project.basedir}/target/kie-karaf-itests;MVCC=TRUE</maven.jdbc.tcp.url>
+    <maven.jdbc.url>jdbc:h2:mem:test_mem;MVCC=TRUE;MODE=LEGACY;OLD_INFORMATION_SCHEMA=TRUE</maven.jdbc.url>
+    <maven.jdbc.tcp.url>jdbc:h2:tcp://localhost/${project.basedir}/target/kie-karaf-itests;MVCC=TRUE;MODE=LEGACY;OLD_INFORMATION_SCHEMA=TRUE</maven.jdbc.tcp.url>
     <maven.jdbc.schema>public</maven.jdbc.schema>
   </properties>
 

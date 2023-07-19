@@ -46,7 +46,7 @@ public class ApplicationSender {
     @ConditionalOnMissingBean(name = "auditEntityManagerFactory")
     @ConditionalOnProperty(name = "kieserver.audit-replication.consumer", havingValue = "true")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(@Qualifier("datasource-replica") DataSource dataSource, JpaProperties jpaProperties) {
-        jpaProperties.getProperties().put("url", "jdbc:h2:mem:kieserver-replication");
+        jpaProperties.getProperties().put("url", "jdbc:h2:mem:kieserver-replication;MODE=LEGACY;OLD_INFORMATION_SCHEMA=TRUE");
         return EntityManagerFactoryHelper.create(applicationContext,
                                                  dataSource,
                                                  jpaProperties,

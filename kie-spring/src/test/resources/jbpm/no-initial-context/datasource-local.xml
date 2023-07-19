@@ -10,7 +10,7 @@
       <props>
         <prop key="user">sa</prop>
         <prop key="password"></prop>
-        <prop key="url">jdbc:h2:mem:jbpm-db;MVCC=true</prop>
+        <prop key="url">jdbc:h2:mem:jbpm-db;MVCC=true;MODE=LEGACY;OLD_INFORMATION_SCHEMA=TRUE</prop>
       </props>
     </property>
   </bean>
