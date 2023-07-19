@@ -10,7 +10,7 @@
 
   <bean id="ds" class="org.kie.aries.blueprint.mocks.MockDataSource">
     <property name="driverClassName" value="org.h2.Driver"/>
-    <property name="url" value="jdbc:h2:tcp://localhost/DroolsFlow"/>
+    <property name="url" value="jdbc:h2:tcp://localhost/DroolsFlow;MODE=LEGACY;OLD_INFORMATION_SCHEMA=TRUE"/>
     <property name="username" value="sa"/>
     <property name="password" value=""/>
   </bean>

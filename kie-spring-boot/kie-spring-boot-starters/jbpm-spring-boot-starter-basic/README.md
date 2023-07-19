@@ -40,7 +40,7 @@ Mandatory configuration that must be placed in application.properties is related
 #data source configuration
 spring.datasource.username=sa
 spring.datasource.password=sa
-spring.datasource.url=jdbc:h2:./target/spring-boot-jbpm;MVCC=true
+spring.datasource.url=jdbc:h2:./target/spring-boot-jbpm;MODE=LEGACY;OLD_INFORMATION_SCHEMA=TRUE
 spring.datasource.driver-class-name=org.h2.Driver
 spring.datasource.type=org.apache.tomcat.jdbc.pool.XADataSource
 
