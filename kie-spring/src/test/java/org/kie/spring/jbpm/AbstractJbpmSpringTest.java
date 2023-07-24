@@ -69,7 +69,7 @@ public abstract class AbstractJbpmSpringTest extends IntegrationSpringBase {
         Properties driverProperties = new Properties();
         driverProperties.put("user", "sa");
         driverProperties.put("password", "");
-        driverProperties.put("url", "jdbc:h2:mem:mydb;MODE=LEGACY;OLD_INFORMATION_SCHEMA=TRUE");
+        driverProperties.put("url", "jdbc:h2:mem:mydb;MODE=LEGACY;NON_KEYWORDS=VALUE");
         driverProperties.put("driverClassName", "org.h2.Driver");
         driverProperties.put("className", "org.h2.jdbcx.JdbcDataSource");
         return DataSourceFactory.setupPoolingDataSource("jdbc/jbpm-ds", driverProperties);

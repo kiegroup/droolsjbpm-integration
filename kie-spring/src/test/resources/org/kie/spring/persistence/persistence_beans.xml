@@ -55,7 +55,7 @@
     <property name="driverClassName" value="org.h2.Driver"/>
     <!-- jdbc:h2:mem:mydb
     jdbc:h2:tcp://localhost/DroolsFlow-->
-    <property name="url" value="jdbc:h2:tcp://localhost/./DroolsFlow;MODE=LEGACY;OLD_INFORMATION_SCHEMA=TRUE"/>
+    <property name="url" value="jdbc:h2:tcp://localhost/./DroolsFlow;MODE=LEGACY;NON_KEYWORDS=VALUE"/>
     <property name="username" value="sa"/>
     <property name="password" value=""/>
   </bean>

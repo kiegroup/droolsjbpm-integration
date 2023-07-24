@@ -66,7 +66,7 @@ public class VariablePersistenceStrategyTest {
         DeleteDbFiles.execute("",
                 "DroolsFlow",
                 true);
-        h2Server = Server.createTcpServer(new String[0]);
+        h2Server = Server.createTcpServer(new String[]{"-ifNotExists"});
         h2Server.start();
     }
 
