@@ -86,6 +86,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected static final String PROCESS_ID_USERTASK_WITH_ROLLBACK = "UserTaskWithRollback";
     protected static final String PROCESS_ID_USERTASK_DIFF_POTUSERS = "usertask-project.usertask-diff-potusers";
     protected static final String PROCESS_ID_USERTASK_SECURED = "secured-project.usertask";
+    protected static final String PROCESS_ID_SLA_ON_PROCESS = "definition-project.SLAOnProcess";
     protected static final String PROCESS_ID_SIGNAL_PROCESS_SECURED = "secured-project.signalprocess";
     protected static final String PROCESS_ID_WORKITEM_SECURED = "secured-project.workitem";
     protected static final String PROCESS_ID_NOTIFICATION = "notification";
