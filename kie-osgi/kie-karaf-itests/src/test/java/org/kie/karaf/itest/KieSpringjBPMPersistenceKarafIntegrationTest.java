@@ -195,7 +195,7 @@ public class KieSpringjBPMPersistenceKarafIntegrationTest extends AbstractKieSpr
     public static Server startH2Server() {
         try {
             // start h2 in memory database
-            Server server = Server.createTcpServer(new String[0]);
+            Server server = Server.createTcpServer(new String[]{"-ifNotExists"});
             server.start();
             return server;
         } catch (Throwable t) {
