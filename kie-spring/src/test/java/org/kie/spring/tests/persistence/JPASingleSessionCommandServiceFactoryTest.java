@@ -82,7 +82,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         DeleteDbFiles.execute("",
                 "DroolsFlow",
                 true);
-        h2Server = Server.createTcpServer(new String[0]);
+        h2Server = Server.createTcpServer(new String[]{"-ifNotExists"});
         h2Server.start();
         try {
             TMPDIR = JPASingleSessionCommandServiceFactoryTest.class.getResource("/kb_persistence").getFile();

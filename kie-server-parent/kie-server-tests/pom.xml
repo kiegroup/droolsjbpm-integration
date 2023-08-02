@@ -59,7 +59,7 @@
     <!-- Kie server datasource configuration. -->
     <!--  <org.kie.server.persistence.ds/> Defined in container profiles.-->
     <org.kie.server.persistence.dialect>org.hibernate.dialect.H2Dialect</org.kie.server.persistence.dialect>
-    <org.kie.server.datasource.connection.url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</org.kie.server.datasource.connection.url>
+    <org.kie.server.datasource.connection.url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=LEGACY;NON_KEYWORDS=VALUE</org.kie.server.datasource.connection.url>
     <org.kie.server.datasource.username>sa</org.kie.server.datasource.username>
     <org.kie.server.datasource.password>sa</org.kie.server.datasource.password>
     <org.kie.server.datasource.driver.class>org.h2.jdbcx.JdbcDataSource</org.kie.server.datasource.driver.class>
@@ -653,7 +653,7 @@
                       <parameters>
                         <user>sa</user>
                         <password>sa</password>
-                        <url>jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MVCC=TRUE</url>
+                        <url>jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=LEGACY;NON_KEYWORDS=VALUE</url>
                         <description>H2 Data Source</description>
                         <loginTimeout>0</loginTimeout>
                         <testOnBorrow>false</testOnBorrow>
@@ -1175,7 +1175,7 @@
                     <!-- Datasource -->
                     <cargo.datasource.datasource.h2>
                       cargo.datasource.driver=org.h2.Driver|
-                      cargo.datasource.url=jdbc:h2:mem:test-db|
+                      cargo.datasource.url=jdbc:h2:mem:test-db;MODE=LEGACY;NON_KEYWORDS=VALUE|
                       cargo.datasource.jndi=jdbc/jbpm|
                       cargo.datasource.username=sa|
                       cargo.datasource.password=|
@@ -1311,7 +1311,7 @@
                     <!-- Datasource -->
                     <cargo.datasource.datasource.h2>
                       cargo.datasource.driver=org.h2.jdbcx.JdbcDataSource|
-                      cargo.datasource.url=jdbc:h2:mem:test-db|
+                      cargo.datasource.url=jdbc:h2:mem:test-db;MODE=LEGACY;NON_KEYWORDS=VALUE|
                       cargo.datasource.jndi=jdbc/jbpm|
                       cargo.datasource.username=sa|
                       cargo.datasource.password=|
