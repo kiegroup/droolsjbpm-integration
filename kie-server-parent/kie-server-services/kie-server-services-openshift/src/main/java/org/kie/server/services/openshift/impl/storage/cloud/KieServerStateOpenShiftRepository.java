@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import io.fabric8.kubernetes.api.model.ConfigMap;
@@ -50,8 +52,8 @@ import org.kie.server.services.openshift.api.KieServerOpenShift;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.api.KieServerConstants.*;
 import static org.kie.server.api.KieServerConstants.KIE_SERVER_ID;
+import static org.kie.server.api.KieServerConstants.KIE_SERVER_LOCATION;
 import static org.kie.server.api.KieServerConstants.KIE_SERVER_STATE_IMMUTABLE;
 import static org.kie.server.api.KieServerConstants.KIE_SERVER_STATE_IMMUTABLE_INIT;
 import static org.kie.server.controller.api.KieServerControllerConstants.KIE_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED;
@@ -62,12 +64,12 @@ import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.
 import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.CFG_MAP_LABEL_SERVER_STATE_VALUE_DETACHED;
 import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.CFG_MAP_LABEL_SERVER_STATE_VALUE_IMMUTABLE;
 import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.CFG_MAP_LABEL_SERVER_STATE_VALUE_USED;
-import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.UNKNOWN;
 import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.CFG_MAP_NAME_SYNTHETIC_NAME;
 import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.ENV_HOSTNAME;
 import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.KIE_SERVER_SERVICES_OPENSHIFT_SERVICE_NAME;
 import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.ROLLOUT_REQUIRED;
 import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.STATE_CHANGE_TIMESTAMP;
+import static org.kie.server.services.openshift.api.KieServerOpenShiftConstants.UNKNOWN;
 
 public class KieServerStateOpenShiftRepository extends KieServerStateCloudRepository implements KieServerOpenShift {
 
@@ -157,7 +159,6 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
                     ann.put(ROLLOUT_REQUIRED, "true");
                     cm.setData(Collections.singletonMap(CFG_MAP_DATA_KEY, xs.toXML(kieServerState)));
                     createOrReplaceCM(client, cm);
-
                 }
             }
             return null;
@@ -167,6 +168,7 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
     @Override
     public KieServerState load(String serverId) {
         if (serverId == null) {
+            logger.debug("Server id is null, returning...");
             return null;
         }
         KieServerState kieServerState = processKieServerStateByOpenShift(client -> {
@@ -193,6 +195,35 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
                                            }
                                            return createOrReplaceKieServerStateCM(client, serverId, state);
                                        });
+
+                // Force reload the location to update the CM
+                // When the location for the given kieserver changes, due ssl activation or deactivation, dns update, etc.
+                // the configMap does not get updated, thus we need to get the current location from the configMap and
+                // compare with the one from the current state, if they are different, we need to update the configMap.
+                KieServerState currentState = getKieServerState(kieCM);
+                String locationFromState = currentState.getConfiguration().getConfigItem(KIE_SERVER_LOCATION).getValue();
+
+                // Load the kieserver-location directly from the CM, if we load it from the current configMap, e.g.,
+                // from kieCM and parse to KieServerState, it will bring the updated value, but if we print the
+                // configMap content as string it brings the value that is actually store in the
+                // ConfigMap (kieCM.getData().get(CFG_MAP_DATA_KEY))
+                String xmlString = kieCM.getData().get(CFG_MAP_DATA_KEY);
+                String regex = "<name>org\\.kie\\.server\\.location</name>\\s*<value>(.*?)</value>";
+
+                Pattern pattern = Pattern.compile(regex);
+                Matcher matcher = pattern.matcher(xmlString);
+                String value = null;
+                if (matcher.find()) {
+                    value = matcher.group(1);
+                }
+
+                if (!locationFromState.equals(value)) {
+                    KieServerConfig config = currentState.getConfiguration();
+                    KieServerStateRepositoryUtils.populateWithSystemProperties(config);
+                    ConfigMap s = createOrReplaceKieServerStateCM(client, serverId, currentState);
+                    logger.debug("KIE Server location updated to {}", locationFromState);
+                    return getKieServerState(s);
+                }
                 return getKieServerState(kieCM);
             } else if (cmOpt.isPresent()) {
                 return getKieServerState(cmOpt.get());
