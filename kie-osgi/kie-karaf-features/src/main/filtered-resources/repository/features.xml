@@ -121,13 +121,13 @@
     <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.dom4j/${karaf.version.org.apache.servicemix.bundles.dom4j}</bundle>
     <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.serp/${karaf.version.org.apache.servicemix.bundles.serp}</bundle>
     <bundle dependency="true">mvn:com.fasterxml/classmate/${karaf.version.com.fasterxml.classmate}</bundle>
-    <bundle dependency="true">mvn:org.javassist/javassist/${version.org.javassist}</bundle>
+    <bundle dependency="true">mvn:org.javassist/javassist/${karaf.version.org.javassist}</bundle>
     <bundle dependency="true">mvn:net.bytebuddy/byte-buddy/${version.net.byte-buddy}</bundle>
     <bundle dependency="true">mvn:jakarta.security.jacc/jakarta.security.jacc-api/${version.jakarta.security.jacc-api}</bundle>
     <bundle dependency="true">mvn:org.jboss/jandex/${karaf.version.org.jboss.jandex}</bundle>
     <bundle dependency="true">mvn:javax.validation/validation-api/${karaf.version.javax.validation}</bundle>
     <bundle dependency="true">mvn:org.jboss.logging/jboss-logging/${version.org.jboss.logging.jboss-logging}</bundle>
-    <bundle dependency="true">mvn:org.hibernate.common/hibernate-commons-annotations/${version.org.hibernate.commons.annotations}</bundle>
+    <bundle dependency="true">mvn:org.hibernate.common/hibernate-commons-annotations/${karaf.version.org.hibernate.commons.annotations}</bundle>
     <bundle start-level="100">mvn:org.hibernate/hibernate-core/${version.org.hibernate}</bundle>
     <bundle start-level="100">mvn:org.hibernate/hibernate-osgi/${version.org.hibernate}</bundle>
     <bundle start-level="100">mvn:org.apache.logging.log4j/log4j-api/${karaf.version.org.apache.logging.log4j}</bundle>
