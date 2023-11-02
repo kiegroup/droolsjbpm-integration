@@ -47,9 +47,11 @@
     <karaf.version.org.apache.servicemix.bundles.ant>1.8.2_2</karaf.version.org.apache.servicemix.bundles.ant>
     <karaf.version.org.apache.servicemix.bundles.dom4j>1.6.1_5</karaf.version.org.apache.servicemix.bundles.dom4j>
     <karaf.version.org.apache.servicemix.bundles.serp>1.14.1_1</karaf.version.org.apache.servicemix.bundles.serp>
-    <karaf.version.com.fasterxml.classmate>1.3.1</karaf.version.com.fasterxml.classmate>
+    <karaf.version.com.fasterxml.classmate>1.5.1</karaf.version.com.fasterxml.classmate>
     <karaf.version.org.jboss.jandex>2.2.3.Final</karaf.version.org.jboss.jandex>
     <karaf.version.javax.validation>1.1.0.Final</karaf.version.javax.validation>
+    <karaf.version.org.javassist>3.27.0-GA</karaf.version.org.javassist>
+    <karaf.version.org.hibernate.commons.annotations>5.1.2.Final</karaf.version.org.hibernate.commons.annotations>
 
     <!-- used by kie-server-client -->
     <karaf.version.org.apache.servicemix.specs>2.9.1</karaf.version.org.apache.servicemix.specs>
@@ -81,13 +83,13 @@
     <karaf.servicemix.version.scripting-api>2.4.0</karaf.servicemix.version.scripting-api>
     <!-- Special overwrites -->
     <karaf.version.org.apache.aries.jpa>1.0.1</karaf.version.org.apache.aries.jpa>
-    <h2.version>1.4.178</h2.version>
+    <h2.version>${version.com.h2database}</h2.version>
 
     <!-- Camel -->
     <karaf.version.org.apache.camel>2.24.0</karaf.version.org.apache.camel>
 
     <!-- Overwrites for Fuse -->
-    <fuse.version.com.h2database>1.3.168</fuse.version.com.h2database>
+    <fuse.version.com.h2database>${version.com.h2database}</fuse.version.com.h2database>
 
     <karaf.version.com.github.javaparser>3.23.1</karaf.version.com.github.javaparser>
 
