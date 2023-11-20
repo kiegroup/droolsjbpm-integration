@@ -23,6 +23,11 @@ public class Order implements Serializable {
         this.approved = false;
     }
 
+    // This method duplicates with approve() and disapprove(). But added to clarify bitmask issue DROOLS-7014.
+    public void setApproved(Boolean approved) {
+        this.approved = approved;
+    }
+
     public Customer getCustomer() {
         return this.customer;
     }

@@ -8,19 +8,22 @@ rule "approve non-alcoholic drink"
 when
   order: Order(isApproved() == null, drink.containsAlcohol == false)
 then
-  order.approve();
+  order.setApproved(true);
+  update(order);
 end
 
 rule "approve alcoholic drink"
 when
   order: Order(isApproved() == null, drink.containsAlcohol, customer.ageInYears >= 18)
 then
-  order.approve();
+  order.setApproved(true);
+  update(order);
 end
 
 rule "disapprove alcoholic drink for too young customer"
 when
   order: Order(isApproved() == null, drink.containsAlcohol, customer.ageInYears < 18)
 then
-  order.disapprove();
+  order.setApproved(false);
+  update(order);
 end
