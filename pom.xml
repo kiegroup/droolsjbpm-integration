@@ -61,7 +61,7 @@
     <module>kie-osgi</module>
     <module>kie-performance-kit</module>
     <module>kie-camel</module>
-    <module>kie-tomcat-integration</module>
+    <!-- <module>kie-tomcat-integration</module> -->
     <module>kie-integration-test-coverage</module>
     <module>kie-plugins-testing</module>
     <module>kie-spring-boot</module>
