@@ -25,6 +25,12 @@
       <groupId>jakarta.security.jacc</groupId>
       <artifactId>jakarta.security.jacc-api</artifactId>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>jakarta.servlet</groupId>
+          <artifactId>jakarta.servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
