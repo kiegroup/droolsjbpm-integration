@@ -30,6 +30,7 @@ public class SolverHandlerConfig {
     private Duration usersSyncInterval;
     private Duration waitForImprovedSolutionDuration;
     private Duration improveSolutionOnBackgroundDuration;
+    private long initDelay;
 
     public SolverHandlerConfig(String targetUserId,
                                int publishWindowSize,
@@ -37,7 +38,8 @@ public class SolverHandlerConfig {
                                Duration syncQueriesShift,
                                Duration usersSyncInterval,
                                Duration waitForImprovedSolutionDuration,
-                               Duration improveSolutionOnBackgroundDuration) {
+                               Duration improveSolutionOnBackgroundDuration,
+                               long initDelay) {
         if (targetUserId == null || targetUserId.isEmpty()) {
             throw new IllegalArgumentException("A non empty targetUserId is expected.");
         }
@@ -47,6 +49,7 @@ public class SolverHandlerConfig {
         checkGreaterOrEqualTo("usersSyncInterval", usersSyncInterval, Duration.ZERO);
         checkGreaterOrEqualTo("waitForImprovedSolutionDuration", waitForImprovedSolutionDuration, Duration.ZERO);
         checkGreaterOrEqualTo("improveSolutionOnBackgroundDuration", improveSolutionOnBackgroundDuration, Duration.ZERO);
+        checkGreaterOrEqualTo("initDelay", initDelay, 0L);
         this.targetUserId = targetUserId;
         this.publishWindowSize = publishWindowSize;
         this.syncInterval = syncInterval;
@@ -54,6 +57,7 @@ public class SolverHandlerConfig {
         this.usersSyncInterval = usersSyncInterval;
         this.waitForImprovedSolutionDuration = waitForImprovedSolutionDuration;
         this.improveSolutionOnBackgroundDuration = improveSolutionOnBackgroundDuration;
+        this.initDelay = initDelay;
     }
 
     public String getTargetUserId() {
@@ -82,5 +86,9 @@ public class SolverHandlerConfig {
 
     public Duration getImproveSolutionOnBackgroundDuration() {
         return improveSolutionOnBackgroundDuration;
+    }
+
+    public long getInitDelay() {
+        return initDelay;
     }
 }

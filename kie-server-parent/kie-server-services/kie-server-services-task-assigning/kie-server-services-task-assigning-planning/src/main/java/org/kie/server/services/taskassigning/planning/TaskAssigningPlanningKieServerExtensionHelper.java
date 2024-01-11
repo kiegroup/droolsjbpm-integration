@@ -29,10 +29,12 @@ import static org.kie.server.services.taskassigning.planning.TaskAssigningConsta
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SYNC_QUERIES_SHIFT;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USERS_SYNC_INTERVAL;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_WAIT_FOR_IMPROVED_SOLUTION_DURATION;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_INIT_DELAY;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PARAMETER_MUST_HAVE_A_GREATER_OR_EQUAL_TO_ZERO_DURATION_VALUE_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PARAMETER_MUST_HAVE_A_GREATER_THAN_ZERO_DURATION_VALUE_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PARAMETER_MUST_HAVE_A_GREATER_THAN_ZERO_INTEGER_VALUE_ERROR;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PARAMETER_MUST_HAVE_A_NON_EMPTY_STRING_VALUE_ERROR;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionMessages.PARAMETER_MUST_BE_ZERO_OR_GREATER_THAN_ZERO_LONG_VALUE_ERROR;
 
 public class TaskAssigningPlanningKieServerExtensionHelper {
 
@@ -42,9 +44,10 @@ public class TaskAssigningPlanningKieServerExtensionHelper {
     static final String DEFAULT_USERS_SYNC_INTERVAL = "PT2H";
     static final String DEFAULT_WAIT_FOR_IMPROVED_SOLUTION_DURATION = "PT0S";
     static final String DEFAULT_IMPROVE_SOLUTION_ON_BACKGROUND_DURATION = "PT1M";
+    static final long DEFAULT_INIT_DELAY = 0L;
 
     private static final String CAUSE = ", cause :";
-
+	
     private TaskAssigningPlanningKieServerExtensionHelper() {
     }
 
@@ -56,6 +59,7 @@ public class TaskAssigningPlanningKieServerExtensionHelper {
         Duration usersSyncInterval;
         Duration waitForImprovedSolutionDuration;
         Duration improveSolutionOnBackgroundDuration;
+        long initDelay;
 
         targetUserId = trimToNull(System.getProperty(TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER));
         if (isNull(targetUserId)) {
@@ -86,8 +90,12 @@ public class TaskAssigningPlanningKieServerExtensionHelper {
                                                                                              String.format(PARAMETER_MUST_HAVE_A_GREATER_OR_EQUAL_TO_ZERO_DURATION_VALUE_ERROR,
                                                                                                            TASK_ASSIGNING_IMPROVE_SOLUTION_ON_BACKGROUND_DURATION));
 
+        initDelay = parseAndValidateEqualsOrGreaterThanZeroLong(System.getProperty(TASK_ASSIGNING_INIT_DELAY, Long.toString(DEFAULT_INIT_DELAY)),
+                                                                String.format(PARAMETER_MUST_BE_ZERO_OR_GREATER_THAN_ZERO_LONG_VALUE_ERROR,
+                                                                              TASK_ASSIGNING_INIT_DELAY));
+        
         return new TaskAssigningServiceConfig(targetUserId, publishWindowSize, syncInterval, syncQueriesShift,
-                                              usersSyncInterval, waitForImprovedSolutionDuration, improveSolutionOnBackgroundDuration);
+                                              usersSyncInterval, waitForImprovedSolutionDuration, improveSolutionOnBackgroundDuration, initDelay);
     }
 
     private static Duration parseAndValidateGreaterThanZeroDuration(String value, String validationErrorMessage) throws TaskAssigningValidationException {
@@ -125,4 +133,18 @@ public class TaskAssigningPlanningKieServerExtensionHelper {
         }
         return result;
     }
+    
+    private static long parseAndValidateEqualsOrGreaterThanZeroLong(String value, String validationErrorMessage) throws TaskAssigningValidationException {
+    	long result;
+        try {
+            result = Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            String msg = validationErrorMessage + CAUSE + e.toString();
+            throw new TaskAssigningValidationException(msg);
+        }
+        if (result < 0) {
+            throw new TaskAssigningValidationException(validationErrorMessage);
+        }
+        return result;
+	}
 }

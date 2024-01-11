@@ -26,6 +26,7 @@ import static org.kie.server.services.taskassigning.planning.SolverHandlerConfig
 import static org.kie.server.services.taskassigning.planning.SolverHandlerConfigTest.TARGET_USER;
 import static org.kie.server.services.taskassigning.planning.SolverHandlerConfigTest.USERS_SYNC_INTERVAL;
 import static org.kie.server.services.taskassigning.planning.SolverHandlerConfigTest.WAIT_FOR_IMPROVED_SOLUTION_DURATION;
+import static org.kie.server.services.taskassigning.planning.SolverHandlerConfigTest.INIT_DELAY;
 
 public class TaskAssigningServiceConfigTest {
 
@@ -37,7 +38,8 @@ public class TaskAssigningServiceConfigTest {
                                                                                   SYNC_QUERIES_SHIFT,
                                                                                   USERS_SYNC_INTERVAL,
                                                                                   WAIT_FOR_IMPROVED_SOLUTION_DURATION,
-                                                                                  IMPROVE_SOLUTION_ON_BACKGROUND_DURATION);
+                                                                                  IMPROVE_SOLUTION_ON_BACKGROUND_DURATION,
+                                                                                  INIT_DELAY);
 
         SolverHandlerConfig handlerConfig = serviceConfig.getSolverHandlerConfig();
         assertThat(handlerConfig).isNotNull();
@@ -48,5 +50,6 @@ public class TaskAssigningServiceConfigTest {
         assertThat(handlerConfig.getUsersSyncInterval()).isEqualTo(USERS_SYNC_INTERVAL);
         assertThat(handlerConfig.getWaitForImprovedSolutionDuration()).isEqualTo(WAIT_FOR_IMPROVED_SOLUTION_DURATION);
         assertThat(handlerConfig.getImproveSolutionOnBackgroundDuration()).isEqualTo(IMPROVE_SOLUTION_ON_BACKGROUND_DURATION);
+        assertThat(handlerConfig.getInitDelay()).isEqualTo(INIT_DELAY);
     }
 }
