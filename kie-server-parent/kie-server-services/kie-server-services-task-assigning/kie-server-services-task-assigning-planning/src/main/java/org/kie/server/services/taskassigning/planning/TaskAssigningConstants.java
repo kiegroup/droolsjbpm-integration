@@ -118,6 +118,11 @@ public class TaskAssigningConstants {
     public static final String TASK_ASSIGNING_IMPROVE_SOLUTION_ON_BACKGROUND_DURATION = "org.kie.server.taskAssigning.improveSolutionOnBackgroundDuration";
 
     /**
+     * Property for configuring the initial delay (in milliseconds) to start the extension.
+     */
+    public static final String TASK_ASSIGNING_INIT_DELAY = "org.kie.server.taskAssigning.initDelay";
+    
+    /**
      * Property for configuring the resource with the solver configuration.
      */
     public static final String TASK_ASSIGNING_SOLVER_CONFIG_RESOURCE = "org.kie.server.taskAssigning.solver.configResource";

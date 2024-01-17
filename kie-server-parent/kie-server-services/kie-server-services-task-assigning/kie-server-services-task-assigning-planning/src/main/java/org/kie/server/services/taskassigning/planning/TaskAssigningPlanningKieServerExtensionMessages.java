@@ -81,6 +81,8 @@ public class TaskAssigningPlanningKieServerExtensionMessages {
 
     static final String PARAMETER_MUST_HAVE_A_GREATER_OR_EQUAL_TO_ZERO_DURATION_VALUE_ERROR = "Parameter %s must be configured with a greater or equal to zero time duration";
 
+    static final String PARAMETER_MUST_BE_ZERO_OR_GREATER_THAN_ZERO_LONG_VALUE_ERROR = "Parameter %s must be configured with a greater or equal to zero long value";
+    
     static String addExtensionMessagePrefix(String msg) {
         return String.format(PLANNER_EXTENSION_MESSAGE_PREFIX, msg);
     }
