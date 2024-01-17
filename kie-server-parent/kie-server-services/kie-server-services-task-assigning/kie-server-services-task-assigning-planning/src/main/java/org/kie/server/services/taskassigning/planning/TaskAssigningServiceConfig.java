@@ -28,14 +28,16 @@ public class TaskAssigningServiceConfig {
                                       Duration syncQueriesShift,
                                       Duration usersSyncInterval,
                                       Duration waitForImprovedSolutionDuration,
-                                      Duration improveSolutionOnBackgroundDuration) {
+                                      Duration improveSolutionOnBackgroundDuration,
+                                      long initDelay) {
         solverHandlerConfig = new SolverHandlerConfig(targetUserId,
                                                       publishWindowSize,
                                                       syncInterval,
                                                       syncQueriesShift,
                                                       usersSyncInterval,
                                                       waitForImprovedSolutionDuration,
-                                                      improveSolutionOnBackgroundDuration);
+                                                      improveSolutionOnBackgroundDuration,
+                                                      initDelay);
     }
 
     public SolverHandlerConfig getSolverHandlerConfig() {

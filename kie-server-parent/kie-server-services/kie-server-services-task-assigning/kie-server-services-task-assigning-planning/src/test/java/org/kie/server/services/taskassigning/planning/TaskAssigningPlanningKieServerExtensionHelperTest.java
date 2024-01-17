@@ -36,6 +36,7 @@ import static org.kie.server.services.taskassigning.planning.SolverHandlerConfig
 import static org.kie.server.services.taskassigning.planning.SolverHandlerConfigTest.TARGET_USER;
 import static org.kie.server.services.taskassigning.planning.SolverHandlerConfigTest.USERS_SYNC_INTERVAL;
 import static org.kie.server.services.taskassigning.planning.SolverHandlerConfigTest.WAIT_FOR_IMPROVED_SOLUTION_DURATION;
+import static org.kie.server.services.taskassigning.planning.SolverHandlerConfigTest.INIT_DELAY;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_IMPROVE_SOLUTION_ON_BACKGROUND_DURATION;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PROCESS_RUNTIME_TARGET_USER;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_PUBLISH_WINDOW_SIZE;
@@ -43,18 +44,21 @@ import static org.kie.server.services.taskassigning.planning.TaskAssigningConsta
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_SYNC_QUERIES_SHIFT;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_USERS_SYNC_INTERVAL;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_WAIT_FOR_IMPROVED_SOLUTION_DURATION;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningConstants.TASK_ASSIGNING_INIT_DELAY;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionHelper.DEFAULT_IMPROVE_SOLUTION_ON_BACKGROUND_DURATION;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionHelper.DEFAULT_PUBLISH_WINDOW_SIZE;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionHelper.DEFAULT_SYNC_INTERVAL;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionHelper.DEFAULT_SYNC_QUERIES_SHIFT;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionHelper.DEFAULT_USERS_SYNC_INTERVAL;
 import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionHelper.DEFAULT_WAIT_FOR_IMPROVED_SOLUTION_DURATION;
+import static org.kie.server.services.taskassigning.planning.TaskAssigningPlanningKieServerExtensionHelper.DEFAULT_INIT_DELAY;
 
 @RunWith(Parameterized.class)
 public class TaskAssigningPlanningKieServerExtensionHelperTest {
 
     private static final Duration NEGATIVE_DURATION = Duration.parse("PT-2S");
     private static final String NON_PARSEABLE = "NON_PARSEABLE";
+    private static final long NEGATIVE_LONG = -5000L;
 
     @Parameter
     public String parameterName;
@@ -81,6 +85,8 @@ public class TaskAssigningPlanningKieServerExtensionHelperTest {
         data.add(new Object[]{TASK_ASSIGNING_WAIT_FOR_IMPROVED_SOLUTION_DURATION, NON_PARSEABLE});
         data.add(new Object[]{TASK_ASSIGNING_IMPROVE_SOLUTION_ON_BACKGROUND_DURATION, NEGATIVE_DURATION.toString()});
         data.add(new Object[]{TASK_ASSIGNING_IMPROVE_SOLUTION_ON_BACKGROUND_DURATION, NON_PARSEABLE});
+        data.add(new Object[]{TASK_ASSIGNING_INIT_DELAY, Long.toString(NEGATIVE_LONG)});
+        data.add(new Object[]{TASK_ASSIGNING_INIT_DELAY, NON_PARSEABLE});
         return data;
     }
 
@@ -96,6 +102,7 @@ public class TaskAssigningPlanningKieServerExtensionHelperTest {
         assertThat(handlerConfig.getUsersSyncInterval()).isEqualTo(USERS_SYNC_INTERVAL);
         assertThat(handlerConfig.getWaitForImprovedSolutionDuration()).isEqualTo(WAIT_FOR_IMPROVED_SOLUTION_DURATION);
         assertThat(handlerConfig.getImproveSolutionOnBackgroundDuration()).isEqualTo(IMPROVE_SOLUTION_ON_BACKGROUND_DURATION);
+        assertThat(handlerConfig.getInitDelay()).isEqualTo(INIT_DELAY);
     }
 
     @Test
@@ -110,6 +117,7 @@ public class TaskAssigningPlanningKieServerExtensionHelperTest {
         assertThat(handlerConfig.getUsersSyncInterval()).isEqualTo(Duration.parse(DEFAULT_USERS_SYNC_INTERVAL));
         assertThat(handlerConfig.getWaitForImprovedSolutionDuration()).isEqualTo(Duration.parse(DEFAULT_WAIT_FOR_IMPROVED_SOLUTION_DURATION));
         assertThat(handlerConfig.getImproveSolutionOnBackgroundDuration()).isEqualTo(Duration.parse(DEFAULT_IMPROVE_SOLUTION_ON_BACKGROUND_DURATION));
+        assertThat(handlerConfig.getInitDelay()).isEqualTo(DEFAULT_INIT_DELAY);
     }
 
     @Test
@@ -137,6 +145,7 @@ public class TaskAssigningPlanningKieServerExtensionHelperTest {
         System.setProperty(TASK_ASSIGNING_USERS_SYNC_INTERVAL, USERS_SYNC_INTERVAL.toString());
         System.setProperty(TASK_ASSIGNING_WAIT_FOR_IMPROVED_SOLUTION_DURATION, WAIT_FOR_IMPROVED_SOLUTION_DURATION.toString());
         System.setProperty(TASK_ASSIGNING_IMPROVE_SOLUTION_ON_BACKGROUND_DURATION, IMPROVE_SOLUTION_ON_BACKGROUND_DURATION.toString());
+        System.setProperty(TASK_ASSIGNING_INIT_DELAY, Long.toString(INIT_DELAY));
     }
 
     public static void clearTaskAssigningServiceProperties() {
@@ -147,5 +156,6 @@ public class TaskAssigningPlanningKieServerExtensionHelperTest {
         System.clearProperty(TASK_ASSIGNING_USERS_SYNC_INTERVAL);
         System.clearProperty(TASK_ASSIGNING_WAIT_FOR_IMPROVED_SOLUTION_DURATION);
         System.clearProperty(TASK_ASSIGNING_IMPROVE_SOLUTION_ON_BACKGROUND_DURATION);
+        System.clearProperty(TASK_ASSIGNING_INIT_DELAY);
     }
 }

@@ -14,6 +14,7 @@
 
   <properties>
     <java.module.name>org.kie.server.itests.taskassigning</java.module.name>
+    <org.kie.server.taskAssigning.initDelay>0</org.kie.server.taskAssigning.initDelay>
   </properties>
 
   <dependencies>
@@ -141,6 +142,7 @@
               <org.kie.server.taskAssigning.processRuntime.pwd>usetheforce123@</org.kie.server.taskAssigning.processRuntime.pwd>
               <org.kie.server.taskAssigning.processRuntime.targetUser>yoda</org.kie.server.taskAssigning.processRuntime.targetUser>>
               <org.kie.server.taskAssigning.solutionSyncInterval>PT1S</org.kie.server.taskAssigning.solutionSyncInterval>
+              <org.kie.server.taskAssigning.initDelay>${org.kie.server.taskAssigning.initDelay}</org.kie.server.taskAssigning.initDelay>
 
               <org.kie.server.taskAssigning.userSystem.name>SimpleUserSystemService</org.kie.server.taskAssigning.userSystem.name>
               <org.kie.server.services.taskassigning.user.system.simple.users>${project.build.testOutputDirectory}/roles.properties</org.kie.server.services.taskassigning.user.system.simple.users>
@@ -242,6 +244,9 @@
           <value>oracle-wls-12</value>
         </property>
       </activation>
+      <properties>
+         <org.kie.server.taskAssigning.initDelay>20000</org.kie.server.taskAssigning.initDelay>
+      </properties>
     </profile>
     <profile>
       <id>websphere9</id>

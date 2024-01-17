@@ -1,5 +1,4 @@
 /*
- * Copyright 2020 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +55,7 @@ import static org.kie.server.services.taskassigning.planning.SolverHandlerConfig
 import static org.kie.server.services.taskassigning.planning.SolverHandlerConfigTest.TARGET_USER;
 import static org.kie.server.services.taskassigning.planning.SolverHandlerConfigTest.USERS_SYNC_INTERVAL;
 import static org.kie.server.services.taskassigning.planning.SolverHandlerConfigTest.WAIT_FOR_IMPROVED_SOLUTION_DURATION;
+import static org.kie.server.services.taskassigning.planning.SolverHandlerConfigTest.INIT_DELAY;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
@@ -129,7 +129,8 @@ public class SolverHandlerTest {
         handlerConfig = spy(new SolverHandlerConfig(TARGET_USER, PUBLISH_WINDOW_SIZE, SYNC_INTERVAL,
                                                     SYNC_QUERIES_SHIFT, USERS_SYNC_INTERVAL,
                                                     WAIT_FOR_IMPROVED_SOLUTION_DURATION,
-                                                    IMPROVE_SOLUTION_ON_BACKGROUND_DURATION));
+                                                    IMPROVE_SOLUTION_ON_BACKGROUND_DURATION,
+                                                    INIT_DELAY));
         previousQueryTime = LocalDateTime.now();
         nextQueryTime = previousQueryTime.plusMinutes(2);
         this.handler = spy(new SolverHandler(solverDef, registry, delegate, userSystemService, executorService, handlerConfig));
@@ -152,7 +153,7 @@ public class SolverHandlerTest {
     public void start() {
         prepareStart();
         verify(executorService).execute(solverExecutor);
-        verify(executorService).execute(solutionSynchronizer);
+        verify(executorService).schedule(solutionSynchronizer, INIT_DELAY, TimeUnit.MILLISECONDS);
         verify(executorService).execute(solutionProcessor);
         verify(solutionSynchronizer).initSolverExecutor();
     }
@@ -217,7 +218,7 @@ public class SolverHandlerTest {
         SolverHandlerContext context = contextCaptor.getValue();
         context.setProcessedChangeSet(context.getCurrentChangeSetId());
         listenerCaptor.getValue().bestSolutionChanged(event);
-        verify(executorService, never()).schedule(any(Runnable.class), anyLong(), any(TimeUnit.class));
+        verify(executorService).schedule(solutionSynchronizer, INIT_DELAY, TimeUnit.MILLISECONDS);
     }
 
     private void prepareOnBestSolutionChangeWithWaitForImprovedSolutionDuration(Duration waitForImprovedSolutionDuration) {
@@ -252,7 +253,7 @@ public class SolverHandlerTest {
         context.setCurrentChangeSetId(changeSet);
         listenerCaptor.getValue().bestSolutionChanged(event);
         verify(solutionProcessor).process(event.getNewBestSolution());
-        verify(executorService, never()).schedule(any(Runnable.class), anyLong(), any(TimeUnit.class));
+        verify(executorService).schedule(solutionSynchronizer, INIT_DELAY, TimeUnit.MILLISECONDS);
         assertTrue(context.isProcessedChangeSet(changeSet));
     }
 
@@ -413,7 +414,7 @@ public class SolverHandlerTest {
         SolverHandlerContext context = contextCaptor.getValue();
         long changeSet = context.nextChangeSetId();
         listenerCaptor.getValue().bestSolutionChanged(event);
-        verify(executorService, never()).schedule(any(Runnable.class), anyLong(), any(TimeUnit.class));
+        verify(executorService).schedule(solutionSynchronizer, INIT_DELAY, TimeUnit.MILLISECONDS);
         verify(solutionProcessor, never()).process(any());
         assertFalse(context.isProcessedChangeSet(changeSet));
     }
