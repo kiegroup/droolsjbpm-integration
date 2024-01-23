@@ -80,8 +80,7 @@
         
         <include>xerces:xercesImpl</include>
 
-        <include>org.glassfish.jaxb:jaxb-runtime</include>
-        <include>org.glassfish.jaxb:jaxb-xjc</include>
+        <include>com.sun.xml.bind:jaxb-xjc</include>
 
         <include>org.jboss.resteasy:resteasy-jackson2-provider</include>
       </includes>
