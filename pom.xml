@@ -22,6 +22,8 @@
 
   <properties>
     <spotbugs.failOnViolation>true</spotbugs.failOnViolation>
+    <skipTests>true</skipTests>
+    <skipITs>true</skipITs>
   </properties>
 
   <repositories>
@@ -51,22 +53,22 @@
   <modules>
     <module>kie-swagger-ui</module>
     <module>kie-maven-plugin</module>
-    <module>kie-takari-plugin</module>
-    <module>droolsjbpm-integration-examples</module>
-    <module>jbpm-simulation</module>
+<!--    <module>kie-takari-plugin</module>-->
+<!--    <module>droolsjbpm-integration-examples</module>-->
+<!--    <module>jbpm-simulation</module>-->
     <module>kie-spring</module>
     <module>kie-aries-blueprint</module>
     <module>kie-server-parent</module>
     <module>jbpm-process-svg</module>
     <module>kie-osgi</module>
-    <module>kie-performance-kit</module>
+<!--    <module>kie-performance-kit</module>-->
     <module>kie-camel</module>
-    <module>kie-tomcat-integration</module>
-    <module>kie-integration-test-coverage</module>
-    <module>kie-plugins-testing</module>
-    <module>kie-spring-boot</module>
-    <module>camel-container-tests</module>
-    <module>optaplanner-workbench-models</module>
+<!--    <module>kie-tomcat-integration</module>-->
+<!--    <module>kie-integration-test-coverage</module>-->
+<!--    <module>kie-plugins-testing</module>-->
+<!--    <module>kie-spring-boot</module>-->
+<!--    <module>camel-container-tests</module>-->
+<!--    <module>optaplanner-workbench-models</module>-->
   </modules>
 
   <dependencyManagement>

@@ -349,6 +349,7 @@
       </activation>
       <properties>
         <skipTests>false</skipTests>
+        <skipITs>false</skipITs>
       </properties>
     </profile>
 
