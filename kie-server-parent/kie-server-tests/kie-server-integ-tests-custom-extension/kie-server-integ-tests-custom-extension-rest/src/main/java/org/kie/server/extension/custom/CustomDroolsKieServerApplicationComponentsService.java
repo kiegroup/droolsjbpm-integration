@@ -52,6 +52,7 @@ public class CustomDroolsKieServerApplicationComponentsService implements KieSer
         List<Object> components = new ArrayList<Object>();
         if (SupportedTransports.REST.equals(type)) {
             components.add(new CustomResource(rulesExecutionService, context));
+            components.add(new CustomJsonResource());
         }
 
         return components;

@@ -28,7 +28,6 @@
       <module name="com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider" />
       <module name="com.fasterxml.jackson.dataformat.jackson-dataformat-yaml" />
       <module name="org.jboss.resteasy.resteasy-jackson2-provider" />
-      <module name="org.jboss.resteasy.resteasy-jackson-provider" />
     </exclusions>
     <dependencies>
       <!-- IMPORTANT: when adding dependency (module) here, make sure it is a public one.
