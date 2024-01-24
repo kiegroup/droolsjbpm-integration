@@ -173,7 +173,8 @@ public class KieServerAutoConfiguration extends AbstractJaxrsClassesScanServer {
     public List<KieContainerResource> buildAutoScanDeployments(KieServerProperties kieServerProperties) throws IOException {
         ApplicationHome appHome = new ApplicationHome();
         final String folder = "BOOT-INF/classes/KIE-INF/lib/";
-        return (explodedJarFolder == null) ? discoverDeployments(folder, new FileInputStream(appHome.getSource())) :  discoverDeployments(folder, new File(explodedJarFolder));
+        List<KieContainerResource> containerResources = discoverDeployments(folder, new File(explodedJarFolder));
+        return containerResources.isEmpty() ? discoverDeployments(folder, new FileInputStream(appHome.getSource())) : containerResources;
     }
 
     public List<KieContainerResource> discoverDeployments(String folder, File root) {
