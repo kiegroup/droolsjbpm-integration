@@ -32,6 +32,7 @@ public class SolverHandlerConfigTest {
     public static final Duration USERS_SYNC_INTERVAL = Duration.parse("PT3H");
     public static final Duration WAIT_FOR_IMPROVED_SOLUTION_DURATION = Duration.parse("PT1S");
     public static final Duration IMPROVE_SOLUTION_ON_BACKGROUND_DURATION = Duration.parse("PT1M");
+    public static final long INIT_DELAY = 10000;
 
     protected SolverHandlerConfig config;
 
@@ -43,7 +44,8 @@ public class SolverHandlerConfigTest {
                                          SYNC_QUERIES_SHIFT,
                                          USERS_SYNC_INTERVAL,
                                          WAIT_FOR_IMPROVED_SOLUTION_DURATION,
-                                         IMPROVE_SOLUTION_ON_BACKGROUND_DURATION);
+                                         IMPROVE_SOLUTION_ON_BACKGROUND_DURATION,
+                                         INIT_DELAY);
     }
 
     @Test
@@ -79,5 +81,10 @@ public class SolverHandlerConfigTest {
     @Test
     public void getImproveSolutionOnBackgroundDuration() {
         assertThat(config.getImproveSolutionOnBackgroundDuration()).isEqualTo(IMPROVE_SOLUTION_ON_BACKGROUND_DURATION);
+    }
+    
+    @Test
+    public void getInitDelay() {
+        assertThat(config.getInitDelay()).isEqualTo(INIT_DELAY);
     }
 }

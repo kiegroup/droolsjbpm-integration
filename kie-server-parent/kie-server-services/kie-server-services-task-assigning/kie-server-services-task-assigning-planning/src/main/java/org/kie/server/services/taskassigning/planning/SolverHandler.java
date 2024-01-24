@@ -102,7 +102,7 @@ public class SolverHandler {
         solutionProcessor = createSolutionProcessor(delegate, this::onSolutionProcessed, config.getTargetUserId(),
                                                     config.getPublishWindowSize());
         executorService.execute(solverExecutor); //is started/stopped on demand by the SolutionSynchronizer.
-        executorService.execute(solutionSynchronizer);
+        executorService.schedule(solutionSynchronizer, config.getInitDelay(), TimeUnit.MILLISECONDS);
         executorService.execute(solutionProcessor);
         solutionSynchronizer.initSolverExecutor();
     }
