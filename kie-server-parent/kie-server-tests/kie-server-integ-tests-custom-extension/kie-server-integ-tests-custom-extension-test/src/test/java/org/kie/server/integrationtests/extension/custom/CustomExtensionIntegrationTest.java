@@ -33,6 +33,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -40,6 +41,8 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.client.CustomExtensionClient;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.common.rest.Authenticator;
+import org.kie.server.integrationtests.category.JEEOnly;
+import org.kie.server.integrationtests.category.WildflyOnly;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerReflections;
 import org.kie.server.integrationtests.shared.basetests.KieServerBaseIntegrationTest;
@@ -116,6 +119,7 @@ public class CustomExtensionIntegrationTest extends RestJmsSharedBaseIntegration
     }
 
     @Test
+    @Category({JEEOnly.class, WildflyOnly.class})
     public void testCustomJsonResourceEndpoint() {
         // RHPAM-4876
         if (configuration.getMarshallingFormat() != MarshallingFormat.JSON) {
