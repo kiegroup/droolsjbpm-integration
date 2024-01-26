@@ -97,9 +97,12 @@
         <include>org.glassfish.jaxb:jaxb-xjc</include>
 
         <include>org.yaml:snakeyaml</include>
+
+        <include>org.jboss.resteasy:resteasy-jackson2-provider</include>
       </includes>
       <excludes>
-        <exclude>org.jboss.resteasy:*</exclude>
+        <exclude>org.jboss.resteasy:resteasy-jackson-provider</exclude>
+        <exclude>org.jboss.resteasy:resteasy-jaxb-provider</exclude>
         <exclude>jakarta.annotation:*</exclude>
         <exclude>jakarta.ejb:*</exclude>
         <exclude>jakarta.interceptor:*</exclude>
