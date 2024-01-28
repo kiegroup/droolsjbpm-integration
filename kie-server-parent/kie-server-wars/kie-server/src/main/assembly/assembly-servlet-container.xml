@@ -89,6 +89,9 @@
         <include>org.quartz-scheduler:quartz</include>
 
         <include>com.google.inject.extensions:guice-servlet</include>
+
+        <include>org.jboss.resteasy:resteasy-jackson2-provider</include>
+ 
       </includes>
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <useTransitiveFiltering>true</useTransitiveFiltering>
