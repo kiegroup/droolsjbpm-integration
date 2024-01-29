@@ -1253,6 +1253,7 @@
                   <home>${websphere.home}</home>
                   <timeout>240000</timeout>
                   <systemProperties>
+                    <org.kie.server.id>test-kie-server</org.kie.server.id>
                     <org.kie.server.persistence.tm>WebSphere</org.kie.server.persistence.tm>
                     <org.kie.server.domain>WSLogin</org.kie.server.domain>
                     <org.kie.executor.jms.cf>jms/cf/KIE.SERVER.EXECUTOR</org.kie.executor.jms.cf>
