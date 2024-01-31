@@ -144,8 +144,7 @@ public class ImageServiceBase {
                     fullLogs.stream()
                             .filter(nodeInstanceDesc ->
                                             (((org.jbpm.kie.services.impl.model.NodeInstanceDesc) nodeInstanceDesc).getType() == NodeInstanceLog.TYPE_ASYNC_ENTER) &&
-                                                    fullLogs.stream().noneMatch(nodeInst -> nodeInstanceDesc.getNodeId().equals(nodeInst.getNodeId())
-                                                            && (((org.jbpm.kie.services.impl.model.NodeInstanceDesc) nodeInst).getType() == NodeInstanceLog.TYPE_EXIT)))
+                                                    finishedLogs.stream().noneMatch(nodeInst -> nodeInstanceDesc.getNodeId().equals(nodeInst.getNodeId())))
                             .map(NodeInstanceDesc::getNodeId).collect(Collectors.toList());
 
             Map<Long, String> active = new HashMap<Long, String>();
