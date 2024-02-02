@@ -13,7 +13,8 @@
     <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.3/${karaf.servicemix.version.javax.xml.bind.jaxb}</bundle>
     <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-xjc/${karaf.servicemix.version.com.sun.xml.bind.jaxb.xjc}</bundle>
     <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-runtime/${karaf.servicemix.version.com.sun.xml.bind.jaxb}</bundle>
-    <bundle>mvn:org.mvel/mvel2/${version.org.mvel}</bundle>
+    <bundle>mvn:org.mvel/mvel2/${karaf.version.org.mvel}</bundle>
+    <bundle>mvn:org.ow2.asm/asm/${karaf.version.org.ow2.asm}</bundle>
     <bundle>wrap:mvn:org.eclipse.jdt/ecj/${karaf.version.org.eclipse.jdt}$Bundle-SymbolicName=Eclipse-JDT-Compiler&amp;Bundle-Version=${karaf.version.org.eclipse.jdt}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-atinject_1.0_spec/${karaf.version.org.apache.geronimo.specs.atinject}</bundle>
     <bundle>wrap:mvn:jakarta.enterprise/jakarta.enterprise.cdi-api/${version.jakarta.enterprise.cdi-api}</bundle>

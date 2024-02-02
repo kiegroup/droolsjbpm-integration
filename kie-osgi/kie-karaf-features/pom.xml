@@ -28,6 +28,7 @@
     <karaf.version.org.jboss.seam>${version.org.jboss.seam}</karaf.version.org.jboss.seam>
     <karaf.version.org.jboss.weld>${version.org.jboss.weld.weld}</karaf.version.org.jboss.weld>
     <karaf.version.org.mvel>${version.org.mvel}</karaf.version.org.mvel>
+    <karaf.version.org.ow2.asm>9.5</karaf.version.org.ow2.asm>
     <karaf.version.org.eclipse.jdt>${version.org.eclipse.jdt}</karaf.version.org.eclipse.jdt>
 
     <!-- Geronimo -->
