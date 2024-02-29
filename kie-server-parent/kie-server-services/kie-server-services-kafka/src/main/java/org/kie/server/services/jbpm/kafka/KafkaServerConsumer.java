@@ -196,12 +196,10 @@ class KafkaServerConsumer implements Runnable {
     
 
     private void printEventsLog(ConsumerRecords<String, byte[]> events) {
-        Map<String, Integer> eventsPerTopic = new HashMap<>();
         for (ConsumerRecord<String, byte[]> event : events) {
             logger.trace("Kafka event received {}", event);
-            eventsPerTopic.compute(event.topic(), (k, v) -> v == null ? 1 : v++);
         }
-        logger.debug("Number of events received per topic {}", eventsPerTopic);
+        logger.debug("Number of events received per topic {}", events.count());
     }
 
     @FunctionalInterface
