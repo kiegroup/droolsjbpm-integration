@@ -46,23 +46,23 @@ class KafkaServerRegistration {
     private Map<String, Map<SignalDesc, Map<DeploymentId, SortedSet<VersionedDeploymentId>>>> topic2Signal = new ConcurrentHashMap<>();
     private Map<String, Map<MessageDesc, Map<DeploymentId, SortedSet<VersionedDeploymentId>>>> topic2Message = new ConcurrentHashMap<>();
 
-    void close() {
+    synchronized void close() {
         topic2Signal.clear();
         topic2Message.clear();
     }
 
-    boolean isEmpty() {
+    synchronized boolean isEmpty() {
         return topic2Signal.isEmpty() && topic2Message.isEmpty();
     }
 
-    Set<String> addRegistration(DeploymentEvent event) {
+    synchronized Set<String> addRegistration(DeploymentEvent event) {
         for (DeployedAsset asset : event.getDeployedUnit().getDeployedAssets()) {
             updateTopics(new DeploymentIdFactory(event), (ProcessDefinition) asset);
         }
         return getTopicsRegistered();
     }
 
-    Set<String> removeRegistration(DeploymentEvent event, Consumer<String> topicProcessed) {
+    synchronized Set<String> removeRegistration(DeploymentEvent event, Consumer<String> topicProcessed) {
         for (DeployedAsset asset : event.getDeployedUnit().getDeployedAssets()) {
             removeTopics(new DeploymentIdFactory(event), (ProcessDefinition) asset, topicProcessed);
         }
