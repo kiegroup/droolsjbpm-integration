@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -112,10 +113,7 @@ class KafkaServerConsumer implements Runnable {
                     consumer = consumerSupplier.get();
                     consumer.subscribe(topics2Register);
                     logger.debug("Created kafka consumer with these topics registered {}", topics2Register);
-                    notifyService.set(
-                            new ThreadPoolExecutor(1, Integer.getInteger(KAFKA_EXTENSION_PREFIX + "maxNotifyThreads", 10),
-                                60L,
-                                TimeUnit.SECONDS, new LinkedBlockingQueue<>()));
+                    notifyService.set(Executors.newFixedThreadPool(Integer.getInteger(KAFKA_EXTENSION_PREFIX + "maxNotifyThreads", 10)));
                     new Thread(this).start();
                 }
             } else {
