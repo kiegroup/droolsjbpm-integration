@@ -318,6 +318,7 @@ Parameters are:
 | templateId         | null                          | true      | kie-ctrl.template-id         | String          |
 | templateName       | ${templateId}                 | false     | kie-ctrl.template-name       | String          |
 | container          | ${project.GAV}                | false     | kie-ctrl.container           | String          |
+| alias              | ${container}                  | false     | kie-ctrl.alias               | String          |
 | runtimeStrategy    | null                          | false     | kie-ctrl.runtime-strategy    | String          |
 | kbase              | null                          | false     | kie-ctrl.kbase               | String          |
 | ksession           | null                          | false     | kie-ctrl.ksession            | String          |
@@ -476,6 +477,7 @@ Parameters are:
 | templateId           | null                          | true      | kie-ctrl.template-id          | String          |
 | templateName         | ${templateId}                 | false     | kie-ctrl.template-name        | String          |
 | container            | ${project.GAV}                | false     | kie-ctrl.container            | String          |
+| alias                | ${container}                  | false     | kie-ctrl.alias                | String          |
 | runtimeStrategy      | null                          | false     | kie-ctrl.runtime-strategy     | String          |
 | kbase                | null                          | false     | kie-ctrl.kbase                | String          |
 | ksession             | null                          | false     | kie-ctrl.ksession             | String          |
