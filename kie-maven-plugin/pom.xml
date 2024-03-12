@@ -33,6 +33,7 @@
           <setupIncludes>
             <setupInclude>kie-maven-plugin-test-kjar-setup/pom.xml</setupInclude>
           </setupIncludes>
+          <debug>true</debug>
           <pomIncludes>
             <pomInclude>*/pom.xml</pomInclude>
           </pomIncludes>
