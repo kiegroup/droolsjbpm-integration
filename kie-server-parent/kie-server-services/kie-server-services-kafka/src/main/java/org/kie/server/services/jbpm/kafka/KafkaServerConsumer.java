@@ -38,6 +38,9 @@ import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.model.MessageDesc;
 import org.jbpm.services.api.model.SignalDesc;
 import org.jbpm.services.api.model.SignalDescBase;
+import org.kie.server.api.jms.JMSConstants;
+import org.kie.server.services.impl.security.adapters.JwtSecurityAdaptor;
+import org.kie.server.services.impl.util.JwtService;
 import org.kie.server.services.impl.security.adapters.BrokerSecurityAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,11 +70,14 @@ class KafkaServerConsumer implements Runnable {
     private Supplier<Consumer<String, byte[]>> consumerSupplier;
     private KafkaEventProcessorFactory factory;
 
+    private JwtService jwtService;
+
     public KafkaServerConsumer(KafkaEventProcessorFactory factory, Supplier<Consumer<String, byte[]>> consumerSupplier,
                                ProcessService processService) {
         this.factory = factory;
         this.consumerSupplier = consumerSupplier;
         this.processService = processService;
+        this.jwtService = JwtService.newJwtServiceBuilder().build();
     }
 
     void addRegistration(DeploymentEvent event) {
@@ -243,7 +249,7 @@ class KafkaServerConsumer implements Runnable {
 
         String username = getValue(event.headers().lastHeader(USER_PROPERTY_NAME));
         String password = getValue(event.headers().lastHeader(PASSWRD_PROPERTY_NAME));
-
+        String token = getValue(event.headers().lastHeader(JMSConstants.ASSERTION_PROPERTY_NAME));
         if (username != null && password != null) {
             BrokerSecurityAdapter.login(username, password);
         } else {
@@ -251,6 +257,9 @@ class KafkaServerConsumer implements Runnable {
         }
 
         try {
+            if (token != null) {
+                JwtSecurityAdaptor.login(jwtService.decodeUserDetails(token));
+            }
             String signalName = signal.getName();
             ClassLoader cl = classLoaders.get(deploymentId);
             Class<?> valueType = Object.class;
@@ -267,8 +276,12 @@ class KafkaServerConsumer implements Runnable {
                     deploymentId, value);
         } catch (ClassNotFoundException ex) {
             logger.error("Class not found in deployment id {}", deploymentId, ex);
+        } catch (IllegalArgumentException e) {
+            logger.error("Exception token login {}", token, e);
         } catch (RuntimeException | IOException ex) {
             logger.error("Exception deserializing event", ex);
+        } finally {
+            JwtSecurityAdaptor.logout();
         }
     }
 }
