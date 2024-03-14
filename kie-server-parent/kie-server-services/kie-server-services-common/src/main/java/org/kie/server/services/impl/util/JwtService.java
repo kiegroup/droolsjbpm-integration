@@ -15,6 +15,7 @@
 
 package org.kie.server.services.impl.util;
 
+import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ public class JwtService {
         return issuer;
     }
 
-    public String token(String user, String ...roles) {
+    public String token(String user, String... roles) {
         return JWT.create().withIssuer(this.issuer).withSubject(user).withClaim("roles", Arrays.asList(roles)).sign(algorithm);
     }
 
@@ -79,6 +80,13 @@ public class JwtService {
 
         public JwtService build() {
             return new JwtService(algorithm != null ? algorithm : Algorithm.none(), issuer != null ? issuer : "jBPM");
+        }
+
+        public JwtServiceBuilder keyPair(KeyPair keyPair) {
+            if (keyPair != null) {
+                this.algorithm = Algorithm.RSA256((RSAPublicKey) keyPair.getPublic(), (RSAPrivateKey) keyPair.getPrivate());
+            }
+            return this;
         }
 
     }

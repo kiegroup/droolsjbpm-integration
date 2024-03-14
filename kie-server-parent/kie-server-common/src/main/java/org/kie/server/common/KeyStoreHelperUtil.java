@@ -1,8 +1,18 @@
 package org.kie.server.common;
 
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.drools.core.util.KeyStoreConstants;
 import org.drools.core.util.KeyStoreHelper;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieServerConfig;
@@ -16,7 +26,10 @@ public class KeyStoreHelperUtil {
     private static final String PROP_PWD_SERVER_PWD = "kie.keystore.key.server.pwd";
 
     // the private key identifier for controller
-     private static final String PROP_PWD_CTRL_ALIAS = "kie.keystore.key.ctrl.alias";
+    public static final String PROP_PWD_JWT_ALIAS = "kie.keystore.key.jwt.alias";
+
+    // the private key identifier for controller
+    private static final String PROP_PWD_CTRL_ALIAS = "kie.keystore.key.ctrl.alias";
     // the private key identifier for controller
     private static final String PROP_PWD_CTRL_PWD = "kie.keystore.key.ctrl.pwd";
 
@@ -35,6 +48,30 @@ public class KeyStoreHelperUtil {
 
     public static String loadControllerPassword(final String defaultPassword) {
         return loadPasswordKey(PROP_PWD_CTRL_ALIAS, PROP_PWD_CTRL_PWD, defaultPassword);
+    }
+
+    public static KeyPair getJwtKeyPair() {
+        String pwdKeyAlias = System.getProperty(PROP_PWD_JWT_ALIAS, "");
+        String pwdKeyPassword = System.getProperty(KeyStoreConstants.PROP_PVT_KS_PWD, "");
+        return getJwtKeyPair(pwdKeyAlias, pwdKeyPassword);
+    }
+
+    public static KeyPair getJwtKeyPair(String pwdKeyAlias, String pwdKeyPassword) {
+        try {
+            KeyStoreHelper keyStoreHelper = KeyStoreHelper.get();
+            KeyStore keystore = keyStoreHelper.getPvtKeyStore();
+            Key key = (PrivateKey) keystore.getKey(pwdKeyAlias, pwdKeyPassword.toCharArray());
+            if (key instanceof PrivateKey) {
+                // Get certificate of public key
+                Certificate cert = keystore.getCertificate(pwdKeyAlias);
+                PublicKey publicKey = cert.getPublicKey();
+                return new KeyPair(publicKey, (PrivateKey) key);
+            }
+            return null;
+        } catch (RuntimeException | UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException re) {
+            logger.warn("Unable to load key store. Using password from configuration");
+        }
+        return null;
     }
 
     public static String loadPasswordKey(String pwdKeyAliasProperty, String pwdKeyPasswordProperty, String defaultPassword) {
