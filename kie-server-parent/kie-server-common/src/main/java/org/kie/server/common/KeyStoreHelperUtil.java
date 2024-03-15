@@ -27,7 +27,8 @@ public class KeyStoreHelperUtil {
 
     // the private key identifier for controller
     public static final String PROP_PWD_JWT_ALIAS = "kie.keystore.key.jwt.alias";
-
+    public static final String PROP_PWD_JWT_PWD = "kie.keystore.key.jwt.pwd";
+    
     // the private key identifier for controller
     private static final String PROP_PWD_CTRL_ALIAS = "kie.keystore.key.ctrl.alias";
     // the private key identifier for controller
@@ -52,7 +53,7 @@ public class KeyStoreHelperUtil {
 
     public static KeyPair getJwtKeyPair() {
         String pwdKeyAlias = System.getProperty(PROP_PWD_JWT_ALIAS, "");
-        String pwdKeyPassword = System.getProperty(KeyStoreConstants.PROP_PVT_KS_PWD, "");
+        String pwdKeyPassword = System.getProperty(PROP_PWD_JWT_PWD, "");
         return getJwtKeyPair(pwdKeyAlias, pwdKeyPassword);
     }
 

@@ -16,8 +16,10 @@
 
 package org.kie.server.common;
 
+import java.io.File;
 import java.net.URI;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
 import org.drools.core.util.KeyStoreConstants;
 import org.drools.core.util.KeyStoreHelper;
@@ -35,25 +37,30 @@ public class KeyStoreHelperUtilTest {
 
     private static final String KEYSTORE_PATH = "target/keystore.jks";
     private static final String KEYSTORE_PWD = "password";
-    private static final String KEYSTORE_ALIAS = "selfsigned";
+    private static final String KEYSTORE_KEY_ALIAS = "selfsigned";
+    private static final String KEYSTORE_KEY_PWD = "password";
 
     @BeforeClass
     public static void init() throws Exception {
+        File file = new File(KEYSTORE_PATH);
+        file.delete();
+
         // generate self signed certificate
         String[] cmd = { "keytool", "-genkey",
                 "-keyalg", "RSA",
-                "-alias", KEYSTORE_ALIAS,
+                "-alias", KEYSTORE_KEY_ALIAS,
                 "-keystore", KEYSTORE_PATH,
                 "-storepass", KEYSTORE_PWD,
                 "-validity", "360",
                 "-keysize", "1024",
+                "-keypass", KEYSTORE_KEY_PWD,
                 "-dname", "CN=root, OU=root, O=root, L=root, ST=root, C=root"
         };
 
         ProcessBuilder builder = new ProcessBuilder();
         builder.command(cmd);
         Process p = builder.start();
-        p.waitFor();
+        p.waitFor(10, TimeUnit.SECONDS);
     }
 
     @Test
@@ -63,7 +70,8 @@ public class KeyStoreHelperUtilTest {
             URI uri = Paths.get(KEYSTORE_PATH).toAbsolutePath().toUri();
             System.setProperty(KeyStoreConstants.PROP_PVT_KS_URL, uri.toURL().toExternalForm());
             System.setProperty(KeyStoreConstants.PROP_PVT_KS_PWD, KEYSTORE_PWD);
-            System.setProperty(KeyStoreHelperUtil.PROP_PWD_JWT_ALIAS, KEYSTORE_ALIAS);
+            System.setProperty(KeyStoreHelperUtil.PROP_PWD_JWT_ALIAS, KEYSTORE_KEY_ALIAS);
+            System.setProperty(KeyStoreHelperUtil.PROP_PWD_JWT_PWD, KEYSTORE_KEY_PWD);
 
             KeyStoreHelper.reInit();
 
@@ -73,6 +81,7 @@ public class KeyStoreHelperUtilTest {
             System.clearProperty(KeyStoreConstants.PROP_PVT_KS_URL);
             System.clearProperty(KeyStoreConstants.PROP_PVT_KS_PWD);
             System.clearProperty(KeyStoreHelperUtil.PROP_PWD_JWT_ALIAS);
+            System.clearProperty(KeyStoreHelperUtil.PROP_PWD_JWT_PWD);
         }
 
     }
