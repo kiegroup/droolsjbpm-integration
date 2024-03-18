@@ -14,19 +14,14 @@
 */
 package org.kie.server.services.jbpm.kafka;
 
-import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.KAFKA_EXTENSION_PREFIX;
-
 import java.io.IOException;
+import java.security.KeyPair;
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -37,14 +32,25 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.errors.WakeupException;
+import org.apache.kafka.common.header.Header;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.services.api.DeploymentEvent;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.model.MessageDesc;
 import org.jbpm.services.api.model.SignalDesc;
 import org.jbpm.services.api.model.SignalDescBase;
+import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.jms.JMSConstants;
+import org.kie.server.common.KeyStoreHelperUtil;
+import org.kie.server.services.impl.security.adapters.JwtSecurityAdaptor;
+import org.kie.server.services.impl.util.JwtService;
+import org.kie.server.services.impl.security.adapters.BrokerSecurityAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.kie.server.api.jms.JMSConstants.PASSWRD_PROPERTY_NAME;
+import static org.kie.server.api.jms.JMSConstants.USER_PROPERTY_NAME;
+import static org.kie.server.services.jbpm.kafka.KafkaServerUtils.KAFKA_EXTENSION_PREFIX;
 
 class KafkaServerConsumer implements Runnable {
 
@@ -67,11 +73,18 @@ class KafkaServerConsumer implements Runnable {
     private Supplier<Consumer<String, byte[]>> consumerSupplier;
     private KafkaEventProcessorFactory factory;
 
+    private JwtService jwtService;
+
     public KafkaServerConsumer(KafkaEventProcessorFactory factory, Supplier<Consumer<String, byte[]>> consumerSupplier,
                                ProcessService processService) {
         this.factory = factory;
         this.consumerSupplier = consumerSupplier;
         this.processService = processService;
+        KeyPair keyPair = KeyStoreHelperUtil.getJwtKeyPair();
+        this.jwtService = JwtService.newJwtServiceBuilder()
+                .keyPair(keyPair)
+                .issuer(System.getProperty(KieServerConstants.CFG_KIE_ISSUER, "jBPM"))
+                .build();
     }
 
     void addRegistration(DeploymentEvent event) {
@@ -232,10 +245,33 @@ class KafkaServerConsumer implements Runnable {
         processEvent(event, deploymentId, message, messageSignaller);
     }
 
+    private String getValue(Header header) {
+        return header != null && header.value() != null ? new String(header.value()) : null;
+    }
+
     private void processEvent(ConsumerRecord<String, byte[]> event,
                               String deploymentId,
                               SignalDescBase signal,
                               Signaller signaller) {
+
+        String username = getValue(event.headers().lastHeader(USER_PROPERTY_NAME));
+        String password = getValue(event.headers().lastHeader(PASSWRD_PROPERTY_NAME));
+
+        if (username != null && password != null) {
+            BrokerSecurityAdapter.login(username, password);
+        } else {
+            logger.debug("Unable to login to BrokerSecurityAdapter, user name and/or password missing for user{}", username);
+        }
+
+        String token = getValue(event.headers().lastHeader(JMSConstants.ASSERTION_PROPERTY_NAME));
+        if (token != null) {
+            try {
+                JwtSecurityAdaptor.login(jwtService.decodeUserDetails(token));
+            }catch (IllegalArgumentException e) {
+                logger.debug("Unable to login to JwtSecurityAdaptor, user name and/or password missing for token {}", token, e);
+            } 
+        }
+
         try {
             String signalName = signal.getName();
             ClassLoader cl = classLoaders.get(deploymentId);
@@ -255,6 +291,10 @@ class KafkaServerConsumer implements Runnable {
             logger.error("Class not found in deployment id {}", deploymentId, ex);
         } catch (RuntimeException | IOException ex) {
             logger.error("Exception deserializing event", ex);
+        } finally {
+            if (token != null) {
+                JwtSecurityAdaptor.logout();
+            }
         }
     }
 }

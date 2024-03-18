@@ -128,7 +128,7 @@ import org.kie.server.services.jbpm.jpa.PersistenceUnitExtensionsLoader;
 import org.kie.server.services.jbpm.jpa.PersistenceUnitInfoImpl;
 import org.kie.server.services.jbpm.jpa.PersistenceUnitInfoLoader;
 import org.kie.server.services.jbpm.security.ElytronUserGroupCallbackImpl;
-import org.kie.server.services.jbpm.security.JMSUserGroupAdapter;
+import org.kie.server.services.jbpm.security.BrokerUserGroupAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -226,11 +226,11 @@ public class JbpmKieServerExtension implements KieServerExtension {
             if (ElytronIdentityProvider.available()) {
                 System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "custom");
                 String name = ElytronUserGroupCallbackImpl.class.getName();
-                ElytronUserGroupCallbackImpl.addExternalUserGroupAdapter(new JMSUserGroupAdapter());
+                ElytronUserGroupCallbackImpl.addExternalUserGroupAdapter(new BrokerUserGroupAdapter());
                 System.setProperty(KieServerConstants.CFG_HT_CALLBACK_CLASS, name);
             } else {
                 System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "jaas");
-                JAASUserGroupCallbackImpl.addExternalUserGroupAdapter(new JMSUserGroupAdapter());
+                JAASUserGroupCallbackImpl.addExternalUserGroupAdapter(new BrokerUserGroupAdapter());
             }
         }
 
