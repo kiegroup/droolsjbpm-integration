@@ -51,7 +51,7 @@ import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
-import org.kie.server.services.impl.security.adapters.JMSSecurityAdapter;
+import org.kie.server.services.impl.security.adapters.BrokerSecurityAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -208,7 +208,7 @@ public class KieServerMDB
                 logger.warn("Unable to retrieve user name and/or password, from message");
             }
             if (username != null && password != null) {
-                JMSSecurityAdapter.login(username, password);
+                BrokerSecurityAdapter.login(username, password);
             } else {
                 logger.warn("Unable to login to JMSSecurityAdapter, user name and/or password missing");
             }
@@ -320,10 +320,10 @@ public class KieServerMDB
                 } catch (JMSRuntimeException runtimeException) {
                     logger.error("Error while attempting to close connection/session",runtimeException);
                 } finally {
-                    JMSSecurityAdapter.logout();
+                    BrokerSecurityAdapter.logout();
                 }
             } else {
-                JMSSecurityAdapter.logout();
+                BrokerSecurityAdapter.logout();
             }
         }
 

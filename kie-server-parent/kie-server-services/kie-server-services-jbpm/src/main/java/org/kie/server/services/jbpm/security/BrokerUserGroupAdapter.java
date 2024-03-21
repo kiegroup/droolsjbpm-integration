@@ -19,11 +19,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jbpm.services.task.identity.adapter.UserGroupAdapter;
-import org.kie.server.services.impl.security.adapters.JMSSecurityAdapter;
+import org.kie.server.services.impl.security.adapters.BrokerSecurityAdapter;
 
-public class JMSUserGroupAdapter implements UserGroupAdapter {
+public class BrokerUserGroupAdapter implements UserGroupAdapter {
 
-    private JMSSecurityAdapter jmsSecurityAdapter = new JMSSecurityAdapter();
+    private BrokerSecurityAdapter jmsSecurityAdapter = new BrokerSecurityAdapter();
 
     @Override
     public List<String> getGroupsForUser(String userId) {

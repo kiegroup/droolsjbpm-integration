@@ -43,8 +43,9 @@ import org.wildfly.security.auth.server.SecurityDomain;
 import org.wildfly.security.auth.server.SecurityIdentity;
 import org.wildfly.security.evidence.Evidence;
 
-public class JMSSecurityAdapter implements SecurityAdapter {
-    private static final Logger logger = LoggerFactory.getLogger(JMSSecurityAdapter.class);
+public class BrokerSecurityAdapter implements SecurityAdapter {
+
+    private static final Logger logger = LoggerFactory.getLogger(BrokerSecurityAdapter.class);
 
     private static final ServiceLoader<SecurityAdapter> securityAdapters = ServiceLoader.load(SecurityAdapter.class);
     private static List<SecurityAdapter> adapters = new ArrayList<>();

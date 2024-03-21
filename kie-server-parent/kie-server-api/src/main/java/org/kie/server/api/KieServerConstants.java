@@ -83,6 +83,7 @@ public class KieServerConstants {
     public static final String CFG_KIE_USER = "org.kie.server.user";
     public static final String CFG_KIE_PASSWORD = "org.kie.server.pwd";
     public static final String CFG_KIE_TOKEN = "org.kie.server.token";
+    public static final String CFG_KIE_ISSUER = "org.kie.server.issuer";
 
     /**
      * Security settings used to connect to KIE Server Controller

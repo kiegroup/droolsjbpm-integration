@@ -27,6 +27,7 @@ public class JMSConstants {
     public static final String TARGET_CAPABILITY_PROPERTY_NAME = "kie_target_capability";
     public static final String USER_PROPERTY_NAME = "kie_user";
     public static final String PASSWRD_PROPERTY_NAME = "kie_password";
+    public static final String ASSERTION_PROPERTY_NAME = "kie_token";
 
     public static final String INTERACTION_PATTERN_PROPERTY_NAME = "kie_interaction_pattern";
 
