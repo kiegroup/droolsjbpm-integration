@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Consumer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
@@ -42,8 +43,8 @@ import org.kie.api.definition.process.Node;
 
 class KafkaServerRegistration {
     
-    private Map<String, Map<SignalDesc, Map<DeploymentId, SortedSet<VersionedDeploymentId>>>> topic2Signal = new HashMap<>();
-    private Map<String, Map<MessageDesc, Map<DeploymentId, SortedSet<VersionedDeploymentId>>>> topic2Message = new HashMap<>();
+    private Map<String, Map<SignalDesc, Map<DeploymentId, SortedSet<VersionedDeploymentId>>>> topic2Signal = new ConcurrentHashMap<>();
+    private Map<String, Map<MessageDesc, Map<DeploymentId, SortedSet<VersionedDeploymentId>>>> topic2Message = new ConcurrentHashMap<>();
 
     synchronized void close() {
         topic2Signal.clear();
@@ -100,7 +101,7 @@ class KafkaServerRegistration {
         forEach(topic2Message, event, eventProcessor);
     }
 
-    private synchronized <T extends SignalDescBase> void forEach(Map<String, Map<T, Map<DeploymentId, SortedSet<VersionedDeploymentId>>>> topic2SignalBase,
+    private <T extends SignalDescBase> void forEach(Map<String, Map<T, Map<DeploymentId, SortedSet<VersionedDeploymentId>>>> topic2SignalBase,
                                                                  ConsumerRecord<String, byte[]> event,
                                                                  KafkaServerEventProcessor<T> processor) {
         Map<T, Map<DeploymentId, SortedSet<VersionedDeploymentId>>> signalInfo = topic2SignalBase.get(event.topic());
