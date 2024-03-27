@@ -86,7 +86,7 @@ public class DecisionTasksIntegrationTest extends JbpmKieServerBaseIntegrationTe
 
             List<VariableInstance> variables = queryClient.findVariablesCurrentState(processInstanceId);
             assertNotNull(variables);
-            assertEquals(2, variables.size());
+            assertEquals(3, variables.size());
             Map<String, String> mappedVars = variables.stream().collect(Collectors.toMap(VariableInstance::getVariableName, VariableInstance::getValue));
             assertEquals("Person{name='john' age='35'}", mappedVars.get("person"));
             processInstanceId = null;
@@ -119,7 +119,7 @@ public class DecisionTasksIntegrationTest extends JbpmKieServerBaseIntegrationTe
 
             List<VariableInstance> variables = queryClient.findVariablesCurrentState(processInstanceId);
             assertNotNull(variables);
-            assertEquals(4, variables.size());
+            assertEquals(5, variables.size());
             Map<String, String> mappedVars = variables.stream().collect(Collectors.toMap(VariableInstance::getVariableName, VariableInstance::getValue));
             assertEquals("27", mappedVars.get("vacationDays"));
             processInstanceId = null;
