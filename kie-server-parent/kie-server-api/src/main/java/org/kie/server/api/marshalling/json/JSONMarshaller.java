@@ -510,7 +510,12 @@ public class JSONMarshaller implements Marshaller {
                 complete.addAll(base);
             }
             if (customClasses != null) {
-                complete.addAll(customClasses);
+                for (NamedType namedType  : customClasses) {
+                    Class<?> clazz = namedType.getType();
+                    if (!a.getRawType().equals(clazz) && a.getRawType().isAssignableFrom(clazz)) {
+                        complete.add(namedType);
+                    }
+                }
             }
             return complete;
         }
