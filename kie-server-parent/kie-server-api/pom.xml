@@ -42,7 +42,7 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    <!-- core dependencies -->
+        <!-- core dependencies -->
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-api</artifactId>
@@ -56,19 +56,19 @@
       <artifactId>kie-soup-xstream</artifactId>
     </dependency>
 
-    <!-- we need to find a way to remove the following 2 dependencies from this jar -->
+        <!-- we need to find a way to remove the following 2 dependencies from this jar -->
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
     </dependency>
 
-    <!-- Needed only for the DMNResult, DMNContext, etc and FEELEvent so should be possible later to migrate to kie-dmn-API -->
+        <!-- Needed only for the DMNResult, DMNContext, etc and FEELEvent so should be possible later to migrate to kie-dmn-API -->
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-dmn-api</artifactId>
     </dependency>
 
-    <!-- json -->
+        <!-- json -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
@@ -90,13 +90,13 @@
       <artifactId>jackson-datatype-jsr310</artifactId>
     </dependency>
 
-    <!-- xstream -->
+        <!-- xstream -->
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
     </dependency>
 
-    <!-- utils -->
+        <!-- utils -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
@@ -130,7 +130,7 @@
       <artifactId>jaxb-impl</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- TRUSTY -->
+        <!-- TRUSTY -->
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-pmml-dependencies</artifactId>
@@ -141,7 +141,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- LEGACY -->
+        <!-- LEGACY -->
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>kie-pmml</artifactId>
