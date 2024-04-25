@@ -121,4 +121,5 @@ public class MarshallingRoundTripCustomClassListTest {
         Object unmarshalledObject = marshaller.unmarshall(rawContent, PojoA.class);
         Assertions.assertThat(unmarshalledObject).isEqualTo(createTestObject());
     }
+
 }
