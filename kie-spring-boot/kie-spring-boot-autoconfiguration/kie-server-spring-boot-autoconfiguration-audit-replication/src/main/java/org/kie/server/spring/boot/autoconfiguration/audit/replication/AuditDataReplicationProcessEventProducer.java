@@ -23,6 +23,7 @@ import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.kie.api.event.process.ProcessAsyncNodeScheduledEvent;
 import org.kie.api.event.process.ProcessCompletedEvent;
+import org.kie.api.event.process.ProcessDataChangedEvent;
 import org.kie.api.event.process.ProcessNodeLeftEvent;
 import org.kie.api.event.process.ProcessNodeTriggeredEvent;
 import org.kie.api.event.process.ProcessStartedEvent;
@@ -39,7 +40,7 @@ import static org.kie.server.spring.boot.autoconfiguration.audit.replication.Mes
 import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.PROCESS_SLA_VIOLATED;
 import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.PROCESS_START_EVENT_TYPE;
 import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.VAR_CHANGE_EVENT_TYPE;
-
+import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.PROCESS_DATA_CHANGED_EVENT_TYPE;
 
 /**
  * AuditListener
@@ -123,5 +124,15 @@ public class AuditDataReplicationProcessEventProducer extends AbstractAuditLogge
             jmsSender.sendMessage(log, NODE_SCHEDULED_EVENT_TYPE);
         }
     }
+
+    @Override
+    public void processDataChanged(ProcessDataChangedEvent event){
+        ProcessInstanceLog log = (ProcessInstanceLog) getProcessInstanceMetadata(event.getProcessInstance(), METADATA_PROCESSINTANCE_LOG);
+        if (log != null) {
+            jmsSender.sendMessage(log, PROCESS_DATA_CHANGED_EVENT_TYPE);
+        }
+
+    }
+
 
 }
