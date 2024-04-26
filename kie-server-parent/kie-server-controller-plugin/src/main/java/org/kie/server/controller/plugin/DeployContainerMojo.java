@@ -46,6 +46,9 @@ public class DeployContainerMojo extends KieControllerMojo {
     @Parameter(property = "kie-ctrl.container")
     protected String container;
 
+    @Parameter(property = "kie-ctrl.alias")
+    protected String alias;
+
     @Parameter(defaultValue = "${project}", readonly = true)
     protected MavenProject project;
 
@@ -88,6 +91,7 @@ public class DeployContainerMojo extends KieControllerMojo {
         ContainerBuilder containerBuilder =
             ContainerBuilder.create(project.getGroupId(), project.getArtifactId(), project.getVersion())
                 .id(container)
+                .alias(alias)
                 .runtimeStrategy(runtimeStrategy)
                 .kbase(kbase)
                 .ksession(ksession)
