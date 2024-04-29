@@ -21,12 +21,26 @@ import java.util.List;
 import org.jbpm.process.audit.AbstractAuditLoggerAdapter;
 import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
-import org.kie.api.event.process.*;
+import org.kie.api.event.process.ProcessAsyncNodeScheduledEvent;
+import org.kie.api.event.process.ProcessCompletedEvent;
+import org.kie.api.event.process.ProcessNodeLeftEvent;
+import org.kie.api.event.process.ProcessNodeTriggeredEvent;
+import org.kie.api.event.process.ProcessStartedEvent;
+import org.kie.api.event.process.ProcessVariableChangedEvent;
+import org.kie.api.event.process.ProcessDataChangedEvent;
+import org.kie.api.event.process.SLAViolatedEvent;
 import org.kie.api.runtime.manager.audit.VariableInstanceLog;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.*;
-
+import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.NODE_ENTER_EVENT_TYPE;
+import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.NODE_LEFT_EVENT_TYPE;
+import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.NODE_SCHEDULED_EVENT_TYPE;
+import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.NODE_SLA_VIOLATED;
+import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.PROCESS_COMPLETED_EVENT_TYPE;
+import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.PROCESS_SLA_VIOLATED;
+import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.PROCESS_START_EVENT_TYPE;
+import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.VAR_CHANGE_EVENT_TYPE;
+import static org.kie.server.spring.boot.autoconfiguration.audit.replication.MessageType.PROCESS_DATA_CHANGED_EVENT_TYPE;
 
 /**
  * AuditListener
