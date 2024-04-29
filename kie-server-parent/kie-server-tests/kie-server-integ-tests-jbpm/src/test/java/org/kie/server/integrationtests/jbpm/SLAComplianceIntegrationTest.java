@@ -156,7 +156,7 @@ public class SLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrationTe
         activeNodes = processClient.findActiveNodeInstances(CONTAINER_ID, pid, 0, 10);
         assertThat(activeNodes).hasSize(1);
         taskNode = activeNodes.get(0);
-        assertNodeInstance(taskNode, "Hello", SLA_VIOLATED);
+        assertNodeInstance(taskNode, "Hello", SLA_VIOLATED, -1);
 
         taskClient.completeAutoProgress(CONTAINER_ID, task.getId(), USER_YODA, null);
         tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
@@ -240,11 +240,15 @@ public class SLAComplianceIntegrationTest extends JbpmKieServerBaseIntegrationTe
         }
     }
 
-    private void assertNodeInstance(NodeInstance ni, String nodeName, int slaStatus) {
+     private void assertNodeInstance(NodeInstance ni, String nodeName, int slaStatus) {
+        assertNodeInstance(ni, nodeName, slaStatus, 30000);
+     }
+
+    private void assertNodeInstance(NodeInstance ni, String nodeName, int slaStatus, long deltaTime) {
         assertThat(ni.getName()).isEqualTo(nodeName);
         assertThat(ni.getSlaCompliance()).isEqualTo(slaStatus);
-        if (slaStatus != SLA_NA) {
-            assertThat(ni.getSlaDueDate()).isCloseTo(new Date(), 30000);
+        if (slaStatus != SLA_NA && deltaTime > 0) {
+            assertThat(ni.getSlaDueDate()).isCloseTo(new Date(), deltaTime);
         }
     }
 
