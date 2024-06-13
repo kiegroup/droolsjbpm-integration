@@ -24,6 +24,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -81,6 +82,7 @@ import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_VAR_PUT_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_WORK_ITEMS_BY_PROC_INST_ID_GET_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_WORK_ITEM_BY_ID_GET_URI;
+import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_WORK_ITEM_COMPLETE_AND_VARS_PUT_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCE_WORK_ITEM_COMPLETE_PUT_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INST_HISTORY_TYPE;
 import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
@@ -94,12 +96,14 @@ import static org.kie.server.api.rest.RestURI.START_PROCESS_FROM_NODES_WITH_CORR
 import static org.kie.server.api.rest.RestURI.START_PROCESS_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_WITH_CORRELATION_KEY_POST_URI;
 import static org.kie.server.api.rest.RestURI.COMPUTE_PROCESS_OUTCOME_POST_URI;
+import static org.kie.server.api.rest.RestURI.WORK_ITEM_ID;
 import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.conflict;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
 import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
+import static org.kie.server.remote.rest.common.util.RestUtils.extractPayloads;
 import static org.kie.server.remote.rest.common.util.RestUtils.forbidden;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
@@ -107,6 +111,8 @@ import static org.kie.server.remote.rest.common.util.RestUtils.isCorrelationKeyA
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.common.util.RestUtils.RESULT_MAP_KEY;
+import static org.kie.server.remote.rest.common.util.RestUtils.VARIABLES_MAP_KEY;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_DEFS_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCES_RESPONSE_JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_INSTANCE_NODES_RESPONSE_JSON;
@@ -822,6 +828,44 @@ public class ProcessResource  {
         }
     }
 
+    @ApiOperation(value = "Sets a specific process variable and completes a specified work item for a specified process instance.",
+            code = 201)
+    @ApiResponses(value = {@ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Process instance, Work Item or Container Id not found"),
+            @ApiResponse(code = 403, message = "User does not have permission to access this asset")})
+    @PUT
+    @Path(PROCESS_INSTANCE_WORK_ITEM_COMPLETE_AND_VARS_PUT_URI)
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response completeWorkItemAndSetProcessVariables(
+            @Context HttpHeaders headers,
+            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @ApiParam(value = "identifier of the process instance that work item belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId,
+            @ApiParam(value = "identifier of the work item to complete", required = true, example = "567") @PathParam(WORK_ITEM_ID) Long workItemId,
+            @ApiParam(value = "optional outcome data give as map", examples = @Example(value = {
+                    @ExampleProperty(mediaType = JSON, value = VAR_MAP_JSON)})) String resultPayload) {
+
+        Variant v = getVariant(headers);
+        String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, this.context, headers);
+        try {
+            Map<String, String> payloads = extractPayloads(resultPayload, type);
+            processServiceBase.setProcessVariables(containerId, processInstanceId, payloads.get(VARIABLES_MAP_KEY), type);
+            processServiceBase.completeWorkItem(containerId, processInstanceId, workItemId, payloads.get(RESULT_MAP_KEY), type);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
+        } catch (NotAcceptableException e) {
+            return createResponse(e.getMessage(), v, Response.Status.NOT_ACCEPTABLE, conversationIdHeader);
+        } catch (ProcessInstanceNotFoundException e) {
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (SecurityException e) {
+            return forbidden(errorMessage(e, e.getMessage()), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(errorMessage(e), v, conversationIdHeader);
+        }
+    }
 
     @ApiOperation(value="Aborts a specified work item for a specified process instance.",
             response=Void.class, code=201)
