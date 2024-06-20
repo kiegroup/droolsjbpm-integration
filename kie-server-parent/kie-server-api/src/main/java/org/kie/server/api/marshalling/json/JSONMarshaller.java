@@ -309,6 +309,8 @@ public class JSONMarshaller implements Marshaller {
             customObjectMapper.setConfig(customObjectMapper.getSerializationConfig().with(introspectorPair).with(SerializationFeature.INDENT_OUTPUT));
             customObjectMapper.configure(MapperFeature.USE_STD_BEAN_NAMING, this.useStrictJavaBeans);
 
+            customObjectMapper.registerModule(new JavaTimeModule());
+
             SimpleModule mod = new SimpleModule("custom-object-mapper", Version.unknownVersion());
             CustomObjectSerializer customObjectSerializer = new CustomObjectSerializer(customObjectMapper);
 
