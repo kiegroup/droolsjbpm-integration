@@ -45,20 +45,6 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
 
-import org.drools.core.xml.jaxb.util.JaxbListAdapter;
-import org.drools.core.xml.jaxb.util.JaxbListWrapper;
-import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
-import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.marshalling.Marshaller;
-import org.kie.server.api.marshalling.MarshallingException;
-import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.api.marshalling.ModelWrapper;
-import org.kie.server.api.model.Wrapped;
-import org.kie.server.api.model.definition.QueryParam;
-import org.kie.server.api.model.type.JaxbByteArray;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -96,6 +82,19 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.databind.util.ClassUtil;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+import org.drools.core.xml.jaxb.util.JaxbListAdapter;
+import org.drools.core.xml.jaxb.util.JaxbListWrapper;
+import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
+import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.marshalling.Marshaller;
+import org.kie.server.api.marshalling.MarshallingException;
+import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.marshalling.ModelWrapper;
+import org.kie.server.api.model.Wrapped;
+import org.kie.server.api.model.definition.QueryParam;
+import org.kie.server.api.model.type.JaxbByteArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JSONMarshaller implements Marshaller {
 
@@ -520,8 +519,9 @@ public class JSONMarshaller implements Marshaller {
                         continue;
                     }
                     String name = elem.name();
-                    if (MARKER_FOR_DEFAULT.equals(name))
+                    if (MARKER_FOR_DEFAULT.equals(name)) {
                         name = null;
+                    }   
                     complete.add(new NamedType(elem.type(), name));
                 }
             } else {
