@@ -104,8 +104,8 @@ public class JSONMarshaller implements Marshaller {
     private boolean jsonHandleXmlAnyElementsNames = Boolean.getBoolean(KieServerConstants.JSON_HANDLE_XML_ANY_ELEMENTS_NAMES);
     private final boolean STRICT_JAVABEANS_SERIALIZERS = Boolean.getBoolean(KieServerConstants.KIE_SERVER_STRICT_JAVABEANS_SERIALIZERS);
 
-    private static final String FIELDS = "fields";
-    private static final String NOT_NULL = "not_null";
+    public static final String FIELDS = "fields";
+    public static final String NOT_NULL = "not_null";
 
     private boolean formatDate;
     private String dateFormatStr = System.getProperty("org.kie.server.json.date_format", "yyyy-MM-dd'T'hh:mm:ss.SSSZ");

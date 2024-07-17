@@ -26,8 +26,9 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.assertj.core.api.Assertions;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
@@ -112,10 +113,15 @@ public class JSONMarshallerExtensionTest {
             marshall = marshaller.marshall(command);
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode input = mapper.readTree(content);
-        JsonNode output = mapper.readTree(marshall);
-        assertThat(input.toPrettyString()).isEqualTo(output.toPrettyString());
+        BatchExecutionCommandImpl input = marshaller.unmarshall(content, BatchExecutionCommandImpl.class);
+        BatchExecutionCommandImpl output = marshaller.unmarshall(marshall, BatchExecutionCommandImpl.class);
+        
+        ObjectMapper mapper = new ObjectMapper().setSerializationInclusion(Include.NON_NULL);
+        ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
+
+        String inputStr = writer.writeValueAsString(input);
+        String outputStr = writer.writeValueAsString(output);
+        assertThat(inputStr).isEqualTo(outputStr);
     }
 
     @Test
@@ -136,9 +142,14 @@ public class JSONMarshallerExtensionTest {
             marshall = marshaller.marshall(command);
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode input = mapper.readTree(content);
-        JsonNode output = mapper.readTree(marshall);
-        assertThat(input.toPrettyString()).isNotEqualTo(output.toPrettyString());
+        BatchExecutionCommandImpl input = marshaller.unmarshall(content, BatchExecutionCommandImpl.class);
+        BatchExecutionCommandImpl output = marshaller.unmarshall(marshall, BatchExecutionCommandImpl.class);
+        
+        ObjectMapper mapper = new ObjectMapper().setSerializationInclusion(Include.NON_NULL);
+        ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
+
+        String inputStr = writer.writeValueAsString(input);
+        String outputStr = writer.writeValueAsString(output);
+        assertThat(inputStr).isEqualTo(outputStr);
     }
 }
