@@ -1,0 +1,26 @@
+{
+    "object": {
+        "org.kie.server.api.marshalling.test.model.kit.ClassRecord": {
+            "wkLogFileData": {
+                "actionId": "actionId",
+                "source": "source",
+                "dateReceived": "dateReceived",
+                "trackingCode": "trackingCode",
+                "subscriberName": "subscriberName",
+                "emailAddress": "emailAddress",
+                "address": "address",
+                "city": "city",
+                "state": "state",
+                "zipCode": "zipCode",
+                "actionPerformed": "actionPerformed",
+                "dateOfAction": "dateOfAction",
+                "actionStatus": "actionStatus",
+                "errorDesc": "",
+                "responseFileName": null,
+                "edeliveryIndicator": false
+            },
+            "actPerformedLength": 7,
+            "wkFileNetLogFileData": null
+        }
+    }
+}
