@@ -16,6 +16,9 @@
 
 package org.kie.server.api.marshalling.json;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -23,17 +26,26 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.assertj.core.api.Assertions;
+import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
+import org.drools.core.util.IoUtils;
 import org.junit.Test;
 import org.kie.api.pmml.PMMLRequestData;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.marshalling.objects.CustomPerson;
+import org.kie.server.api.marshalling.objects.FreeFormItemType;
+import org.kie.server.api.marshalling.objects.ItemsType;
+import org.kie.server.api.marshalling.objects.StandardItemType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class JSONMarshallerExtensionTest {
@@ -82,5 +94,62 @@ public class JSONMarshallerExtensionTest {
         // verify if it's processed by JSONMarshallerExtensionCustomPerson deserializer
         assertEquals(50, result.getAge());
 
+    }
+
+    @Test
+    public void testPolymorphicInsideCommand() throws IOException {
+        Set<Class<?>> extraClasses = new HashSet<Class<?>>();
+        extraClasses.add(FreeFormItemType.class);
+        extraClasses.add(StandardItemType.class);
+        extraClasses.add(ItemsType.class);
+        Marshaller marshaller = MarshallerFactory.getMarshaller(extraClasses, MarshallingFormat.JSON, this.getClass().getClassLoader());
+
+        byte[] content = new byte[0];
+        String marshall = null;
+        URL uri = this.getClass().getClassLoader().getResource("poly_payload.json");
+        try (InputStream is = uri.openStream()) {
+            content = IoUtils.readBytesFromInputStream(is);
+            BatchExecutionCommandImpl command = marshaller.unmarshall(content, BatchExecutionCommandImpl.class);
+            marshall = marshaller.marshall(command);
+        }
+
+        BatchExecutionCommandImpl input = marshaller.unmarshall(content, BatchExecutionCommandImpl.class);
+        BatchExecutionCommandImpl output = marshaller.unmarshall(marshall, BatchExecutionCommandImpl.class);
+        
+        ObjectMapper mapper = new ObjectMapper().setSerializationInclusion(Include.NON_NULL);
+        ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
+
+        String inputStr = writer.writeValueAsString(input);
+        String outputStr = writer.writeValueAsString(output);
+        assertThat(inputStr).isEqualTo(outputStr);
+    }
+
+    @Test
+    public void testPolymorphicInsideCommandHandle() throws IOException {
+        Set<Class<?>> extraClasses = new HashSet<Class<?>>();
+        extraClasses.add(FreeFormItemType.class);
+        extraClasses.add(StandardItemType.class);
+        extraClasses.add(ItemsType.class);
+        Marshaller marshaller = MarshallerFactory.getMarshaller(extraClasses, MarshallingFormat.JSON, this.getClass().getClassLoader());
+        ((JSONMarshaller) marshaller).setXmlAnyElementsNames(true);
+        
+        byte[] content = new byte[0];
+        String marshall = null;
+        URL uri = this.getClass().getClassLoader().getResource("poly_payload.json");
+        try (InputStream is = uri.openStream()) {
+            content = IoUtils.readBytesFromInputStream(is);
+            BatchExecutionCommandImpl command = marshaller.unmarshall(content, BatchExecutionCommandImpl.class);
+            marshall = marshaller.marshall(command);
+        }
+
+        BatchExecutionCommandImpl input = marshaller.unmarshall(content, BatchExecutionCommandImpl.class);
+        BatchExecutionCommandImpl output = marshaller.unmarshall(marshall, BatchExecutionCommandImpl.class);
+        
+        ObjectMapper mapper = new ObjectMapper().setSerializationInclusion(Include.NON_NULL);
+        ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
+
+        String inputStr = writer.writeValueAsString(input);
+        String outputStr = writer.writeValueAsString(output);
+        assertThat(inputStr).isEqualTo(outputStr);
     }
 }
