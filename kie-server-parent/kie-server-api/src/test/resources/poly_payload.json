@@ -1,0 +1,35 @@
+{
+  "commands": [
+    {
+      "insert": {
+                "object": {
+                        "org.kie.server.api.marshalling.objects.ItemsType": {
+                            "standardItemsAndFreeformItems": [
+                                {
+                                    "FreeFormItemType": {
+                                        "itemValue": "TEST 1"
+                                    }
+                                },
+                                {
+                                    "FreeFormItemType": {
+                                        "itemValue": "TEST 2"
+                                    }
+                                }
+                            ]
+                        }
+        },
+                "disconnected": false,
+                "out-identifier": "result",
+                "return-object": true,
+                "entry-point": "DEFAULT"
+      }
+    },
+    {
+      "fire-all-rules": {
+        "max": -1,
+        "agendaFilter": null,
+        "out-identifier" : "numberOfFiredRules"
+      }
+    }
+  ]
+}
