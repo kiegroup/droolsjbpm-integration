@@ -426,7 +426,7 @@
         <org.kie.server.datasource.driver.class>com.mysql.cj.jdbc.MysqlXADataSource</org.kie.server.datasource.driver.class>
         <!-- Connection URL, format example: jdbc:mysql://localhost:3306/mydb -->
         <org.kie.server.datasource.connection.url>specify-mysql-connection-url-in-org.kie.server.datasource.connection.url</org.kie.server.datasource.connection.url>
-        <springboot.jdbc.driver.jar>${mysql:mysql-connector-java:jar}</springboot.jdbc.driver.jar>
+        <springboot.jdbc.driver.jar>${com.mysql:mysql-connector-j:jar}</springboot.jdbc.driver.jar>
       </properties>
       <build>
         <pluginManagement>
@@ -438,8 +438,8 @@
                 <container>
                   <dependencies combine.children="append">
                     <dependency>
-                      <groupId>mysql</groupId>
-                      <artifactId>mysql-connector-java</artifactId>
+                      <groupId>com.mysql</groupId>
+                      <artifactId>mysql-connector-j</artifactId>
                     </dependency>
                   </dependencies>
                 </container>
@@ -450,8 +450,8 @@
       </build>
       <dependencies>
         <dependency>
-          <groupId>mysql</groupId>
-          <artifactId>mysql-connector-java</artifactId>
+          <groupId>com.mysql</groupId>
+          <artifactId>mysql-connector-j</artifactId>
         </dependency>
       </dependencies>
     </profile>
