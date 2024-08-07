@@ -87,7 +87,7 @@
     <h2.version>${version.com.h2database}</h2.version>
 
     <!-- Camel -->
-    <karaf.version.org.apache.camel>2.24.0</karaf.version.org.apache.camel>
+    <karaf.version.org.apache.camel>2.25.4</karaf.version.org.apache.camel>
 
     <!-- Overwrites for Fuse -->
     <fuse.version.com.h2database>${version.com.h2database}</fuse.version.com.h2database>
