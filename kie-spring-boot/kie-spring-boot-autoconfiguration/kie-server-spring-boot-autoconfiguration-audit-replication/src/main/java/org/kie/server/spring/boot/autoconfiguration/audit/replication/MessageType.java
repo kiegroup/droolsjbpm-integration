@@ -30,6 +30,7 @@ public final class MessageType {
     public static final int VAR_CHANGE_EVENT_TYPE = 104;
     public static final int NODE_SLA_VIOLATED = 105;
     public static final int PROCESS_SLA_VIOLATED = 106;
+    public static final int PROCESS_DATA_CHANGED_EVENT_TYPE = 108;
 
     public static final int TASK_STARTED = 201;
     public static final int TASK_ACTIVATED = 202;
