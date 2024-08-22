@@ -20,17 +20,24 @@ import java.io.StringWriter;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.MessageFormat;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
+import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import org.kie.server.api.ConversationId;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
+import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
@@ -47,6 +54,8 @@ public class RestUtils {
     private static Variant ERROR_VARIANT = new Variant(MediaType.TEXT_PLAIN_TYPE, (Locale) null, null);
     private static final String UNEXPECTED_ERROR = "Unexpected error during processing: {0}";
     private static final boolean INCLUDE_STACKTRACE = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_SERVER_INCLUDE_STACKTRACE, "false"));
+    public static final String VARIABLES_MAP_KEY = "variables";
+    public static final String RESULT_MAP_KEY = "result";
     
     public static Response createCorrectVariant(Object responseObj, HttpHeaders headers, Header... customHeaders) {
         return createCorrectVariant(responseObj, headers, null, customHeaders);
@@ -286,6 +295,24 @@ public class RestUtils {
             return true;
         }
         return false;
+
+    public static Map<String, String> extractPayloads(String fullPayload, String type) {
+        try {
+            if (type.equals(MediaType.APPLICATION_JSON)) {
+                JSONObject fullBody = new JSONObject(fullPayload);
+                HashMap<String, String> payloads = new HashMap<>();
+                payloads.put(VARIABLES_MAP_KEY, fullBody.remove(VARIABLES_MAP_KEY).toString());
+                payloads.put(RESULT_MAP_KEY, fullBody.toString());
+                return payloads;
+            } else {
+                throw new NotAcceptableException(
+                        String.format(
+                                "Expected request media type of [%s], found [%s].",
+                                MediaType.APPLICATION_JSON, type));
+            }
+        } catch (JSONException e) {
+            throw new MarshallingException("Error marshalling input", e);
+        }
 
     }
 }
