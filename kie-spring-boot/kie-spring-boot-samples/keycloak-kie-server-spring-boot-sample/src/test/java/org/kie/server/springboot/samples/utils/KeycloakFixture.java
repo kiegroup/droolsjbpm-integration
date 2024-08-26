@@ -24,7 +24,7 @@ import static org.kie.server.springboot.samples.utils.KeycloakSampleConstants.BA
 import static org.kie.server.springboot.samples.utils.KeycloakSampleConstants.JOHN;
 import static org.kie.server.springboot.samples.utils.KeycloakSampleConstants.JOHN_PW;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
