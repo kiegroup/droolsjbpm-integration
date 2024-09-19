@@ -68,7 +68,7 @@
     <karaf.servicemix.version.com.google.protobuf>3.19.6_1</karaf.servicemix.version.com.google.protobuf>
     <karaf.servicemix.version.com.sun.xml.bind.jaxb>2.3.2_3</karaf.servicemix.version.com.sun.xml.bind.jaxb>
     <karaf.servicemix.version.com.sun.xml.bind.jaxb.xjc>2.3.2_2</karaf.servicemix.version.com.sun.xml.bind.jaxb.xjc>
-    <karaf.servicemix.version.com.thoughtworks.xstream>1.4.20_1</karaf.servicemix.version.com.thoughtworks.xstream>
+    <karaf.servicemix.version.com.thoughtworks.xstream>1.4.10_1</karaf.servicemix.version.com.thoughtworks.xstream>
     <karaf.servicemix.version.com.thoughtworks.xmlpull>1.1.4c_7</karaf.servicemix.version.com.thoughtworks.xmlpull>
     <karaf.servicemix.version.javax.xml.bind.jaxb>2.3_3</karaf.servicemix.version.javax.xml.bind.jaxb>
     <karaf.servicemix.version.org.antlr>3.5_1</karaf.servicemix.version.org.antlr>
@@ -165,7 +165,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
-        <artifactId>org.apache.servicemix.bundles.xstream</artifactId>
+        <artifactId>org.apache.servicemix.bundles.xstream-java8</artifactId>
         <version>${karaf.servicemix.version.com.thoughtworks.xstream}</version>
       </dependency>
       <dependency>
@@ -623,7 +623,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
-      <artifactId>org.apache.servicemix.bundles.xstream</artifactId>
+      <artifactId>org.apache.servicemix.bundles.xstream-java8</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
