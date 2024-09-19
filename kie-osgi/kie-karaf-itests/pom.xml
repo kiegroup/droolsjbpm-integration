@@ -12,7 +12,7 @@
   <name>KIE :: Karaf Integration Tests</name>
 
   <properties>
-    <skipTests>true</skipTests>
+    <skipTests>false</skipTests>
 
     <java.module.name>org.kie.karaf.itests.main</java.module.name>
     <version.org.apache.karaf>4.3.8</version.org.apache.karaf>
