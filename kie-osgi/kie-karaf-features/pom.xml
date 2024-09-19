@@ -57,23 +57,23 @@
     <!-- used by kie-server-client -->
     <karaf.version.org.apache.servicemix.specs>2.9.1</karaf.version.org.apache.servicemix.specs>
 
-    <karaf.version.org.apache.logging.log4j>2.19.0</karaf.version.org.apache.logging.log4j>
+    <karaf.version.org.apache.logging.log4j>2.23.1</karaf.version.org.apache.logging.log4j>
     <!-- used by hibernate-validator -->
     <karaf.version.org.apache.servicemix.specs.jsr303-api>2.4.0</karaf.version.org.apache.servicemix.specs.jsr303-api>
 
     <!-- Overwrites with a different Maven version. Apache POI 3.11+ needs version >=1.9 -->
-    <karaf.version.commons-codec>1.10</karaf.version.commons-codec>
+    <karaf.version.commons-codec>1.15</karaf.version.commons-codec>
     <karaf.version.commons-collections4>4.1</karaf.version.commons-collections4>
     <!-- Overwrites with a servicemix version -->
-    <karaf.servicemix.version.com.google.protobuf>2.4.1_1</karaf.servicemix.version.com.google.protobuf>
+    <karaf.servicemix.version.com.google.protobuf>3.19.6_1</karaf.servicemix.version.com.google.protobuf>
     <karaf.servicemix.version.com.sun.xml.bind.jaxb>2.3.2_3</karaf.servicemix.version.com.sun.xml.bind.jaxb>
     <karaf.servicemix.version.com.sun.xml.bind.jaxb.xjc>2.3.2_2</karaf.servicemix.version.com.sun.xml.bind.jaxb.xjc>
-    <karaf.servicemix.version.com.thoughtworks.xstream>1.4.10_1</karaf.servicemix.version.com.thoughtworks.xstream>
+    <karaf.servicemix.version.com.thoughtworks.xstream>1.4.20_1</karaf.servicemix.version.com.thoughtworks.xstream>
     <karaf.servicemix.version.com.thoughtworks.xmlpull>1.1.4c_7</karaf.servicemix.version.com.thoughtworks.xmlpull>
     <karaf.servicemix.version.javax.xml.bind.jaxb>2.3_3</karaf.servicemix.version.javax.xml.bind.jaxb>
     <karaf.servicemix.version.org.antlr>3.5_1</karaf.servicemix.version.org.antlr>
-    <karaf.servicemix.version.org.apache.poi>4.1.2_1</karaf.servicemix.version.org.apache.poi>
-    <karaf.servicemix.version.org.apache.xmlbeans>3.1.0_2</karaf.servicemix.version.org.apache.xmlbeans>
+    <karaf.servicemix.version.org.apache.poi>5.2.3_1</karaf.servicemix.version.org.apache.poi>
+    <karaf.servicemix.version.org.apache.xmlbeans>5.2.0_1</karaf.servicemix.version.org.apache.xmlbeans>
     <!-- Santurio and xmlresolver needed by POI 3.15+ -->
     <karaf.version.org.apache.commons-collections4>4.1</karaf.version.org.apache.commons-collections4>
     <karaf.version.org.apache.santurio>2.2.6</karaf.version.org.apache.santurio>
@@ -165,7 +165,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
-        <artifactId>org.apache.servicemix.bundles.xstream-java8</artifactId>
+        <artifactId>org.apache.servicemix.bundles.xstream</artifactId>
         <version>${karaf.servicemix.version.com.thoughtworks.xstream}</version>
       </dependency>
       <dependency>
@@ -623,7 +623,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
-      <artifactId>org.apache.servicemix.bundles.xstream-java8</artifactId>
+      <artifactId>org.apache.servicemix.bundles.xstream</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>

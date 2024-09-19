@@ -29,7 +29,9 @@
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.poi/${karaf.servicemix.version.org.apache.poi}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlbeans/${karaf.servicemix.version.org.apache.xmlbeans}</bundle>
     <bundle>mvn:org.apache.commons/commons-compress/${version.org.apache.commons.compress}</bundle>
+    <bundle>mvn:commons-io/commons-io/${version.commons-io}</bundle>
     <bundle>mvn:org.apache.commons/commons-math3/${version.org.apache.commons.math3}</bundle>
+    <bundle start-level="100">mvn:org.apache.logging.log4j/log4j-api/${karaf.version.org.apache.logging.log4j}</bundle>
   </feature>
 
   <feature name="drools-wb-guided-decisiontables" description="Drools Workbench Guided Decision Tables" version="${project.version}">

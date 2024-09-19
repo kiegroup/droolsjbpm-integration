@@ -353,6 +353,16 @@
     </profile>
 
     <profile>
+      <id>java11</id>
+      <activation>
+        <jdk>11</jdk>
+      </activation>
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
+    </profile>
+
+    <profile>
       <id>fuse7</id>
       <properties>
         <version.org.ops4j.pax.exam>4.11.0</version.org.ops4j.pax.exam>
