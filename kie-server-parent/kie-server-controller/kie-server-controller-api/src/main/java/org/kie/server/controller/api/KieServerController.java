@@ -27,7 +27,7 @@ import org.kie.server.controller.api.model.KieServerSetup;
 public interface KieServerController {
 
     /**
-     * Entry point for for KieServer to connect(and register if done for the first time). At the same time, when given KieServerInstance
+     * Entry point for KieServer to connect(and register if done for the first time). At the same time, when given KieServerInstance
      * has been already added a KieServerSetup with data will be returned. Otherwise empty (or default) KieServerSetup will be provided.
      * @param serverInfo representation of minimal set of information about KieServer
      * @return KieServer configuration
@@ -35,8 +35,8 @@ public interface KieServerController {
     KieServerSetup connect(KieServerInfo serverInfo);
 
     /**
-     * Entry point for for KieServer to update its status information.
-     * @param serverInfo representation of minimal set of information about KieServer
+     * Entry point for KieServer to update its status information.
+     * @param containerSpec representation of minimal set of information about KieServer
      */
 
     default KieServerSetup update(KieServerStateInfo containerSpec) {

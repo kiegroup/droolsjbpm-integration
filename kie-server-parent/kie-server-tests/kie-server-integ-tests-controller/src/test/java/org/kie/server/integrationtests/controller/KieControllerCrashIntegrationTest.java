@@ -96,7 +96,7 @@ public class KieControllerCrashIntegrationTest extends KieControllerManagementBa
         if (TestConfig.isLocalServer()) {
             controllerClient = KieServerControllerClientFactory.newWebSocketClient(TestConfig.getControllerWebSocketManagementUrl(),
                                                                               (String) null,
-                                                                              (String) null, 
+                                                                              (String) null,
                                                                               eventHandler);
         } else {
             controllerClient = KieServerControllerClientFactory.newWebSocketClient(TestConfig.getControllerWebSocketManagementUrl(),
@@ -162,7 +162,8 @@ public class KieControllerCrashIntegrationTest extends KieControllerManagementBa
 
         };
         registry.registerStateRepository(dummyKieServerStateRepository);
-        KieServerController controller =  new DefaultRestControllerImpl(registry);
+        DefaultRestControllerImpl controller =  new DefaultRestControllerImpl();
+        controller.setRegistry(registry);
         controller.connect(kieServerInfo);
         // Check that kie server is registered.
         serverUp.await(5, TimeUnit.SECONDS);

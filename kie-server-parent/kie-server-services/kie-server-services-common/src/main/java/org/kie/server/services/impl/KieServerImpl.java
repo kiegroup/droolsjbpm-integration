@@ -16,19 +16,7 @@
 
 package org.kie.server.services.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -1138,15 +1126,48 @@ public class KieServerImpl implements KieServer {
         return parameters;
     }
 
+    /**
+     * Get the first KieServerController which is supported for the all controller URLs. This assumes that all
+     * controllers are of the same type. For example, it is not possible to have one REST and one WebSocket controller.
+     *
+     * @return A KieServerController or null if one is not available.
+     */
     protected KieServerController getController() {
-        KieServerController controller = new DefaultRestControllerImpl(context);
-        try {
-            Iterator<KieServerController> it = kieControllers.iterator();
-            if (it != null && it.hasNext()) {
-                controller = it.next();
+        KieServerState currentState = context.getStateRepository().load(KieServerEnvironment.getServerId());
+        Set<String> controllers = currentState.getControllers();
 
-                if (controller instanceof KieServerRegistryAware) {
-                    ((KieServerRegistryAware) controller).setRegistry(context);
+        if (controllers.isEmpty()) {
+            logger.debug("No controllers registered");
+            return null;
+        }
+
+        KieServerController controller = null;
+        int controllerPriority = Integer.MAX_VALUE;
+        try {
+            for (KieServerController curr: kieControllers) {
+                // Only want remote capable
+                if (!(curr instanceof KieServerRegistryAware)) {
+                    continue;
+                }
+
+                KieServerRegistryAware currRemote = (KieServerRegistryAware)curr;
+                currRemote.setRegistry(context);
+
+                boolean supportsAll = controllers.stream().allMatch(currRemote::supports);
+                if (!supportsAll) {
+                    logger.debug("KieServerController {} does not support all controllers", curr.getClass().getName());
+                    continue;
+                }
+
+                // See if this is a better fit.
+                Integer currPriority = currRemote.getPriority();
+                if (null == currPriority) {
+                    currPriority = Integer.MAX_VALUE;
+                }
+
+                if (currPriority >= 0 && currPriority < controllerPriority) {
+                    controllerPriority = currPriority;
+                    controller = curr;
                 }
             }
         } catch (Exception e) {
@@ -1161,7 +1182,9 @@ public class KieServerImpl implements KieServer {
     }
 
     protected KieServerController getDefaultController() {
-        return new DefaultRestControllerImpl(context);
+        DefaultRestControllerImpl controller = new DefaultRestControllerImpl();
+        controller.setRegistry(context);
+        return controller;
     }
 
     protected ContainerManager getContainerManager() {
