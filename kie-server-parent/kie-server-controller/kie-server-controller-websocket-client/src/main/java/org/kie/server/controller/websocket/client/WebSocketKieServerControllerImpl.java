@@ -16,6 +16,8 @@
 package org.kie.server.controller.websocket.client;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -102,6 +104,7 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
                                                                                          "kieserver"))
                                                      .password(KeyStoreHelperUtil.loadControllerPassword(config))
                                                      .token(config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN))
+                                                     .userProperties(getUserProperties())
                                                      .build());
                             CountDownLatch waitLatch = new CountDownLatch(1);
                             
@@ -185,5 +188,9 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
     @Override
     public KieServerRegistry getRegistry() {
         return this.context;
+    }
+
+    protected Map<String, Object> getUserProperties() {
+        return new HashMap<>();
     }
 }
