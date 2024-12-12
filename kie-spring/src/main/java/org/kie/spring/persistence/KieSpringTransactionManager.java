@@ -50,8 +50,8 @@ public class KieSpringTransactionManager
             // RHBPMS-4621 - transaction can be marked as rollback
             // and still be associated with current thread
             // See WFLY-4327
-            if ( getStatus() == TransactionManager.STATUS_ROLLEDBACK ) {
-                logger.debug("Cleanup of transaction that has been rolled back previously");
+            if (getStatus() == TransactionManager.STATUS_ROLLEDBACK) {
+                logger.warn("Cleaning up rolledback transaction");
                 rollback(true);
             }
             if (getStatus() == TransactionManager.STATUS_NO_TRANSACTION) {
@@ -82,33 +82,34 @@ public class KieSpringTransactionManager
         try {
             // if we didn't begin this transaction, then do nothing
             this.ptm.commit(currentTransaction);
-            currentTransaction = null;
-            if (TransactionSynchronizationManager.hasResource(KieSpringTransactionManager.RESOURCE_CONTAINER)) {
-                TransactionSynchronizationManager.unbindResource(KieSpringTransactionManager.RESOURCE_CONTAINER);
-            }
         } catch (Exception e) {
             logger.warn("Unable to commit transaction",
                     e);
             throw new RuntimeException("Unable to commit transaction",
                     e);
+        } finally {
+            cleanupTransaction();
         }
 
     }
 
     public void rollback(boolean transactionOwner) {
-        try {
-            if (transactionOwner) {
+        if (transactionOwner) {
+            try {
                 this.ptm.rollback(currentTransaction);
-                currentTransaction = null;
-                if (TransactionSynchronizationManager.hasResource(KieSpringTransactionManager.RESOURCE_CONTAINER)) {
-                    TransactionSynchronizationManager.unbindResource(KieSpringTransactionManager.RESOURCE_CONTAINER);
-                }
+            } catch (Exception e) {
+                logger.warn("Unable to rollback transaction", e);
+                throw new RuntimeException("Unable to rollback transaction", e);
+            } finally {
+                cleanupTransaction();
             }
-        } catch (Exception e) {
-            logger.warn("Unable to rollback transaction",
-                    e);
-            throw new RuntimeException("Unable to rollback transaction",
-                    e);
+        }
+    }
+
+    private void cleanupTransaction() {
+        currentTransaction = null;
+        if (TransactionSynchronizationManager.hasResource(KieSpringTransactionManager.RESOURCE_CONTAINER)) {
+            TransactionSynchronizationManager.unbindResource(KieSpringTransactionManager.RESOURCE_CONTAINER);
         }
     }
 
