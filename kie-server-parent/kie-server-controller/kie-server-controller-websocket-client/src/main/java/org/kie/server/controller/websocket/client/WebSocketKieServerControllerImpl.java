@@ -16,6 +16,8 @@
 package org.kie.server.controller.websocket.client;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -51,10 +53,9 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
     private KieServerRegistry context;
     private final KieServerMessageHandlerWebSocketClient client;
     private final Marshaller marshaller;
-    
+    private final DefaultRestControllerImpl restController = new DefaultRestControllerImpl();
+
     private KieServerInfo serverInfo;
-    
-    private DefaultRestControllerImpl restController;
 
     public WebSocketKieServerControllerImpl() {
         this.marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.JSON, this.getClass().getClassLoader());
@@ -67,6 +68,16 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
                 logger.warn("Error when trying to reconnect to Web Socket server - {}", e.getMessage());
             }
         });
+    }
+
+    @Override
+    public Integer getPriority() {
+        return 100;
+    }
+
+    @Override
+    public boolean supports(String url) {
+        return url != null && url.startsWith("ws");
     }
 
     @Override
@@ -93,6 +104,7 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
                                                                                          "kieserver"))
                                                      .password(KeyStoreHelperUtil.loadControllerPassword(config))
                                                      .token(config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN))
+                                                     .userProperties(getUserProperties())
                                                      .build());
                             CountDownLatch waitLatch = new CountDownLatch(1);
                             
@@ -170,8 +182,7 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
     @Override
     public void setRegistry(KieServerRegistry registry) {
         this.context = registry;
-        
-        this.restController = new DefaultRestControllerImpl(this.context);
+        this.restController.setRegistry(registry);
     }
 
     @Override
@@ -179,6 +190,7 @@ public class WebSocketKieServerControllerImpl implements KieServerController, Ki
         return this.context;
     }
 
-
-
+    protected Map<String, Object> getUserProperties() {
+        return new HashMap<>();
+    }
 }

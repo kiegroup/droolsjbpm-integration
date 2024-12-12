@@ -62,11 +62,7 @@ import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.Severity;
 import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.model.KieServerSetup;
-import org.kie.server.services.api.KieContainerInstance;
-import org.kie.server.services.api.KieControllerNotConnectedException;
-import org.kie.server.services.api.KieServerExtension;
-import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.api.SupportedTransports;
+import org.kie.server.services.api.*;
 import org.kie.server.services.impl.controller.DefaultRestControllerImpl;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
@@ -710,9 +706,10 @@ public abstract class AbstractKieServerImplTest {
 
             @Override
             public KieServerController getController() {
-                return new DefaultRestControllerImpl(getServerRegistry()) {
+                KieServerController controller = new DefaultRestControllerImpl() {
                     @Override
                     public KieServerSetup connect(KieServerInfo serverInfo) {
+                        setRegistry(getServerRegistry());
                         try {
                             if (latch.await(10, TimeUnit.MILLISECONDS)) {
                                 return new KieServerSetup();
@@ -722,8 +719,9 @@ public abstract class AbstractKieServerImplTest {
                             throw new KieControllerNotConnectedException("Unable to connect to any controller");
                         }
                     }
-
                 };
+                ((KieServerRegistryAware)controller).setRegistry(getServerRegistry());
+                return controller;
             }
 
         };
