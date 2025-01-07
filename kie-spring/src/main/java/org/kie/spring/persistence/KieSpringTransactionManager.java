@@ -107,10 +107,11 @@ public class KieSpringTransactionManager
     }
 
     private void cleanupTransaction() {
-        currentTransaction = null;
         if (TransactionSynchronizationManager.hasResource(KieSpringTransactionManager.RESOURCE_CONTAINER)) {
             TransactionSynchronizationManager.unbindResource(KieSpringTransactionManager.RESOURCE_CONTAINER);
         }
+        TransactionSynchronizationManager.clear();
+        currentTransaction = null;
     }
 
     /**
