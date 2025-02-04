@@ -393,6 +393,18 @@
           "fieldName": "SOLVER_URI",
           "elementKind": "field",
           "justification": "OptaPlanner extension removed."
+        },
+        {
+          "ignore": true,
+          "code": "java.field.removed",
+          "old": "field com.thoughtworks.xstream.mapper.ElementIgnoringMapper.fieldsToOmit @ org.kie.server.api.marshalling.xstream.XStreamMarshaller.CustomElementIgnore",
+          "justification": "Change on xStream side - no impact"
+        },
+        {
+          "ignore": true,
+          "code": "java.field.removed",
+          "old": "field com.thoughtworks.xstream.mapper.ElementIgnoringMapper.unknownElementsToIgnore @ org.kie.server.api.marshalling.xstream.XStreamMarshaller.CustomElementIgnore",
+          "justification": "Change on xStream side - no impact"
         }
       ]
     }
