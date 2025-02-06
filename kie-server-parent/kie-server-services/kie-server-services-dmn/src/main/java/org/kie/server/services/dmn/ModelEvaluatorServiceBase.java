@@ -28,6 +28,8 @@ import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.cfg.JsonNodeFeature;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieRuntimeFactory;
 import org.kie.dmn.api.core.DMNContext;
@@ -87,7 +89,9 @@ public class ModelEvaluatorServiceBase {
                             .addSerializer(org.kie.dmn.feel.lang.types.impl.ComparablePeriod.class,
                                            new DMNFEELComparablePeriodSerializer()))
             .disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);
+            .disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+            .configure(JsonNodeFeature.STRIP_TRAILING_BIGDECIMAL_ZEROES, false)
+            .configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true);
 
     public ModelEvaluatorServiceBase(KieServerRegistry context) {
         this.context = context;
