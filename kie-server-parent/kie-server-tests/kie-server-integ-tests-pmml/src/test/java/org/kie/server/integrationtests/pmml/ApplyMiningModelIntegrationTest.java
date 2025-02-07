@@ -15,6 +15,7 @@
  */
 package org.kie.server.integrationtests.pmml;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class ApplyMiningModelIntegrationTest extends PMMLApplyModelBaseTest {
     private static final String MODEL_NAME = "MixedMining";
     private static final String FILE_NAME = "MiningModelMixed.pmml";
     private static final String TARGET_FIELD = "categoricalResult";
-    private static final Object EXPECTED_RESULT = 2.3724999999999987;
+    private static final BigDecimal EXPECTED_RESULT = BigDecimal.valueOf(2.3724999999999987);
     private static final Map<String, Object> INPUT_DATA;
     private static final long EXTENDED_TIMEOUT = 90000000L;
     // Test setup

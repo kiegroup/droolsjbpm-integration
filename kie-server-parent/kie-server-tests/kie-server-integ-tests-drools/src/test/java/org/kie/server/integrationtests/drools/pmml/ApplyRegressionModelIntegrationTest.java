@@ -33,6 +33,8 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
+import java.math.BigDecimal;
+
 public class ApplyRegressionModelIntegrationTest extends PMMLApplyModelBaseTest {
 
     private static final ReleaseId releaseId =
@@ -57,8 +59,8 @@ public class ApplyRegressionModelIntegrationTest extends PMMLApplyModelBaseTest 
     public void testApplyPmmlRegressionModel() {
         final PMMLRequestData request = new PMMLRequestData("123", "LinReg");
         request.setSource("test_regression.pmml");
-        request.addRequestParam("fld1", 12.0);
-        request.addRequestParam("fld2", 25.0);
+        request.addRequestParam("fld1", BigDecimal.valueOf(12.0));
+        request.addRequestParam("fld2", BigDecimal.valueOf(25.0));
         request.addRequestParam("fld3", "x");
 
         final ApplyPmmlModelCommand command = (ApplyPmmlModelCommand) ((CommandFactoryServiceImpl) commandsFactory)
@@ -71,9 +73,9 @@ public class ApplyRegressionModelIntegrationTest extends PMMLApplyModelBaseTest 
         final Object obj = resultHolder.getResultValue("Fld4", null);
         Assertions.assertThat(obj).isNotNull();
 
-        final Double targetValue = resultHolder.getResultValue("Fld4", "value", Double.class)
+        final BigDecimal targetValue = resultHolder.getResultValue("Fld4", "value", BigDecimal.class)
                 .orElse(null);
         Assertions.assertThat(targetValue).isNotNull();
-        Assertions.assertThat(targetValue).isEqualTo(1.0);
+        Assertions.assertThat(targetValue).isEqualTo(BigDecimal.valueOf(1.0));
     }
 }
