@@ -15,6 +15,7 @@
  */
 package org.kie.server.integrationtests.pmml;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class ApplyRegressionModelIntegrationTest extends PMMLApplyModelBaseTest 
     private static final String MODEL_NAME = "LinReg";
     private static final String FILE_NAME = "test_regression.pmml";
     private static final String TARGET_FIELD = "fld4";
-    private static final Object EXPECTED_RESULT = 1.0;
+    private static final BigDecimal EXPECTED_RESULT = BigDecimal.valueOf(1.0);
     private static final Map<String, Object> INPUT_DATA;
     private static final long EXTENDED_TIMEOUT = 30000000L;
     // Test setup

@@ -16,6 +16,8 @@
 
 package org.kie.server.integrationtests.drools.pmml;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,8 +60,8 @@ public class ApplyPmmlMultipleTimesIntegrationTest extends PMMLApplyModelBaseTes
 
     @Test
     public void testMultipleRegressionEvaluation() {
-        double fld1 = 12.0;
-        double fld2 = 25.0;
+        BigDecimal fld1 = BigDecimal.valueOf(12.0);
+        BigDecimal fld2 = BigDecimal.valueOf(25.0);
         String fld3 = "x";
         PMMLRequestData request = new PMMLRequestData("123", "LinReg");
         request.setSource("test_regression.pmml");
@@ -77,13 +79,13 @@ public class ApplyPmmlMultipleTimesIntegrationTest extends PMMLApplyModelBaseTes
         Object obj = resultHolder.getResultValue("Fld4", null);
         Assertions.assertThat(obj).isNotNull();
 
-        Double targetValue = resultHolder.getResultValue("Fld4", "value", Double.class)
+        BigDecimal targetValue = resultHolder.getResultValue("Fld4", "value", BigDecimal.class)
                 .orElse(null);
         Assertions.assertThat(targetValue).isNotNull();
         Assertions.assertThat(targetValue).isEqualTo(simpleRegressionResult(fld1, fld2, fld3));
 
-        fld1 = 5;
-        fld2 = 8;
+        fld1 = BigDecimal.valueOf(5);
+        fld2 = BigDecimal.valueOf(8);
         fld3 = "y";
         request = new PMMLRequestData("123", "LinReg");
         request.addRequestParam("fld1", fld1);
@@ -100,24 +102,27 @@ public class ApplyPmmlMultipleTimesIntegrationTest extends PMMLApplyModelBaseTes
         obj = resultHolder.getResultValue("Fld4", null);
         Assertions.assertThat(obj).isNotNull();
 
-        targetValue = resultHolder.getResultValue("Fld4", "value", Double.class)
+        targetValue = resultHolder.getResultValue("Fld4", "value", BigDecimal.class)
                 .orElse(null);
         Assertions.assertThat(targetValue).isNotNull();
         Assertions.assertThat(targetValue).isEqualTo(simpleRegressionResult(fld1, fld2, fld3));
     }
 
-    private static double simpleRegressionResult(double fld1, double fld2, String fld3) {
-        double result = 0.5 + 5 * fld1 * fld1 + 2 * fld2 + fld3Coefficient(fld3) + 0.4 * fld1 * fld2;
-        result = 1.0 / (1.0 + Math.exp(-result));
-
+    private static BigDecimal simpleRegressionResult(BigDecimal fld1, BigDecimal fld2, String fld3) {
+        BigDecimal result = fld1.multiply(fld1).multiply(BigDecimal.valueOf(5))
+                .add(BigDecimal.valueOf(0.5))
+                .add(fld2.multiply(BigDecimal.valueOf(2)))
+                .add(fld3Coefficient(fld3))
+                .add(fld1.multiply(fld2).multiply(BigDecimal.valueOf(0.4)));
+        result = BigDecimal.ONE.divide(BigDecimal.ONE.add(BigDecimal.valueOf(Math.exp(-result.doubleValue()))));
         return result;
     }
 
-    private static double fld3Coefficient(String fld3) {
+    private static BigDecimal fld3Coefficient(String fld3) {
         final Map<String, Double> fld3ValueMap = new HashMap<>();
         fld3ValueMap.put("x", -3.0);
         fld3ValueMap.put("y", 3.0);
 
-        return fld3ValueMap.getOrDefault(fld3, 0.0);
+        return BigDecimal.valueOf(fld3ValueMap.getOrDefault(fld3, 0.0));
     }
 }

@@ -279,6 +279,7 @@ public class JSONMarshaller implements Marshaller {
         deserializeObjectMapper.setConfig(objectMapper.getDeserializationConfig()
                 .with(introspectorPair)
                 .with(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+                .with(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
                 .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
 
         objectMapper.configure(MapperFeature.USE_STD_BEAN_NAMING, this.useStrictJavaBeans);
