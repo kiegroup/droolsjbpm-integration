@@ -16,6 +16,7 @@
 package org.kie.server.integrationtests.drools.pmml;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -90,8 +91,8 @@ public class ApplyScorecardModelIntegrationTest extends PMMLApplyModelBaseTest {
         Thread.currentThread().setContextClassLoader(classLoader);
         PMMLRequestData request = new PMMLRequestData("123", "SimpleScorecard");
         request.setSource("test_scorecard_simple.pmml");
-        request.addRequestParam("param1", 10.0);
-        request.addRequestParam("param2", 15.0);
+        request.addRequestParam("param1", BigDecimal.valueOf(10.0));
+        request.addRequestParam("param2", BigDecimal.valueOf(15.0));
 
         ApplyPmmlModelCommand command = (ApplyPmmlModelCommand) ((CommandFactoryServiceImpl) commandsFactory).newApplyPmmlModel(request);
 
@@ -102,9 +103,9 @@ public class ApplyScorecardModelIntegrationTest extends PMMLApplyModelBaseTest {
         assertNotNull(resultHolder);
         assertEquals("OK", resultHolder.getResultCode());
 
-        double score = resultHolder.getResultValue("ScoreCard", "score", Double.class).get();
-        Assertions.assertThat(score).isEqualTo(40.8);
-        Map<String, Double> rankingMap = (Map<String, Double>) resultHolder.getResultValue("ScoreCard", "ranking");
+        BigDecimal score = resultHolder.getResultValue("ScoreCard", "score", BigDecimal.class).get();
+        Assertions.assertThat(score).isEqualTo(BigDecimal.valueOf(40.8));
+        Map<String, BigDecimal> rankingMap = (Map<String, BigDecimal>) resultHolder.getResultValue("ScoreCard", "ranking");
         Assertions.assertThat(rankingMap.get("reasonCh1")).isEqualTo(5);
         Assertions.assertThat(rankingMap.get("reasonCh2")).isEqualTo(-6);
         logger.info("ApplyScorecardModelIntegrationTest#testApplyPmmlScorecard completed successfully");
@@ -115,8 +116,8 @@ public class ApplyScorecardModelIntegrationTest extends PMMLApplyModelBaseTest {
         Thread.currentThread().setContextClassLoader(classLoader);
         PMMLRequestData request = new PMMLRequestData("123", "SimpleScorecard");
         request.setSource("test_scorecard_simple.pmml");
-        request.addRequestParam("param1", 10.0);
-        request.addRequestParam("param2", 15.0);
+        request.addRequestParam("param1", BigDecimal.valueOf(10.0));
+        request.addRequestParam("param2", BigDecimal.valueOf(15.0));
 
         List<Command<?>> cmds = new ArrayList<>();
         ApplyPmmlModelCommand command = (ApplyPmmlModelCommand) ((CommandFactoryServiceImpl) commandsFactory).newApplyPmmlModel(request);
@@ -129,9 +130,9 @@ public class ApplyScorecardModelIntegrationTest extends PMMLApplyModelBaseTest {
         assertNotNull(resultHolder);
         assertEquals("OK", resultHolder.getResultCode());
 
-        double score = resultHolder.getResultValue("ScoreCard", "score", Double.class).get();
-        Assertions.assertThat(score).isEqualTo(40.8);
-        Map<String, Double> rankingMap = (Map<String, Double>) resultHolder.getResultValue("ScoreCard", "ranking");
+        BigDecimal score = resultHolder.getResultValue("ScoreCard", "score", BigDecimal.class).get();
+        Assertions.assertThat(score).isEqualTo(BigDecimal.valueOf(40.8));
+        Map<String, BigDecimal> rankingMap = (Map<String, BigDecimal>) resultHolder.getResultValue("ScoreCard", "ranking");
         Assertions.assertThat(rankingMap.get("reasonCh1")).isEqualTo(5);
         Assertions.assertThat(rankingMap.get("reasonCh2")).isEqualTo(-6);
         logger.info("ApplyScorecardModelIntegrationTest#testApplyPmmlScorecardInBatch completed successfully");

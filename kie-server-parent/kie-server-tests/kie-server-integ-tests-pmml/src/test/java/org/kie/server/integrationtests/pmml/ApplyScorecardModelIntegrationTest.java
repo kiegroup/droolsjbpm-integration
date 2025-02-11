@@ -15,6 +15,7 @@
  */
 package org.kie.server.integrationtests.pmml;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ public class ApplyScorecardModelIntegrationTest extends PMMLApplyModelBaseTest {
     private static final String MODEL_NAME = "CompoundPredicateScorecard";
     private static final String FILE_NAME = "CompoundPredicateScorecard.pmml";
     private static final String TARGET_FIELD = "score";
-    private static final Object EXPECTED_RESULT = -93.0;
+    private static final BigDecimal EXPECTED_RESULT = BigDecimal.valueOf(-93.0);
     private static final Map<String, Object> INPUT_DATA;
     private static final long EXTENDED_TIMEOUT = 30000000L;
     // Test setup
