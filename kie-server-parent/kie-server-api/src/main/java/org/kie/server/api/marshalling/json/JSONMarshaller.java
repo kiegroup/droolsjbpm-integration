@@ -438,7 +438,7 @@ public class JSONMarshaller implements Marshaller {
 
         try {
             Class<?> actualType = classesSet.contains(type) ? Object.class : type;
-            if (actualType.getPackage().getName().endsWith(".dmn")) {
+            if (actualType != null && actualType.getPackage() != null && actualType.getPackage().getName().endsWith(".dmn")) {
                 deserializeObjectMapper.setConfig(deserializeObjectMapper.getDeserializationConfig().with(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS));
             }
             return (T) unwrap(deserializeObjectMapper.readValue(serializedInput, actualType));
@@ -454,7 +454,7 @@ public class JSONMarshaller implements Marshaller {
 
         try {
             Class<?> actualType = classesSet.contains(type) ? Object.class : type;
-            if (actualType.getPackage().getName().endsWith(".dmn")) {
+            if (actualType != null && actualType.getPackage() != null && actualType.getPackage().getName().endsWith(".dmn")) {
                 deserializeObjectMapper.setConfig(deserializeObjectMapper.getDeserializationConfig().with(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS));
             }
             return (T) unwrap(deserializeObjectMapper.readValue(serializedInput, actualType));
