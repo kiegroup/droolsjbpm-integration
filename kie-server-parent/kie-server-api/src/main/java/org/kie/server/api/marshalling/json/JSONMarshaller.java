@@ -279,6 +279,7 @@ public class JSONMarshaller implements Marshaller {
         deserializeObjectMapper.setConfig(objectMapper.getDeserializationConfig()
                 .with(introspectorPair)
                 .with(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+//                .with(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
                 .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
 
         objectMapper.configure(MapperFeature.USE_STD_BEAN_NAMING, this.useStrictJavaBeans);
@@ -437,6 +438,9 @@ public class JSONMarshaller implements Marshaller {
 
         try {
             Class<?> actualType = classesSet.contains(type) ? Object.class : type;
+            if (actualType != null && actualType.getPackage() != null && actualType.getPackage().getName().endsWith(".dmn")) {
+                deserializeObjectMapper.setConfig(deserializeObjectMapper.getDeserializationConfig().with(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS));
+            }
             return (T) unwrap(deserializeObjectMapper.readValue(serializedInput, actualType));
         } catch (IOException e) {
             throw new MarshallingException("Error unmarshalling input", e);
@@ -450,6 +454,9 @@ public class JSONMarshaller implements Marshaller {
 
         try {
             Class<?> actualType = classesSet.contains(type) ? Object.class : type;
+            if (actualType != null && actualType.getPackage() != null && actualType.getPackage().getName().endsWith(".dmn")) {
+                deserializeObjectMapper.setConfig(deserializeObjectMapper.getDeserializationConfig().with(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS));
+            }
             return (T) unwrap(deserializeObjectMapper.readValue(serializedInput, actualType));
         } catch (IOException e) {
             throw new MarshallingException("Error unmarshalling input", e);
