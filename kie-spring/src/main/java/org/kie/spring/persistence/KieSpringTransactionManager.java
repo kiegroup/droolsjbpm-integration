@@ -39,7 +39,7 @@ public class KieSpringTransactionManager
     private AbstractPlatformTransactionManager ptm;
 
     TransactionDefinition td = new DefaultTransactionDefinition();
-    TransactionStatus currentTransaction = null;
+    ThreadLocal<TransactionStatus> currentTransaction = new ThreadLocal<>();
 
     public KieSpringTransactionManager(AbstractPlatformTransactionManager ptm) {
         this.ptm = ptm;
@@ -50,14 +50,14 @@ public class KieSpringTransactionManager
             // RHBPMS-4621 - transaction can be marked as rollback
             // and still be associated with current thread
             // See WFLY-4327
-            if ( getStatus() == TransactionManager.STATUS_ROLLEDBACK ) {
-                logger.debug("Cleanup of transaction that has been rolled back previously");
+            if (getStatus() == TransactionManager.STATUS_ROLLEDBACK) {
+                logger.warn("Cleaning up rolledback transaction");
                 rollback(true);
             }
             if (getStatus() == TransactionManager.STATUS_NO_TRANSACTION) {
                 // If there is no transaction then start one, we will commit within the same Command
                 // it seems in spring calling getTransaction is enough to begin a new transaction
-                currentTransaction = this.ptm.getTransaction(td);
+                currentTransaction.set(this.ptm.getTransaction(td));
                 return true;
             } else {
                 return false;
@@ -81,35 +81,37 @@ public class KieSpringTransactionManager
 
         try {
             // if we didn't begin this transaction, then do nothing
-            this.ptm.commit(currentTransaction);
-            currentTransaction = null;
-            if (TransactionSynchronizationManager.hasResource(KieSpringTransactionManager.RESOURCE_CONTAINER)) {
-                TransactionSynchronizationManager.unbindResource(KieSpringTransactionManager.RESOURCE_CONTAINER);
-            }
+            this.ptm.commit(currentTransaction.get());
         } catch (Exception e) {
             logger.warn("Unable to commit transaction",
                     e);
             throw new RuntimeException("Unable to commit transaction",
                     e);
+        } finally {
+            cleanupTransaction();
         }
 
     }
 
     public void rollback(boolean transactionOwner) {
-        try {
-            if (transactionOwner) {
-                this.ptm.rollback(currentTransaction);
-                currentTransaction = null;
-                if (TransactionSynchronizationManager.hasResource(KieSpringTransactionManager.RESOURCE_CONTAINER)) {
-                    TransactionSynchronizationManager.unbindResource(KieSpringTransactionManager.RESOURCE_CONTAINER);
-                }
+        if (transactionOwner) {
+            try {
+                this.ptm.rollback(currentTransaction.get());
+            } catch (Exception e) {
+                logger.warn("Unable to rollback transaction", e);
+                throw new RuntimeException("Unable to rollback transaction", e);
+            } finally {
+                cleanupTransaction();
             }
-        } catch (Exception e) {
-            logger.warn("Unable to rollback transaction",
-                    e);
-            throw new RuntimeException("Unable to rollback transaction",
-                    e);
         }
+    }
+
+    private void cleanupTransaction() {
+        if (TransactionSynchronizationManager.hasResource(KieSpringTransactionManager.RESOURCE_CONTAINER)) {
+            TransactionSynchronizationManager.unbindResource(KieSpringTransactionManager.RESOURCE_CONTAINER);
+        }
+        TransactionSynchronizationManager.clear();
+        currentTransaction.remove();
     }
 
     /**
@@ -124,13 +126,13 @@ public class KieSpringTransactionManager
         if (TransactionSynchronizationManager.isActualTransactionActive()) {
             TransactionStatus transaction = null;
             try {
-                if (currentTransaction == null) {
+                if (currentTransaction.get() == null) {
                     transaction = ptm.getTransaction(td);
                     if (transaction.isNewTransaction()) {
                         return TransactionManager.STATUS_COMMITTED;
                     }
                 } else {
-                    transaction = currentTransaction;
+                    transaction = currentTransaction.get();
                 }
                 logger.debug("Current TX: " + transaction);
                 // If SynchronizationManager thinks it has an active transaction but
@@ -152,7 +154,7 @@ public class KieSpringTransactionManager
                     return TransactionManager.STATUS_ACTIVE;
                 }
             } finally {
-                if (currentTransaction == null && transaction != null) {
+                if (currentTransaction.get() == null && transaction != null) {
                     ptm.commit(transaction);
                 }
             }
