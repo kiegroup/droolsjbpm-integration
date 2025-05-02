@@ -33,6 +33,8 @@ public class ContainerBuilder {
 
     private String id;
 
+    private String alias;
+
     @NotEmpty
     private String groupId;
 
@@ -56,6 +58,11 @@ public class ContainerBuilder {
     // if container name is not defined by default we use maven GAV
     public String getId() {
         return (id != null) ? id : getGAV();
+    }
+
+    // if container alias is not defined by default we use id
+    public String getAlias() {
+        return (alias != null) ? alias : getId();
     }
 
     public ContainerSpec build(String templateId, String templateName) {
@@ -84,7 +91,7 @@ public class ContainerBuilder {
         ReleaseId releasedId = new ReleaseId(groupId, artifactId, version);
 
         return new ContainerSpec(
-            getId(), getId(),
+            getId(), getAlias(),
             new ServerTemplateKey(templateId, templateName),
             releasedId, KieContainerStatus.STOPPED, configs
         );
@@ -107,6 +114,11 @@ public class ContainerBuilder {
 
     public ContainerBuilder id(String id) {
         this.id = id;
+        return this;
+    }
+
+    public ContainerBuilder alias(String alias) {
+        this.alias = alias;
         return this;
     }
 
