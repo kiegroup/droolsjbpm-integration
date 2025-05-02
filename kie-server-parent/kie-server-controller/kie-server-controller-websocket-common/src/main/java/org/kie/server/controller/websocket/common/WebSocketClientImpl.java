@@ -113,6 +113,7 @@ public abstract class WebSocketClientImpl<T extends MessageHandler> extends Endp
                     .encoders(clientConfig.getEncoders())
                     .decoders(clientConfig.getDecoders())
                     .build();
+            this.config.getUserProperties().putAll(clientConfig.getUserProperties());
             this.endpoint =  URI.create(clientConfig.getControllerUrl());
             session = container.connectToServer(this, this.config, this.endpoint);
             LOGGER.info("New Web Socket Session with id: {}, started", session.getId());

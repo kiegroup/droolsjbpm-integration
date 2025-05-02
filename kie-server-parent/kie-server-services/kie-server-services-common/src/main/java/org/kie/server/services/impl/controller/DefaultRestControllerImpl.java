@@ -36,22 +36,41 @@ import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.services.api.KieControllerNotConnectedException;
 import org.kie.server.services.api.KieControllerNotDefinedException;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.api.KieServerRegistryAware;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.kie.server.common.KeyStoreHelperUtil.loadControllerPassword;
 
-public class DefaultRestControllerImpl implements KieServerController {
+public class DefaultRestControllerImpl implements KieServerController, KieServerRegistryAware {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultRestControllerImpl.class);
 
-    private final KieServerRegistry context;
+    private KieServerRegistry context;
 
-    public DefaultRestControllerImpl(KieServerRegistry context) {
-        this.context = context;
+    public DefaultRestControllerImpl() {
     }
 
+    @Override
+    public void setRegistry(KieServerRegistry registry) {
+        this.context = registry;
+    }
+
+    @Override
+    public KieServerRegistry getRegistry() {
+        return context;
+    }
+
+    @Override
+    public Integer getPriority() {
+        return 100;
+    }
+
+    @Override
+    public boolean supports(String url) {
+        return url != null && url.startsWith("http");
+    }
 
     protected <T> T makeHttpPutRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType, String user, String password, String token) {
         logger.debug("About to send PUT request to '{}' with payload '{}' by thread {}", uri, body, Thread.currentThread().getId());
@@ -323,6 +342,4 @@ public class DefaultRestControllerImpl implements KieServerController {
             }
         }
     }
-
-
 }

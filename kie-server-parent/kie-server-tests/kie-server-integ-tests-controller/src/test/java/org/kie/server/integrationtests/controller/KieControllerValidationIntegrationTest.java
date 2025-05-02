@@ -110,7 +110,8 @@ public class KieControllerValidationIntegrationTest extends KieControllerManagem
         kieServerInfo.setMode(KieServerMode.PRODUCTION);
         kieServerInfo.setName(SERVER_NAME);
 
-        KieServerController controller = new DefaultRestControllerImpl(registry);
+        DefaultRestControllerImpl controller = new DefaultRestControllerImpl();
+        controller.setRegistry(registry);
         assertThatThrownBy(() -> controller.connect(kieServerInfo)).isInstanceOf(KieControllerNotConnectedException.class);
 
         // Check that kie server is not registered.
@@ -151,7 +152,8 @@ public class KieControllerValidationIntegrationTest extends KieControllerManagem
         KieServerRegistry registry = new KieServerRegistryImpl();
 
         registry.registerStateRepository(dummyKieServerStateRepository);
-        KieServerController controller = new DefaultRestControllerImpl(registry);
+        DefaultRestControllerImpl controller = new DefaultRestControllerImpl();
+        controller.setRegistry(registry);
         KieServerSetup setup = controller.connect(kieServerInfo);
         Assert.assertTrue(setup.hasNoErrors());
 

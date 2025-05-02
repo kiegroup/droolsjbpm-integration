@@ -18,6 +18,7 @@ package org.kie.server.controller.websocket.common.config;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import javax.websocket.Decoder;
 import javax.websocket.Encoder;
 
@@ -42,6 +43,8 @@ public interface WebSocketClientConfiguration {
     List<Class<? extends Encoder>> getEncoders();
 
     List<Class<? extends Decoder>> getDecoders();
+
+    Map<String, Object> getUserProperties();
 
     class Builder {
 
@@ -84,6 +87,11 @@ public interface WebSocketClientConfiguration {
 
         public Builder decoders(final Class<? extends Decoder>... decoders) {
             config.setDecoders(Arrays.asList(decoders));
+            return this;
+        }
+
+        public Builder userProperties(final Map<String, Object> userProperties) {
+            config.setUserProperties(userProperties);
             return this;
         }
 

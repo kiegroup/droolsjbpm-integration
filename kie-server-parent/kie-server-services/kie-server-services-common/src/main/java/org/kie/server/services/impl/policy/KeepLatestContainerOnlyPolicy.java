@@ -88,7 +88,8 @@ public class KeepLatestContainerOnlyPolicy implements Policy {
     @Override
     public void apply(KieServerRegistry kieServerRegistry, KieServer kieServer) {
 
-        DefaultRestControllerImpl controller = new DefaultRestControllerImpl(kieServerRegistry);
+        DefaultRestControllerImpl controller = new DefaultRestControllerImpl();
+        controller.setRegistry(kieServerRegistry);
 
         List<String> containerAliases = kieServerRegistry.getContainerAliases();
         if (containerAliases.isEmpty()) {

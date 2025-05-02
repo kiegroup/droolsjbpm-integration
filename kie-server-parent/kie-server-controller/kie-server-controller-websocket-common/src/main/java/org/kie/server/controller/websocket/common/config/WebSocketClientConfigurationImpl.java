@@ -16,7 +16,9 @@
 
 package org.kie.server.controller.websocket.common.config;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.websocket.Decoder;
 import javax.websocket.Encoder;
 
@@ -37,6 +39,8 @@ public class WebSocketClientConfigurationImpl implements WebSocketClientConfigur
     private List<Class<? extends Encoder>> encoders;
 
     private List<Class<? extends Decoder>> decoders;
+
+    private Map<String, Object> userProperties;
 
     protected WebSocketClientConfigurationImpl() {
     }
@@ -114,6 +118,15 @@ public class WebSocketClientConfigurationImpl implements WebSocketClientConfigur
     }
 
     @Override
+    public Map<String, Object> getUserProperties() {
+        return userProperties;
+    }
+
+    public void setUserProperties(Map<String, Object> userProperties) {
+        this.userProperties = userProperties;
+    }
+
+    @Override
     public String toString() {
         return "WebSocketClientConfigurationImpl{" +
                 "controllerUrl='" + controllerUrl + '\'' +
@@ -124,6 +137,7 @@ public class WebSocketClientConfigurationImpl implements WebSocketClientConfigur
                 ", asyncSendTimeout=" + asyncSendTimeout +
                 ", encoders=" + encoders +
                 ", decoders=" + decoders +
+                ", userProperties=" + userProperties +
                 '}';
     }
 }
