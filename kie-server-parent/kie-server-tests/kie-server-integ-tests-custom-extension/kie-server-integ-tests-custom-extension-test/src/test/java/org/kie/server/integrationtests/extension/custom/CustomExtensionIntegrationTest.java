@@ -28,7 +28,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
-import org.jboss.resteasy.plugins.providers.jackson.ResteasyJacksonProvider;
+import org.jboss.resteasy.plugins.providers.jackson.ResteasyJackson2Provider;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -130,7 +130,7 @@ public class CustomExtensionIntegrationTest extends RestJmsSharedBaseIntegration
                 .establishConnectionTimeout(configuration.getTimeout(), TimeUnit.MILLISECONDS)
                 .socketTimeout(configuration.getTimeout(), TimeUnit.MILLISECONDS)
                 .register(new Authenticator(configuration.getUserName(), configuration.getPassword()))
-                .register(new ResteasyJacksonProvider())
+                .register(new ResteasyJackson2Provider())
                 .build();
 
         Map<String, Object> testPayload = new HashMap<>();
