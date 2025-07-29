@@ -27,10 +27,20 @@
           <artifactId>jcl-over-slf4j</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>  
+    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.security</groupId>
+          <artifactId>spring-security-web</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-web</artifactId>
     </dependency>
 
     <!-- extra dependencies for swagger -->
