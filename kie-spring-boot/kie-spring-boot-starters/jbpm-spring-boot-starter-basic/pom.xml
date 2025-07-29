@@ -36,10 +36,18 @@
       <artifactId>spring-boot-starter-security</artifactId>
       <exclusions>
         <exclusion>
+          <groupId>org.springframework.security</groupId>
+          <artifactId>spring-security-web</artifactId>
+        </exclusion>
+        <exclusion>
           <artifactId>jul-to-slf4j</artifactId>
           <groupId>org.slf4j</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-web</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
