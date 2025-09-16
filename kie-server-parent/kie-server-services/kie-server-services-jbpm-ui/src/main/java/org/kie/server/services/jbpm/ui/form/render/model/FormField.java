@@ -66,6 +66,14 @@ public class FormField {
     private String editionForm;
 
     private boolean showTime;
+    
+    // MaskedTextBox specific properties
+    private Integer minLength;
+    private String maskingCharacter;
+    private Integer maskingStartIndex;
+    private Integer maskingFromStartLength;
+    private Integer maskingFromEndLength;
+    private Boolean isMaskedInDB;
 
     public boolean isShowTime() {
         return showTime;
@@ -243,4 +251,52 @@ public class FormField {
         return tags;
     }
 
+    // MaskedTextBox getters and setters
+    public Integer getMinLength() {
+        return minLength;
+    }
+
+    public void setMinLength(Integer minLength) {
+        this.minLength = minLength;
+    }
+
+    public String getMaskingCharacter() {
+        return maskingCharacter;
+    }
+
+    public void setMaskingCharacter(String maskingCharacter) {
+        this.maskingCharacter = maskingCharacter;
+    }
+
+    public Integer getMaskingStartIndex() {
+        return maskingStartIndex;
+    }
+
+    public void setMaskingStartIndex(Integer maskingStartIndex) {
+        this.maskingStartIndex = maskingStartIndex;
+    }
+
+    public Integer getMaskingFromStartLength() {
+        return maskingFromStartLength;
+    }
+
+    public void setMaskingFromStartLength(Integer maskingFromStartLength) {
+        this.maskingFromStartLength = maskingFromStartLength;
+    }
+
+    public Integer getMaskingFromEndLength() {
+        return maskingFromEndLength;
+    }
+
+    public void setMaskingFromEndLength(Integer maskingFromEndLength) {
+        this.maskingFromEndLength = maskingFromEndLength;
+    }
+
+    public Boolean getIsMaskedInDB() {
+        return isMaskedInDB;
+    }
+
+    public void setIsMaskedInDB(Boolean isMaskedInDB) {
+        this.isMaskedInDB = isMaskedInDB;
+    }
 }

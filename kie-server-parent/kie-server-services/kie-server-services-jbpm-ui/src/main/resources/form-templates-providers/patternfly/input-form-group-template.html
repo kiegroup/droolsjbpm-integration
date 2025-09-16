@@ -158,6 +158,23 @@
 	</#if>
     <input id="${item.id}" data-slider-id='${item.id}Slider' data-slider-value="${item.value}" name="${item.name}" data-slider-min="${item.min}" data-slider-max="${item.max}" data-slider-step="${item.step}" type="text" class="form-control" value="${item.value}" ${(item.required)?string('required', '')} data-slider-tooltip="hide" data-slider-handle="triangle" style="width: 100%;"/>    
 </div>
+<#elseif item.type == "text" && item.maskingCharacter??>
+<div class="form-group">
+	<label for="${item.id}">${item.label}</label> 
+	<#if item.required>
+	<strong style="color: red">*</strong>
+	</#if>
+	<input name="${item.name}" type="text" class="form-control masked-input-text-field" id="${item.id}" 
+	       placeholder="${item.placeHolder}" value="${item.value}" pattern="${item.pattern}" 
+	       data-field-type="MaskedTextBox"
+	       <#if item.minLength??>minlength="${item.minLength}"</#if>
+	       <#if item.maskingCharacter??>data-masking-character="${item.maskingCharacter}"</#if>
+	       <#if item.maskingStartIndex??>data-masking-start-index="${item.maskingStartIndex}"</#if>
+	       <#if item.maskingFromStartLength??>data-masking-from-start-length="${item.maskingFromStartLength}"</#if>
+	       <#if item.maskingFromEndLength??>data-masking-from-end-length="${item.maskingFromEndLength}"</#if>
+	       <#if item.isMaskedInDB??>data-is-masked-in-db="${item.isMaskedInDB?c}"</#if>
+	       ${(item.readOnly)?string('readonly', '')} ${(item.required)?string('required', '')}>
+</div>
 <#else>
 <div class="form-group">
 	<label for="${item.id}">${item.label}</label> 

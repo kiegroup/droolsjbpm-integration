@@ -114,6 +114,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
         this.inputTypes.put("DocumentCollection", "documentCollection");
         this.inputTypes.put("MultipleSelector", "multipleSelector");
         this.inputTypes.put("MultipleInput", "multipleInput");
+        this.inputTypes.put("MaskedTextBox", "text");
 
         
         cfg = new Configuration(Configuration.VERSION_2_3_26);
@@ -414,6 +415,16 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                             item.setPrecision(field.getPrecision());
                             item.setStep(field.getStep());
                             item.setShowTime(field.isShowTime());
+                            
+                            // Set MaskedTextBox specific properties if this is a MaskedTextBox field
+                            if ("MaskedTextBox".equals(field.getCode())) {
+                                item.setMinLength(field.getMinLength());
+                                item.setMaskingCharacter(field.getMaskingCharacter());
+                                item.setMaskingStartIndex(field.getMaskingStartIndex());
+                                item.setMaskingFromStartLength(field.getMaskingFromStartLength());
+                                item.setMaskingFromEndLength(field.getMaskingFromEndLength());
+                                item.setIsMaskedInDB(field.getIsMaskedInDB());
+                            }
 
                             Object value = "";
                             if (inputs.get(field.getBinding()) != null) {
