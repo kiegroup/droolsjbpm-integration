@@ -419,6 +419,7 @@ public abstract class AbstractFormRenderer implements FormRenderer {
                             // Set MaskedTextBox specific properties if this is a MaskedTextBox field
                             if ("MaskedTextBox".equals(field.getCode())) {
                                 item.setMinLength(field.getMinLength());
+                                item.setMaxLength(field.getMaxLength());
                                 item.setMaskingCharacter(field.getMaskingCharacter());
                                 item.setMaskingStartIndex(field.getMaskingStartIndex());
                                 item.setMaskingFromStartLength(field.getMaskingFromStartLength());

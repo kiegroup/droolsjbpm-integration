@@ -168,6 +168,7 @@
 	       placeholder="${item.placeHolder}" value="${item.value}" pattern="${item.pattern}" 
 	       data-field-type="MaskedTextBox"
 	       <#if item.minLength??>minlength="${item.minLength}"</#if>
+	       <#if item.maxLength??>maxlength="${item.maxLength}"</#if>
 	       <#if item.maskingCharacter??>data-masking-character="${item.maskingCharacter}"</#if>
 	       <#if item.maskingStartIndex??>data-masking-start-index="${item.maskingStartIndex}"</#if>
 	       <#if item.maskingFromStartLength??>data-masking-from-start-length="${item.maskingFromStartLength}"</#if>

@@ -47,6 +47,7 @@ public class LayoutItem {
     
     // MaskedTextBox specific properties
     private Integer minLength;
+    private Long maxLength;
     private String maskingCharacter;
     private Integer maskingStartIndex;
     private Integer maskingFromStartLength;
@@ -196,6 +197,14 @@ public class LayoutItem {
 
     public void setMinLength(Integer minLength) {
         this.minLength = minLength;
+    }
+
+    public Long getMaxLength() {
+        return maxLength;
+    }
+
+    public void setMaxLength(Long maxLength) {
+        this.maxLength = maxLength;
     }
 
     public String getMaskingCharacter() {
