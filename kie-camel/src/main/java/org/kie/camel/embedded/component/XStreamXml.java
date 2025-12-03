@@ -45,40 +45,7 @@ public class XStreamXml {
 
     public static XStreamDataFormat newXStreamMarshaller(XStreamDataFormat xstreamDataFormat) {
         XStreamHelper.setAliases(xstreamDataFormat);
-
-        // xstream.processAnnotations( BatchExecutionCommand.class );
-
-        Map<String, String[]> map = xstreamDataFormat.getImplicitCollections();
-        if (map == null) {
-            map = new HashMap<String, String[]>();
-        }
-        map.put(BatchExecutionCommandImpl.class.getName(), new String[] {"commands"});
-        xstreamDataFormat.setImplicitCollections(map);
-
-        List<String> converters = xstreamDataFormat.getConverters();
-        if (converters == null) {
-            converters = new ArrayList<String>();
-        }
-
-        converters.add(InsertConverter.class.getName());
-        converters.add(DeleteConverter.class.getName());
-        converters.add(ModifyConverter.class.getName());
-        converters.add(GetObjectConverter.class.getName());
-        converters.add(InsertElementsConverter.class.getName());
-        converters.add(FireAllRulesConverter.class.getName());
-        converters.add(StartProcessConvert.class.getName());
-        converters.add(SignalEventConverter.class.getName());
-        converters.add(CompleteWorkItemConverter.class.getName());
-        converters.add(AbortWorkItemConverter.class.getName());
-        converters.add(QueryConverter.class.getName());
-        converters.add(SetGlobalConverter.class.getName());
-        converters.add(GetGlobalConverter.class.getName());
-        converters.add(GetObjectsConverter.class.getName());
-        converters.add(BatchExecutionResultConverter.class.getName());
-        converters.add(QueryResultsConverter.class.getName());
-        converters.add(FactHandleConverter.class.getName());
-        xstreamDataFormat.setConverters(converters);
-
+        // For Camel 3.x we rely on the configured aliases and default XStream settings
         return xstreamDataFormat;
     }
 

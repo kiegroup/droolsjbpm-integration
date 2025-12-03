@@ -18,7 +18,7 @@ package org.kie.camel;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.apache.camel.util.ExchangeHelper;
+import org.apache.camel.support.ExchangeHelper;
 
 import static org.kie.camel.KieCamelConstants.KIE_HEADERS_PREFIX;
 

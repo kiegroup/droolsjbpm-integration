@@ -23,7 +23,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.util.jndi.JndiContext;
+import org.apache.camel.support.jndi.JndiContext;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
@@ -56,7 +56,7 @@ public class JsonQueryTest {
         Context context = new JndiContext();
         context.bind("ksession", session);
 
-        CamelContext camelContext = new DefaultCamelContext(context);
+        CamelContext camelContext = new DefaultCamelContext(new org.apache.camel.support.jndi.JndiBeanRepository(context));
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {

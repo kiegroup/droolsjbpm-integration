@@ -219,11 +219,13 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
             @Override
             public void configure() throws Exception {
                 org.apache.camel.model.dataformat.XStreamDataFormat xstreamDataFormat = new org.apache.camel.model.dataformat.XStreamDataFormat();
-                xstreamDataFormat.setConverters(Arrays.asList(new String[] {PersonConverter.class.getName()}));
+                Map<String, String> converters = new HashMap<String, String>();
+                converters.put(Person.class.getName(), PersonConverter.class.getName());
+                xstreamDataFormat.setConverters(converters);
 
                 Map<String, DataFormatDefinition> dataFormats = new HashMap<String, DataFormatDefinition>();
                 dataFormats.put("custom-xstream", xstreamDataFormat);
-                getContext().setDataFormats(dataFormats);
+                ((org.apache.camel.model.ModelCamelContext)getContext()).setDataFormats(dataFormats);
 
                 from("direct:test-with-session").policy(new KiePolicy()).unmarshal("xstream").to("kie-local:ksession1").marshal("xstream");
                 from("direct:test-with-session-json").policy(new KiePolicy()).unmarshal("json").to("kie-local:ksession1").marshal("json");

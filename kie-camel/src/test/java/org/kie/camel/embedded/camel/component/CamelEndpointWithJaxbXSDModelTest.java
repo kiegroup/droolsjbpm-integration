@@ -132,7 +132,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends KieCamelTestSupport {
         routeBuilder = new RouteBuilder() {
             public void configure() throws Exception {
                 JaxbDataFormat def = new JaxbDataFormat();
-                def.setPrettyPrint(true);
+                def.setPrettyPrint("true");
                 def.setContextPath("org.kie.pipeline.camel");
 
                 from("direct:test-with-session").policy(new KiePolicy()).unmarshal(def).to("kie-local:ksession1").marshal(def);

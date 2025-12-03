@@ -40,9 +40,9 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
 import org.apache.camel.RuntimeCamelException;
-import org.apache.camel.impl.DefaultEndpoint;
-import org.apache.camel.impl.DefaultExchange;
-import org.apache.camel.impl.DefaultMessage;
+import org.apache.camel.support.DefaultEndpoint;
+import org.apache.camel.support.DefaultExchange;
+import org.apache.camel.support.DefaultMessage;
 import org.apache.camel.spi.DataFormat;
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.core.impl.InternalKnowledgeBase;
@@ -136,7 +136,7 @@ public class KieEmbeddedEndpoint extends DefaultEndpoint {
         ksessionId = getKsessionId(uri);
 
         if (!StringUtils.isEmpty(ksessionId)) {
-            executor = component.getCamelContext().getRegistry().lookup(ksessionId, CommandExecutor.class);
+            executor = component.getCamelContext().getRegistry().lookupByNameAndType(ksessionId, CommandExecutor.class);
             if (executor == null) {
                 if (NO_KSESSION_ENDPOINT.equals(ksessionId)) {
                     executorsByName = new HashMap<String, CommandExecutor>();
@@ -180,7 +180,7 @@ public class KieEmbeddedEndpoint extends DefaultEndpoint {
 
         CommandExecutor exec = executorsByName.get(name);
         if (exec == null) {
-            exec = getComponent().getCamelContext().getRegistry().lookup(name, CommandExecutor.class);
+            exec = getComponent().getCamelContext().getRegistry().lookupByNameAndType(name, CommandExecutor.class);
             if (exec == null) {
                 throw new RuntimeException("ExecutionNode for CommandExecutor lookup cannot be null");
             } else {
@@ -233,7 +233,7 @@ public class KieEmbeddedEndpoint extends DefaultEndpoint {
     }
 
     public Exchange createExchange(Object pojo) {
-        DefaultMessage msg = new DefaultMessage();
+        DefaultMessage msg = new DefaultMessage(getCamelContext());
         msg.setBody(pojo);
         DefaultExchange exchange = new DefaultExchange(this, getExchangePattern());
         exchange.setIn(msg);

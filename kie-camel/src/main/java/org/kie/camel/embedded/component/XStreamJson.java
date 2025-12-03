@@ -47,48 +47,12 @@ import org.drools.core.runtime.help.impl.XStreamJSon.JSonStartProcessConvert;
 import org.drools.core.runtime.help.impl.XStreamJSon.RowItemConverter;
 
 public class XStreamJson {
-    public static XStreamDataFormat newJSonMarshaller(XStreamDataFormat xstreamDataFormat) {
+        public static XStreamDataFormat newJSonMarshaller(XStreamDataFormat xstreamDataFormat) {
         xstreamDataFormat.setDriver("json");
-
         XStreamHelper.setAliases(xstreamDataFormat);
-
-        xstreamDataFormat.getAliases().put("commands", CommandsObjectContainer.class.getName());
-        xstreamDataFormat.getAliases().put("objects", ObjectsObjectContainer.class.getName());
-        xstreamDataFormat.getAliases().put("item", RowItemContainer.class.getName());
-        xstreamDataFormat.getAliases().put("parameters", ParameterContainer.class.getName());
-        xstreamDataFormat.getAliases().put("results", WorkItemResultsContainer.class.getName());
-
-        // xstream.setMode( XStream.NO_REFERENCES );
-
-        List<String> converters = xstreamDataFormat.getConverters();
-        if (converters == null) {
-            converters = new ArrayList<String>();
-        }
-
-        converters.add(JSonFactHandleConverter.class.getName());
-        converters.add(JSonBatchExecutionResultConverter.class.getName());
-        converters.add(JSonInsertConverter.class.getName());
-        converters.add(JSonFireAllRulesConverter.class.getName());
-        converters.add(JSonBatchExecutionCommandConverter.class.getName());
-        converters.add(CommandsContainerConverter.class.getName());
-        converters.add(JSonGetObjectConverter.class.getName());
-        converters.add(JSonRetractConverter.class.getName());
-        converters.add(JSonModifyConverter.class.getName());
-        converters.add(JSonSetGlobalConverter.class.getName());
-        converters.add(JSonInsertElementsConverter.class.getName());
-        converters.add(JSonGetGlobalConverter.class.getName());
-        converters.add(JSonGetObjectsConverter.class.getName());
-        converters.add(JSonQueryConverter.class.getName());
-        converters.add(JSonQueryResultsConverter.class.getName());
-        converters.add(RowItemConverter.class.getName());
-        converters.add(JSonStartProcessConvert.class.getName());
-        converters.add(JSonSignalEventConverter.class.getName());
-        converters.add(JSonCompleteWorkItemConverter.class.getName());
-        converters.add(JSonAbortWorkItemConverter.class.getName());
-
-        xstreamDataFormat.setConverters(converters);
-
+        // For Camel 3.x we rely on aliases and the default XStream JSON configuration
         return xstreamDataFormat;
     }
+
 
 }

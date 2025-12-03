@@ -24,7 +24,7 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.dataformat.JaxbDataFormat;
-import org.apache.camel.util.jndi.JndiContext;
+import org.apache.camel.support.jndi.JndiContext;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.impl.KnowledgeBaseFactory;
 import org.junit.Before;
@@ -74,13 +74,13 @@ public class JaxbInsertTest {
         Context context = new JndiContext();
         context.bind("ksession", session);
 
-        CamelContext camelContext = new DefaultCamelContext(context);
+        CamelContext camelContext = new DefaultCamelContext(new org.apache.camel.support.jndi.JndiBeanRepository(context));
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
                 JaxbDataFormat jdf = new JaxbDataFormat();
                 jdf.setContextPath("org.kie.camel.embedded.camel.testdomain");
-                jdf.setPrettyPrint(true);
+                jdf.setPrettyPrint("true");
 
                 from("direct:test-session").policy(new KiePolicy()).unmarshal(jdf).to("kie-local://ksession").marshal(jdf);
                 from("direct:unmarshall").policy(new KiePolicy()).unmarshal(jdf);
