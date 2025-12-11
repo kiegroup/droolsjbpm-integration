@@ -41,8 +41,8 @@ public class ElytronIdentityProvider
 
     @Override
     public String getName() {
-        if (!contextUsers.isEmpty()) {
-            return contextUsers.peek();
+        if (contextUsers.get() != null) {
+            return contextUsers.get();
         }
         final Optional<SecurityIdentity> identity = getCurrentSecurityIdentity();
         if (identity.isPresent()) {
@@ -56,7 +56,7 @@ public class ElytronIdentityProvider
 
     @Override
     public List<String> getRoles() {
-        if (!contextUsers.isEmpty()) {
+        if (contextUsers.get() != null) {
             return emptyList();
         }
 
