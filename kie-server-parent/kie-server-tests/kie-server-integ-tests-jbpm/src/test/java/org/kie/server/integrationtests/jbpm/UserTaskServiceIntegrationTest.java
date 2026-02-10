@@ -440,6 +440,27 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         }
     }
 
+     @Test
+     public void testSuspendWithNegativeDurationFails() throws Exception {
+        Long processInstanceId =processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        assertNotNull(processInstanceId);
+
+        try {
+            List<TaskSummary> taskList =taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+        try {
+            taskClient.suspendTask(CONTAINER_ID, taskSummary.getId(), USER_YODA, Collections.singletonMap("suspendUntil", "PT-3S"));
+            fail("Expected IllegalArgumentException for negative suspendUntil");
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("Time duration must not be negative"));
+        }
+
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }   
+
     @Test
     public void testFailUserTask() throws Exception {
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
