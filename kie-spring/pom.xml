@@ -20,6 +20,7 @@
 
   <properties>
     <java.module.name>org.kie.spring</java.module.name>
+    <version.org.slf4j>1.7.30</version.org.slf4j>
   </properties>
 
   <dependencies>
