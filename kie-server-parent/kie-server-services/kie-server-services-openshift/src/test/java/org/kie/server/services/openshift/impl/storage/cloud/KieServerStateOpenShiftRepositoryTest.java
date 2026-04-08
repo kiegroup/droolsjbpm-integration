@@ -26,6 +26,7 @@ import java.util.function.Supplier;
 import com.thoughtworks.xstream.XStream;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ReplicationController;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.server.mock.KubernetesCrudDispatcher;
 import io.fabric8.mockwebserver.Context;
@@ -103,6 +104,11 @@ public abstract class KieServerStateOpenShiftRepositoryTest {
 
             @Override
             public boolean isKieServerReady() {
+                return true;
+            }
+
+            @Override
+            public boolean isDeploymentStable(Deployment deployment) {
                 return true;
             }
 

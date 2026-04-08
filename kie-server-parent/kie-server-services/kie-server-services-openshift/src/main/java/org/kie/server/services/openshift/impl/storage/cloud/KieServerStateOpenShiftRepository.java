@@ -38,6 +38,7 @@ import io.fabric8.kubernetes.api.model.LabelSelectorRequirementBuilder;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.client.OpenShiftClient;
@@ -329,8 +330,19 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
     public ConfigMap createOrReplaceKieServerStateCM(OpenShiftClient client, String serverId, KieServerState kieServerState) {
         Map<String, String> labels = new HashMap<>();
         Optional<String> appName = getAppName(client, serverId);
+        
+        // Prefer Deployment over DeploymentConfig
+        Optional<Deployment> deploymentOpt = getKieServerDeployment(client, serverId);
         Optional<DeploymentConfig> dcOpt = getKieServerDC(client, serverId);
-        String cfgMapName = dcOpt.map(dc -> dc.getMetadata().getName()).orElseGet(() -> getKieServerCMSyntheticName(client));
+        
+        String cfgMapName;
+        if (deploymentOpt.isPresent()) {
+            cfgMapName = deploymentOpt.get().getMetadata().getName();
+        } else if (dcOpt.isPresent()) {
+            cfgMapName = dcOpt.get().getMetadata().getName();
+        } else {
+            cfgMapName = getKieServerCMSyntheticName(client);
+        }
 
         kieServerState.getConfiguration().addConfigItem(
             new KieServerConfigItem(KIE_SERVER_SERVICES_OPENSHIFT_SERVICE_NAME, cfgMapName, String.class.getName()));
@@ -345,7 +357,24 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
             labels.put(CFG_MAP_LABEL_SERVER_STATE_KEY, CFG_MAP_LABEL_SERVER_STATE_VALUE_USED);
         }
 
-        return dcOpt.map(dc -> createOrReplaceCM(client, new ConfigMapBuilder()
+        // Prefer Deployment owner reference over DeploymentConfig
+        if (deploymentOpt.isPresent()) {
+            Deployment deployment = deploymentOpt.get();
+            return createOrReplaceCM(client, new ConfigMapBuilder()
+                                           .withNewMetadata()
+                                             .withName(cfgMapName)
+                                             .withLabels(labels)
+                                             .withOwnerReferences(new OwnerReferenceBuilder()
+                                                                  .withApiVersion(deployment.getApiVersion())
+                                                                  .withKind(deployment.getKind())
+                                                                  .withName(deployment.getMetadata().getName())
+                                                                  .withUid(deployment.getMetadata().getUid())
+                                                                  .build())
+                                           .endMetadata()
+                                           .withData(Collections.singletonMap(CFG_MAP_DATA_KEY, xs.toXML(kieServerState)))
+                                           .build());
+        } else {
+            return dcOpt.map(dc -> createOrReplaceCM(client, new ConfigMapBuilder()
                                                    .withNewMetadata()
                                                      .withName(cfgMapName)
                                                      .withLabels(labels)
@@ -358,13 +387,14 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
                                                    .endMetadata()
                                                    .withData(Collections.singletonMap(CFG_MAP_DATA_KEY, xs.toXML(kieServerState)))
                                                    .build()))
-                    .orElseGet(() -> createOrReplaceCM(client, new ConfigMapBuilder()
-                                       .withNewMetadata()
-                                         .withName(cfgMapName)
-                                         .withLabels(labels)
-                                       .endMetadata()
-                                       .withData(Collections.singletonMap(CFG_MAP_DATA_KEY, xs.toXML(kieServerState)))
-                                       .build()));
+                        .orElseGet(() -> createOrReplaceCM(client, new ConfigMapBuilder()
+                                           .withNewMetadata()
+                                             .withName(cfgMapName)
+                                             .withLabels(labels)
+                                           .endMetadata()
+                                           .withData(Collections.singletonMap(CFG_MAP_DATA_KEY, xs.toXML(kieServerState)))
+                                           .build()));
+        }
     }
 
     public ConfigMap createOrReplaceCM(OpenShiftClient client, ConfigMap cm) {
@@ -418,6 +448,18 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
     }
 
     private boolean isUpdateByNonKieServerProcessAllowed(OpenShiftClient client, String serverId, ConfigMap cm, KieServerState newState) {
+        // Prefer Deployment over DeploymentConfig
+        Optional<Deployment> deploymentOpt = getKieServerDeployment(client, serverId);
+        if (deploymentOpt.isPresent()) {
+            if (isDeploymentStable(deploymentOpt.get())) {
+                logger.debug("Non KieServer process updated KieServerState.");
+                return true;
+            } else {
+                return isKieContainerUpdateDuringRolloutAllowed(cm, newState);
+            }
+        }
+        
+        // Fallback to DeploymentConfig
         Optional<DeploymentConfig> dcOpt = getKieServerDC(client, serverId);
         if (dcOpt.isPresent()) {
             if (isDCStable(dcOpt.get())) {
@@ -432,7 +474,6 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
     }
 
     private boolean isUpdateByKieServerProcessAllowed(OpenShiftClient client, String serverId, ConfigMap cm, KieServerState newState) {
-        DeploymentConfig dc = getKieServerDC(client, serverId).orElseThrow(IllegalStateException::new);
         if (!isKieContainerRemovalAllowed(cm, newState)) {
             return false;
         }
@@ -441,9 +482,20 @@ public class KieServerStateOpenShiftRepository extends KieServerStateCloudReposi
             logger.debug("KieServerState updates during KieServer starting up is ignored!");
             return false;
         }
-        if (!isDCStable(dc)) {
-            logger.debug("KieServerState updates during DC rollout is ignored!");
-            return false;
+        
+        // Prefer Deployment over DeploymentConfig
+        Optional<Deployment> deploymentOpt = getKieServerDeployment(client, serverId);
+        if (deploymentOpt.isPresent()) {
+            if (!isDeploymentStable(deploymentOpt.get())) {
+                logger.debug("KieServerState updates during Deployment rollout is ignored!");
+                return false;
+            }
+        } else {
+            DeploymentConfig dc = getKieServerDC(client, serverId).orElseThrow(IllegalStateException::new);
+            if (!isDCStable(dc)) {
+                logger.debug("KieServerState updates during DC rollout is ignored!");
+                return false;
+            }
         }
         logger.debug("KieServer process updated KieServerState.");
         return true;
