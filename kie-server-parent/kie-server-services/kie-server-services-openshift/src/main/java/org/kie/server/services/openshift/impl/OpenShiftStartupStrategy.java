@@ -17,6 +17,7 @@ package org.kie.server.services.openshift.impl;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -24,16 +25,24 @@ import java.util.function.Supplier;
 
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
+import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.model.KieServerSetup;
+import org.kie.server.services.api.KieControllerNotConnectedException;
+import org.kie.server.services.api.KieControllerNotDefinedException;
 import org.kie.server.services.api.StartupStrategy;
 import org.kie.server.services.impl.ContainerManager;
+import org.kie.server.services.impl.DummyContainerManager;
 import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.impl.controller.ControllerConnectRunnable;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.openshift.api.KieServerOpenShift;
 import org.kie.server.services.openshift.impl.storage.cloud.CloudClientFactory;
@@ -76,15 +85,36 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
                     public void eventReceived(Action action, ConfigMap kieServerState) {
                         logger.debug("Event - Action: {}, {} on ConfigMap ", action, kieServerState.getMetadata().getLabels().getOrDefault(CFG_MAP_LABEL_SERVER_ID_KEY, UNKNOWN));
 
-                        getKieServerDC(client, kieServerId).ifPresent(dc -> {
-                            if (action.equals(Action.MODIFIED) && isRolloutRequired(client, kieServerId, isDCStable(dc))) {
-                                String dcName = dc.getMetadata().getName();
-                                logger.info("Triggering rollout for DeploymentConfig: {}", dcName);
-                                client.deploymentConfigs().inNamespace(namespace).withName(dcName).deployLatest();
+                        // Prefer Deployment over DeploymentConfig
+                        Optional<Deployment> deploymentOpt = getKieServerDeployment(client, kieServerId);
+                        if (deploymentOpt.isPresent()) {
+                            Deployment deployment = deploymentOpt.get();
+                            if (action.equals(Action.MODIFIED) && isRolloutRequired(client, kieServerId, isDeploymentStable(deployment))) {
+                                String deploymentName = deployment.getMetadata().getName();
+                                logger.info("Triggering rollout for Deployment: {}", deploymentName);
+                                // Trigger rollout by patching the deployment with a restart annotation
+                                client.apps().deployments().inNamespace(namespace).withName(deploymentName)
+                                    .patch(new io.fabric8.kubernetes.api.model.apps.DeploymentBuilder(deployment)
+                                        .editMetadata()
+                                            .addToAnnotations("kubectl.kubernetes.io/restartedAt",
+                                                java.time.ZonedDateTime.now().format(java.time.format.DateTimeFormatter.ISO_INSTANT))
+                                        .endMetadata()
+                                        .build());
                             } else {
                                 logger.debug("Event - Ignored");
                             }
-                        });
+                        } else {
+                            // Fallback to DeploymentConfig if Deployment not found
+                            getKieServerDC(client, kieServerId).ifPresent(dc -> {
+                                if (action.equals(Action.MODIFIED) && isRolloutRequired(client, kieServerId, isDCStable(dc))) {
+                                    String dcName = dc.getMetadata().getName();
+                                    logger.info("Triggering rollout for DeploymentConfig: {}", dcName);
+                                    client.deploymentConfigs().inNamespace(namespace).withName(dcName).deployLatest();
+                                } else {
+                                    logger.debug("Event - Ignored");
+                                }
+                            });
+                        }
                     }
 
                     @Override
@@ -131,7 +161,7 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
             }
         }
 
-        private boolean isRolloutRequired(OpenShiftClient client, String kieServerId, boolean isDCStable) {
+        private boolean isRolloutRequired(OpenShiftClient client, String kieServerId, boolean isStable) {
             boolean pullTrigger = false;
             String triggerName = KIE_SERVER_ROLLOUT_IN_PROGRESS + "-" + kieServerId;
             ConfigMap cm = getKieServerCM(client, kieServerId).orElseThrow(IllegalStateException::new);
@@ -139,13 +169,13 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
 
             if (ann != null && ann.containsKey(ROLLOUT_REQUIRED)) {
                 try {
-                    if (isDCStable) {
-                        // Create temporary rollout-in-progress configmap only if there is no DC activities.
+                    if (isStable) {
+                        // Create temporary rollout-in-progress configmap only if there are no deployment activities.
                         client.configMaps().inNamespace(namespace).create(new ConfigMapBuilder().withNewMetadata().withName(triggerName).withLabels(Collections.singletonMap(KIE_SERVER_INSTANCE_ID, kieServerId)).endMetadata().build());
                         pullTrigger = true;
-                        logger.info("KieServer: {}, DC rollout - Begin", KIE_SERVER_INSTANCE_ID);
+                        logger.info("KieServer: {}, Deployment rollout - Begin", KIE_SERVER_INSTANCE_ID);
                     } else {
-                        logger.info("KieServer: {}, DC rollout - In progress", KIE_SERVER_INSTANCE_ID);
+                        logger.info("KieServer: {}, Deployment rollout - In progress", KIE_SERVER_INSTANCE_ID);
                     }
 
                     /**
@@ -154,7 +184,7 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
                     ann.remove(ROLLOUT_REQUIRED);
                     client.configMaps().inNamespace(namespace).createOrReplace(cm);
                 } catch (KubernetesClientException kce) {
-                    logger.debug("Mark DC rollout failed", kce);
+                    logger.debug("Mark Deployment rollout failed", kce);
                 }
             }
             return pullTrigger;
@@ -176,6 +206,29 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
 
             clearRollout(client, kieServerId);
         }
+        
+        // Register with controller (Business Central) to enable KieServer visibility in UI
+        KieServerController kieController = kieServer.getController();
+        KieServerInfo kieServerInfo = kieServer.getInfoInternal();
+        
+        try {
+            kieController.connect(kieServerInfo);
+            logger.info("Successfully registered KieServer with controller");
+        } catch (KieControllerNotDefinedException e) {
+            logger.debug("No controller defined, skipping controller registration");
+            // no-op - controller not configured
+        } catch (KieControllerNotConnectedException e) {
+            logger.warn("Unable to connect to controller, will retry in background thread");
+            // Start background thread to retry controller connection
+            Thread connectToControllerThread = new Thread(new ControllerConnectRunnable(kieServerActive,
+                                                                                        kieController,
+                                                                                        kieServerInfo,
+                                                                                        currentState,
+                                                                                        new DummyContainerManager(),
+                                                                                        kieServer,
+                                                                                        this), "KieServer-ControllerConnect");
+            connectToControllerThread.start();
+        }
     }
 
     private static void startWatcherThread(String kieServerId) {
@@ -188,7 +241,7 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
 
         // Cleanup the configmap related to rollout-in-progress if needed
         if (client.configMaps().inNamespace(namespace).withName(triggerName).delete()) {
-            logger.info("Kie server: {}, DC rollout - End", KIE_SERVER_INSTANCE_ID);
+            logger.info("Kie server: {}, Deployment rollout - End", KIE_SERVER_INSTANCE_ID);
         }
     }
 
@@ -199,6 +252,6 @@ public class OpenShiftStartupStrategy implements StartupStrategy {
 
     @Override
     public String toString() {
-        return "OpenShiftStartupStrategy - deploys only kie containers defined from OpenShift ConfigMap, ignores kie containers given by controller";
+        return "OpenShiftStartupStrategy - deploys only kie containers defined from OpenShift ConfigMap, prefers Deployment over DeploymentConfig, ignores kie containers given by controller";
     }
 }

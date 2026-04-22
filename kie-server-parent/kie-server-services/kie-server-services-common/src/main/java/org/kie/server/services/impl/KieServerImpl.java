@@ -274,7 +274,7 @@ public class KieServerImpl implements KieServer {
         return this.context.getServerExtensions();
     }
 
-    protected KieServerInfo getInfoInternal() {
+    public KieServerInfo getInfoInternal() {
         Version version = KieServerEnvironment.getVersion();
         String serverId = KieServerEnvironment.getServerId();
         String serverName = KieServerEnvironment.getServerName();
@@ -1023,7 +1023,7 @@ public class KieServerImpl implements KieServer {
         String containerId = kci.getContainerId();
         Message response = null;
 
-        kci.clearExtraClasses();
+        kci.clearExtraClasseFs();
         kci.disposeMarshallers();
         Results results = kci.getKieContainer().updateToVersion(releaseId);
 
@@ -1138,7 +1138,7 @@ public class KieServerImpl implements KieServer {
         return parameters;
     }
 
-    protected KieServerController getController() {
+    public KieServerController getController() {
         KieServerController controller = new DefaultRestControllerImpl(context);
         try {
             Iterator<KieServerController> it = kieControllers.iterator();
