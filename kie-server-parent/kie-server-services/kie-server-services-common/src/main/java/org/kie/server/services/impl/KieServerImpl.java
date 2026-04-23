@@ -1023,7 +1023,7 @@ public class KieServerImpl implements KieServer {
         String containerId = kci.getContainerId();
         Message response = null;
 
-        kci.clearExtraClasseFs();
+        kci.clearExtraClasses();
         kci.disposeMarshallers();
         Results results = kci.getKieContainer().updateToVersion(releaseId);
 
