@@ -364,6 +364,8 @@ public class KieServerImpl implements KieServer {
                                 // store the current state of the server
                                 storeServerState(currentState -> {
                                     container.setStatus(KieContainerStatus.STARTED);
+                                    // Remove existing container with same ID to prevent duplicates
+                                    currentState.getContainers().removeIf(c -> c.getContainerId().equals(container.getContainerId()));
                                     currentState.getContainers().add(container);
                                 });
                                 eventSupport.fireAfterContainerStarted(this, ci);
@@ -378,6 +380,8 @@ public class KieServerImpl implements KieServer {
                                 // store the current state of the server
                                 storeServerState(currentState -> {
                                     container.setStatus(KieContainerStatus.FAILED);
+                                    // Remove existing container with same ID to prevent duplicates
+                                    currentState.getContainers().removeIf(c -> c.getContainerId().equals(container.getContainerId()));
                                     currentState.getContainers().add(container);
                                 });
                                 return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Failed to create container " + containerId + " with module " + releaseId + ".");
