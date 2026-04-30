@@ -34,8 +34,8 @@ public class JACCIdentityProvider
 
     @Override
     public String getName() {
-        if (!contextUsers.isEmpty()) {
-            return contextUsers.peek();
+        if (contextUsers.get() != null) {
+            return contextUsers.get();
         }
 
         Subject subject = getSubjectFromContainer();
@@ -56,7 +56,7 @@ public class JACCIdentityProvider
 
     @Override
     public List<String> getRoles() {
-        if (!contextUsers.isEmpty()) {
+        if (contextUsers.get() != null) {
             return emptyList();
         }
 

@@ -1,9 +1,9 @@
 package org.kie.server.services.impl.security;
 
+import java.lang.ThreadLocal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
-import java.util.Stack;
 
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.server.api.security.SecurityAdapter;
@@ -11,7 +11,7 @@ import org.kie.server.api.security.SecurityAdapter;
 public abstract class BaseIdentityProvider
         implements IdentityProvider {
 
-    protected Stack<String> contextUsers;
+    protected static ThreadLocal<String> contextUsers = new ThreadLocal<String>();
 
     protected static final ServiceLoader<SecurityAdapter> securityAdapters = ServiceLoader.load(SecurityAdapter.class);
 
@@ -21,17 +21,16 @@ public abstract class BaseIdentityProvider
         for (SecurityAdapter adapter : securityAdapters) {
             adapters.add(adapter);
         }
-        contextUsers = new Stack<>();
     }
 
     @Override
     public void setContextIdentity(String userId) {
-        contextUsers.push(userId);
+        contextUsers.set(userId);
     }
 
     @Override
     public void removeContextIdentity() {
-        contextUsers.pop();
+        contextUsers.remove();
     }
 
     protected String getNameFromAdapter() {

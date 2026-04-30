@@ -122,6 +122,29 @@ public class JACCIdentityProviderWildFlyTomcatTest {
         assertEquals(2, jaccIdentityProvider.getRoles().size());
     }
 
+    @Test
+    public void testContextUsersMultiThreaded() throws Exception {
+        IdentityProvider jaccIdentityProvider = new JACCIdentityProvider();
+        
+        jaccIdentityProvider.setContextIdentity(CONTEXT_USER_NAME);
+        assertEquals(CONTEXT_USER_NAME, jaccIdentityProvider.getName());
+        assertEquals(0, jaccIdentityProvider.getRoles().size());
+        
+        Thread t = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                assertEquals(PRINCIPAL_NAME, jaccIdentityProvider.getName());
+            }
+        });        
+        t.start();
+        t.join();
+        
+        jaccIdentityProvider.removeContextIdentity();
+        assertEquals(PRINCIPAL_NAME, jaccIdentityProvider.getName());
+        assertEquals(2, jaccIdentityProvider.getRoles().size());
+    }
+
     private class GroupImpl implements Group {
 
         private String name;
