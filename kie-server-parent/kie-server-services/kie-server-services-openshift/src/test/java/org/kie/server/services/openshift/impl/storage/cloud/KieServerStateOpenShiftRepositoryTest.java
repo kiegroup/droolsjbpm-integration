@@ -26,6 +26,7 @@ import java.util.function.Supplier;
 import com.thoughtworks.xstream.XStream;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ReplicationController;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.server.mock.KubernetesCrudDispatcher;
 import io.fabric8.mockwebserver.Context;
@@ -107,6 +108,11 @@ public abstract class KieServerStateOpenShiftRepositoryTest {
             }
 
             @Override
+            public boolean isDeploymentStable(Deployment deployment) {
+                return true;
+            }
+
+            @Override
             public boolean isDCStable(DeploymentConfig dc) {
                 return true;
             }
@@ -144,6 +150,7 @@ public abstract class KieServerStateOpenShiftRepositoryTest {
         client.close();
     }
 
+    // Helper methods for DeploymentConfig (legacy)
     protected void createDummyDCandRC() {
         createDummyDCandRC(TEST_KIE_SERVER_ID, UUID.randomUUID().toString(), 1);
     }
@@ -151,6 +158,7 @@ public abstract class KieServerStateOpenShiftRepositoryTest {
     protected void createDummyDCandRC(String kieServerID, String kieServerDCUID, int replicas) {
         createDummyDCandRC(UUID.randomUUID().toString(), kieServerID, kieServerDCUID, replicas);
     }
+    
     protected void createDummyDCandRC(String name, String kieServerID, String kieServerDCUID, int replicas) {
         Map<String, String> labels = new HashMap<>();
         labels.put(CFG_MAP_LABEL_APP_NAME_KEY, TEST_APP_NAME);
@@ -220,6 +228,7 @@ public abstract class KieServerStateOpenShiftRepositoryTest {
                                   .endSpec()
                                   .done();
 
+        // Create Pod owned by the ReplicationController
         client.pods().inNamespace(testNamespace)
             .createOrReplaceWithNew()
             .withNewMetadata()
@@ -243,6 +252,113 @@ public abstract class KieServerStateOpenShiftRepositoryTest {
               .endContainer()
             .endSpec()
             .done();
+    }
 
+    // Helper methods for Deployment API (preferred)
+    protected void createDummyDeploymentAndRS() {
+        createDummyDeploymentAndRS(TEST_KIE_SERVER_ID, UUID.randomUUID().toString(), 1);
+    }
+
+    protected void createDummyDeploymentAndRS(String kieServerID, String kieServerDeploymentUID, int replicas) {
+        createDummyDeploymentAndRS(UUID.randomUUID().toString(), kieServerID, kieServerDeploymentUID, replicas);
+    }
+    
+    protected void createDummyDeploymentAndRS(String name, String kieServerID, String kieServerDeploymentUID, int replicas) {
+        Map<String, String> labels = new HashMap<>();
+        labels.put(CFG_MAP_LABEL_APP_NAME_KEY, TEST_APP_NAME);
+        labels.put(CFG_MAP_LABEL_SERVER_ID_KEY, kieServerID);
+
+        Deployment deployment = client.apps().deployments().inNamespace(testNamespace)
+                                .createOrReplaceWithNew()
+                                .withNewMetadata()
+                                  .withName(name)
+                                  .withLabels(labels)
+                                  .withUid(kieServerDeploymentUID)
+                                .endMetadata()
+                                .withNewSpec()
+                                  .withReplicas(replicas)
+                                  .withNewSelector()
+                                    .addToMatchLabels("app", "kieserver")
+                                    .addToMatchLabels(CFG_MAP_LABEL_SERVER_ID_KEY, kieServerID)
+                                  .endSelector()
+                                  .withNewTemplate()
+                                    .withNewMetadata()
+                                      .addToLabels("app", "kieserver")
+                                      .addToLabels(CFG_MAP_LABEL_SERVER_ID_KEY, kieServerID)
+                                    .endMetadata()
+                                    .withNewSpec()
+                                      .addNewContainer()
+                                        .withName("kieserver")
+                                        .withImage("kieserver")
+                                        .addNewPort()
+                                          .withContainerPort(8080)
+                                        .endPort()
+                                      .endContainer()
+                                    .endSpec()
+                                  .endTemplate()
+                                .endSpec()
+                                .done();
+
+        // Create ReplicaSet owned by the Deployment (simulating Kubernetes behavior)
+        client.apps().replicaSets().inNamespace(testNamespace)
+                                    .createOrReplaceWithNew()
+                                    .withNewMetadata()
+                                      .withName(name + "-rs")
+                                      .withUid(kieServerDeploymentUID + "-rs")
+                                      .addNewOwnerReference()
+                                        .withApiVersion(deployment.getApiVersion())
+                                        .withKind(deployment.getKind())
+                                        .withName(deployment.getMetadata().getName())
+                                        .withUid(deployment.getMetadata().getUid())
+                                      .endOwnerReference()
+                                    .endMetadata()
+                                    .withNewSpec()
+                                    .withReplicas(replicas)
+                                    .withNewSelector()
+                                      .addToMatchLabels("app", "kieserver")
+                                      .addToMatchLabels(CFG_MAP_LABEL_SERVER_ID_KEY, kieServerID)
+                                    .endSelector()
+                                    .withNewTemplate()
+                                      .withNewMetadata()
+                                        .addToLabels("app", "kieserver")
+                                        .addToLabels(CFG_MAP_LABEL_SERVER_ID_KEY, kieServerID)
+                                      .endMetadata()
+                                      .withNewSpec()
+                                        .addNewContainer()
+                                          .withName("kieserver")
+                                          .withImage("kieserver")
+                                          .addNewPort()
+                                            .withContainerPort(8080)
+                                          .endPort()
+                                        .endContainer()
+                                      .endSpec()
+                                    .endTemplate()
+                                  .endSpec()
+                                  .done();
+
+        // Create Pod owned by the ReplicaSet (simulating Kubernetes behavior)
+        client.pods().inNamespace(testNamespace)
+            .createOrReplaceWithNew()
+            .withNewMetadata()
+              .withName("kieserver-pod-" + kieServerID)
+              .addToLabels("app", "kieserver")
+              .addToLabels(CFG_MAP_LABEL_SERVER_ID_KEY, kieServerID)
+              .addNewOwnerReference()
+                .withApiVersion("apps/v1")
+                .withKind("ReplicaSet")
+                .withName(name + "-rs")
+                .withUid(kieServerDeploymentUID + "-rs")
+              .endOwnerReference()
+            .endMetadata()
+            .withNewSpec()
+              .addNewContainer()
+                .withName("kieserver")
+                .withImage("kieserver")
+                .addNewPort()
+                  .withContainerPort(8080)
+                .endPort()
+              .endContainer()
+            .endSpec()
+            .done();
     }
 }

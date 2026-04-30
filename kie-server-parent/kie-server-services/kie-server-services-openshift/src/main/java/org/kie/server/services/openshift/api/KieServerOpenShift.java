@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import io.fabric8.kubernetes.api.model.ConfigMap;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.kie.server.services.impl.KieServerLocator;
@@ -31,9 +32,29 @@ public interface KieServerOpenShift {
         return KieServerLocator.getInstance().isKieServerReady();
     }
 
+    default boolean isDeploymentStable(Deployment deployment) {
+        return deployment.getStatus() != null
+                && deployment.getStatus().getConditions() != null
+                && !deployment.getStatus().getConditions().isEmpty()
+                && "True".equalsIgnoreCase(deployment.getStatus().getConditions().get(0).getStatus())
+                && (deployment.getStatus().getUnavailableReplicas() == null
+                    || deployment.getStatus().getUnavailableReplicas() == 0);
+    }
+
     default boolean isDCStable(DeploymentConfig dc) {
-        return "True".equalsIgnoreCase(dc.getStatus().getConditions().get(0).getStatus()) 
+        return "True".equalsIgnoreCase(dc.getStatus().getConditions().get(0).getStatus())
                 && dc.getStatus().getUnavailableReplicas() == 0;
+    }
+
+    default Optional<Deployment> getKieServerDeployment(OpenShiftClient client, String serverId) {
+        List<Deployment> deployments = client.apps().deployments().inNamespace(client.getNamespace())
+                .withLabel(CFG_MAP_LABEL_SERVER_ID_KEY, serverId).list().getItems();
+        if (deployments.isEmpty()) { return Optional.empty();}
+        if (deployments.size() == 1) {
+            return deployments.stream().filter(d -> d.getSpec().getReplicas().intValue() > 0).findFirst();
+        }
+        throw new IllegalStateException("Ambiguous KIE server id: [" + serverId +
+                                        "]; more than one KIE server Deployment exists.");
     }
 
     default Optional<DeploymentConfig> getKieServerDC(OpenShiftClient client, String serverId) {
@@ -43,7 +64,7 @@ public interface KieServerOpenShift {
         if (deployments.size() == 1) {
             return deployments.stream().filter(dc -> dc.getSpec().getReplicas().intValue() > 0).findFirst();
         }
-        throw new IllegalStateException("Ambiguous KIE server id: [" + serverId + 
+        throw new IllegalStateException("Ambiguous KIE server id: [" + serverId +
                                         "]; more than one KIE server DeploymentConfig exists.");
     }
     
