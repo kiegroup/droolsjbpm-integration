@@ -72,18 +72,23 @@ public class ConnectedKieServerHandler implements InternalMessageHandler {
         
         ServerTemplate serverTemplate = controller.getTemplateStorage().load(serverInfo.getServerId());
         
-        ServerInstanceKey serverInstanceKey = serverTemplate.getServerInstanceKeys().stream()
+        // Find the server instance key matching this server's URL
+        serverTemplate.getServerInstanceKeys().stream()
                 .filter(server -> server.getUrl().equals(serverInfo.getLocation()))
                 .findFirst()
-                .get();
-        ServerInstance serverInstance = new ServerInstance();
-        serverInstance.setServerName(serverInstanceKey.getServerName());
-        serverInstance.setServerTemplateId(serverInstanceKey.getServerTemplateId());
-        serverInstance.setServerInstanceId(serverInstanceKey.getServerInstanceId());
-        serverInstance.setUrl(serverInstanceKey.getUrl());
-        
-        controller.getNotificationService().notify(new ServerInstanceUpdated(serverInstance));
-        controller.getNotificationService().notify(new ServerInstanceConnected(serverInstance));
+                .ifPresent(serverInstanceKey -> {
+                    // Only send notifications if server instance was found
+                    ServerInstance serverInstance = new ServerInstance();
+                    serverInstance.setServerName(serverInstanceKey.getServerName());
+                    serverInstance.setServerTemplateId(serverInstanceKey.getServerTemplateId());
+                    serverInstance.setServerInstanceId(serverInstanceKey.getServerInstanceId());
+                    serverInstance.setUrl(serverInstanceKey.getUrl());
+                    
+                    controller.getNotificationService().notify(new ServerInstanceUpdated(serverInstance));
+                    controller.getNotificationService().notify(new ServerInstanceConnected(serverInstance));
+                    
+                    logger.debug("Sent server instance notifications for server '{}'", serverInfo.getServerId());
+                });
     }
 
 }

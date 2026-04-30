@@ -274,7 +274,7 @@ public class KieServerImpl implements KieServer {
         return this.context.getServerExtensions();
     }
 
-    protected KieServerInfo getInfoInternal() {
+    public KieServerInfo getInfoInternal() {
         Version version = KieServerEnvironment.getVersion();
         String serverId = KieServerEnvironment.getServerId();
         String serverName = KieServerEnvironment.getServerName();
@@ -364,6 +364,8 @@ public class KieServerImpl implements KieServer {
                                 // store the current state of the server
                                 storeServerState(currentState -> {
                                     container.setStatus(KieContainerStatus.STARTED);
+                                    // Remove existing container with same ID to prevent duplicates
+                                    currentState.getContainers().removeIf(c -> c.getContainerId().equals(container.getContainerId()));
                                     currentState.getContainers().add(container);
                                 });
                                 eventSupport.fireAfterContainerStarted(this, ci);
@@ -378,6 +380,8 @@ public class KieServerImpl implements KieServer {
                                 // store the current state of the server
                                 storeServerState(currentState -> {
                                     container.setStatus(KieContainerStatus.FAILED);
+                                    // Remove existing container with same ID to prevent duplicates
+                                    currentState.getContainers().removeIf(c -> c.getContainerId().equals(container.getContainerId()));
                                     currentState.getContainers().add(container);
                                 });
                                 return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Failed to create container " + containerId + " with module " + releaseId + ".");
@@ -1138,7 +1142,7 @@ public class KieServerImpl implements KieServer {
         return parameters;
     }
 
-    protected KieServerController getController() {
+    public KieServerController getController() {
         KieServerController controller = new DefaultRestControllerImpl(context);
         try {
             Iterator<KieServerController> it = kieControllers.iterator();
