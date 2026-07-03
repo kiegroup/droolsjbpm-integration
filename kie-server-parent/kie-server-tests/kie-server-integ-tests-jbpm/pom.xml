@@ -310,7 +310,7 @@
           <artifactId>hibernate-core</artifactId>
           <scope>test</scope>
           <exclusions>
-            <!-- collides with com.sun.xml.bind:jaxb-impl:jar:2.3.0 and com.sun.xml.bind:jaxb-impl:jar:2.3.0 -->
+            <!-- collides with org.glassfish.jaxb:jaxb-runtime -->
             <exclusion>
               <groupId>org.glassfish.jaxb</groupId>
               <artifactId>jaxb-runtime</artifactId>

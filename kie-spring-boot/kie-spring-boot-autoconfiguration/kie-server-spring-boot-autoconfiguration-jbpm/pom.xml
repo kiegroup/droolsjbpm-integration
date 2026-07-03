@@ -146,7 +146,7 @@
           <groupId>com.zaxxer</groupId>
           <artifactId>HikariCP-java7</artifactId>
         </exclusion>
-        <!-- collides with com.sun.xml.bind:jaxb-impl:jar:2.3.0 and com.sun.xml.bind:jaxb-impl:jar:2.3.0 -->
+        <!-- collides with org.glassfish.jaxb:jaxb-runtime -->
         <exclusion>
           <groupId>org.glassfish.jaxb</groupId>
           <artifactId>jaxb-runtime</artifactId>
