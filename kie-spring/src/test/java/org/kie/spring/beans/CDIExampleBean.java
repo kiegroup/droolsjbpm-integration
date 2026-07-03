@@ -19,7 +19,7 @@ import org.kie.api.cdi.KSession;
 import org.kie.api.runtime.StatelessKieSession;
 
 import javax.enterprise.inject.spi.BeanManager;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 

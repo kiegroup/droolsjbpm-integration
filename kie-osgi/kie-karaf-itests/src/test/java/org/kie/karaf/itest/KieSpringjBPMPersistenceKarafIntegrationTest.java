@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.persistence.EntityManagerFactory;
 
 import org.h2.tools.Server;

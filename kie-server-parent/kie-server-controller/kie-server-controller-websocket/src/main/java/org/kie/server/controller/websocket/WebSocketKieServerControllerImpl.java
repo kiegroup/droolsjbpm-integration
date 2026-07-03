@@ -21,7 +21,7 @@ import java.util.ServiceLoader;
 import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;

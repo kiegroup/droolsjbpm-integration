@@ -16,7 +16,7 @@
 
 package org.kie.karaf.itest.camel.kiecamel;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.component.bean.PojoProxyHelper;

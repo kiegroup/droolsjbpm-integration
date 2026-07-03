@@ -363,8 +363,8 @@ public class CompilerHelperTest {
 
         return "package org.drools.compiler.cdi.test;\n" +
                 "import javax.inject.Named;\n" +
-                "import javax.inject.Inject;\n" +
-                "import javax.inject.Inject;\n" +
+                "import jakarta.inject.Inject;\n" +
+                "import jakarta.inject.Inject;\n" +
                 "import javax.enterprise.event.Observes;\n" +
                 "import " + KieBase.class.getName() + ";\n" +
                 "import " + KieSession.class.getName() + ";\n" +

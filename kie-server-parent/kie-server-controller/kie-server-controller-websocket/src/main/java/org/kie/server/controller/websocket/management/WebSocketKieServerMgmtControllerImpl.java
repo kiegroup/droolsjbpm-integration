@@ -20,7 +20,7 @@ import java.io.IOException;
 import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 
