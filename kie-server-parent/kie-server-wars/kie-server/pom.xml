@@ -236,22 +236,11 @@
     <!-- webcontainer dependencies -->
     <dependency>
       <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-entitymanager</artifactId>
+      <artifactId>hibernate-core</artifactId>
       <exclusions>
         <exclusion>
           <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-core</artifactId>
-      <exclusions>
-        <!-- collides with org.glassfish.jaxb:jaxb-runtime -->
-        <exclusion>
-          <groupId>org.glassfish.jaxb</groupId>
-          <artifactId>jaxb-runtime</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -334,12 +323,6 @@
             </goals>
             <configuration>
               <artifactItems>
-                <artifactItem>
-                  <groupId>org.hibernate</groupId>
-                  <artifactId>hibernate-entitymanager</artifactId>
-                  <version>${version.org.hibernate-4ee7}</version>
-                  <type>jar</type>
-                </artifactItem>
                 <artifactItem>
                   <groupId>org.hibernate</groupId>
                   <artifactId>hibernate-core</artifactId>
