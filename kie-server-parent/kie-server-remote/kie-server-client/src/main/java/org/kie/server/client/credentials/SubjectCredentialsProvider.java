@@ -27,7 +27,7 @@ import org.wildfly.security.auth.server.SecurityIdentity;
 import org.wildfly.security.credential.PasswordCredential;
 import org.wildfly.security.password.interfaces.ClearPassword;
 
-import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
 
 public class SubjectCredentialsProvider implements CredentialsProvider {
 

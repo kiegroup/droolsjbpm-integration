@@ -17,7 +17,7 @@ package org.kie.server.client.credentials;
 
 import org.kie.server.client.CredentialsProvider;
 
-import static javax.ws.rs.core.HttpHeaders.*;
+import static jakarta.ws.rs.core.HttpHeaders.*;
 
 /**
  * Token based implementation of <code>CredentialsProvider</code> that is expected to get

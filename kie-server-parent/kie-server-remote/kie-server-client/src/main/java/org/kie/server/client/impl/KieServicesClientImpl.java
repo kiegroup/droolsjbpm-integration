@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.kie.api.command.Command;
 import org.kie.server.api.KieServerConstants;

@@ -16,7 +16,7 @@
 
 package org.kie.server.controller.client;
 
-import javax.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.Configuration;
 
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.controller.client.event.EventHandler;

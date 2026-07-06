@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.ws.rs.GET;
+import jakarta.ws.rs.GET;
 
 import org.kie.server.remote.rest.common.marker.KieServerEndpoint;
 import org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType;

@@ -42,9 +42,9 @@ import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 import static java.net.HttpURLConnection.HTTP_OK;
-import static javax.ws.rs.core.HttpHeaders.IF_NONE_MATCH;
-import static javax.ws.rs.core.HttpHeaders.USER_AGENT;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.HttpHeaders.IF_NONE_MATCH;
+import static jakarta.ws.rs.core.HttpHeaders.USER_AGENT;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -59,8 +59,10 @@ import static org.kie.server.common.rest.KieServerHttpRequest.newRequest;
 import static org.kie.server.common.rest.KieServerHttpRequest.postRequest;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -72,12 +74,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.GZIPOutputStream;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.util.B64Code;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -582,11 +583,17 @@ public class KieServerHttpRequestTest extends ServerTestCase {
             public void handle( Request request, HttpServletResponse response ) {
                 String auth = request.getHeader("Authorization");
                 auth = auth.substring(auth.indexOf(' ') + 1);
-                auth = B64Code.decode(auth, CHARSET_UTF8);
-                int colon = auth.indexOf(':');
-                user.set(auth.substring(0, colon));
-                password.set(auth.substring(colon + 1));
-                response.setStatus(HTTP_OK);
+
+                //auth = B64Code.decode(auth, CHARSET_UTF8);
+                try {
+                    auth = new String(Base64.getDecoder().decode(auth), CHARSET_UTF8);
+                    int colon = auth.indexOf(':');
+                    user.set(auth.substring(0, colon));
+                    password.set(auth.substring(colon + 1));
+                    response.setStatus(HTTP_OK);
+                } catch (UnsupportedEncodingException e) {
+                    response.setStatus(HTTP_BAD_REQUEST);
+                }
             }
         };
         KieServerHttpRequest request = newRequest(url).basicAuthorization("user", "p4ssw0rd");

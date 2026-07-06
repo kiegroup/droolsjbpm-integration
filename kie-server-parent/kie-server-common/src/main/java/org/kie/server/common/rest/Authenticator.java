@@ -18,9 +18,9 @@ package org.kie.server.common.rest;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.client.ClientRequestContext;
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.xml.bind.DatatypeConverter;
 
 public class Authenticator implements ClientRequestFilter {

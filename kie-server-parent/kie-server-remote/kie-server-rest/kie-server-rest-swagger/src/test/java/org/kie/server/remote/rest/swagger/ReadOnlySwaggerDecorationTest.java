@@ -20,8 +20,8 @@ import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.not;
 import static org.kie.server.remote.rest.swagger.ReadOnlySwaggerDecoration.SWAGGER_EXTENSION_READ_ONLY;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 
 import org.junit.Assert;
 import org.junit.Test;

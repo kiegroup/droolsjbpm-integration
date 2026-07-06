@@ -15,7 +15,7 @@
 
 package org.kie.server.remote.rest.swagger;
 
-import javax.ws.rs.Path;
+import jakarta.ws.rs.Path;
 
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 

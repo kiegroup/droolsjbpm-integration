@@ -21,8 +21,8 @@ import static org.kie.server.api.rest.RestURI.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Response;
 
 import org.junit.After;
 import org.junit.Assert;

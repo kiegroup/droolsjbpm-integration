@@ -19,7 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 
 import org.drools.compiler.kie.builder.impl.KieServicesImpl;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;

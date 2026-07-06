@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.Configuration;
 
 import org.assertj.core.api.SoftAssertions;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;

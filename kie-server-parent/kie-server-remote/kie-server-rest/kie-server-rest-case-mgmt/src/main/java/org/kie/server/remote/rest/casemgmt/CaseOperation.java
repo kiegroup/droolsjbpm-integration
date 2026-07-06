@@ -15,8 +15,8 @@
 
 package org.kie.server.remote.rest.casemgmt;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Variant;
 
 import org.kie.server.remote.rest.common.Header;
 

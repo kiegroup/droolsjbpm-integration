@@ -32,9 +32,9 @@ import javax.security.auth.Subject;
 import javax.security.jacc.PolicyContext;
 import javax.security.jacc.PolicyContextException;
 import javax.security.jacc.PolicyContextHandler;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequestEvent;
-import javax.servlet.ServletRequestListener;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequestEvent;
+import jakarta.servlet.ServletRequestListener;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;

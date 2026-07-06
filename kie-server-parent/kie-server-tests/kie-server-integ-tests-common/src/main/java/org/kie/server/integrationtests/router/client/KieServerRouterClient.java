@@ -18,11 +18,11 @@ package org.kie.server.integrationtests.router.client;
 import java.io.StringReader;
 import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import com.thoughtworks.xstream.core.util.Base64Encoder;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;

@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.drools.core.base.RuleNameEndsWithAgendaFilter;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;

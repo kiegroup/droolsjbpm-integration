@@ -18,7 +18,7 @@ package org.kie.server.gateway;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;

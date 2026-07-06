@@ -18,7 +18,7 @@ package org.kie.server.gateway;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import javax.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.Configuration;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.kie.server.api.marshalling.MarshallingFormat;

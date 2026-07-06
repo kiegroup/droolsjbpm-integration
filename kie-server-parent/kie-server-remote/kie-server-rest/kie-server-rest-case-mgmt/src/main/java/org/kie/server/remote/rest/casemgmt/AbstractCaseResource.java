@@ -17,9 +17,9 @@
 package org.kie.server.remote.rest.casemgmt;
 
 import java.text.MessageFormat;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Variant;
 
 import org.jbpm.casemgmt.api.AdHocFragmentNotFoundException;
 import org.jbpm.casemgmt.api.CaseActiveException;

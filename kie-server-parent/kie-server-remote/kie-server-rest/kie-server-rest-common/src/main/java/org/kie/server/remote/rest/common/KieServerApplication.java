@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
 
 import org.kie.server.remote.rest.common.marker.KieServerEndpointRequestFilter;
 import org.kie.server.remote.rest.common.resource.KieServerRestImpl;

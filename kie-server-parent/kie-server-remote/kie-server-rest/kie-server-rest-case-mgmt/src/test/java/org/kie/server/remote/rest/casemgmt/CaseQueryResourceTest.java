@@ -18,8 +18,8 @@ package org.kie.server.remote.rest.casemgmt;
 
 import java.util.List;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MultivaluedHashMap;
 
 import org.junit.Before;
 import org.junit.Test;
