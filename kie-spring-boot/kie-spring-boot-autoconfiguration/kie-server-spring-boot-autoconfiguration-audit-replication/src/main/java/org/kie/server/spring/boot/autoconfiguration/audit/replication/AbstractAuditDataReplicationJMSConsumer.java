@@ -18,8 +18,8 @@ package org.kie.server.spring.boot.autoconfiguration.audit.replication;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.jms.JMSException;
-import javax.jms.TextMessage;
+import jakarta.jms.JMSException;
+import jakarta.jms.TextMessage;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 

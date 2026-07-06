@@ -18,8 +18,8 @@ package org.kie.server.client;
 import org.kie.server.client.impl.KieServicesClientImpl;
 import org.kie.server.client.impl.KieServicesConfigurationImpl;
 
-import javax.jms.ConnectionFactory;
-import javax.jms.Queue;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.Queue;
 import javax.naming.InitialContext;
 
 public class KieServicesFactory {

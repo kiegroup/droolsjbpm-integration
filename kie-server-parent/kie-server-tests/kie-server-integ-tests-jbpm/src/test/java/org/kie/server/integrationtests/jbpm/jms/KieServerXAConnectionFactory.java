@@ -14,10 +14,10 @@
 */
 package org.kie.server.integrationtests.jbpm.jms;
 
-import javax.jms.JMSException;
-import javax.jms.XAConnection;
-import javax.jms.XAConnectionFactory;
-import javax.jms.XAJMSContext;
+import jakarta.jms.JMSException;
+import jakarta.jms.XAConnection;
+import jakarta.jms.XAConnectionFactory;
+import jakarta.jms.XAJMSContext;
 
 import org.kie.server.integrationtests.config.TestConfig;
 

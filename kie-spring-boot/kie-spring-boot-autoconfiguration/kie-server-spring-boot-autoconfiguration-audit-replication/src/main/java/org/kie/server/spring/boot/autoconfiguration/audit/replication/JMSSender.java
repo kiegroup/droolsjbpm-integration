@@ -16,7 +16,7 @@
 
 package org.kie.server.spring.boot.autoconfiguration.audit.replication;
 
-import javax.jms.TextMessage;
+import jakarta.jms.TextMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

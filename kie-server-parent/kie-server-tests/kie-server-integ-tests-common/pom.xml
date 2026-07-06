@@ -68,7 +68,7 @@
     <!-- Used for REST operations -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxrs</artifactId>
+      <artifactId>resteasy-core-spi</artifactId>
       <exclusions>
         <exclusion>
           <groupId>net.jcip</groupId>

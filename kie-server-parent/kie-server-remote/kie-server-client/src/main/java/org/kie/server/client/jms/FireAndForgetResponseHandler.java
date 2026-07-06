@@ -16,10 +16,10 @@
 package org.kie.server.client.jms;
 
 import java.util.Arrays;
-import javax.jms.Connection;
-import javax.jms.JMSException;
-import javax.jms.Queue;
-import javax.jms.Session;
+import jakarta.jms.Connection;
+import jakarta.jms.JMSException;
+import jakarta.jms.Queue;
+import jakarta.jms.Session;
 
 import org.kie.server.api.jms.JMSConstants;
 import org.kie.server.api.marshalling.Marshaller;

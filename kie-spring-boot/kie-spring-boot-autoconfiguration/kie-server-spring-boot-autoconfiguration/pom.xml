@@ -178,7 +178,7 @@
           <groupId>org.jboss.resteasy</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>resteasy-jaxrs</artifactId>
+          <artifactId>resteasy-core-spi</artifactId>
           <groupId>org.jboss.resteasy</groupId>
         </exclusion>
         <exclusion>

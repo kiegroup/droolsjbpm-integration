@@ -58,7 +58,7 @@
         </exclusion>
         <exclusion>
           <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jaxrs</artifactId>
+          <artifactId>resteasy-core-spi</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.jboss.resteasy</groupId>

@@ -101,7 +101,7 @@
     <!-- RestEasy JAX-RS dependencies -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxrs</artifactId>
+      <artifactId>resteasy-core-spi</artifactId>
       <scope>runtime</scope>
       <exclusions>
         <exclusion>

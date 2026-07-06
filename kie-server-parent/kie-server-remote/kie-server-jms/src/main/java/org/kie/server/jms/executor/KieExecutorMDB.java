@@ -20,7 +20,7 @@ import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
-import javax.jms.Message;
+import jakarta.jms.Message;
 
 import org.jbpm.executor.impl.ClassCacheManager;
 import org.jbpm.executor.impl.ExecutorImpl;
