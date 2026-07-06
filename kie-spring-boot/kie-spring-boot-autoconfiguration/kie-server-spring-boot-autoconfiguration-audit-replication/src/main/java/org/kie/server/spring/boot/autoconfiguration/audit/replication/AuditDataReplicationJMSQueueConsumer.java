@@ -16,7 +16,7 @@
 
 package org.kie.server.spring.boot.autoconfiguration.audit.replication;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.transaction.annotation.Transactional;

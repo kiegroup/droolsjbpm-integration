@@ -23,7 +23,7 @@ import java.math.BigInteger;
 import java.util.List;
 import javax.naming.Context;
 import javax.naming.NamingException;
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.Marshaller;
 
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;

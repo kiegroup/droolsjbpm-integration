@@ -16,7 +16,7 @@
 
 package org.kie.server.services.jbpm.jpa;
 
-import javax.persistence.spi.PersistenceUnitInfo;
+import jakarta.persistence.spi.PersistenceUnitInfo;
 
 /**
  * Helper class for testing the PersistenceUnitExtensionsLoader mechanism.

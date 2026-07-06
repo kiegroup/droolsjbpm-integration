@@ -15,7 +15,7 @@
 
 package org.kie.server.testing.multimodule.domain;
 
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlTransient;
 
 @XmlTransient()
 public interface Vehicle {

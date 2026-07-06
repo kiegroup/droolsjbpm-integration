@@ -31,8 +31,8 @@ import org.kie.api.runtime.Globals;
 import org.springframework.beans.factory.*;
 import org.springframework.orm.jpa.JpaTransactionManager;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -19,7 +19,7 @@ package org.kie.server.api.marshalling.objects;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "pojo-a")
 public class PojoA implements Serializable {

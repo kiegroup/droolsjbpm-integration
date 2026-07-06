@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.spi.PersistenceUnitInfo;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.spi.PersistenceUnitInfo;
 
 import org.apache.commons.io.IOUtils;
 import org.appformer.maven.support.DependencyFilter;

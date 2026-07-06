@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 import javax.naming.InitialContext;
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import javax.transaction.UserTransaction;
 
 import org.drools.persistence.jta.JtaTransactionManager;

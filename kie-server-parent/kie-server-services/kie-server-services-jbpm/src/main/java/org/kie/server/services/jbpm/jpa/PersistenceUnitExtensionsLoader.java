@@ -16,7 +16,7 @@
 
 package org.kie.server.services.jbpm.jpa;
 
-import javax.persistence.spi.PersistenceUnitInfo;
+import jakarta.persistence.spi.PersistenceUnitInfo;
 
 public interface PersistenceUnitExtensionsLoader {
 

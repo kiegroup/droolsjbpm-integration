@@ -27,7 +27,7 @@ import org.kie.internal.persistence.jpa.JPAKnowledgeService;
 import org.kie.spring.factorybeans.KSessionFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 public class StatefulKSessionFactoryBeanHelper extends KSessionFactoryBeanHelper {
 

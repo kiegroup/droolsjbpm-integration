@@ -16,7 +16,7 @@
 
 package org.kie.camel.embedded.camel.testdomain;
 
-import javax.xml.bind.annotation.XmlRegistry;
+import jakarta.xml.bind.annotation.XmlRegistry;
 
 @XmlRegistry
 public class ObjectFactory {

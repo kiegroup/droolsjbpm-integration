@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.jbpm.casemgmt.api.AdvanceCaseRuntimeDataService;
 import org.jbpm.casemgmt.api.CaseRuntimeDataService;

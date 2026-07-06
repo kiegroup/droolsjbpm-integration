@@ -54,7 +54,8 @@
     <module>kie-takari-plugin</module>
     <module>droolsjbpm-integration-examples</module>
     <module>jbpm-simulation</module>
-    <module>kie-spring</module>
+    <!-- TEMP DISABLED - TO BE RESTORED !! ->
+    <module>kie-spring</module>-->
     <module>kie-aries-blueprint</module>
     <module>kie-server-parent</module>
     <module>jbpm-process-svg</module>
@@ -64,7 +65,8 @@
     <module>kie-tomcat-integration</module>
     <module>kie-integration-test-coverage</module>
     <module>kie-plugins-testing</module>
-    <module>kie-spring-boot</module>
+    <!-- TEMP DISABLED - TO BE RESTORED !! ->
+    <module>kie-spring-boot</module>-->
     <module>camel-container-tests</module>
   </modules>
 
