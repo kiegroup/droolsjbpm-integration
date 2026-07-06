@@ -6,4 +6,8 @@
   <artifactId>case-insurance</artifactId>
   <version>1.0.0</version>
   <name>Case Insurance</name>
+
+  <properties>
+    <java.module.name>org.kie.server.testing.case.insurance</java.module.name>
+  </properties>
 </project>

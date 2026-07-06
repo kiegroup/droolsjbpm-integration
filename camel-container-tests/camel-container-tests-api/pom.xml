@@ -12,9 +12,14 @@
   <artifactId>camel-container-tests-api</artifactId>
 
   <name>API for container tests for Camel integration</name>
+
   <description>
     API for container tests for Camel integration
   </description>
+
+  <properties>
+    <java.module.name>org.drools.camel.container.tests.api</java.module.name>
+  </properties>
 
   <dependencies>
     <dependency>

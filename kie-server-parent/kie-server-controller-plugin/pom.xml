@@ -28,7 +28,11 @@
   <packaging>maven-plugin</packaging>
 
   <name>KIE :: Execution Server :: Controller :: Deploy Maven Plugin</name>
+  <properties>
+    <java.module.name>org.kie.server.controller.plugin</java.module.name>
+  </properties>
   <url>http://maven.apache.org</url>
+
 
   <build>
     <plugins>

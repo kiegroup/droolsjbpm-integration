@@ -10,6 +10,9 @@
   <artifactId>kie-server-spring-boot-autoconfiguration</artifactId>
   <name>KIE :: Spring :: Boot :: KIE Server Auto Configuration</name>
   <description>KIE Server SpringBoot Auto Configuration</description>
+  <properties>
+    <java.module.name>org.kie.server.spring.boot.autoconfiguration</java.module.name>
+  </properties>
 
   <dependencies>
     <dependency>

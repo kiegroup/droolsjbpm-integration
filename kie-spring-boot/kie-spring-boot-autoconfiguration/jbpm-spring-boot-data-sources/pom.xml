@@ -11,9 +11,11 @@
 
   <name>KIE :: Spring :: Boot :: jBPM Data Sources Auto Configuration</name>
   <description>jBPM Data Sources Auto Configuration</description>
+  <properties>
+    <java.module.name>org.kie.jbpm.spring.boot.data.sources</java.module.name>
+  </properties>
 
   <dependencies>
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot</artifactId>

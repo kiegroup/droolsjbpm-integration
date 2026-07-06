@@ -24,6 +24,7 @@
   <description>Sample project for jBPM SpringBoot application</description>
 
   <properties>
+    <java.module.name>org.kie.jbpm.spring.boot.sample.basic</java.module.name>
     <start-class>org.jbpm.springboot.samples.JBPMApplication</start-class>
   </properties>
 

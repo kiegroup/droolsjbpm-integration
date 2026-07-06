@@ -17,6 +17,10 @@
     Builds the binary download zip of BRMS.
   </description>
 
+  <properties>
+    <java.module.name>org.drools.brms.distribution</java.module.name>
+  </properties>
+
   <build>
     <plugins>
       <plugin>

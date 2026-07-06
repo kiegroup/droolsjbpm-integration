@@ -11,6 +11,10 @@
 
   <artifactId>camel-container-tests-model</artifactId>
 
+  <properties>
+    <java.module.name>org.drools.camel.container.tests.model</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>jakarta.xml.bind</groupId>

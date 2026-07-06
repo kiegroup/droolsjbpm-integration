@@ -5,4 +5,8 @@
   <groupId>org.jbpm.test</groupId>
   <artifactId>timer</artifactId>
   <version>1.0.0</version>
+
+  <properties>
+    <java.module.name>org.jbpm.test.timer</java.module.name>
+  </properties>
 </project>

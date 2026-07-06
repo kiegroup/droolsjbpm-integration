@@ -6,4 +6,8 @@
   <packaging>jar</packaging>
   <version>1.0</version>
   <name>intermediate-timer-sample</name>
+
+  <properties>
+    <java.module.name>org.jbpm.intermediate.timer.sample</java.module.name>
+  </properties>
 </project>

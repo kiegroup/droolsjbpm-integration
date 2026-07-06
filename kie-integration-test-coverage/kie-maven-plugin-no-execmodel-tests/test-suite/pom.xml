@@ -12,7 +12,9 @@
   <artifactId>kie-maven-plugin-no-execmodel-test-suite</artifactId>
 
   <name>KIE Integration :: KIE Maven Plugin Additional Tests (NO exec model)</name>
-
+  <properties>
+    <java.module.name>org.drools.testcoverage.no.execmodel.test.suite</java.module.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.drools</groupId>

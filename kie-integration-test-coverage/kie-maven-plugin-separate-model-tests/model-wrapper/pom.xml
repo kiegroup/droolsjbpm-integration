@@ -13,6 +13,9 @@
   <packaging>jar</packaging>
 
   <name>KIE Integration :: KIE Maven Plugin Instrumented Model JAR Wrapper</name>
+  <properties>
+    <java.module.name>org.drools.testcoverage.separate.model.wrapper</java.module.name>
+  </properties>
 
   <dependencies>
     <dependency>

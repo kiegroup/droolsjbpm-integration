@@ -17,6 +17,7 @@
   </description>
 
   <properties>
+    <java.module.name>org.drools.camel.container.integration.tests</java.module.name>
     <!-- <container.port/> can't define the default port value, because the build-helper-maven-plugin:reserve-network-port
          is not able to override the value of the property. The port number would then always be the same
          (the default one, unless changed from outside) -->

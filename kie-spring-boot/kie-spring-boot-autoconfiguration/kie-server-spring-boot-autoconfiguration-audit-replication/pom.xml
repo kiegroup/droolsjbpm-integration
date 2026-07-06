@@ -15,6 +15,7 @@
   <description>jBPM KIE Server SpringBoot Audit Data Replication Auto Configuration</description>
 
   <properties>
+    <java.module.name>org.kie.server.spring.boot.autoconfiguration.audit.replication</java.module.name>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencies>

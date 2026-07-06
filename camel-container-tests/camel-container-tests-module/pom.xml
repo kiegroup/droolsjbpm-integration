@@ -13,9 +13,14 @@
   <packaging>war</packaging>
 
   <name>WAR for container tests for Camel integration</name>
+
   <description>
     WAR for container tests for Camel integration
   </description>
+
+  <properties>
+    <java.module.name>org.drools.camel.container.tests.module</java.module.name>
+  </properties>
 
   <dependencies>
     <dependency>

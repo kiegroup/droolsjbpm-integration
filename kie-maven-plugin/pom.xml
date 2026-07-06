@@ -15,7 +15,9 @@
   <packaging>maven-plugin</packaging>
 
   <name>KIE :: Maven Plugin</name>
-
+  <properties>
+    <java.module.name>org.kie.maven.plugin</java.module.name>
+  </properties>
   <build>
     <plugins>
       <plugin>

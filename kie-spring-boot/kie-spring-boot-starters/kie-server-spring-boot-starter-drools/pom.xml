@@ -9,7 +9,10 @@
   
   <name>KIE Server :: Spring :: Boot :: Starter :: Drools and DMN</name>
   <description>Drools and DMN - KIE Server SpringBoot Starter</description>
-  
+  <properties>
+    <java.module.name>org.kie.server.spring.boot.starter.drools</java.module.name>
+  </properties>
+
   <dependencies>
     <!-- Spring Boot v2 has no updates, but the tomcat version it uses has multiple CVEs -->
     <!-- For this reason, we're going to include our own version of tomcat and exclude what it brings in -->

@@ -10,9 +10,11 @@
   <artifactId>jbpm-spring-boot-autoconfiguration</artifactId>
   <name>KIE :: Spring :: Boot :: jBPM Auto Configuration</name>
   <description>jBPM SpringBoot Auto Configuration</description>
+  <properties>
+    <java.module.name>org.kie.jbpm.spring.boot.autoconfiguration</java.module.name>
+  </properties>
 
   <dependencies>
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot</artifactId>

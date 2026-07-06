@@ -6,4 +6,8 @@
   <packaging>jar</packaging>
   <version>2.0</version>
   <name>timer-in-process-migration</name>
+
+  <properties>
+    <java.module.name>org.jbpm.timer.in.process.migration</java.module.name>
+  </properties>
 </project>

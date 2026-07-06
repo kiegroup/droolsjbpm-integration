@@ -8,13 +8,13 @@
     <version>7.81.1-SNAPSHOT</version>
   </parent>
 
-  <properties>
-    <java.module.name>org.kie.tomcat</java.module.name>
-  </properties>
-
   <groupId>org.kie</groupId>
   <artifactId>kie-tomcat-integration</artifactId>
   <name>KIE Tomcat integration</name>
+
+  <properties>
+    <java.module.name>org.kie.tomcat</java.module.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.apache.tomcat</groupId>

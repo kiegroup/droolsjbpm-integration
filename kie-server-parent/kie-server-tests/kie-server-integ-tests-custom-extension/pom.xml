@@ -14,6 +14,10 @@
   <name>KIE :: Execution Server :: Tests :: Custom extension</name>
   <description>KIE Execution Server Integration Tests (REST, JMS) running against custom extension.</description>
 
+  <properties>
+    <java.module.name>org.kie.server.itests.custom.extension</java.module.name>
+  </properties>
+
   <modules>
     <module>kie-server-integ-tests-custom-extension-services</module>
     <module>kie-server-integ-tests-custom-extension-rest</module>
