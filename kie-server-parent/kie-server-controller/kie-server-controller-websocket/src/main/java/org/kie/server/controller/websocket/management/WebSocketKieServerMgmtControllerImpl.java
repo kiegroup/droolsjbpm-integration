@@ -17,7 +17,7 @@
 package org.kie.server.controller.websocket.management;
 
 import java.io.IOException;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import jakarta.inject.Inject;

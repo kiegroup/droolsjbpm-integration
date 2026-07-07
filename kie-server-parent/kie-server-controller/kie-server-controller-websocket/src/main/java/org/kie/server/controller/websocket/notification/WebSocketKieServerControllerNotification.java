@@ -16,7 +16,7 @@
 
 package org.kie.server.controller.websocket.notification;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 

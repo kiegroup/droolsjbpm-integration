@@ -17,10 +17,10 @@ package org.kie.server.jms;
 
 import java.util.Set;
 
-import javax.ejb.Asynchronous;
-import javax.ejb.Singleton;
-import javax.ejb.TransactionManagement;
-import javax.ejb.TransactionManagementType;
+import jakarta.ejb.Asynchronous;
+import jakarta.ejb.Singleton;
+import jakarta.ejb.TransactionManagement;
+import jakarta.ejb.TransactionManagementType;
 
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.controller.api.model.KieServerSetup;
