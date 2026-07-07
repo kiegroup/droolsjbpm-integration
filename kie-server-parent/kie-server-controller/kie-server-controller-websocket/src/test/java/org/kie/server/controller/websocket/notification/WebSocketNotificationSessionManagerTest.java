@@ -18,9 +18,9 @@ package org.kie.server.controller.websocket.notification;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
-import javax.websocket.EncodeException;
-import javax.websocket.RemoteEndpoint;
-import javax.websocket.Session;
+import jakarta.websocket.EncodeException;
+import jakarta.websocket.RemoteEndpoint;
+import jakarta.websocket.Session;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

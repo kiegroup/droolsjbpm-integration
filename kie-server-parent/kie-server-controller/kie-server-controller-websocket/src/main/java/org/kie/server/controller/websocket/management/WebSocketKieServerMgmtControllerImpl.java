@@ -21,8 +21,8 @@ import jakarta.annotation.PostConstruct;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import jakarta.inject.Inject;
-import javax.websocket.*;
-import javax.websocket.server.ServerEndpoint;
+import jakarta.websocket.*;
+import jakarta.websocket.server.ServerEndpoint;
 
 import org.kie.server.controller.api.commands.KieServerControllerDescriptorCommand;
 import org.kie.server.controller.api.model.KieServerControllerServiceResponse;
