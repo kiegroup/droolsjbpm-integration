@@ -15,15 +15,15 @@
 
 package org.kie.server.services.impl.security.adapters;
 
-import java.io.IOException;
-import java.security.Principal;
-import java.security.acl.Group;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.ServiceLoader;
-import java.util.Set;
+import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.security.SecurityAdapter;
+import org.kie.server.services.impl.security.ElytronIdentityProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.wildfly.security.auth.server.SecurityDomain;
+import org.wildfly.security.auth.server.SecurityIdentity;
+import org.wildfly.security.evidence.Evidence;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -33,15 +33,15 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import javax.security.sasl.RealmCallback;
+import java.io.IOException;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.ServiceLoader;
+import java.util.Set;
 
-import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.security.SecurityAdapter;
-import org.kie.server.services.impl.security.ElytronIdentityProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.wildfly.security.auth.server.SecurityDomain;
-import org.wildfly.security.auth.server.SecurityIdentity;
-import org.wildfly.security.evidence.Evidence;
+import static org.kie.server.services.impl.security.SecurityMigrationUtils.getRolesFromPrincipals;
 
 public class BrokerSecurityAdapter implements SecurityAdapter {
 
@@ -150,19 +150,7 @@ public class BrokerSecurityAdapter implements SecurityAdapter {
             Set<Principal> principals = subject.getPrincipals();
 
             if (principals != null) {
-
-                roles = new ArrayList<String>();
-                for (Principal principal : principals) {
-                    if (principal instanceof Group) {
-                        Enumeration<? extends Principal> groups = ((Group) principal).members();
-
-                        while (groups.hasMoreElements()) {
-                            Principal groupPrincipal = (Principal) groups.nextElement();
-                            roles.add(groupPrincipal.getName());
-                        }
-                        break;
-                    }
-                }
+                roles = getRolesFromPrincipals(principals);
             }
             roles.addAll(getRolesFromAdapter(subject));
         }
