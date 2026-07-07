@@ -365,7 +365,7 @@ public class CompilerHelperTest {
                 "import jakarta.inject.Named;\n" +
                 "import jakarta.inject.Inject;\n" +
                 "import jakarta.inject.Inject;\n" +
-                "import javax.enterprise.event.Observes;\n" +
+                "import jakarta.enterprise.event.Observes;\n" +
                 "import " + KieBase.class.getName() + ";\n" +
                 "import " + KieSession.class.getName() + ";\n" +
                 "import " + StatelessKieSession.class.getName() + ";\n" +
