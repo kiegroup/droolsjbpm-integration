@@ -18,7 +18,7 @@ package org.kie.server.remote.rest.jbpm;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.mail.internet.MimeUtility;
+import jakarta.mail.internet.MimeUtility;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
