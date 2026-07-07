@@ -86,7 +86,7 @@ public class CaseAdminResource extends AbstractCaseResource {
     @GET
     @Path(ADMIN_CASE_ALL_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getCaseInstances(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response getCaseInstances(@jakarta.ws.rs.core.Context HttpHeaders headers,
                                      @ApiParam(value = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, allowableValues="open,closed,cancelled") @QueryParam("status") List<String> status,
                                      @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
                                      @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
@@ -127,7 +127,7 @@ public class CaseAdminResource extends AbstractCaseResource {
     @Path(MIGRATE_CASE_INST_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response migrateCaseInstance(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response migrateCaseInstance(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of case instance to be migrated", required = true, example = "CASE-000000001") @PathParam("caseId") String caseId,
             @ApiParam(value = "container id that new case definition should be migrated to to", required = true) @QueryParam("targetContainerId") String targetContainerId,             

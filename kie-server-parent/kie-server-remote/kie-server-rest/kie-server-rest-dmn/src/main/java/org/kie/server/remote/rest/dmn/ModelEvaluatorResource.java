@@ -102,7 +102,7 @@ public class ModelEvaluatorResource {
                                                                      @ExampleProperty(mediaType = MediaType.APPLICATION_XML, value = EXAMPLE_KIESERVER_GET_RESPONSE_XML)}))})
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getModels(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getModels(@jakarta.ws.rs.core.Context HttpHeaders headers, 
                               @ApiParam(value = "Container id that models should be loaded from", required = true, example = EXAMPLE_CONTAINER_ID) @PathParam(CONTAINER_ID) String containerId) {
         Variant v = getVariant( headers );
         Header conversationIdHeader = buildConversationIdHeader(containerId, modelEvaluatorService.getKieServerRegistry(), headers);
@@ -129,7 +129,7 @@ public class ModelEvaluatorResource {
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response evaluateDecisions(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response evaluateDecisions(@jakarta.ws.rs.core.Context HttpHeaders headers, 
                                       @ApiParam(value = PARAM_CONTAINER_ID_EVAL, required = true, example = EXAMPLE_CONTAINER_ID) @PathParam(CONTAINER_ID) String containerId,
                                       @ApiParam(value = "DMN context to be used while evaluation decisions as DMNContextKS type", required = true,
                                                 examples = @Example(value = {@ExampleProperty(mediaType = MediaType.APPLICATION_JSON, value = EXAMPLE_KIESERVER_POST_REQ_JSON),

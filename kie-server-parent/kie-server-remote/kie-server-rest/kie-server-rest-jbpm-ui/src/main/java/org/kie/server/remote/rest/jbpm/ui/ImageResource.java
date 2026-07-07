@@ -74,7 +74,7 @@ public class ImageResource {
     @GET
     @Path(PROCESS_IMG_GET_URI)
     @Produces({MediaType.APPLICATION_SVG_XML})
-    public Response getProcessImage(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response getProcessImage(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that process definition belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the process definition that image should be loaded for", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId) {
         Variant v = getVariant(headers);
@@ -99,7 +99,7 @@ public class ImageResource {
     @GET
     @Path(PROCESS_INST_IMG_GET_URI)
     @Produces({MediaType.APPLICATION_SVG_XML})
-    public Response getProcessInstanceImage(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response getProcessInstanceImage(@jakarta.ws.rs.core.Context HttpHeaders headers,
                                             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
                                             @ApiParam(value = "identifier of the process instance that image should be loaded for", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long procInstId,
                                             @ApiParam(value = "svg completed node color", required = false, example = COMPLETED_COLOR) @QueryParam(SVG_NODE_COMPLETED_COLOR) @DefaultValue(COMPLETED_COLOR) String svgNodeCompletedColor,

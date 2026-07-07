@@ -78,7 +78,7 @@ public class ControllerUtils {
         return modelClasses;
     }
 
-    public static Response createCorrectVariant(String responseObj, HttpHeaders headers, javax.ws.rs.core.Response.Status status) {
+    public static Response createCorrectVariant(String responseObj, HttpHeaders headers, jakarta.ws.rs.core.Response.Status status) {
         Response.ResponseBuilder responseBuilder = null;
         Variant v = getVariant(headers);
 

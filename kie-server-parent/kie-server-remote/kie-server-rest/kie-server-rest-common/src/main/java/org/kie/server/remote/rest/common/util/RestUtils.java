@@ -52,7 +52,7 @@ public class RestUtils {
         return createCorrectVariant(responseObj, headers, null, customHeaders);
     }
 
-    public static Response createCorrectVariant(Object responseObj, HttpHeaders headers, javax.ws.rs.core.Response.Status status, Header... customHeaders) {
+    public static Response createCorrectVariant(Object responseObj, HttpHeaders headers, jakarta.ws.rs.core.Response.Status status, Header... customHeaders) {
         Response.ResponseBuilder responseBuilder = null;
         Variant v = getVariant(headers, responseObj);
         String contentType = getContentType(headers);
@@ -66,7 +66,7 @@ public class RestUtils {
         return responseBuilder.build();
     }
 
-    public static Response createCorrectVariant(MarshallerHelper marshallerHelper, String containerId, Object responseObj, HttpHeaders headers, javax.ws.rs.core.Response.Status status, Header... customHeaders) {
+    public static Response createCorrectVariant(MarshallerHelper marshallerHelper, String containerId, Object responseObj, HttpHeaders headers, jakarta.ws.rs.core.Response.Status status, Header... customHeaders) {
         Response.ResponseBuilder responseBuilder = null;
         Variant v = getVariant(headers, responseObj);
         String contentType = getContentType(headers);
@@ -86,7 +86,7 @@ public class RestUtils {
         return responseBuilder.build();
     }
     
-    public static Response createResponse(Object responseObj, Variant v, javax.ws.rs.core.Response.Status status, Header... customHeaders) {
+    public static Response createResponse(Object responseObj, Variant v, jakarta.ws.rs.core.Response.Status status, Header... customHeaders) {
         Response.ResponseBuilder responseBuilder = null;
         if( status != null ) {
             responseBuilder = Response.status(status).entity(responseObj).variant(v);
