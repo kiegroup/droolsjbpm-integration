@@ -22,6 +22,7 @@ import java.util.List;
 import jakarta.ws.rs.core.Application;
 
 import org.drools.compiler.kie.builder.impl.KieServicesImpl;
+import org.jboss.resteasy.core.ResteasyDeploymentImpl;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.kie.api.KieServices;
@@ -108,7 +109,7 @@ public class KieServerExecutor {
         kieServer = new KieServerImpl();
         kieServer.init();
 
-        ResteasyDeployment deployment = new ResteasyDeployment();
+        ResteasyDeployment deployment = new ResteasyDeploymentImpl();
         deployment.setApplication(new Application());
 
         deployment.getResources().add(new KieServerRestImpl(kieServer));
