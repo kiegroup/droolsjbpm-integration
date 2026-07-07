@@ -17,7 +17,7 @@ package org.kie.server.remote.rest.swagger;
 
 import jakarta.ws.rs.Path;
 
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
+import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationModule;
 
 import io.swagger.jaxrs.listing.ApiListingResource;
 import io.swagger.util.Json;
@@ -27,6 +27,6 @@ public class KieApiListingResource extends ApiListingResource {
 	
     
     public KieApiListingResource() {
-        Json.mapper().registerModule(new JaxbAnnotationModule());
+        Json.mapper().registerModule(new JakartaXmlBindAnnotationModule());
     }
 }
