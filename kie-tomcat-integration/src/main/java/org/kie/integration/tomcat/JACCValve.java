@@ -17,8 +17,8 @@ package org.kie.integration.tomcat;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -81,16 +81,18 @@ public class JACCValve extends ValveBase {
 
                     Set<Principal> principals = new HashSet<Principal>();
                     principals.add(req.getPrincipal());
-                    principals.add(getGroup(req.getPrincipal()));
-                    if (req.getPrincipal() instanceof GenericPrincipal) {
-                        try {
-                            String name = ((GenericPrincipal) req.getPrincipal()).getName();
-                            String password = ((GenericPrincipal) req.getPrincipal()).getPassword();
-                            String basicAuthHeader = "Basic " + Base64.getEncoder().encodeToString((name + ":" + password).getBytes("UTF-8"));
+                    principals.add(getGroupPrincipal(req.getPrincipal()));
+                    if (req.getPrincipal() instanceof GenericPrincipal genericPrincipal) {
+                        String basicAuthHeader = req.getHeader("Authorization");
+                        if (basicAuthHeader != null && basicAuthHeader.startsWith("Basic ")) {
                             principals.add(new BasicAuthorizationPrincipal(basicAuthHeader));
-                        } catch (UnsupportedEncodingException e) {
-                            logger.warn("UnsupportedEncodingException while preparing basic auth principal");
                         }
+                        // Original method based on GenericPrincipal.getPassword()
+                        // which has been removed in Tomcat 10 due to security concerns
+                        /*String name = genericPrincipal.getName();
+                        String password = genericPrincipal.getPassword();
+                        String basicAuthHeader = "Basic " + Base64.getEncoder().encodeToString((name + ":" + password).getBytes(StandardCharsets.UTF_8));
+                        principals.add(new BasicAuthorizationPrincipal(basicAuthHeader));*/
                     }
 
 			        final Subject s = new Subject(false, principals , Collections.EMPTY_SET, Collections.EMPTY_SET);
@@ -118,8 +120,8 @@ public class JACCValve extends ValveBase {
 	}
 
 
-    protected Group getGroup(Principal principal) {
-        Group group = new Group() {
+    protected Principal getGroupPrincipal(Principal principal) {
+            SimpleRolePrincipal group = new SimpleRolePrincipal(new String[0]) {
             
             private List<Principal> members = new ArrayList<Principal>();
             public String getName() {
