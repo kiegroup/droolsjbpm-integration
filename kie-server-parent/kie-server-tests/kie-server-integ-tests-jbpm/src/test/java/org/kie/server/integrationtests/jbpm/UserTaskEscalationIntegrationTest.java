@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.ServerSetup;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -53,8 +55,6 @@ import org.kie.server.integrationtests.category.Unstable;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
-import org.subethamail.wiser.Wiser;
-import org.subethamail.wiser.WiserMessage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -85,7 +85,7 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
         params.put("escalation", ESCALATION_TEXT);
     }
 
-    private Wiser wiser;
+    private GreenMail greenMail;
 
     @Parameterized.Parameters(name = "{0} {1}")
     public static Collection<Object[]> data() {
@@ -101,16 +101,17 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Before
     public void startWiser() {
-        wiser = new Wiser();
-        wiser.setHostname(SMTP_HOST);
-        wiser.setPort(SMTP_PORT);
-        wiser.start();
+        ServerSetup smtpSetup = new ServerSetup(SMTP_PORT,
+                SMTP_HOST,
+                ServerSetup.PROTOCOL_SMTP);
+        greenMail = new GreenMail(smtpSetup);
+        greenMail.start();
     }
 
     @After
     public void stopWiser() {
-        if (wiser != null) {
-            wiser.stop();
+        if (greenMail != null) {
+            greenMail.stop();
         }
     }
 
@@ -165,7 +166,7 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
             assertNotNull(taskInstance);
             assertEquals(USER_JOHN, taskInstance.getActualOwner());
 
-            waitForEmailsReceive(wiser);
+            waitForEmailsReceive(greenMail);
             taskClient.completeTask(CONTAINER_ID, taskId, USER_JOHN, new HashMap<String, Object>());
 
             ProcessInstance processInstance = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
@@ -204,11 +205,11 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
         assertNotNull(processInstance);
         assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, processInstance.getState().intValue());
 
-        KieServerAssert.assertNullOrEmpty("Email received!", wiser.getMessages());
+        KieServerAssert.assertNullOrEmpty("Email received!", greenMail.getReceivedMessages());
 
         //wait while, cause email is sent 6s after task start
         Thread.sleep(8000L);
-        KieServerAssert.assertNullOrEmpty("Email received!", wiser.getMessages());
+        KieServerAssert.assertNullOrEmpty("Email received!", greenMail.getReceivedMessages());
     }
 
     @Test(timeout = 10000)
@@ -277,13 +278,11 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
     }
 
     private List<Message> getEmails() throws MessagingException, IOException {
-        List<WiserMessage> wiserMessages = wiser.getMessages();
-        assertNotNull(wiserMessages);
-        List<Message> messages = new ArrayList<>(wiserMessages.size());
+        MimeMessage[] receivedMessages = greenMail.getReceivedMessages();
+        assertNotNull(receivedMessages);
+        List<Message> messages = new ArrayList<>(receivedMessages.length);
 
-        for (WiserMessage wiserMessage : wiserMessages) {
-
-            MimeMessage receivedMessage = wiserMessage.getMimeMessage();
+        for (MimeMessage receivedMessage : receivedMessages) {
             assertNotNull(receivedMessage);
             Message message = new Message();
             message.subject = receivedMessage.getSubject();
@@ -303,7 +302,7 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
                 assertEquals(USER_ADMINISTRATOR + EMAIL_DOMAIN, toAddrs[0].getAddress());
                 message.to = toAddrs[1].getAddress();
             }
-            if (!messages.contains(message)) { //wiser should catch 2 messages (one for user and one for Administrator)
+            if (!messages.contains(message)) { //greenMail should catch 2 messages (one for user and one for Administrator)
                 messages.add(message);
             }
         }
@@ -311,7 +310,7 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
     }
 
     private void assertTotalOfEmails(int totalMessages) throws IOException, MessagingException {
-        List<WiserMessage> messages = wiser.getMessages();
+        MimeMessage[] messages = greenMail.getReceivedMessages();
         assertNotNull(messages);
         assertEquals(totalMessages, getEmails().size());
     }
@@ -319,10 +318,10 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
     private static final long SERVICE_TIMEOUT = 30000;
     private static final long TIMEOUT_BETWEEN_CALLS = 200;
 
-    protected void waitForEmailsReceive(Wiser wiser) throws Exception {
+    protected void waitForEmailsReceive(GreenMail greenMail) throws Exception {
         long timeoutTime = Calendar.getInstance().getTimeInMillis() + SERVICE_TIMEOUT;
         while (Calendar.getInstance().getTimeInMillis() < timeoutTime) {
-            if (wiser.getMessages().isEmpty()) {
+            if (greenMail.getReceivedMessages().length == 0) {
                 Thread.sleep(TIMEOUT_BETWEEN_CALLS);
             } else {
                 return;

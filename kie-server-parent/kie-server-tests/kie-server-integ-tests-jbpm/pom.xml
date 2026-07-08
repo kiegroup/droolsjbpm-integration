@@ -84,8 +84,8 @@
 
     <!-- Used as an email client in UserTaskEscalationIntegrationTest -->
     <dependency>
-      <groupId>org.subethamail</groupId>
-      <artifactId>subethasmtp-wiser</artifactId>
+      <groupId>com.icegreen</groupId>
+      <artifactId>greenmail</artifactId>
       <scope>test</scope>
     </dependency>
 
