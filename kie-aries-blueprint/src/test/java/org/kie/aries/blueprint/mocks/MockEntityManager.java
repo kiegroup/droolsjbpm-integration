@@ -19,18 +19,13 @@ import jakarta.persistence.Cache;
 import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.PersistenceUnitTransactionType;
 import jakarta.persistence.PersistenceUnitUtil;
 import jakarta.persistence.Query;
-import jakarta.persistence.SchemaManager;
 import jakarta.persistence.SynchronizationType;
-import jakarta.persistence.TypedQueryReference;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.metamodel.Metamodel;
 import javax.sql.DataSource;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class MockEntityManager implements EntityManagerFactory {
 
@@ -94,11 +89,6 @@ public class MockEntityManager implements EntityManagerFactory {
     }
 
     @Override
-    public String getName() {
-        return "";
-    }
-
-    @Override
     public Map<String, Object> getProperties() {
         return null;
     }
@@ -110,16 +100,6 @@ public class MockEntityManager implements EntityManagerFactory {
 
     @Override
     public PersistenceUnitUtil getPersistenceUnitUtil() {
-        return null;
-    }
-
-    @Override
-    public PersistenceUnitTransactionType getTransactionType() {
-        return null;
-    }
-
-    @Override
-    public SchemaManager getSchemaManager() {
         return null;
     }
 
@@ -136,25 +116,5 @@ public class MockEntityManager implements EntityManagerFactory {
     @Override
     public <T> void addNamedEntityGraph(String s, EntityGraph<T> entityGraph) {
 
-    }
-
-    @Override
-    public <R> Map<String, TypedQueryReference<R>> getNamedQueries(Class<R> resultType) {
-        return Map.of();
-    }
-
-    @Override
-    public void runInTransaction(Consumer<EntityManager> work) {
-
-    }
-
-    @Override
-    public <R> R callInTransaction(Function<EntityManager, R> work) {
-        return null;
-    }
-
-    @Override
-    public <E> Map<String, EntityGraph<? extends E>> getNamedEntityGraphs(Class<E> entityType) {
-        return Map.of();
     }
 }

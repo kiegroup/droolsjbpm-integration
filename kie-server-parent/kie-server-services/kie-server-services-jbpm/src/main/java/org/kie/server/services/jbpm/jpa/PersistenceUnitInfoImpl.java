@@ -160,16 +160,6 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
         return tmpClassLoader;
     }
 
-    @Override
-    public String getScopeAnnotationName() {
-        return "";
-    }
-
-    @Override
-    public List<String> getQualifierAnnotationNames() {
-        return List.of();
-    }
-
     public void setPersistenceUnitName(String persistenceUnitName) {
         this.persistenceUnitName = persistenceUnitName;
     }
