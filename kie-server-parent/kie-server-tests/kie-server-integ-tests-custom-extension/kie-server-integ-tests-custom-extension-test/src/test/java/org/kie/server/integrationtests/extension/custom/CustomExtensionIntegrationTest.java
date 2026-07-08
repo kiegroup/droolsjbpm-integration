@@ -27,7 +27,7 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.jboss.resteasy.plugins.providers.jackson.ResteasyJackson2Provider;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -126,9 +126,9 @@ public class CustomExtensionIntegrationTest extends RestJmsSharedBaseIntegration
             return;
         }
 
-        Client httpClient = new ResteasyClientBuilder()
-                .establishConnectionTimeout(configuration.getTimeout(), TimeUnit.MILLISECONDS)
-                .socketTimeout(configuration.getTimeout(), TimeUnit.MILLISECONDS)
+        Client httpClient = new ResteasyClientBuilderImpl()
+                .connectTimeout(configuration.getTimeout(), TimeUnit.MILLISECONDS)
+                .readTimeout(configuration.getTimeout(), TimeUnit.MILLISECONDS)
                 .register(new Authenticator(configuration.getUserName(), configuration.getPassword()))
                 .register(new ResteasyJackson2Provider())
                 .build();

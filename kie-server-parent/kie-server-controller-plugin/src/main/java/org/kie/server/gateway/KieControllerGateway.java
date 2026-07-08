@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import jakarta.ws.rs.core.Configuration;
 
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.ContainerSpecKey;
@@ -49,11 +49,11 @@ public class KieControllerGateway {
             .toString();
 
         final Configuration configuration =
-                new ResteasyClientBuilder()
+                new ResteasyClientBuilderImpl()
                         .connectionPoolSize(1)
-                        .establishConnectionTimeout(connectionTimeout,
+                        .connectTimeout(connectionTimeout,
                                                     TimeUnit.SECONDS)
-                        .socketTimeout(socketTimeout,
+                        .readTimeout(socketTimeout,
                                        TimeUnit.SECONDS)
                         .getConfiguration();
 

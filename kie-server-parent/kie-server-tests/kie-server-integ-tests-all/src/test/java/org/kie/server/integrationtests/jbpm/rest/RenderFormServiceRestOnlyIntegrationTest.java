@@ -32,7 +32,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import org.jboss.resteasy.client.jaxrs.internal.BasicAuthentication;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -159,9 +159,9 @@ public class RenderFormServiceRestOnlyIntegrationTest extends KieServerBaseInteg
 
     protected WebTarget newRequest(String uriString) {
         if(httpClient == null) {
-            httpClient = new ResteasyClientBuilder()
-                    .establishConnectionTimeout(10, TimeUnit.SECONDS)
-                    .socketTimeout(10, TimeUnit.SECONDS)
+            httpClient = new ResteasyClientBuilderImpl()
+                    .connectTimeout(10, TimeUnit.SECONDS)
+                    .readTimeout(10, TimeUnit.SECONDS)
                     .build();
         }
         WebTarget webTarget = httpClient.target(uriString);

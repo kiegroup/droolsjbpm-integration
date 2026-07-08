@@ -36,7 +36,7 @@ import jakarta.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.resteasy.client.jaxrs.internal.BasicAuthentication;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -111,7 +111,7 @@ public class PrometheusIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
     protected String getMetrics() {
         if (httpClient == null) {
-            httpClient = new ResteasyClientBuilder().readTimeout(10, TimeUnit.SECONDS).build();
+            httpClient = new ResteasyClientBuilderImpl().readTimeout(10, TimeUnit.SECONDS).build();
         }
 
         WebTarget webTarget = httpClient.target(URI.create(TestConfig.getKieServerHttpUrl()).resolve("../rest/metrics"));

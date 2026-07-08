@@ -24,7 +24,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import org.drools.core.runtime.impl.ExecutionResultImpl;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.Marshaller;
@@ -44,9 +44,9 @@ public class CustomExtensionClientRest implements CustomExtensionClient {
         this.config = configuration.clone();
         this.marshaller = MarshallerFactory.getMarshaller(configuration.getExtraClasses(), configuration.getMarshallingFormat(), classLoader);
 
-        httpClient = new ResteasyClientBuilder()
-                .establishConnectionTimeout(configuration.getTimeout(), TimeUnit.MILLISECONDS)
-                .socketTimeout(configuration.getTimeout(), TimeUnit.MILLISECONDS)
+        httpClient = new ResteasyClientBuilderImpl()
+                .connectTimeout(configuration.getTimeout(), TimeUnit.MILLISECONDS)
+                .readTimeout(configuration.getTimeout(), TimeUnit.MILLISECONDS)
                 .register(new Authenticator(configuration.getUserName(), configuration.getPassword()))
                 .build();
     }

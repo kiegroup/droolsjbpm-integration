@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import jakarta.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.kie.server.api.marshalling.json.JSONMarshaller;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ServiceResponse;
@@ -35,10 +35,10 @@ public class KieServerGateway {
 
     public KieServerGateway(String username, String password, Integer connectionTimeout, Integer socketTimeout) {
 
-        client = new ResteasyClientBuilder()
+        client = new ResteasyClientBuilderImpl()
             .connectionPoolSize(1)
-            .establishConnectionTimeout(connectionTimeout, TimeUnit.SECONDS)
-            .socketTimeout(socketTimeout, TimeUnit.SECONDS)
+            .connectTimeout(connectionTimeout, TimeUnit.SECONDS)
+            .readTimeout(socketTimeout, TimeUnit.SECONDS)
             .register(new Authenticator(username, password))
             .register(new ErrorResponseFilter())
             .build();
