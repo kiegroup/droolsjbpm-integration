@@ -46,7 +46,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.naming.NamingException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import javax.transaction.*;
+import jakarta.transaction.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

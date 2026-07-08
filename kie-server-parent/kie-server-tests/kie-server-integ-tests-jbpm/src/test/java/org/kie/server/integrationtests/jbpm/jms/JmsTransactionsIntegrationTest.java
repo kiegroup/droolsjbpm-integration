@@ -22,9 +22,8 @@ import java.util.Collection;
 import java.util.List;
 
 import jakarta.jms.XAConnectionFactory;
-import javax.transaction.UserTransaction;
+import jakarta.transaction.UserTransaction;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
