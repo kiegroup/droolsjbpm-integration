@@ -16,7 +16,6 @@
 package org.kie.server.services.impl.security;
 
 import java.security.Principal;
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,9 +50,9 @@ public class JACCIdentityProviderWildFlyTomcatTest {
         // WildFly has java.security.acl.Group named Roles that contains
         // the role names from the application domain to which the user has been assigned.
         // Tomcat uses JACCValve with same Principal structure as WildFly.
-        final GroupImpl groupRoles = new GroupImpl("Roles");
-        final GroupImpl groupOne = new GroupImpl(GROUP_ONE_NAME);
-        final GroupImpl groupTwo = new GroupImpl(GROUP_TWO_NAME);
+        final Group groupRoles = new Group("Roles");
+        final Group groupOne = new Group(GROUP_ONE_NAME);
+        final Group groupTwo = new Group(GROUP_TWO_NAME);
         final UserImpl user = new UserImpl(PRINCIPAL_NAME);
 
         groupOne.addMember(user);
@@ -145,12 +144,12 @@ public class JACCIdentityProviderWildFlyTomcatTest {
         assertEquals(2, jaccIdentityProvider.getRoles().size());
     }
 
-    private class GroupImpl implements Group {
+    private class Group implements Principal {
 
         private String name;
         private Collection<Principal> members;
 
-        public GroupImpl(String name) {
+        public Group(String name) {
             this.name = name;
             members = new ArrayList<Principal>();
         }
@@ -160,7 +159,6 @@ public class JACCIdentityProviderWildFlyTomcatTest {
             return name;
         }
 
-        @Override
         public boolean addMember(Principal user) {
             if(members.contains(user)) {
                 return false;
@@ -169,7 +167,6 @@ public class JACCIdentityProviderWildFlyTomcatTest {
             return true;
         }
 
-        @Override
         public boolean removeMember(Principal user) {
             if(members.contains(user)) {
                 members.remove(user);
@@ -178,12 +175,10 @@ public class JACCIdentityProviderWildFlyTomcatTest {
             return false;
         }
 
-        @Override
         public boolean isMember(Principal member) {
             return members.contains(member);
         }
 
-        @Override
         public Enumeration<? extends Principal> members() {
             return Collections.enumeration(members);
         }

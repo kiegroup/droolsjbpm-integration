@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.naming.InitialContext;
-import javax.transaction.UserTransaction;
+import jakarta.transaction.UserTransaction;
 
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.junit.Test;

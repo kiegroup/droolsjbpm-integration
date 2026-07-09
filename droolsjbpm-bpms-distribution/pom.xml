@@ -13,9 +13,15 @@
   <packaging>pom</packaging>
 
   <name>BPMS distribution</name>
+
+  
   <description>
     Builds the binary download zip of BPMS.
   </description>
+
+  <properties>
+    <java.module.name>org.drools.bpms.distribution</java.module.name>
+  </properties>
 
   <build>
     <plugins>
@@ -72,7 +78,7 @@
           <groupId>ch.qos.logback</groupId>
           <artifactId>logback-classic</artifactId>
         </exclusion>
-        <!-- collides with com.sun.xml.bind:jaxb-impl:jar:2.3.0 and com.sun.xml.bind:jaxb-impl:jar:2.3.0 -->
+        <!-- collides with org.glassfish.jaxb:jaxb-runtime -->
         <exclusion>
           <groupId>org.glassfish.jaxb</groupId>
           <artifactId>jaxb-runtime</artifactId>

@@ -13,7 +13,9 @@
   <packaging>jar</packaging>
 
   <name>KIE Integration :: KIE Maven Plugin Instrumented kJAR Wrapper</name>
-
+  <properties>
+    <java.module.name>org.drools.testcoverage.kjar.separate.model.wrapper</java.module.name>
+  </properties>
   <dependencies>
     <dependency>
       <!-- Artificial dependency to make sure that kie-maven-plugin is always built before this

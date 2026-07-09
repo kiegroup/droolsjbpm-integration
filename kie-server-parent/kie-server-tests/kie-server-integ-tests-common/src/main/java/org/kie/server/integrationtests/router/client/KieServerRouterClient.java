@@ -18,14 +18,14 @@ package org.kie.server.integrationtests.router.client;
 import java.io.StringReader;
 import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import com.thoughtworks.xstream.core.util.Base64Encoder;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.kie.server.controller.client.exception.KieServerControllerHTTPClientException;
 import org.kie.server.router.Configuration;
 import org.kie.server.router.repository.ConfigurationMarshaller;
@@ -49,9 +49,9 @@ public class KieServerRouterClient implements AutoCloseable {
 
     public KieServerRouterClient(String routerBaseUrl) {
         this.routerBaseUrl = routerBaseUrl;
-        httpClient = new ResteasyClientBuilder()
-                .establishConnectionTimeout(10, TimeUnit.SECONDS)
-                .socketTimeout(10, TimeUnit.SECONDS)
+        httpClient = new ResteasyClientBuilderImpl()
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
                 .build();
     }
 

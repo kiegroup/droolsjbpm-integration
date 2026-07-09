@@ -22,8 +22,9 @@
 
   <name>jBPM :: Spring :: Boot :: Starter :: basic</name>
   <description>jBPM SpringBoot Starter - Basic</description>
-
-
+  <properties>
+    <java.module.name>org.kie.jbpm.spring.boot.starter.basic</java.module.name>
+  </properties>
 
   <dependencies>
     <!-- Spring boot dependencies -->

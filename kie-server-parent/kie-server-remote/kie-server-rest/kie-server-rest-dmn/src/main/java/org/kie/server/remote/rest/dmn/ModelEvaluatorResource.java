@@ -17,16 +17,16 @@ package org.kie.server.remote.rest.dmn;
 
 import java.text.MessageFormat;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Variant;
 
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.dmn.DMNModelInfoList;
@@ -102,7 +102,7 @@ public class ModelEvaluatorResource {
                                                                      @ExampleProperty(mediaType = MediaType.APPLICATION_XML, value = EXAMPLE_KIESERVER_GET_RESPONSE_XML)}))})
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getModels(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getModels(@jakarta.ws.rs.core.Context HttpHeaders headers, 
                               @ApiParam(value = "Container id that models should be loaded from", required = true, example = EXAMPLE_CONTAINER_ID) @PathParam(CONTAINER_ID) String containerId) {
         Variant v = getVariant( headers );
         Header conversationIdHeader = buildConversationIdHeader(containerId, modelEvaluatorService.getKieServerRegistry(), headers);
@@ -129,7 +129,7 @@ public class ModelEvaluatorResource {
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response evaluateDecisions(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response evaluateDecisions(@jakarta.ws.rs.core.Context HttpHeaders headers, 
                                       @ApiParam(value = PARAM_CONTAINER_ID_EVAL, required = true, example = EXAMPLE_CONTAINER_ID) @PathParam(CONTAINER_ID) String containerId,
                                       @ApiParam(value = "DMN context to be used while evaluation decisions as DMNContextKS type", required = true,
                                                 examples = @Example(value = {@ExampleProperty(mediaType = MediaType.APPLICATION_JSON, value = EXAMPLE_KIESERVER_POST_REQ_JSON),

@@ -17,19 +17,19 @@ package org.kie.server.remote.rest.casemgmt;
 
 import java.util.List;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Variant;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -103,7 +103,7 @@ public class CaseQueryResource extends AbstractCaseResource {
     @GET
     @Path(CASE_ALL_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getCaseInstances(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response getCaseInstances(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "data item name that case instances will be filtered by", required = false) @QueryParam("dataItemName") String dataItemName, 
             @ApiParam(value = "data item value that case instances will be filtered by", required = false) @QueryParam("dataItemValue") String dataItemValue,
             @ApiParam(value = "case instance owner that case instances will be filtered by", required = false) @QueryParam("owner") String owner,
@@ -147,7 +147,7 @@ public class CaseQueryResource extends AbstractCaseResource {
     @GET
     @Path(CASE_INSTANCES_BY_ROLE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getCaseInstancesByRole(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response getCaseInstancesByRole(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "case role that instances should be found for", required = true, example = "owner") @PathParam(CASE_ROLE_NAME) String roleName, 
             @ApiParam(value = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, allowableValues="open,closed,cancelled") @QueryParam("status") List<String> status,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
@@ -179,7 +179,7 @@ public class CaseQueryResource extends AbstractCaseResource {
                     @ExampleProperty(mediaType=JSON, value=CASE_DEFINITIONS_JSON)}))})
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getCaseDefinitions(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response getCaseDefinitions(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "case definition id or name that case definitions will be filtered by", required = true) @QueryParam("filter") String filter,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
@@ -209,7 +209,7 @@ public class CaseQueryResource extends AbstractCaseResource {
     @GET
     @Path(CASE_ALL_PROCESSES_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getProcessDefinitions(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response getProcessDefinitions(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "process definition id or name that process definitions will be filtered by", required = true) @QueryParam("filter") String filter,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
@@ -236,7 +236,7 @@ public class CaseQueryResource extends AbstractCaseResource {
     @GET
     @Path(CASE_PROCESSES_BY_CONTAINER_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getProcessDefinitionsByContainer(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getProcessDefinitionsByContainer(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process definitions should be filtered by", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
@@ -267,7 +267,7 @@ public class CaseQueryResource extends AbstractCaseResource {
     @GET
     @Path(CASE_TASKS_AS_POT_OWNER_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getCaseInstanceTasksAsPotentialOwner(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response getCaseInstanceTasksAsPotentialOwner(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "case instance identifier that tasks should belong to", required = true, example = "CASE-00000000011") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String user, 
             @ApiParam(value = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
@@ -295,7 +295,7 @@ public class CaseQueryResource extends AbstractCaseResource {
     @GET
     @Path(CASE_TASKS_AS_ADMIN_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getCaseInstanceTasksAsAdmin(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response getCaseInstanceTasksAsAdmin(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "case instance identifier that tasks should belong to", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String user, 
             @ApiParam(value = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
@@ -323,7 +323,7 @@ public class CaseQueryResource extends AbstractCaseResource {
     @GET
     @Path(CASE_TASKS_AS_STAKEHOLDER_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getCaseInstanceTasksAsStakeholder(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response getCaseInstanceTasksAsStakeholder(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "case instance identifier that tasks should belong to", required = true, example = "CASE-0000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String user, 
             @ApiParam(value = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
@@ -351,7 +351,7 @@ public class CaseQueryResource extends AbstractCaseResource {
     @GET
     @Path(CASE_FILE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getCaseInstanceDataItems(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getCaseInstanceDataItems(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "case instance identifier that data items should belong to", required = true, example = "CASE-0000000001") @PathParam(CASE_ID) String caseId,
             @ApiParam(value = "optionally filter by data item names", required = false) @QueryParam("name") List<String> names, 
             @ApiParam(value = "optionally filter by data item types", required = false) @QueryParam("type") List<String> types,

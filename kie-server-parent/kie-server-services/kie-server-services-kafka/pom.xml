@@ -14,6 +14,10 @@
   <name>KIE :: Execution Server :: Services :: Kafka Extension</name>
   <description>KIE Kafka jBPM Execution Server Extension</description>
 
+  <properties>
+    <java.module.name>org.kie.server.services.kafka</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>

@@ -12,6 +12,7 @@
   <description>KIE Server SpringBoot Integration Tests Sample (includes all KIE Server capabilities) used for integration tests</description>
 
   <properties>
+    <java.module.name>org.kie.server.spring.boot.integ.tests.sample</java.module.name>
     <start-class>org.kie.server.springboot.samples.KieServerIntegrationTestsApplication</start-class>
     <sonar.exclusions>**/IntegrationTestsWebSecurityConfig.java</sonar.exclusions>
   </properties>

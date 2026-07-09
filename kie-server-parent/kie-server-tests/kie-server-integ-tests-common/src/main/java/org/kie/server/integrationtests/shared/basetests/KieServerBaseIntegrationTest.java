@@ -25,9 +25,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.naming.Context;
-import javax.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.Configuration;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Assume;
@@ -160,10 +161,10 @@ public abstract class KieServerBaseIntegrationTest {
 
     private void disposeServerTemplates() {
         final Configuration configuration =
-                new ResteasyClientBuilder()
-                        .establishConnectionTimeout(10,
+                new ResteasyClientBuilderImpl()
+                        .connectTimeout(10,
                                                     TimeUnit.SECONDS)
-                        .socketTimeout(60,
+                        .readTimeout(60,
                                        TimeUnit.SECONDS)
                         .getConfiguration();
         try (

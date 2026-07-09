@@ -149,7 +149,7 @@ public class OASGenerator {
 
     private void pathModelGET(PathItem pathItem, DMNModel dmnModel) {
         MediaType mediaType = OASFactory.createMediaType().schema(OASFactory.createSchema().type(SchemaType.STRING));
-        Content content = OASFactory.createObject(Content.class).addMediaType(javax.ws.rs.core.MediaType.APPLICATION_XML, mediaType);
+        Content content = OASFactory.createObject(Content.class).addMediaType(jakarta.ws.rs.core.MediaType.APPLICATION_XML, mediaType);
         APIResponse apiResponse = OASFactory.createObject(APIResponse.class).description("model without decision-logic");
         apiResponse.content(content);
         APIResponses apiResponses = OASFactory.createObject(APIResponses.class);
@@ -160,13 +160,13 @@ public class OASGenerator {
 
     private Operation buildOperationWithIORefs(String description, String inputRef, String outputRef) {
         MediaType mediaType = OASFactory.createMediaType().schema(OASFactory.createSchema().ref(outputRef));
-        Content content = OASFactory.createObject(Content.class).addMediaType(javax.ws.rs.core.MediaType.APPLICATION_JSON, mediaType);
+        Content content = OASFactory.createObject(Content.class).addMediaType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON, mediaType);
         APIResponse apiResponse = OASFactory.createObject(APIResponse.class).description(description);
         apiResponse.content(content);
         APIResponses apiResponses = OASFactory.createObject(APIResponses.class);
         apiResponses.defaultValue(apiResponse);
         MediaType requestMediaType = OASFactory.createMediaType().schema(OASFactory.createSchema().ref(inputRef));
-        Content requestContent = OASFactory.createContent().addMediaType(javax.ws.rs.core.MediaType.APPLICATION_JSON, requestMediaType);
+        Content requestContent = OASFactory.createContent().addMediaType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON, requestMediaType);
         RequestBody requestBody = OASFactory.createRequestBody().description(description).content(requestContent);
         Operation operation = OASFactory.createObject(Operation.class).responses(apiResponses).requestBody(requestBody);
         return operation;

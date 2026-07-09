@@ -19,8 +19,8 @@ package org.kie.spring.persistence;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;

@@ -15,11 +15,11 @@
  */
 package org.kie.server.services.jbpm.locator;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.NonUniqueResultException;
+import jakarta.persistence.Query;
 
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.junit.Before;

@@ -101,7 +101,7 @@
     <!-- RestEasy JAX-RS dependencies -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxrs</artifactId>
+      <artifactId>resteasy-core-spi</artifactId>
       <scope>runtime</scope>
       <exclusions>
         <exclusion>
@@ -149,7 +149,7 @@
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.module</groupId>
-      <artifactId> jackson-module-jaxb-annotations</artifactId>
+      <artifactId>jackson-module-jakarta-xmlbind-annotations</artifactId>
     </dependency>
 
     <dependency>
@@ -209,7 +209,7 @@
     </dependency>
 
     <dependency>
-      <groupId>com.sun.xml.bind</groupId>
+      <groupId>org.glassfish.jaxb</groupId>
       <artifactId>jaxb-core</artifactId>
       <scope>test</scope>
     </dependency>

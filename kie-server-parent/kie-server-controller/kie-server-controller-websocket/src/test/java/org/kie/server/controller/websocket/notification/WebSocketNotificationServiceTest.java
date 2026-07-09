@@ -17,8 +17,8 @@
 package org.kie.server.controller.websocket.notification;
 
 import java.util.ArrayList;
-import javax.websocket.RemoteEndpoint;
-import javax.websocket.Session;
+import jakarta.websocket.RemoteEndpoint;
+import jakarta.websocket.Session;
 
 import org.junit.Before;
 import org.junit.Test;

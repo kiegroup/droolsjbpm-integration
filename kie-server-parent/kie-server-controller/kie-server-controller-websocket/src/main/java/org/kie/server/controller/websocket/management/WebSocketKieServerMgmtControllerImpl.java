@@ -17,12 +17,12 @@
 package org.kie.server.controller.websocket.management;
 
 import java.io.IOException;
-import javax.annotation.PostConstruct;
-import javax.enterprise.inject.Any;
-import javax.enterprise.inject.Instance;
-import javax.inject.Inject;
-import javax.websocket.*;
-import javax.websocket.server.ServerEndpoint;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.inject.Any;
+import jakarta.enterprise.inject.Instance;
+import jakarta.inject.Inject;
+import jakarta.websocket.*;
+import jakarta.websocket.server.ServerEndpoint;
 
 import org.kie.server.controller.api.commands.KieServerControllerDescriptorCommand;
 import org.kie.server.controller.api.model.KieServerControllerServiceResponse;

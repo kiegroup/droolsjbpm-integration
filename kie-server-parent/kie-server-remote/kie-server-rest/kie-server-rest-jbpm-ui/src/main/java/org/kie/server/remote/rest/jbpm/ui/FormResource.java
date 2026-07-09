@@ -38,17 +38,17 @@ import static org.kie.server.remote.rest.jbpm.ui.docs.ParameterSamples.TASK_FORM
 
 import java.text.MessageFormat;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.Variant;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Variant;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jbpm.services.api.DeploymentNotFoundException;
@@ -107,7 +107,7 @@ public class FormResource {
     @GET
     @Path(PROCESS_FORM_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getProcessForm(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response getProcessForm(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that process definition belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of process definition that form should be fetched for", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId,
             @ApiParam(value = "optional language that the form should be found for", required = false) @QueryParam("lang") @DefaultValue("en") String language, 
@@ -147,7 +147,7 @@ public class FormResource {
     @GET
     @Path(TASK_FORM_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getTaskForm(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response getTaskForm(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance that form should be fetched for", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId,
             @ApiParam(value = "optional language that the form should be found for", required = false) @QueryParam("lang") @DefaultValue("en") String language, 
@@ -188,7 +188,7 @@ public class FormResource {
     @GET
     @Path(PROCESS_FORM_CONTENT_GET_URI)
     @Produces({MediaType.TEXT_HTML})
-    public Response getProcessRenderedForm(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response getProcessRenderedForm(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that process definition belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of process definition that form should be fetched for", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId, 
             @ApiParam(value = "optional renderer name that the form should be rendered with", required = false) @QueryParam("renderer") @DefaultValue("patternfly") String renderer) {
@@ -222,7 +222,7 @@ public class FormResource {
     @GET
     @Path(TASK_FORM_CONTENT_GET_URI)
     @Produces({MediaType.TEXT_HTML})
-    public Response getTaskRenderedForm(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response getTaskRenderedForm(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance that form should be fetched for", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
             @ApiParam(value = "optional renderer name that the form should be rendered with", required = false) @QueryParam("renderer") @DefaultValue("patternfly") String renderer) {
@@ -258,7 +258,7 @@ public class FormResource {
     @GET
     @Path(CASE_FORM_CONTENT_GET_URI)
     @Produces({MediaType.TEXT_HTML})
-    public Response getCaseRenderedForm(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response getCaseRenderedForm(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that case definition belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of case definition that form should be fetched for", required = true, example = "orderhardware") @PathParam("caseDefId") String caseDefId, 
             @ApiParam(value = "optional renderer name that the form should be rendered with", required = false) @QueryParam("renderer") @DefaultValue("patternfly") String renderer) {

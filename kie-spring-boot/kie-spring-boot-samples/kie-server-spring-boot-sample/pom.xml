@@ -13,6 +13,7 @@
   <description>KIE Server SpringBoot Sample (includes all KIE Server capabilities)</description>
 
   <properties>
+    <java.module.name>org.kie.server.spring.boot.sample</java.module.name>
     <start-class>org.kie.server.springboot.samples.KieServerApplication</start-class>
     <sonar.exclusions>**/WebSecurityConfig.java</sonar.exclusions>
   </properties>

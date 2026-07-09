@@ -18,7 +18,7 @@ package org.kie.spring.jbpm;
 import java.util.Arrays;
 import java.util.Collection;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.drools.persistence.api.TransactionManagerFactory;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;

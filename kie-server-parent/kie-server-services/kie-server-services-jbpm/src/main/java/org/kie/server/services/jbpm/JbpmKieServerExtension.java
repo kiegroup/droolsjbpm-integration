@@ -38,10 +38,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.naming.InitialContext;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.spi.PersistenceProvider;
-import javax.persistence.spi.PersistenceProviderResolverHolder;
-import javax.persistence.spi.PersistenceUnitInfo;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.spi.PersistenceProvider;
+import jakarta.persistence.spi.PersistenceProviderResolverHolder;
+import jakarta.persistence.spi.PersistenceUnitInfo;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;

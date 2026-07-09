@@ -16,7 +16,7 @@
 
 package org.kie.server.controller.common;
 
-import javax.ws.rs.Path;
+import jakarta.ws.rs.Path;
 
 import io.swagger.jaxrs.listing.ApiListingResource;
 

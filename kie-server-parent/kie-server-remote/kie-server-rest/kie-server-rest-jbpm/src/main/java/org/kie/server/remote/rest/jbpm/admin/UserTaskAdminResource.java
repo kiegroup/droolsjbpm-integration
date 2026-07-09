@@ -19,20 +19,20 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Variant;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -134,7 +134,7 @@ public class UserTaskAdminResource {
     @Path(TASK_INSTANCE_POT_OWNERS_USERS_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response addPotentialOwners(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response addPotentialOwners(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
@@ -154,7 +154,7 @@ public class UserTaskAdminResource {
     @Path(TASK_INSTANCE_EXL_OWNERS_USERS_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response addExcludedOwners(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response addExcludedOwners(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
@@ -174,7 +174,7 @@ public class UserTaskAdminResource {
     @Path(TASK_INSTANCE_ADMINS_USERS_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response addAdmins(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response addAdmins(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
@@ -194,7 +194,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_POT_OWNERS_USERS_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response removePotentialOwnersUsers(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response removePotentialOwnersUsers(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
@@ -210,7 +210,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_EXL_OWNERS_USERS_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response removeExcludedOwnersUsers(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response removeExcludedOwnersUsers(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
@@ -226,7 +226,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_ADMINS_USERS_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response removeAdminsUsers(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response removeAdminsUsers(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
@@ -242,7 +242,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_POT_OWNERS_GROUPS_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response removePotentialOwnersGroups(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response removePotentialOwnersGroups(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
@@ -258,7 +258,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_EXL_OWNERS_GROUPS_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response removeExcludedOwnersGroups(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response removeExcludedOwnersGroups(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
@@ -274,7 +274,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_ADMINS_GROUPS_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response removeAdminsGroups(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response removeAdminsGroups(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
@@ -291,7 +291,7 @@ public class UserTaskAdminResource {
     @Path(TASK_INSTANCE_INPUTS_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response addTaskInputs(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response addTaskInputs(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "map of data to be set as task inputs, as Map", required = true, examples=@Example(value= {
@@ -321,7 +321,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_INPUTS_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response removeTaskInputs(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response removeTaskInputs(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "one or more names of task inputs to be removed", required = true) @QueryParam("name") List<String> inputNames) {
@@ -348,7 +348,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_OUTPUTS_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response removeTaskOutputs(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response removeTaskOutputs(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "one or more names of task outputs to be removed", required = true) @QueryParam("name") List<String> outputNames) {
@@ -377,7 +377,7 @@ public class UserTaskAdminResource {
     @Path(TASK_INSTANCE_REASSIGNMENTS_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response reassign(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response reassign(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "time expression for reassignmnet", required = true) @QueryParam("expiresAt") String expiresAt, 
@@ -427,7 +427,7 @@ public class UserTaskAdminResource {
     @Path(TASK_INSTANCE_NOTIFICATIONS_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response notify(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response notify(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "time expression for notification", required = true) @QueryParam("expiresAt") String expiresAt, 
@@ -472,7 +472,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_REASSIGNMENT_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response cancelReassignment(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response cancelReassignment(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "identifier of reassignment to be canceled", required = true, example = "567") @PathParam("reassignmentId") Long reassignmentId) {
@@ -499,7 +499,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_NOTIFICATION_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response cancelNotification(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response cancelNotification(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "identifier of notification to be canceled", required = true, example = "567") @PathParam("notificationId") Long notificationId) {
@@ -527,7 +527,7 @@ public class UserTaskAdminResource {
     @GET
     @Path(TASK_INSTANCE_REASSIGNMENTS_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getTaskReassignments(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getTaskReassignments(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "optional flag that indicates if active only reassignmnets should be collected, defaults to true", required = false) @QueryParam("activeOnly") @DefaultValue("true") boolean activeOnly) {
@@ -555,7 +555,7 @@ public class UserTaskAdminResource {
     @GET
     @Path(TASK_INSTANCE_NOTIFICATIONS_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getTaskNotifications(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getTaskNotifications(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @ApiParam(value = "optional flag that indicates if active only notifications should be collected, defaults to true", required = false) @QueryParam("activeOnly") @DefaultValue("true") boolean activeOnly) {
@@ -582,7 +582,7 @@ public class UserTaskAdminResource {
     @PUT
     @Path(ACK_ERROR_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response acknowledgeError(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response acknowledgeError(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that error belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the execution error to be acknowledged", required = true, example = "xxx-yyy-zzz") @PathParam("errorId") String errorId) {
         Variant v = getVariant(headers);
@@ -608,7 +608,7 @@ public class UserTaskAdminResource {
     @PUT
     @Path(ACK_ERRORS_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response acknowledgeErrors(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response acknowledgeErrors(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that errors belong to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "list of identifiers of execution errors to be acknowledged", required = true) @QueryParam("errorId") List<String> errorIds) {
         Variant v = getVariant(headers);
@@ -635,7 +635,7 @@ public class UserTaskAdminResource {
     @GET
     @Path(ERROR_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getExecutionErrorById(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getExecutionErrorById(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that error belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the execution error to load", required = true, example = "xxx-yyy-zzz") @PathParam("errorId") String errorId) {
         Variant v = getVariant(headers);
@@ -662,7 +662,7 @@ public class UserTaskAdminResource {
     @GET
     @Path(ERRORS_BY_TASK_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getExecutionErrorsByTask(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getExecutionErrorsByTask(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the task instance that errors should be collected for", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
             @ApiParam(value = "optional flag that indicates if acknowledged errors should also be collected, defaults to false", required = false) @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged, 
@@ -694,7 +694,7 @@ public class UserTaskAdminResource {
     @GET
     @Path(ERRORS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getExecutionErrors(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getExecutionErrors(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "optional flag that indicates if acknowledged errors should also be collected, defaults to false", required = false) @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged, 
             @ApiParam(value = "optional name of the task to filter by", required = false) @QueryParam("name") String taskName, 

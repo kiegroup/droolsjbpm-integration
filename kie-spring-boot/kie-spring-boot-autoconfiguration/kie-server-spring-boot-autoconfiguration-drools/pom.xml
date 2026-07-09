@@ -8,7 +8,10 @@
   <artifactId>kie-server-spring-boot-autoconfiguration-drools</artifactId>
   <name>KIE :: Spring :: Boot :: KIE Server Auto Configuration :: Drools</name>
   <description>Drools KIE Server SpringBoot Auto Configuration</description>
-  
+  <properties>
+    <java.module.name>org.kie.server.spring.boot.autoconfiguration.drools</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -55,7 +58,7 @@
         </exclusion>
         <exclusion>
           <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jaxrs</artifactId>
+          <artifactId>resteasy-core-spi</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.jboss.resteasy</groupId>

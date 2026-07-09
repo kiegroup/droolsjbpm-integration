@@ -22,10 +22,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.PersistenceException;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Entity;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
 
 import org.jbpm.springboot.persistence.JBPMPersistenceUnitPostProcessor;

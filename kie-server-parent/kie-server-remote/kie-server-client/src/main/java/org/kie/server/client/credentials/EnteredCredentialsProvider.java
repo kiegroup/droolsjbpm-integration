@@ -18,7 +18,7 @@ package org.kie.server.client.credentials;
 import org.kie.server.common.rest.Base64Util;
 import org.kie.server.client.CredentialsProvider;
 
-import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION;
 
 /**
  * Default implementation of <code>CredentialsProvider</code> that is expected to get

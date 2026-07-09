@@ -19,20 +19,20 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Variant;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -136,7 +136,7 @@ public class ProcessAdminResource {
     @Path(MIGRATE_PROCESS_INST_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response migrateProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response migrateProcessInstance(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of process instance to be migrated", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId,
             @ApiParam(value = "container id that new process definition belongs to", required = true) @QueryParam("targetContainerId") String targetContainerId, 
@@ -174,7 +174,7 @@ public class ProcessAdminResource {
     @Path(MIGRATE_PROCESS_SUBPROCESS_INST_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response migrateProcessInstanceWithSubprocess(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response migrateProcessInstanceWithSubprocess(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instances belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "list of identifiers of process instance to be migrated", required = true) @PathParam(PROCESS_INST_ID) Long processInstanceId,
             @ApiParam(value = "container id that new process definition belongs to", required = true) @QueryParam("targetContainerId") String targetContainerId, 
@@ -212,7 +212,7 @@ public class ProcessAdminResource {
     @Path(MIGRATE_PROCESS_INSTANCES_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response migrateProcessInstances(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response migrateProcessInstances(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instances belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "list of identifiers of process instance to be migrated", required = true) @QueryParam(PROCESS_INST_ID) List<Long> processInstanceIds,
             @ApiParam(value = "container id that new process definition belongs to", required = true) @QueryParam("targetContainerId") String targetContainerId, 
@@ -248,7 +248,7 @@ public class ProcessAdminResource {
     @DELETE
     @Path(CANCEL_NODE_INST_PROCESS_INST_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response cancelNodeInstance(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response cancelNodeInstance(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of process instance that node instance belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId,
             @ApiParam(value = "identifier of node instance that should be canceled", required = true, example = "567") @PathParam("nodeInstanceId") Long nodeInstanceId) {
@@ -281,7 +281,7 @@ public class ProcessAdminResource {
     @PUT
     @Path(RETRIGGER_NODE_INST_PROCESS_INST_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response retriggerNodeInstance(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response retriggerNodeInstance(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of process instance that node instance belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId,
             @ApiParam(value = "identifier of node instance that should be retriggered", required = true, example = "567") @PathParam("nodeInstanceId") Long nodeInstanceId) {
@@ -315,7 +315,7 @@ public class ProcessAdminResource {
     @Path(UPDATE_TIMER_PROCESS_INST_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response updateTimer(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response updateTimer(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of process instance that timer belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId,
             @ApiParam(value = "identifier of timer instance to be updated", required = true, example = "99") @PathParam("timerId") Long timerId, 
@@ -353,7 +353,7 @@ public class ProcessAdminResource {
     @POST
     @Path(TRIGGER_NODE_PROCESS_INST_POST_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response triggerNode(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response triggerNode(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of process instance where node should be triggered", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId,
             @ApiParam(value = "identifier of the node to be triggered", required = true, example = "567") @PathParam("nodeId") Long nodeId) {
@@ -388,7 +388,7 @@ public class ProcessAdminResource {
     @GET
     @Path(TIMERS_PROCESS_INST_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getTimerInstances(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getTimerInstances(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of process instance that timer instances should be collected for", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId) {
         Variant v = getVariant(headers);
@@ -417,7 +417,7 @@ public class ProcessAdminResource {
     @GET
     @Path(NODE_INSTANCES_PROCESS_INST_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getActiveNodeInstances(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getActiveNodeInstances(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of process instance that active nodes instances should be collected for", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId) {
         Variant v = getVariant(headers);
@@ -446,7 +446,7 @@ public class ProcessAdminResource {
     @GET
     @Path(NODES_PROCESS_INST_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getNodes(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getNodes(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of process instance that process nodes should be collected from", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId) {
         Variant v = getVariant(headers);
@@ -474,7 +474,7 @@ public class ProcessAdminResource {
     @PUT
     @Path(ACK_ERROR_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response acknowledgeError(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response acknowledgeError(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that error belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of error to be acknowledged", required = true, example = "xxx-yyy-zzz") @PathParam("errorId") String errorId) {
         Variant v = getVariant(headers);
@@ -500,7 +500,7 @@ public class ProcessAdminResource {
     @PUT
     @Path(ACK_ERRORS_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response acknowledgeErrors(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response acknowledgeErrors(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that errors belong to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "list of error identifiers to be acknowledged", required = true, example = "xxx-yyy-zzz") @QueryParam("errorId") List<String> errorIds) {
         Variant v = getVariant(headers);
@@ -527,7 +527,7 @@ public class ProcessAdminResource {
     @GET
     @Path(ERROR_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getExecutionErrorById(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getExecutionErrorById(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process error belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of error to be loaded", required = true, example = "xxx-yyy-zzz") @PathParam("errorId") String errorId) {
         Variant v = getVariant(headers);
@@ -555,7 +555,7 @@ public class ProcessAdminResource {
     @GET
     @Path(ERRORS_BY_PROCESS_INST_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getExecutionErrorsByProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getExecutionErrorsByProcessInstance(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of process instance that errors should be collected for", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId,
             @ApiParam(value = "optional flag that indicates if acknowledged errors should also be collected, defaults to false", required = false) @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged, 
@@ -590,7 +590,7 @@ public class ProcessAdminResource {
     @GET
     @Path(ERRORS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getExecutionErrors(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response getExecutionErrors(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id that errors belong to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "optional flag that indicates if acknowledged errors should also be collected, defaults to false", required = false) @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged,
             @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 

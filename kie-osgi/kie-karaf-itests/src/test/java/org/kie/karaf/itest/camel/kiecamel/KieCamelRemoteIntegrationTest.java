@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.component.bean.PojoProxyHelper;
@@ -170,7 +170,7 @@ public class KieCamelRemoteIntegrationTest extends AbstractKarafIntegrationTest 
 
                 // without this, JAXB model uses annotations from JAXB API bundle, while the runtime itself
                 // comes from the system classloader
-                bootDelegationPackages("javax.xml.bind", "javax.xml.bind.*"),
+                bootDelegationPackages("javax.xml.bind", "jakarta.xml.bind.*"),
 
                 AbstractKarafIntegrationTest.loadKieFeatures("drools-module", "drools-decisiontable", "kie-ci", "kie-aries-blueprint", "kie-camel"),
 

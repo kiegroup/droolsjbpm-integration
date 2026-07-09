@@ -19,22 +19,22 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Variant;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -169,7 +169,7 @@ public class ProcessResource  {
     @Path(START_PROCESS_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response startProcess(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response startProcess(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "process id that new instance should be created from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId, 
             @ApiParam(value = "optional map of process variables", required = false, examples=@Example(value= {
@@ -215,7 +215,7 @@ public class ProcessResource  {
     @Path(COMPUTE_PROCESS_OUTCOME_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response startSynchronousProcess(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response startSynchronousProcess(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "process id that new instance should be created from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId, 
             @ApiParam(value = "optional map of process variables", required = false, examples=@Example(value= {
@@ -259,7 +259,7 @@ public class ProcessResource  {
     @Path(START_PROCESS_FROM_NODES_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response startProcessFromNodeIds(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response startProcessFromNodeIds(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "process instance id that new instance should be created from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId, 
                                             @ApiParam(value = "optional map of process variables", required = false) @DefaultValue("") String payload) {
@@ -303,7 +303,7 @@ public class ProcessResource  {
     @Path(START_PROCESS_FROM_NODES_WITH_CORRELATION_KEY_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response startProcessWithCorrelationKeyFromNodeIds(@javax.ws.rs.core.Context HttpHeaders headers,
+    public Response startProcessWithCorrelationKeyFromNodeIds(@jakarta.ws.rs.core.Context HttpHeaders headers,
                                             @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
                                             @ApiParam(value = "process instance id that new instance should be created from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId,
                                                               @ApiParam(value = "correlation key that should be used for creating the process", required = true,
@@ -352,7 +352,7 @@ public class ProcessResource  {
     @Path(START_PROCESS_WITH_CORRELATION_KEY_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response startProcessWithCorrelation(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response startProcessWithCorrelation(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "process id that new instance should be created from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId,
             @ApiParam(value = "correlation key to be assigned to process instance", required = true, example = "john-evaluation-2019") @PathParam("correlationKey") String correlationKey, 
@@ -396,7 +396,7 @@ public class ProcessResource  {
     @DELETE
     @Path(ABORT_PROCESS_INST_DEL_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response abortProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response abortProcessInstance(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "identifier of the process instance to be aborted", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId) {
         Variant v = getVariant(headers);
@@ -427,7 +427,7 @@ public class ProcessResource  {
     @DELETE
     @Path(ABORT_PROCESS_INSTANCES_DEL_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response abortProcessInstances(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response abortProcessInstances(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @ApiParam(value = "list of identifiers of the process instances to be aborted", required = true) @QueryParam("instanceId") List<Long> processInstanceIds) {
         Variant v = getVariant(headers);
@@ -459,7 +459,7 @@ public class ProcessResource  {
     @Path(SIGNAL_PROCESS_INST_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response signalProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response signalProcessInstance(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the process instance to be signaled", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
             @ApiParam(value = "signal name to be send to process instance", required = true, example = "EventReceived") @PathParam(SIGNAL_NAME) String signalName, 
@@ -497,7 +497,7 @@ public class ProcessResource  {
     @Path(SIGNAL_PROCESS_BY_CORRELATION_KEY_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response signalProcessInstanceByCorrelationKey(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response signalProcessInstanceByCorrelationKey(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "correlation key of the process instance to be signaled", required = true, example = "123") @PathParam(CORRELATION_KEY) String correlationKey, 
             @ApiParam(value = "signal name to be sent to process instance", required = true, example = "EventReceived") @PathParam(SIGNAL_NAME) String signalName, 
@@ -533,7 +533,7 @@ public class ProcessResource  {
     @Path(SIGNAL_PROCESS_INSTANCES_PORT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response signalProcessInstances(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response signalProcessInstances(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "list of identifiers of the process instances to be signaled", required = false) @QueryParam("instanceId") List<Long> processInstanceIds, 
             @ApiParam(value = "list of correlationKeys of the process instances to be signaled", required = false) @QueryParam("correlationKey") List<String> correlationKeys, 
@@ -579,7 +579,7 @@ public class ProcessResource  {
     @GET
     @Path(PROCESS_INSTANCE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getProcessInstance(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the process instance to be fetched", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
             @ApiParam(value = "indicates if process instance variables should be loaded or not", required = false) @QueryParam("withVars") boolean withVars) {
@@ -612,7 +612,7 @@ public class ProcessResource  {
     @Path(PROCESS_INSTANCE_VAR_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response setProcessVariable(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response setProcessVariable(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the process instance to be updated", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
             @ApiParam(value = "name of the variable to be set/updated", required = true, example = "name") @PathParam("varName") String varName, 
@@ -649,7 +649,7 @@ public class ProcessResource  {
     @Path(PROCESS_INSTANCE_VARS_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response setProcessVariables(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response setProcessVariables(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the process instance to be updated", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
             @ApiParam(value = "variable data give as map", required = true, examples=@Example(value= {
@@ -684,7 +684,7 @@ public class ProcessResource  {
     @GET
     @Path(PROCESS_INSTANCE_VAR_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Object getProcessInstanceVariable(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Object getProcessInstanceVariable(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the process instance that variable should be retrieved from", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
             @ApiParam(value = "variable name to be retrieved", required = true, example = "person") @PathParam("varName") String varName) {
@@ -721,7 +721,7 @@ public class ProcessResource  {
     @GET
     @Path(PROCESS_INSTANCE_VARS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getProcessInstanceVariables(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getProcessInstanceVariables(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the process instance that variables should be retrieved from", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId) {
         Variant v = getVariant(headers);
@@ -758,7 +758,7 @@ public class ProcessResource  {
     @GET
     @Path(PROCESS_INSTANCE_SIGNALS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getAvailableSignals(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getAvailableSignals(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the process instance that signals should be collected for", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId) {
         Variant v = getVariant(headers);
@@ -793,7 +793,7 @@ public class ProcessResource  {
     @Path(PROCESS_INSTANCE_WORK_ITEM_COMPLETE_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response completeWorkItem(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response completeWorkItem(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the process instance that work item belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
             @ApiParam(value = "identifier of the work item to complete", required = true, example = "567") @PathParam("workItemId") Long workItemId, 
@@ -831,7 +831,7 @@ public class ProcessResource  {
     @PUT
     @Path(PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response abortWorkItem(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response abortWorkItem(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the process instance that work item belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
             @ApiParam(value = "identifier of the work item to abort", required = true, example = "567") @PathParam("workItemId") Long workItemId) {
@@ -866,7 +866,7 @@ public class ProcessResource  {
     @GET
     @Path(PROCESS_INSTANCE_WORK_ITEM_BY_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getWorkItem(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getWorkItem(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the process instance that work item belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
             @ApiParam(value = "identifier of the work item to retrieve", required = true, example = "567") @PathParam("workItemId") Long workItemId) {
@@ -903,7 +903,7 @@ public class ProcessResource  {
     @GET
     @Path(PROCESS_INSTANCE_WORK_ITEMS_BY_PROC_INST_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getWorkItemByProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, 
+    public Response getWorkItemByProcessInstance(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @ApiParam(value = "identifier of the process instance that work items belong to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId) {
         Variant v = getVariant(headers);

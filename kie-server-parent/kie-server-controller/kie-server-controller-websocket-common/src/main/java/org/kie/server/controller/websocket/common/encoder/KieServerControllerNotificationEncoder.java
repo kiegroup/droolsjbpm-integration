@@ -16,9 +16,9 @@
 
 package org.kie.server.controller.websocket.common.encoder;
 
-import javax.websocket.EncodeException;
-import javax.websocket.Encoder;
-import javax.websocket.EndpointConfig;
+import jakarta.websocket.EncodeException;
+import jakarta.websocket.Encoder;
+import jakarta.websocket.EndpointConfig;
 
 import org.kie.server.controller.api.model.notification.KieServerControllerNotification;
 import org.kie.server.controller.websocket.common.WebSocketUtils;

@@ -15,6 +15,7 @@
   <description>jBPM KIE Server SpringBoot Audit Data Replication Auto Configuration</description>
 
   <properties>
+    <java.module.name>org.kie.server.spring.boot.autoconfiguration.audit.replication</java.module.name>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencies>
@@ -108,7 +109,7 @@
         </exclusion>
         <exclusion>
           <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jaxrs</artifactId>
+          <artifactId>resteasy-core-spi</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.jboss.resteasy</groupId>
@@ -156,7 +157,7 @@
           <groupId>com.zaxxer</groupId>
           <artifactId>HikariCP-java7</artifactId>
         </exclusion>
-        <!-- collides with com.sun.xml.bind:jaxb-impl:jar:2.3.0 and com.sun.xml.bind:jaxb-impl:jar:2.3.0 -->
+        <!-- collides with org.glassfish.jaxb:jaxb-runtime -->
         <exclusion>
           <groupId>org.glassfish.jaxb</groupId>
           <artifactId>jaxb-runtime</artifactId>

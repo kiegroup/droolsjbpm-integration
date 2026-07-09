@@ -11,6 +11,9 @@
 
   <groupId>org.kie</groupId>
   <artifactId>kie-maven-project-example</artifactId>
+  <properties>
+    <java.module.name>org.kie.maven.project.example</java.module.name>
+  </properties>
 
   <dependencies>
     <dependency>

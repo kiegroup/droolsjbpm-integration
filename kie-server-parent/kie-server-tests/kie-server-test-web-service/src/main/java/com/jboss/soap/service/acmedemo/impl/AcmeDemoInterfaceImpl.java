@@ -3,7 +3,7 @@ package com.jboss.soap.service.acmedemo.impl;
 import java.math.BigDecimal;
 import java.util.Random;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 import org.apache.cxf.phase.PhaseInterceptorChain;
 

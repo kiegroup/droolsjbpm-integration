@@ -15,8 +15,9 @@
  */
 package org.kie.server.integrationtests.shared;
 
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 
+import org.jboss.resteasy.core.ResteasyDeploymentImpl;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.kie.server.controller.service.StandaloneKieServerControllerImpl;
@@ -37,7 +38,7 @@ public class KieControllerExecutor {
 
         controller = new UndertowJaxrsServer();
         controller.start(builder().addHttpListener(getControllerAllocatedPort(), "localhost"));
-        ResteasyDeployment deployment = new ResteasyDeployment();
+        ResteasyDeployment deployment = new ResteasyDeploymentImpl();
         deployment.setApplication(new Application());
         deployment.setResources(asList(new StandaloneSpecManagementServiceImpl(), new StandaloneKieServerControllerImpl()));
         controller.deploy(deployment);

@@ -77,7 +77,7 @@ public class KieServerClientKarafIntegrationJaxbIntegrationTest extends BaseKieS
 
                 // without this, JAXB model uses annotations from JAXB API bundle, while the runtime itself
                 // comes from the system classloader
-                bootDelegationPackages("javax.xml.bind", "javax.xml.bind.*"),
+                bootDelegationPackages("javax.xml.bind", "jakarta.xml.bind.*"),
 
                 // Load kie-server-client
                 AbstractKarafIntegrationTest.loadKieFeatures("kie-server-client")

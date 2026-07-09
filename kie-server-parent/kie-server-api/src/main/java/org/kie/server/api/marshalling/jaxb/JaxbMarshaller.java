@@ -24,11 +24,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.ValidationEvent;
-import javax.xml.bind.util.ValidationEventCollector;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.ValidationEvent;
+import jakarta.xml.bind.util.ValidationEventCollector;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
@@ -194,8 +194,8 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import static javax.xml.bind.ValidationEvent.ERROR;
-import static javax.xml.bind.ValidationEvent.FATAL_ERROR;
+import static jakarta.xml.bind.ValidationEvent.ERROR;
+import static jakarta.xml.bind.ValidationEvent.FATAL_ERROR;
 import static org.kie.server.api.KieServerConstants.KIE_SERVER_STRICT_JAXB_FORMAT;;
 
 public class JaxbMarshaller implements Marshaller {
@@ -490,9 +490,9 @@ public class JaxbMarshaller implements Marshaller {
         return MarshallingFormat.JAXB;
     }
 
-    protected javax.xml.bind.Marshaller getMarshaller() throws JAXBException {
-        javax.xml.bind.Marshaller marshaller = jaxbContext.createMarshaller();
-        marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, true);
+    protected jakarta.xml.bind.Marshaller getMarshaller() throws JAXBException {
+        jakarta.xml.bind.Marshaller marshaller = jaxbContext.createMarshaller();
+        marshaller.setProperty(jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, true);
         return marshaller;
     }
 

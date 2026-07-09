@@ -17,9 +17,9 @@ package org.kie.server.services.jbpm.locator;
 
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.NonUniqueResultException;
 
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.kie.server.api.KieServerConstants;

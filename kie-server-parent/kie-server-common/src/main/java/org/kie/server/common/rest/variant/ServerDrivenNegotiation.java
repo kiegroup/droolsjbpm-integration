@@ -21,8 +21,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Variant;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Variant;
 
 
 

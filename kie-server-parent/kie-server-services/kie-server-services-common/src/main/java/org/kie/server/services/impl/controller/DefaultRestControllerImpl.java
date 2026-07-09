@@ -18,8 +18,8 @@ package org.kie.server.services.impl.controller;
 import java.net.URLEncoder;
 import java.util.Set;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;

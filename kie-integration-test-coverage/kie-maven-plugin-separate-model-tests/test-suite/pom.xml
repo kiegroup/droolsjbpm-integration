@@ -12,7 +12,9 @@
   <artifactId>kie-maven-plugin-separate-model-test-suite</artifactId>
 
   <name>KIE Integration :: KIE Maven Plugin Additional Tests</name>
-
+  <properties>
+    <java.module.name>org.drools.testcoverage.separate.model.test.suite</java.module.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.drools</groupId>

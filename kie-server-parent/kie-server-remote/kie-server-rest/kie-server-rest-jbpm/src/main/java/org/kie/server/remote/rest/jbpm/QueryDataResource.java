@@ -17,21 +17,21 @@ package org.kie.server.remote.rest.jbpm;
 
 import java.text.MessageFormat;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Variant;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Variant;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -141,7 +141,7 @@ public class QueryDataResource {
     @Path(CREATE_QUERY_DEF_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response createQueryDefinition( @javax.ws.rs.core.Context HttpHeaders headers,
+    public Response createQueryDefinition( @jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "identifier of the query definition to be registered", required = true, example = "customQuery") @PathParam("queryName") String queryName,
             @ApiParam(value = "query definition represented as QueryDefinition", required = true, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=QUERY_DEF_JSON),
@@ -187,7 +187,7 @@ public class QueryDataResource {
     @Path(REPLACE_QUERY_DEF_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response replaceQueryDefinition( @javax.ws.rs.core.Context HttpHeaders headers,
+    public Response replaceQueryDefinition( @jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "identifier of the query definition to be replaced", required = true, example = "customQuery") @PathParam("queryName") String queryName,
             @ApiParam(value = "query definition represented as QueryDefinition", required = true, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=QUERY_DEF_JSON),
@@ -226,7 +226,7 @@ public class QueryDataResource {
     @DELETE
     @Path(DROP_QUERY_DEF_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response dropQueryDefinition( @javax.ws.rs.core.Context HttpHeaders headers,
+    public Response dropQueryDefinition( @jakarta.ws.rs.core.Context HttpHeaders headers,
             @ApiParam(value = "identifier of the query definition to be deleted", required = true, example = "customQuery") @PathParam("queryName") String queryName ) {
         Variant v = getVariant( headers );
         // no container id available so only used to transfer conversation id if

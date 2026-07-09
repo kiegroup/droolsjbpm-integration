@@ -18,10 +18,10 @@ package org.kie.karaf.itest.beans;
 
 import java.util.Properties;
 
-import javax.persistence.EntityManagerFactory;
-import javax.transaction.TransactionManager;
-import javax.transaction.TransactionSynchronizationRegistry;
-import javax.transaction.UserTransaction;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.transaction.TransactionManager;
+import jakarta.transaction.TransactionSynchronizationRegistry;
+import jakarta.transaction.UserTransaction;
 
 import org.jbpm.services.task.identity.JBossUserGroupCallbackImpl;
 import org.kie.api.KieBase;

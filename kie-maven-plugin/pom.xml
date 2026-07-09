@@ -15,7 +15,9 @@
   <packaging>maven-plugin</packaging>
 
   <name>KIE :: Maven Plugin</name>
-
+  <properties>
+    <java.module.name>org.kie.maven.plugin</java.module.name>
+  </properties>
   <build>
     <plugins>
       <plugin>
@@ -244,12 +246,12 @@
           <artifactId>jakarta.activation-api</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>com.sun.xml.bind</groupId>
+          <groupId>org.glassfish.jaxb</groupId>
           <artifactId>jaxb-core</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>com.sun.xml.bind</groupId>
-          <artifactId>jaxb-impl</artifactId>
+          <groupId>org.glassfish.jaxb</groupId>
+          <artifactId>jaxb-runtime</artifactId>
         </exclusion>
         <exclusion>
           <groupId>jakarta.xml.bind</groupId>

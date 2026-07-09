@@ -20,9 +20,9 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.Response;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;

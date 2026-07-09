@@ -17,8 +17,8 @@
 package org.kie.server.controller.websocket.common;
 
 import java.util.function.Consumer;
-import javax.websocket.EndpointConfig;
-import javax.websocket.Session;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.Session;
 
 import org.kie.server.controller.api.model.events.KieServerControllerEvent;
 import org.kie.server.controller.websocket.common.handlers.KieServerControllerNotificationMessageHandler;

@@ -38,12 +38,12 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
+import jakarta.xml.bind.annotation.XmlAnyElement;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElements;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapters;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -81,7 +81,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.databind.util.ClassUtil;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationIntrospector;
 import org.drools.core.xml.jaxb.util.JaxbListAdapter;
 import org.drools.core.xml.jaxb.util.JaxbListWrapper;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
@@ -496,7 +496,7 @@ public class JSONMarshaller implements Marshaller {
         return data;
     }
 
-    class ExtendedJaxbAnnotationIntrospector extends JaxbAnnotationIntrospector {
+    class ExtendedJaxbAnnotationIntrospector extends JakartaXmlBindAnnotationIntrospector {
 
         private List<NamedType> customClasses;
         private ObjectMapper customObjectMapper;
@@ -674,7 +674,7 @@ public class JSONMarshaller implements Marshaller {
         @Override
         public PropertyName findNameForSerialization(Annotated a) {
             PropertyName pn = super.findNameForSerialization(a);
-            // JaxbAnnotationIntrospector doesn't handle XmlAnyElement
+            // JakartaXmlBindAnnotationIntrospector doesn't handle XmlAnyElement
             if (pn == null && a.getAnnotation(XmlAnyElement.class) != null) {
                 return PropertyName.USE_DEFAULT;
             }
@@ -684,7 +684,7 @@ public class JSONMarshaller implements Marshaller {
         @Override
         public PropertyName findNameForDeserialization(Annotated a) {
             PropertyName pn = super.findNameForDeserialization(a);
-            // JaxbAnnotationIntrospector doesn't handle XmlAnyElement
+            // JakartaXmlBindAnnotationIntrospector doesn't handle XmlAnyElement
             if (pn == null && a.getAnnotation(XmlAnyElement.class) != null) {
                 return PropertyName.USE_DEFAULT;
             }

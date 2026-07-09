@@ -11,6 +11,9 @@
 
   <name>KIE Server :: Spring :: Boot :: Starter :: jBPM and Case management</name>
   <description>jBPM and Case management - KIE Server SpringBoot Starter</description>
+  <properties>
+    <java.module.name>org.kie.server.spring.boot.starter.jbpm</java.module.name>
+  </properties>
 
   <dependencies>
     <!-- Spring Boot v2 has no updates, but the tomcat version it uses has multiple CVEs -->

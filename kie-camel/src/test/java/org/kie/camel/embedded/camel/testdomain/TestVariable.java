@@ -16,7 +16,7 @@
 
 package org.kie.camel.embedded.camel.testdomain;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.junit.Ignore;
 

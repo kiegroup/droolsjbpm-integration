@@ -18,7 +18,7 @@ package org.jbpm.springboot.services;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.drools.core.event.AbstractEventSupport;
 import org.jbpm.casemgmt.api.event.CaseEventListener;

@@ -12,6 +12,7 @@
   <description>KIE Server SpringBoot Sample (includes all KIE Server capabilities) with Keycloak as security management</description>
 
   <properties>
+    <java.module.name>org.kie.keycloak.server.spring.boot.sample</java.module.name>
     <start-class>org.kie.server.springboot.samples.KieServerApplication</start-class>
   </properties>
 

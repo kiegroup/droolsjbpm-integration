@@ -11,7 +11,9 @@
 
   <name>KIE :: Execution Server :: Tests :: JAX-WS Test Web Service</name>
   <description>JAX-WS Test Web Service to verify WebService integration with jBPM.</description>
-
+  <properties>
+    <java.module.name>org.kie.server.itests.test.web.service</java.module.name>
+  </properties>
   <build>
     <finalName>kie-server-test-web-service</finalName>
     <plugins>

@@ -27,8 +27,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import javax.persistence.LockTimeoutException;
-import javax.persistence.PessimisticLockException;
+import jakarta.persistence.LockTimeoutException;
+import jakarta.persistence.PessimisticLockException;
 import org.jbpm.process.audit.AuditLogService;
 
 import org.junit.Rule;

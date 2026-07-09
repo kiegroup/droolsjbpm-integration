@@ -17,8 +17,8 @@
 package org.kie.spring.factorybeans;
 
 import java.util.Map;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.jbpm.process.core.timer.GlobalSchedulerService;
 import org.kie.api.KieBase;

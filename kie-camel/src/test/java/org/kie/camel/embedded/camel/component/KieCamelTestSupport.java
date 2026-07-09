@@ -32,7 +32,7 @@ package org.kie.camel.embedded.camel.component;
 import java.util.List;
 import javax.naming.Context;
 import javax.naming.NamingException;
-import javax.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBContext;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JaxbDataFormat;

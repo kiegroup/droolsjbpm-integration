@@ -18,11 +18,11 @@ package org.kie.server.controller.rest;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.Variant;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.Variant;
 
 import org.kie.server.common.KeyStoreHelperUtil;
 import org.kie.server.common.rest.RestEasy960Util;
@@ -78,7 +78,7 @@ public class ControllerUtils {
         return modelClasses;
     }
 
-    public static Response createCorrectVariant(String responseObj, HttpHeaders headers, javax.ws.rs.core.Response.Status status) {
+    public static Response createCorrectVariant(String responseObj, HttpHeaders headers, jakarta.ws.rs.core.Response.Status status) {
         Response.ResponseBuilder responseBuilder = null;
         Variant v = getVariant(headers);
 

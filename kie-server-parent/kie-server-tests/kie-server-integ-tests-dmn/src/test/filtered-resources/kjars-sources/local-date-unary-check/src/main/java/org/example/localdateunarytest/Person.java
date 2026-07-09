@@ -1,13 +1,13 @@
 package org.example.localdateunarytest;
 
-@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)
+@jakarta.xml.bind.annotation.XmlAccessorType(jakarta.xml.bind.annotation.XmlAccessType.FIELD)
 public class Person implements java.io.Serializable {
 
     static final long serialVersionUID = 1L;
 
     private java.lang.String id;
     private java.lang.String name;
-    @javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter(org.kie.internal.jaxb.LocalDateXmlAdapter.class)
+    @jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter(org.kie.internal.jaxb.LocalDateXmlAdapter.class)
     private java.time.LocalDate dojoining;
 
     public Person() {

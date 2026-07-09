@@ -11,7 +11,9 @@
 
   <name>KIE Server :: Spring :: Boot :: Starter</name>
   <description>KIE Server SpringBoot Starter</description>
-
+  <properties>
+    <java.module.name>org.kie.server.spring.boot.starter</java.module.name>
+  </properties>
 
   <dependencies> 
     <!-- Spring Boot v2 has no updates, but the tomcat version it uses has multiple CVEs -->

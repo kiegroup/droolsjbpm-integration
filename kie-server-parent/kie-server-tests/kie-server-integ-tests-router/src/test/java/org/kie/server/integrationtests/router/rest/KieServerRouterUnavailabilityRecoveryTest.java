@@ -27,12 +27,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -196,9 +196,9 @@ public class KieServerRouterUnavailabilityRecoveryTest {
     protected WebTarget newRequest(String uriString) {
 
         if(httpClient == null) {
-            httpClient = new ResteasyClientBuilder()
-                    .establishConnectionTimeout(10, TimeUnit.SECONDS)
-                    .socketTimeout(10, TimeUnit.SECONDS)
+            httpClient = new ResteasyClientBuilderImpl()
+                    .connectTimeout(10, TimeUnit.SECONDS)
+                    .readTimeout(10, TimeUnit.SECONDS)
                     .register(new Authenticator(TestConfig.getUsername(), TestConfig.getPassword()))
                     .build();
         }

@@ -16,7 +16,7 @@
 
 package org.kie.aries.blueprint.mocks;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;

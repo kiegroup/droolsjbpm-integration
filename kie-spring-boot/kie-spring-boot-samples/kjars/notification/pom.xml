@@ -6,4 +6,8 @@
   <artifactId>notification</artifactId>
   <version>1.0.0</version>
   <name>Simple Notification Process</name>
+
+  <properties>
+    <java.module.name>org.jbpm.notification</java.module.name>
+  </properties>
 </project>

@@ -16,9 +16,9 @@
 
 package org.kie.server.controller.common;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.annotation.WebListener;
 
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.config.DefaultJaxrsScanner;

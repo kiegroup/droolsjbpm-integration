@@ -17,7 +17,7 @@ package org.kie.server.services.jbpm.jpa;
 
 import java.io.InputStream;
 import javax.naming.InitialContext;
-import javax.persistence.spi.PersistenceUnitInfo;
+import jakarta.persistence.spi.PersistenceUnitInfo;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;

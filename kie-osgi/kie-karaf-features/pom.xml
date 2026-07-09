@@ -66,8 +66,8 @@
     <karaf.version.commons-collections4>4.1</karaf.version.commons-collections4>
     <!-- Overwrites with a servicemix version -->
     <karaf.servicemix.version.com.google.protobuf>2.4.1_1</karaf.servicemix.version.com.google.protobuf>
-    <karaf.servicemix.version.com.sun.xml.bind.jaxb>2.3.2_3</karaf.servicemix.version.com.sun.xml.bind.jaxb>
-    <karaf.servicemix.version.com.sun.xml.bind.jaxb.xjc>2.3.2_2</karaf.servicemix.version.com.sun.xml.bind.jaxb.xjc>
+    <karaf.servicemix.version.org.glassfish.jaxb.jaxb-runtime>2.3.2_3</karaf.servicemix.version.org.glassfish.jaxb.jaxb-runtime>
+    <karaf.servicemix.version.org.glassfish.jaxb.jaxb-xjc>2.3.2_2</karaf.servicemix.version.org.glassfish.jaxb.jaxb-xjc>
     <karaf.servicemix.version.com.thoughtworks.xstream>1.4.10_1</karaf.servicemix.version.com.thoughtworks.xstream>
     <karaf.servicemix.version.com.thoughtworks.xmlpull>1.1.4c_7</karaf.servicemix.version.com.thoughtworks.xmlpull>
     <karaf.servicemix.version.javax.xml.bind.jaxb>2.3_3</karaf.servicemix.version.javax.xml.bind.jaxb>
@@ -192,7 +192,7 @@
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.jaxb-xjc</artifactId>
-        <version>${karaf.servicemix.version.com.sun.xml.bind.jaxb.xjc}</version>
+        <version>${karaf.servicemix.version.org.glassfish.jaxb.jaxb-xjc}</version>
         <exclusions>
           <exclusion>
             <groupId>javax.xml.stream</groupId>
@@ -215,7 +215,7 @@
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.jaxb-runtime</artifactId>
-        <version>${karaf.servicemix.version.com.sun.xml.bind.jaxb}</version>
+        <version>${karaf.servicemix.version.org.glassfish.jaxb.jaxb-runtime}</version>
         <exclusions>
           <exclusion>
             <groupId>javax.xml.stream</groupId>
@@ -694,11 +694,6 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-entitymanager</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>

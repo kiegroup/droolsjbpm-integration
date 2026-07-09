@@ -17,8 +17,8 @@
 package org.kie.camel.embedded.component;
 
 import java.io.InputStream;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;

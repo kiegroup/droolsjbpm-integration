@@ -5,4 +5,8 @@
   <groupId>org.jbpm.test</groupId>
   <artifactId>evaluation</artifactId>
   <version>1.0.0</version>
+
+  <properties>
+    <java.module.name>org.jbpm.test.evaluation</java.module.name>
+  </properties>
 </project>

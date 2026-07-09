@@ -15,7 +15,7 @@
 
 package org.kie.spring.manager;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import org.drools.persistence.api.TransactionManagerFactory;
 import org.jbpm.process.core.timer.GlobalSchedulerService;

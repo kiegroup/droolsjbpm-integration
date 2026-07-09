@@ -15,7 +15,7 @@
 
 package org.kie.server.services.impl.adapters;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.kie.api.runtime.ExecutionResults;

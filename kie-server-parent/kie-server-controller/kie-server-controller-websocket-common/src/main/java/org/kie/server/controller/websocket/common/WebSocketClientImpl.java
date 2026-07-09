@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import javax.websocket.*;
+import jakarta.websocket.*;
 
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.kie.server.controller.websocket.common.auth.WebSocketAuthConfigurator;

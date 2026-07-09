@@ -16,7 +16,7 @@
 
 package org.kie.karaf.itest;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.osgi.framework.BundleContext;
 import org.springframework.context.ConfigurableApplicationContext;

@@ -24,6 +24,7 @@
   <description>Sample project for jBPM SpringBoot application</description>
 
   <properties>
+    <java.module.name>org.kie.jbpm.spring.boot.sample.basic</java.module.name>
     <start-class>org.jbpm.springboot.samples.JBPMApplication</start-class>
   </properties>
 
@@ -31,7 +32,7 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>jbpm-spring-boot-starter-basic</artifactId>     
-      <!-- collides with com.sun.xml.bind:jaxb-impl:jar:2.3.0 and com.sun.xml.bind:jaxb-impl:jar:2.3.0 -->
+      <!-- collides with org.glassfish.jaxb:jaxb-runtime -->
       <exclusions>
         <exclusion>
           <groupId>org.glassfish.jaxb</groupId>
@@ -123,13 +124,13 @@
 
     <!--Java 11 test dependencies-->
     <dependency>
-      <groupId>com.sun.xml.bind</groupId>
+      <groupId>org.glassfish.jaxb</groupId>
       <artifactId>jaxb-core</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

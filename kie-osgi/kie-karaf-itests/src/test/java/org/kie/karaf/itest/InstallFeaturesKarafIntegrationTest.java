@@ -19,7 +19,7 @@ package org.kie.karaf.itest;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.karaf.features.FeaturesService;
 import org.junit.After;

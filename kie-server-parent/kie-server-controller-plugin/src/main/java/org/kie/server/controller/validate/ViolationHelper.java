@@ -17,7 +17,7 @@
 package org.kie.server.controller.validate;
 
 import java.util.Set;
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 public class ViolationHelper {
 

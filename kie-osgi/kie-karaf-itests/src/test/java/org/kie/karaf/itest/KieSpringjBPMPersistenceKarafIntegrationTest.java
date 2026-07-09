@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManagerFactory;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.h2.tools.Server;
 import org.jbpm.process.instance.impl.demo.SystemOutWorkItemHandler;

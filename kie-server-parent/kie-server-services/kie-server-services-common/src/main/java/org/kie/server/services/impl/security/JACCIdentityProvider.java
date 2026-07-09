@@ -15,19 +15,21 @@
 
 package org.kie.server.services.impl.security;
 
-import java.security.Principal;
-import java.security.acl.Group;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Set;
+import org.kie.server.api.security.SecurityAdapter;
 
 import javax.security.auth.Subject;
 import javax.security.jacc.PolicyContext;
-
-import org.kie.server.api.security.SecurityAdapter;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Collections.emptyList;
+import static org.kie.server.services.impl.security.SecurityMigrationUtils.getGroupsEquivalentReflective;
+import static org.kie.server.services.impl.security.SecurityMigrationUtils.getRolesFromPrincipals;
+import static org.kie.server.services.impl.security.SecurityMigrationUtils.isGroupPrincipal;
 
 public class JACCIdentityProvider
         extends BaseIdentityProvider {
@@ -67,19 +69,7 @@ public class JACCIdentityProvider
             Set<Principal> principals = subject.getPrincipals();
 
             if (principals != null) {
-
-                roles = new ArrayList<String>();
-                for (Principal principal : principals) {
-                    if (principal instanceof Group) {
-                        Enumeration<? extends Principal> groups = ((Group) principal).members();
-
-                        while (groups.hasMoreElements()) {
-                            Principal groupPrincipal = groups.nextElement();
-                            roles.add(groupPrincipal.getName());
-                        }
-                        break;
-                    }
-                }
+                roles = getRolesFromPrincipals(principals);
             }
         }
 
@@ -95,15 +85,18 @@ public class JACCIdentityProvider
             Set<Principal> principals = subject.getPrincipals();
             if (principals != null) {
                 for (Principal principal : principals) {
-                    if (principal instanceof Group) {
-                        Enumeration<? extends Principal> groups = ((Group) principal).members();
-                        while (groups.hasMoreElements()) {
-                            Principal groupPrincipal = groups.nextElement();
-                            if (groupPrincipal.getName().equals(s)) {
-                                return true;
+                    if (isGroupPrincipal(principal)) {
+                        Optional<Enumeration<? extends Principal>> optionalGroups = getGroupsEquivalentReflective(principal);
+                        if (optionalGroups.isPresent()) {
+                            Enumeration<? extends Principal> groups = optionalGroups.get();
+                            while (groups.hasMoreElements()) {
+                                Principal groupPrincipal = groups.nextElement();
+                                if (groupPrincipal.getName().equals(s)) {
+                                    return true;
+                                }
                             }
+                            break;
                         }
-                        break;
                     }
                 }
             }
@@ -120,17 +113,15 @@ public class JACCIdentityProvider
 
     protected static Subject getSubjectFromContainer() {
         try {
-            return (Subject) PolicyContext.getContext("javax.security.auth.Subject.container");
+            return (Subject) PolicyContext.getContext("jakarta.security.auth.Subject.container");
         } catch (Exception e) {
             return null;
         }
     }
 
     protected boolean supportedPrincipal(Principal principal) {
-        if (!(principal instanceof Group) && !principal.getClass().getName().endsWith("BasicAuthorizationPrincipal")) {
-            return true;
-        }
-
-        return false;
+        return !isGroupPrincipal(principal) && !principal.getClass().getName().endsWith("BasicAuthorizationPrincipal");
     }
+
+
 }

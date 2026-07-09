@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import javax.naming.InitialContext;
-import javax.transaction.UserTransaction;
+import jakarta.transaction.UserTransaction;
 
 import static org.junit.Assert.*;
 

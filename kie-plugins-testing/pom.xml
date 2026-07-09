@@ -14,6 +14,9 @@
   <packaging>takari-maven-plugin</packaging>
 
   <name>KIE :: Plugins Testing</name>
+  <properties>
+    <java.module.name>org.kie.plugin.testing</java.module.name>
+  </properties>
 
   <build>
     <plugins>
@@ -66,13 +69,13 @@
     </dependency>
 
     <dependency>
-      <groupId>com.sun.xml.bind</groupId>
+      <groupId>org.glassfish.jaxb</groupId>
       <artifactId>jaxb-core</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>

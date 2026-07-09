@@ -16,7 +16,7 @@
 
 package org.kie.server.services.jbpm.locator;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import org.kie.server.services.api.ContainerLocator;
 

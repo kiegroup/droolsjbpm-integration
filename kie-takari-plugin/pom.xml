@@ -14,6 +14,11 @@
   <packaging>takari-maven-plugin</packaging>
 
   <name>KIE :: Takari Plugin</name>
+  <properties>
+    <java.module.name>org.kie.takari.plugin</java.module.name>
+    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.source>17</maven.compiler.source>
+  </properties>
 
   <build>
     <plugins>
@@ -172,12 +177,12 @@
           <artifactId>jakarta.activation-api</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>com.sun.xml.bind</groupId>
+          <groupId>org.glassfish.jaxb</groupId>
           <artifactId>jaxb-core</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>com.sun.xml.bind</groupId>
-          <artifactId>jaxb-impl</artifactId>
+          <groupId>org.glassfish.jaxb</groupId>
+          <artifactId>jaxb-runtime</artifactId>
         </exclusion>
         <exclusion>
           <groupId>jakarta.xml.bind</groupId>

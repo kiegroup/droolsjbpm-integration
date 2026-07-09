@@ -28,6 +28,9 @@
   <artifactId>kie-spring-test</artifactId>
 
   <name>KIE Integration :: KIE Spring Integration Test</name>
+  <properties>
+    <java.module.name>org.drools.testcoverage.spring.test</java.module.name>
+  </properties>
 
   <dependencies>
     <dependency>

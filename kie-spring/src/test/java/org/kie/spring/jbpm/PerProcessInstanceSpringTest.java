@@ -21,8 +21,8 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 import javax.naming.InitialContext;
-import javax.persistence.EntityManager;
-import javax.transaction.UserTransaction;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.UserTransaction;
 
 import org.drools.persistence.jta.JtaTransactionManager;
 import org.jbpm.process.audit.ProcessInstanceLog;

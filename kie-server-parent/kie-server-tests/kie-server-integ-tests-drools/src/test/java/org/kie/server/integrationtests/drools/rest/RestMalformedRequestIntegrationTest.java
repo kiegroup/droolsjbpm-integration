@@ -15,9 +15,9 @@
 
 package org.kie.server.integrationtests.drools.rest;
 
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.Response;
 
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.junit.BeforeClass;

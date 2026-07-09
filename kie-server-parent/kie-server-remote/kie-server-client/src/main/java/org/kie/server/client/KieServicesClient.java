@@ -15,7 +15,7 @@
 
 package org.kie.server.client;
 
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.kie.api.command.Command;
 import org.kie.server.api.commands.CommandScript;

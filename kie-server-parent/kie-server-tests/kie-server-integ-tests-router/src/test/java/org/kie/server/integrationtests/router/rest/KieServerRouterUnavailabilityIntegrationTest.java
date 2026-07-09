@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.stream.Stream;
 
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Response;
 
 import org.junit.After;
 import org.junit.Assert;
