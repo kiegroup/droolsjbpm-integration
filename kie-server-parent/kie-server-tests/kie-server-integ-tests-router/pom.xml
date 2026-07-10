@@ -87,7 +87,7 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
-      <classifier>ee8</classifier>
+      <classifier>ee10</classifier>
       <type>war</type>
       <scope>test</scope>
     </dependency>

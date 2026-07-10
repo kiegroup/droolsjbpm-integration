@@ -107,7 +107,7 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
-      <classifier>ee8</classifier>
+      <classifier>ee10</classifier>
       <type>war</type>
       <scope>test</scope>
     </dependency>
@@ -358,7 +358,7 @@
         </property>
       </activation>
       <properties>
-        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.ee8.war.path}</kie-server.war.path>
+        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.ee10.war.path}</kie-server.war.path>
         <skip-prepare-kie-server>false</skip-prepare-kie-server>
       </properties>
       <build>
@@ -409,7 +409,7 @@
         </property>
       </activation>
       <properties>
-        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.ee8.war.path}</kie-server.war.path>
+        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.ee10.war.path}</kie-server.war.path>
         <skip-prepare-kie-server>false</skip-prepare-kie-server>
       </properties>
       <build>

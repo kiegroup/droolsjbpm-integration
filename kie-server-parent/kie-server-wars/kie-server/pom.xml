@@ -379,6 +379,7 @@
         <configuration>
           <finalName>kie-server-${project.version}</finalName>
           <descriptors>
+            <descriptor>src/main/assembly/assembly-ee10-container.xml</descriptor>
             <descriptor>src/main/assembly/assembly-ee8-container.xml</descriptor>
             <descriptor>src/main/assembly/assembly-ee7-container.xml</descriptor>
             <descriptor>src/main/assembly/assembly-servlet-container.xml</descriptor>
