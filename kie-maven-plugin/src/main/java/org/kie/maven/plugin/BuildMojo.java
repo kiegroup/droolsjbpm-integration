@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import jakarta.inject.Inject;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
@@ -44,8 +43,12 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.drools.compiler.compiler.io.memory.MemoryFile;
 import org.drools.compiler.compiler.io.memory.MemoryFileSystem;
 import org.drools.compiler.kie.builder.impl.CompilationCacheProvider;
@@ -66,7 +69,7 @@ import static org.kie.maven.plugin.ExecModelMode.isModelCompilerInClassPath;
         requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
         requiresProject = true,
         defaultPhase = LifecyclePhase.COMPILE)
-public class BuildMojo extends AbstractDMNValidationAwareMojo {
+public class BuildMojo extends AbstractDMNValidationAwareMojo implements Contextualizable {
 
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     private MavenSession mavenSession;
@@ -95,9 +98,12 @@ public class BuildMojo extends AbstractDMNValidationAwareMojo {
     /**
      * This container is the same accessed in the KieMavenCli in the kie-wb-common
      */
-    @Inject
     private PlexusContainer container;
 
+    @Override
+    public void contextualize(Context context) throws ContextException {
+        container = (PlexusContainer) context.get(PlexusConstants.PLEXUS_KEY);
+    }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         // BuildMojo is executed when GenerateModelMojo isn't and vice-versa
