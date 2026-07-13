@@ -14,7 +14,7 @@
   <name>KIE Integration :: KIE Maven Plugin Additional Tests (DEFAULT exec model)</name>
 
   <properties>
-    <java.module.name>org.drools.testcoverage.default.execmodel.test.suite</java.module.name>
+    <java.module.name>org.drools.testcoverage.execmodel.test.suite</java.module.name>
   </properties>
 
   <dependencies>
