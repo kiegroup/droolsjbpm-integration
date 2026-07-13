@@ -14,7 +14,7 @@
 
   <name>KIE Integration :: KIE Maven Plugin Instrumented kJAR Wrapper (DEFAULT exec model)</name>
   <properties>
-    <java.module.name>org.drools.testcoverage.kjar.default.execmodel.wrapper</java.module.name>
+    <java.module.name>org.drools.testcoverage.kjar.execmodel.wrapper</java.module.name>
   </properties>
 
   <dependencies>
