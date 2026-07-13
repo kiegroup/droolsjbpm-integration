@@ -34,6 +34,8 @@ import static org.kie.server.services.impl.security.SecurityMigrationUtils.isGro
 public class JACCIdentityProvider
         extends BaseIdentityProvider {
 
+    public static final String SECURITY_AUTH_SUBJECT_CONTAINER = "javax.security.auth.Subject.container";
+
     @Override
     public String getName() {
         if (contextUsers.get() != null) {
@@ -113,7 +115,7 @@ public class JACCIdentityProvider
 
     protected static Subject getSubjectFromContainer() {
         try {
-            return (Subject) PolicyContext.getContext("jakarta.security.auth.Subject.container");
+            return (Subject) PolicyContext.getContext(SECURITY_AUTH_SUBJECT_CONTAINER);
         } catch (Exception e) {
             return null;
         }

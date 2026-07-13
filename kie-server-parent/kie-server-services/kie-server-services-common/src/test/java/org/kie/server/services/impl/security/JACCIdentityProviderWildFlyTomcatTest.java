@@ -35,6 +35,7 @@ import org.kie.internal.identity.IdentityProvider;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.kie.server.services.impl.security.JACCIdentityProvider.SECURITY_AUTH_SUBJECT_CONTAINER;
 
 public class JACCIdentityProviderWildFlyTomcatTest {
 
@@ -64,15 +65,12 @@ public class JACCIdentityProviderWildFlyTomcatTest {
 
             @Override
             public boolean supports(String key) throws PolicyContextException {
-                if ("javax.security.auth.Subject.container".equals(key)) {
-                    return true;
-                }
-                return false;
+                return SECURITY_AUTH_SUBJECT_CONTAINER.equals(key);
             }
 
             @Override
             public String[] getKeys() throws PolicyContextException {
-                return new String[]{"javax.security.auth.Subject.container"};
+                return new String[]{SECURITY_AUTH_SUBJECT_CONTAINER};
             }
 
             @Override
@@ -85,7 +83,7 @@ public class JACCIdentityProviderWildFlyTomcatTest {
                 return s;
             }
         };
-        PolicyContext.registerHandler("javax.security.auth.Subject.container", handler, true);
+        PolicyContext.registerHandler(SECURITY_AUTH_SUBJECT_CONTAINER, handler, true);
     }
 
     @Test
