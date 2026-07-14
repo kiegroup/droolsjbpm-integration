@@ -64,6 +64,14 @@
       <artifactId>jaxb-core</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!-- Test - JAX-RS runtime implementation (needed for RuntimeDelegate) -->
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
