@@ -18,7 +18,7 @@ package org.kie.server.integrationtests.swagger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.swagger.models.Operation;
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.models.Swagger;
 import io.swagger.parser.SwaggerParser;
 

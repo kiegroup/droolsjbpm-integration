@@ -28,11 +28,11 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Variant;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
@@ -75,7 +75,7 @@ import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_TASK_OUT
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_DEFINITION_NOT_FOUND;
 
-@Api(value="Process and task definitions")
+@Tag(name="Process and task definitions")
 @Path("server/" + PROCESS_DEF_URI)
 public class DefinitionResource {
 
@@ -92,17 +92,17 @@ public class DefinitionResource {
     }
 
 
-    @ApiOperation(value="Returns entity and task information for a specified process.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(code = 200, response = ProcessDefinition.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Returns entity and task information for a specified process.")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
+            @ApiResponse(responseCode = 404, message = "Process or Container Id not found"), 
+            @ApiResponse(responseCode = 200, response = ProcessDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEF_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessDefinition(@Context HttpHeaders headers, 
-            @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
-            @ApiParam(value = "process id that the definition should be retrieved for", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId) {
+            @Parameter(description = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @Parameter(description = "process id that the definition should be retrieved for", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -119,17 +119,17 @@ public class DefinitionResource {
         }
     }
 
-    @ApiOperation(value="Retrieves sub process definitions that are defined in given process within given container")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(code = 200, response = SubProcessesDefinition.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Retrieves sub process definitions that are defined in given process within given container")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
+            @ApiResponse(responseCode = 404, message = "Process or Container Id not found"), 
+            @ApiResponse(responseCode = 200, response = SubProcessesDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_SUBP_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_SUBPROCESS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getReusableSubProcesses(@Context HttpHeaders headers, 
-            @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "process id that subprocesses should be retrieved from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId) {
+            @Parameter(description = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @Parameter(description = "process id that subprocesses should be retrieved from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -145,17 +145,17 @@ public class DefinitionResource {
         }
     }
 
-    @ApiOperation(value="Retrieves process variables definitions that are present in given process and container")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(code = 200, response = VariablesDefinition.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Retrieves process variables definitions that are present in given process and container")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
+            @ApiResponse(responseCode = 404, message = "Process or Container Id not found"), 
+            @ApiResponse(responseCode = 200, response = VariablesDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_VARS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_VARIABLES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessVariables(@Context HttpHeaders headers, 
-            @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "process id that the variable definitions should be retrieved from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId) {
+            @Parameter(description = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @Parameter(description = "process id that the variable definitions should be retrieved from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -171,17 +171,17 @@ public class DefinitionResource {
         }
     }
 
-    @ApiOperation(value="Retrieves service tasks definitions that are present in given process and container")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(code = 200, response = ServiceTasksDefinition.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Retrieves service tasks definitions that are present in given process and container")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
+            @ApiResponse(responseCode = 404, message = "Process or Container Id not found"), 
+            @ApiResponse(responseCode = 200, response = ServiceTasksDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_SERVICE_TASKS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_SERVICE_TASKS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getServiceTasks(@Context HttpHeaders headers, 
-            @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "process id that the service task definitions should be retrieved from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId) {
+            @Parameter(description = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @Parameter(description = "process id that the service task definitions should be retrieved from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -197,17 +197,17 @@ public class DefinitionResource {
         }
     }
 
-    @ApiOperation(value="Retrieves actors and groups that are involved in given process and container")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(code = 200, response = AssociatedEntitiesDefinition.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Retrieves actors and groups that are involved in given process and container")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
+            @ApiResponse(responseCode = 404, message = "Process or Container Id not found"), 
+            @ApiResponse(responseCode = 200, response = AssociatedEntitiesDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_ENTITIES_RESPONSE_JSON)})) })    
     @GET
     @Path(PROCESS_DEF_ASSOCIATED_ENTITIES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getAssociatedEntities(@Context HttpHeaders headers, 
-            @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "process id that the involved actors and groups should be retrieved from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId) {
+            @Parameter(description = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @Parameter(description = "process id that the involved actors and groups should be retrieved from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -223,17 +223,17 @@ public class DefinitionResource {
         }
     }
 
-    @ApiOperation(value="Retrieves user tasks definitions that are present in given process and container")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(code = 200, response = UserTaskDefinitionList.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Retrieves user tasks definitions that are present in given process and container")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
+            @ApiResponse(responseCode = 404, message = "Process or Container Id not found"), 
+            @ApiResponse(responseCode = 200, response = UserTaskDefinitionList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASKS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_USER_TASKS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTasksDefinitions(@Context HttpHeaders headers, 
-            @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "process id that the user task definitions should be retrieved from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId) {
+            @Parameter(description = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @Parameter(description = "process id that the user task definitions should be retrieved from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -249,18 +249,18 @@ public class DefinitionResource {
         }
     }
 
-    @ApiOperation(value="Retrieves input variables defined on a given user task")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(code = 200, response = TaskInputsDefinition.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Retrieves input variables defined on a given user task")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
+            @ApiResponse(responseCode = 404, message = "Process or Container Id not found"), 
+            @ApiResponse(responseCode = 200, response = TaskInputsDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_INPUTS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_USER_TASK_INPUT_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTaskInputMappings(@Context HttpHeaders headers, 
-            @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "process id that given task belongs to", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId, 
-            @ApiParam(value = "task name that input variable definitions should be retrieved for", required = true, example = "Review") @PathParam("taskName") String taskName) {
+            @Parameter(description = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @Parameter(description = "process id that given task belongs to", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId, 
+            @Parameter(description = "task name that input variable definitions should be retrieved for", required = true, example = "Review") @PathParam("taskName") String taskName) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -277,18 +277,18 @@ public class DefinitionResource {
         }
     }
 
-    @ApiOperation(value="Retrieves output variables defined on a given user task")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(code = 200, response = TaskOutputsDefinition.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Retrieves output variables defined on a given user task")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
+            @ApiResponse(responseCode = 404, message = "Process or Container Id not found"), 
+            @ApiResponse(responseCode = 200, response = TaskOutputsDefinition.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_OUTPUTS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_USER_TASK_OUTPUT_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTaskOutputMappings(@Context HttpHeaders headers, 
-            @ApiParam(value = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "process id that given task belongs to", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId, 
-            @ApiParam(value = "task name that output variable definitions should be retrieved for", required = true, example = "Review") @PathParam("taskName") String taskName) {
+            @Parameter(description = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
+            @Parameter(description = "process id that given task belongs to", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId, 
+            @Parameter(description = "task name that output variable definitions should be retrieved for", required = true, example = "Review") @PathParam("taskName") String taskName) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {

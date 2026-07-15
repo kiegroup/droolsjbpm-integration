@@ -23,19 +23,22 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import io.swagger.v3.core.model.ApiDescription;
+import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import io.swagger.v3.oas.integration.OpenApiConfigurationException;
+import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.swagger.SwaggerKieServerExtension;
 
-import io.swagger.config.FilterFactory;
-import io.swagger.core.filter.AbstractSpecFilter;
-import io.swagger.core.filter.SwaggerSpecFilter;
-import io.swagger.jaxrs.ext.SwaggerExtension;
-import io.swagger.jaxrs.ext.SwaggerExtensions;
-import io.swagger.jaxrs.listing.SwaggerSerializers;
-import io.swagger.model.ApiDescription;
-import io.swagger.models.Operation;
+import io.swagger.v3.core.filter.AbstractSpecFilter;
+import io.swagger.v3.jaxrs2.ext.OpenAPIExtension;
+import io.swagger.v3.jaxrs2.ext.OpenAPIExtensions;
+import io.swagger.v3.jaxrs2.SwaggerSerializers;
+import io.swagger.v3.oas.models.Operation;
 
 public class SwaggerRestApplicationComponentsService implements KieServerApplicationComponentsService {
 
@@ -50,6 +53,7 @@ public class SwaggerRestApplicationComponentsService implements KieServerApplica
 				
         // add filter only if the history mode is active
         if (Boolean.getBoolean(KIE_SERVER_REST_MODE_READONLY)) {
+            /*
             SwaggerSpecFilter filter = new AbstractSpecFilter() {
 
                 @Override
@@ -59,16 +63,37 @@ public class SwaggerRestApplicationComponentsService implements KieServerApplica
 
             };
             FilterFactory.setFilter(filter);
-            List<SwaggerExtension> extensions = new ArrayList<>(SwaggerExtensions.getExtensions());
+             */
+            try {
+                new JaxrsOpenApiContextBuilder<>()
+                        .openApiConfiguration(
+                                new SwaggerConfiguration()
+                                        .filterClass(ReadOnlySpecFilter.class.getName())
+                        )
+                        .buildContext(true);
+            } catch (OpenApiConfigurationException e) {
+                throw new RuntimeException("Failed to register OpenAPI filter", e);
+            }
+            List<OpenAPIExtension> extensions = new ArrayList<>(OpenAPIExtensions.getExtensions());
             extensions.add(new ReadOnlySwaggerDecoration());
-            SwaggerExtensions.setExtensions(extensions);
+            OpenAPIExtensions.setExtensions(extensions);
         }
 		List<Object> components = new ArrayList<Object>(2);
 		// Swagger Resources
-		components.add(new KieApiListingResource());
+        // kept for backward compatibility, to still have the server/swagger.() rest
+        components.add(new KieApiListingResource());
+        // provides the new /openapi.() rest
+		components.add(new OpenApiResource());
 		components.add(new SwaggerSerializers());
 
 		return components;
 	}
+
+    private static class ReadOnlySpecFilter extends AbstractSpecFilter {
+        @Override
+        public Optional<Operation> filterOperation(Operation operation, ApiDescription api, Map<String, List<String>> params, Map<String, String> cookies, Map<String, List<String>> headers) {
+            return operation.getExtensions().containsKey(SWAGGER_EXTENSION_READ_ONLY) ? Optional.of(operation) : Optional.empty();
+        }
+    }
 
 }

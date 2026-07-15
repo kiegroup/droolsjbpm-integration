@@ -28,21 +28,21 @@ import jakarta.ws.rs.GET;
 import org.kie.server.remote.rest.common.marker.KieServerEndpoint;
 import org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType;
 
-import io.swagger.jaxrs.ext.AbstractSwaggerExtension;
-import io.swagger.jaxrs.ext.SwaggerExtension;
-import io.swagger.models.Operation;
+import io.swagger.v3.jaxrs2.ext.AbstractOpenAPIExtension;
+import io.swagger.v3.jaxrs2.ext.OpenAPIExtension;
+import io.swagger.v3.oas.models.Operation;
 
 
-public class ReadOnlySwaggerDecoration extends AbstractSwaggerExtension {
+public class ReadOnlySwaggerDecoration extends AbstractOpenAPIExtension {
 
     public static final String SWAGGER_EXTENSION_READ_ONLY = "x-readonly"; 
     
     private final List<EndpointType> valid = Arrays.asList(KieServerEndpoint.EndpointType.ALWAYS, KieServerEndpoint.EndpointType.HISTORY);
 
     @Override
-    public void decorateOperation(Operation operation, Method method, Iterator<SwaggerExtension> chain) {
+    public void decorateOperation(Operation operation, Method method, Iterator<OpenAPIExtension> chain) {
         if(method.isAnnotationPresent(GET.class)) {
-            operation.setVendorExtension(SWAGGER_EXTENSION_READ_ONLY, Boolean.TRUE);
+            operation.addExtension(SWAGGER_EXTENSION_READ_ONLY, Boolean.TRUE);
             if (chain.hasNext()) {
                 chain.next().decorateOperation(operation, method, chain);
             }
@@ -58,7 +58,7 @@ public class ReadOnlySwaggerDecoration extends AbstractSwaggerExtension {
             List<EndpointType> current = new ArrayList<>(asList(api.categories()));
             current.retainAll(valid);
             if(!current.isEmpty()) {
-                operation.setVendorExtension(SWAGGER_EXTENSION_READ_ONLY, Boolean.TRUE);
+                operation.addExtension(SWAGGER_EXTENSION_READ_ONLY, Boolean.TRUE);
             }
         }
 

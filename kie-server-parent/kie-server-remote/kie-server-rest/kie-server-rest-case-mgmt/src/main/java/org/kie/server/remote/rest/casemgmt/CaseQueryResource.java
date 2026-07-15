@@ -31,11 +31,11 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Variant;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 import org.kie.api.runtime.query.QueryContext;
@@ -80,7 +80,7 @@ import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 
-@Api(value="Case queries")
+@Tag(name="Case queries")
 @Path("server/" + CASE_QUERY_URI)
 public class CaseQueryResource extends AbstractCaseResource {
 
@@ -96,23 +96,23 @@ public class CaseQueryResource extends AbstractCaseResource {
         super(caseManagementRuntimeDataServiceBase, context);
     }
 
-    @ApiOperation(value="Returns cases instances with authentication checks.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = CaseInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Returns cases instances with authentication checks.")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
+            @ApiResponse(responseCode = 200, response = CaseInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
     @GET
     @Path(CASE_ALL_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstances(@jakarta.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "data item name that case instances will be filtered by", required = false) @QueryParam("dataItemName") String dataItemName, 
-            @ApiParam(value = "data item value that case instances will be filtered by", required = false) @QueryParam("dataItemValue") String dataItemValue,
-            @ApiParam(value = "case instance owner that case instances will be filtered by", required = false) @QueryParam("owner") String owner,
-            @ApiParam(value = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, allowableValues="open,closed,cancelled") @QueryParam("status") List<String> status,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder,
-            @ApiParam(value = "optional flag to load data when loading case instance", required = false) @QueryParam("withData") @DefaultValue("false") boolean withData) {
+            @Parameter(description = "data item name that case instances will be filtered by", required = false) @QueryParam("dataItemName") String dataItemName, 
+            @Parameter(description = "data item value that case instances will be filtered by", required = false) @QueryParam("dataItemValue") String dataItemValue,
+            @Parameter(description = "case instance owner that case instances will be filtered by", required = false) @QueryParam("owner") String owner,
+            @Parameter(description = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, allowableValues="open,closed,cancelled") @QueryParam("status") List<String> status,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder,
+            @Parameter(description = "optional flag to load data when loading case instance", required = false) @QueryParam("withData") @DefaultValue("false") boolean withData) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -140,21 +140,21 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns cases instances that involve the querying user in a specified role.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = CaseInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Returns cases instances that involve the querying user in a specified role.")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
+            @ApiResponse(responseCode = 200, response = CaseInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
     @GET
     @Path(CASE_INSTANCES_BY_ROLE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstancesByRole(@jakarta.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "case role that instances should be found for", required = true, example = "owner") @PathParam(CASE_ROLE_NAME) String roleName, 
-            @ApiParam(value = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, allowableValues="open,closed,cancelled") @QueryParam("status") List<String> status,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder,
-            @ApiParam(value = "optional flag to load data when loading case instance", required = false) @QueryParam("withData") @DefaultValue("false") boolean withData) {
+            @Parameter(description = "case role that instances should be found for", required = true, example = "owner") @PathParam(CASE_ROLE_NAME) String roleName, 
+            @Parameter(description = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, allowableValues="open,closed,cancelled") @QueryParam("status") List<String> status,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder,
+            @Parameter(description = "optional flag to load data when loading case instance", required = false) @QueryParam("withData") @DefaultValue("false") boolean withData) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -173,18 +173,18 @@ public class CaseQueryResource extends AbstractCaseResource {
      * case definition methods
      */
     
-    @ApiOperation(value="Returns a specified case definition from all KIE containers.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successful response", response = CaseDefinitionList.class, examples=@Example(value= {
+    @Operation(summary="Returns a specified case definition from all KIE containers.")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
+            @ApiResponse(responseCode = 200, message = "Successful response", response = CaseDefinitionList.class, examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_DEFINITIONS_JSON)}))})
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseDefinitions(@jakarta.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "case definition id or name that case definitions will be filtered by", required = true) @QueryParam("filter") String filter,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "case definition id or name that case definitions will be filtered by", required = true) @QueryParam("filter") String filter,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -202,19 +202,19 @@ public class CaseQueryResource extends AbstractCaseResource {
     /*
      * process definition methods
      */
-    @ApiOperation(value="Returns a specified process associated with case definitions from all KIE containers.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = ProcessDefinitionList.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Returns a specified process associated with case definitions from all KIE containers.")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
+            @ApiResponse(responseCode = 200, response = ProcessDefinitionList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEFS_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_ALL_PROCESSES_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessDefinitions(@jakarta.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "process definition id or name that process definitions will be filtered by", required = true) @QueryParam("filter") String filter,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "process definition id or name that process definitions will be filtered by", required = true) @QueryParam("filter") String filter,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -229,19 +229,19 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns processes associated with case definitions in a specified KIE container.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = ProcessDefinitionList.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Returns processes associated with case definitions in a specified KIE container.")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
+            @ApiResponse(responseCode = 200, response = ProcessDefinitionList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEFS_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_PROCESSES_BY_CONTAINER_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessDefinitionsByContainer(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process definitions should be filtered by", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "container id that process definitions should be filtered by", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -260,21 +260,21 @@ public class CaseQueryResource extends AbstractCaseResource {
      * Case tasks
      */
 
-    @ApiOperation(value="Returns tasks for potential owners in a specified case instance.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Returns tasks for potential owners in a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
+            @ApiResponse(responseCode = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_TASKS_AS_POT_OWNER_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstanceTasksAsPotentialOwner(@jakarta.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "case instance identifier that tasks should belong to", required = true, example = "CASE-00000000011") @PathParam(CASE_ID) String caseId,
-            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String user, 
-            @ApiParam(value = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "case instance identifier that tasks should belong to", required = true, example = "CASE-00000000011") @PathParam(CASE_ID) String caseId,
+            @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String user, 
+            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -288,21 +288,21 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns tasks for business administrators in a specified case instance.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Returns tasks for business administrators in a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
+            @ApiResponse(responseCode = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_TASKS_AS_ADMIN_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstanceTasksAsAdmin(@jakarta.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "case instance identifier that tasks should belong to", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
-            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String user, 
-            @ApiParam(value = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "case instance identifier that tasks should belong to", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
+            @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String user, 
+            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -316,21 +316,21 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns tasks for stakeholders in a specified case instance.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Returns tasks for stakeholders in a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
+            @ApiResponse(responseCode = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_TASKS_AS_STAKEHOLDER_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstanceTasksAsStakeholder(@jakarta.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "case instance identifier that tasks should belong to", required = true, example = "CASE-0000000001") @PathParam(CASE_ID) String caseId,
-            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String user, 
-            @ApiParam(value = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "case instance identifier that tasks should belong to", required = true, example = "CASE-0000000001") @PathParam(CASE_ID) String caseId,
+            @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String user, 
+            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -344,19 +344,19 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value="Returns case file data items for a specified case instance.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = CaseFileDataItemList.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Returns case file data items for a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
+            @ApiResponse(responseCode = 200, response = CaseFileDataItemList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_CASE_FILE_DATA_RESPONSE_JSON)}))})
     @GET
     @Path(CASE_FILE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstanceDataItems(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "case instance identifier that data items should belong to", required = true, example = "CASE-0000000001") @PathParam(CASE_ID) String caseId,
-            @ApiParam(value = "optionally filter by data item names", required = false) @QueryParam("name") List<String> names, 
-            @ApiParam(value = "optionally filter by data item types", required = false) @QueryParam("type") List<String> types,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @Parameter(description = "case instance identifier that data items should belong to", required = true, example = "CASE-0000000001") @PathParam(CASE_ID) String caseId,
+            @Parameter(description = "optionally filter by data item names", required = false) @QueryParam("name") List<String> names, 
+            @Parameter(description = "optionally filter by data item types", required = false) @QueryParam("type") List<String> types,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
         return invokeCaseOperation(headers,
                 "",
                 caseId,
@@ -369,15 +369,15 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
-    @ApiOperation(value = "Queries cases by variables and tasks", response = CaseInstanceCustomVarsList.class)
+    @Operation(summary = "Queries cases by variables and tasks", response = CaseInstanceCustomVarsList.class)
     @POST
     @Path(RestURI.VARIABLES_CASES_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @KieServerEndpoint(categories = {EndpointType.DEFAULT, EndpointType.HISTORY})
     public Response queryCaseByVariables(@Context HttpHeaders headers, String payload,
-                                         @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-                                         @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+                                         @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+                                         @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         Variant v = getVariant(headers);
@@ -395,7 +395,7 @@ public class CaseQueryResource extends AbstractCaseResource {
 
     }
 
-    @ApiOperation(value = "Queries cases tasks by variables", response = CaseUserTaskWithVariablesList.class)
+    @Operation(summary = "Queries cases tasks by variables", response = CaseUserTaskWithVariablesList.class)
     @POST
     @Path(RestURI.VARIABLES_TASKS_CASES_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -403,8 +403,8 @@ public class CaseQueryResource extends AbstractCaseResource {
     @KieServerEndpoint(categories = {EndpointType.DEFAULT, EndpointType.HISTORY})
     public Response queryCaseUserTasksByVariables(@Context HttpHeaders headers,
                                                   String payload,
-                                                  @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-                                                  @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+                                                  @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+                                                  @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         Variant v = getVariant(headers);

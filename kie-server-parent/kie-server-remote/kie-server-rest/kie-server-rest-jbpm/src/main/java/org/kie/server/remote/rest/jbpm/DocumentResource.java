@@ -36,11 +36,11 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 import jakarta.ws.rs.core.Variant;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.annotations.Example;
 import io.swagger.annotations.ExampleProperty;
 import io.swagger.annotations.ResponseHeader;
@@ -74,7 +74,7 @@ import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_DOCUMENT
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.JSON;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 
-@Api(value="Documents")
+@Tag(name="Documents")
 @Path("server/" + DOCUMENT_URI)
 public class DocumentResource {
 
@@ -92,15 +92,15 @@ public class DocumentResource {
         this.context = context;
     }
 
-    @ApiOperation(value="Retrieves document's content identified by given documentId",
+    @Operation(summary="Retrieves document's content identified by given documentId",
             response=byte[].class, code=200, responseHeaders={@ResponseHeader(name="Content-Disposition", description="provides file name of the document")})
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Document with given id not found") })
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
+            @ApiResponse(responseCode = 404, message = "Document with given id not found") })
     @GET
     @Path(DOCUMENT_INSTANCE_CONTENT_GET_URI)
     @Produces({MediaType.APPLICATION_OCTET_STREAM})
     public Response getDocumentContent(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "document id of a document that content should be retruned from", required = true, example = "xxx-yyy-zzz") @PathParam("documentId") String documentId) {
+            @Parameter(description = "document id of a document that content should be retruned from", required = true, example = "xxx-yyy-zzz") @PathParam("documentId") String documentId) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -132,16 +132,16 @@ public class DocumentResource {
         }
     }
 
-    @ApiOperation(value="Returns information about a specified document.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Document with given id not found"), 
-            @ApiResponse(code = 200, response = DocumentInstance.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Returns information about a specified document.")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
+            @ApiResponse(responseCode = 404, message = "Document with given id not found"), 
+            @ApiResponse(responseCode = 200, response = DocumentInstance.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_DOCUMENT_RESPONSE_JSON)})) })
     @GET
     @Path(DOCUMENT_INSTANCE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getDocument(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "document id of a document that should be retruned", required = true, example = "xxx-yyy-zzz") @PathParam("documentId") String documentId) {
+            @Parameter(description = "document id of a document that should be retruned", required = true, example = "xxx-yyy-zzz") @PathParam("documentId") String documentId) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -158,15 +158,15 @@ public class DocumentResource {
         }
     }
 
-    @ApiOperation(value="Returns all documents from KIE Server.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = DocumentInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Returns all documents from KIE Server.")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
+            @ApiResponse(responseCode = 200, response = DocumentInstanceList.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_DOCUMENTS_RESPONSE_JSON)})) })
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response listDocuments(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -181,15 +181,15 @@ public class DocumentResource {
         }
     }
 
-    @ApiOperation(value="Uploads a new document to KIE Server.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 201, response = String.class, message = "Successful response", examples=@Example(value= {
+    @Operation(summary="Uploads a new document to KIE Server.")
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
+            @ApiResponse(responseCode = 201, response = String.class, message = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CREATE_DOC_RESPONSE_JSON)}))})
     @POST
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response createDocument(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "document content represented as DocumentInstance", required = true, type="DocumentInstance", examples=@Example(value= {
+            @Parameter(description = "document content represented as DocumentInstance", required = true, type="DocumentInstance", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=DOCUMENT_JSON),
                     @ExampleProperty(mediaType=XML, value=DOCUMENT_XML)})) String payload) {
         Variant v = getVariant(headers);
@@ -207,17 +207,17 @@ public class DocumentResource {
         }
     }
 
-    @ApiOperation(value="Updates a specified document in KIE Server.",
+    @Operation(summary="Updates a specified document in KIE Server.",
             response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Document with given id not found")})
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
+            @ApiResponse(responseCode = 404, message = "Document with given id not found")})
     @PUT
     @Path(DOCUMENT_INSTANCE_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response updateDocument(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "document id of a document that should be updated", required = true, example = "xxx-yyy-zzz") @PathParam("documentId") String documentId, 
-            @ApiParam(value = "document content represented as DocumentInstance", required = true, type="DocumentInstance", examples=@Example(value= {
+            @Parameter(description = "document id of a document that should be updated", required = true, example = "xxx-yyy-zzz") @PathParam("documentId") String documentId, 
+            @Parameter(description = "document content represented as DocumentInstance", required = true, type="DocumentInstance", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=DOCUMENT_JSON),
                     @ExampleProperty(mediaType=XML, value=DOCUMENT_XML)})) String payload) {
         Variant v = getVariant(headers);
@@ -237,15 +237,15 @@ public class DocumentResource {
         }
     }
 
-    @ApiOperation(value="Deletes a specified document from KIE Server.",
+    @Operation(summary="Deletes a specified document from KIE Server.",
             response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Document with given id not found") })
+    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
+            @ApiResponse(responseCode = 404, message = "Document with given id not found") })
     @DELETE
     @Path(DOCUMENT_INSTANCE_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response deleteDocument(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @ApiParam(value = "document id of a document that should be deleted", required = true, example = "xxxx-yyy-zzz") @PathParam("documentId") String documentId) {
+            @Parameter(description = "document id of a document that should be deleted", required = true, example = "xxxx-yyy-zzz") @PathParam("documentId") String documentId) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
