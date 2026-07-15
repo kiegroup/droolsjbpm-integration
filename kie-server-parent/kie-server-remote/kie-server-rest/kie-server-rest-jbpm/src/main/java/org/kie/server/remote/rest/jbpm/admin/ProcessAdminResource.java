@@ -19,6 +19,8 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -39,8 +41,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.NodeInstanceNotFoundException;
 import org.jbpm.services.api.NodeNotFoundException;
@@ -130,8 +130,9 @@ public class ProcessAdminResource {
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"),
             @ApiResponse(responseCode = "404", description = "Container Id not found"), 
-            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_MIGRATION_REPORT_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "201", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_MIGRATION_REPORT_RESPONSE_JSON)})
+            }) })
     @PUT
     @Path(MIGRATE_PROCESS_INST_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -141,9 +142,10 @@ public class ProcessAdminResource {
             @Parameter(description = "identifier of process instance to be migrated", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId,
             @Parameter(description = "container id that new process definition belongs to", required = true) @QueryParam("targetContainerId") String targetContainerId, 
             @Parameter(description = "process definition that process instance should be migrated to", required = true) @QueryParam("targetProcessId") String targetProcessId, 
-            @Parameter(description = "node mapping - unique ids of old definition to new definition given as Map", required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=SIMPLE_VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=SIMPLE_VAR_MAP_XML)})) String payload) {
+            @Parameter(description = "node mapping - unique ids of old definition to new definition given as Map", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = SIMPLE_VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = SIMPLE_VAR_MAP_XML)})
+            }) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -168,8 +170,9 @@ public class ProcessAdminResource {
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"),
             @ApiResponse(responseCode = "404", description = "Container Id not found"), 
-            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_MIGRATION_REPORTS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "201", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_MIGRATION_REPORTS_RESPONSE_JSON)})
+            }) })
     @PUT
     @Path(MIGRATE_PROCESS_SUBPROCESS_INST_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -179,9 +182,10 @@ public class ProcessAdminResource {
             @Parameter(description = "list of identifiers of process instance to be migrated", required = true) @PathParam(PROCESS_INST_ID) Long processInstanceId,
             @Parameter(description = "container id that new process definition belongs to", required = true) @QueryParam("targetContainerId") String targetContainerId, 
             @Parameter(description = "process definition that process instances should be migrated to", required = true) @QueryParam("targetProcessId") String targetProcessId, 
-            @Parameter(description = "migration specifcation. It contains process mapping and node mapping - unique ids of old definition to new definition given as Map", required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=MIGRATION_VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=MIGRATION_VAR_MAP_XML)})) String payload) {
+            @Parameter(description = "migration specifcation. It contains process mapping and node mapping - unique ids of old definition to new definition given as Map", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = MIGRATION_VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = MIGRATION_VAR_MAP_XML)})
+            }) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -206,8 +210,9 @@ public class ProcessAdminResource {
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"),
             @ApiResponse(responseCode = "404", description = "Container Id not found"), 
-            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_MIGRATION_REPORTS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "201", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_MIGRATION_REPORTS_RESPONSE_JSON)})
+            }) })
     @PUT
     @Path(MIGRATE_PROCESS_INSTANCES_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -217,9 +222,10 @@ public class ProcessAdminResource {
             @Parameter(description = "list of identifiers of process instance to be migrated", required = true) @QueryParam(PROCESS_INST_ID) List<Long> processInstanceIds,
             @Parameter(description = "container id that new process definition belongs to", required = true) @QueryParam("targetContainerId") String targetContainerId, 
             @Parameter(description = "process definition that process instances should be migrated to", required = true) @QueryParam("targetProcessId") String targetProcessId, 
-            @Parameter(description = "node mapping - unique ids of old definition to new definition given as Map", required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=SIMPLE_VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=SIMPLE_VAR_MAP_XML)})) String payload) {
+            @Parameter(description = "node mapping - unique ids of old definition to new definition given as Map", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = SIMPLE_VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = SIMPLE_VAR_MAP_XML)})
+            }) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -317,9 +323,10 @@ public class ProcessAdminResource {
             @Parameter(description = "identifier of process instance that timer belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId,
             @Parameter(description = "identifier of timer instance to be updated", required = true, example = "99") @PathParam("timerId") Long timerId, 
             @Parameter(description = "optional flag that indicates if the time expression is relative to the current date or not, defaults to true", required = false) @QueryParam("relative") @DefaultValue("true") boolean relative, 
-            @Parameter(description = "Map of timer expressions - deplay, perios and repeat are allowed values in the map", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=TIMER_VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=TIMER_VAR_MAP_XML)})) String payload) {
+            @Parameter(description = "Map of timer expressions - deplay, perios and repeat are allowed values in the map", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = TIMER_VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = TIMER_VAR_MAP_XML)})
+            }) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -379,8 +386,9 @@ public class ProcessAdminResource {
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"),
             @ApiResponse(responseCode = "404", description = "Container Id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_TIMERS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TIMERS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(TIMERS_PROCESS_INST_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -408,8 +416,9 @@ public class ProcessAdminResource {
     @Operation(summary="Returns all the active node instances in a specified process instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"), 
-            @ApiResponse(responseCode = "200" , description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_NODES_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200" , description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_NODES_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(NODE_INSTANCES_PROCESS_INST_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -437,8 +446,9 @@ public class ProcessAdminResource {
     @Operation(summary="Returns all nodes in a specified process instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_NODES_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_NODES_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(NODES_PROCESS_INST_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -516,8 +526,9 @@ public class ProcessAdminResource {
     @Operation(summary="Returns information about a specified process execution error.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERROR_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_EXEC_ERROR_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(ERROR_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -544,8 +555,9 @@ public class ProcessAdminResource {
     @Operation(summary="Returns all process execution errors for a specified process instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Container Id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERRORS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_EXEC_ERRORS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(ERRORS_BY_PROCESS_INST_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -579,8 +591,9 @@ public class ProcessAdminResource {
     @Operation(summary="Returns all process execution errors for a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERRORS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_EXEC_ERRORS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(ERRORS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})

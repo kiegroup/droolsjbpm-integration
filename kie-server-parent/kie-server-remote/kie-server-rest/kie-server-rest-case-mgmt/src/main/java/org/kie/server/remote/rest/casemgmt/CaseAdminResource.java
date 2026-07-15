@@ -17,6 +17,8 @@ package org.kie.server.remote.rest.casemgmt;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -35,8 +37,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 import org.kie.server.api.model.cases.CaseInstanceList;
 import org.kie.server.api.model.cases.CaseMigrationReportInstance;
 import org.kie.server.remote.rest.common.Header;
@@ -81,8 +81,9 @@ public class CaseAdminResource extends AbstractCaseResource {
 
     @Operation(summary="Returns case instances without authentication checks.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_INSTANCES_JSON)})
+            })})
     @GET
     @Path(ADMIN_CASE_ALL_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -121,8 +122,9 @@ public class CaseAdminResource extends AbstractCaseResource {
     @Operation(summary="Migrates a specified case instance to another KIE container and case definition.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Case instance or Container Id not found"), 
-            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_MIGRATION_REPORT_JSON)})) })
+            @ApiResponse(responseCode = "201", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_MIGRATION_REPORT_JSON)})
+            }) })
     @PUT
     @Path(MIGRATE_CASE_INST_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -132,9 +134,10 @@ public class CaseAdminResource extends AbstractCaseResource {
             @Parameter(description = "identifier of case instance to be migrated", required = true, example = "CASE-000000001") @PathParam("caseId") String caseId,
             @Parameter(description = "container id that new case definition should be migrated to to", required = true) @QueryParam("targetContainerId") String targetContainerId,             
             @Parameter(description = "process and node mapping - unique ids of old definition to new definition given as Map of Maps - ProcessMapping should provide map of process definitions (mandatory), NodeMapping should provide map of node mappings (optional)",
-            required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_MIGRATION_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=CASE_MIGRATION_MAP_XML)})) String payload) {
+            required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_MIGRATION_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = CASE_MIGRATION_MAP_XML)})
+            }) String payload) {
         
         return invokeCaseOperation(headers,
                                    "",

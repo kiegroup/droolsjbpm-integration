@@ -17,8 +17,9 @@ package org.kie.server.remote.rest.jbpm;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.Map;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -40,16 +41,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 import org.jbpm.services.api.TaskNotFoundException;
 import org.jbpm.services.task.exception.PermissionDeniedException;
-import org.kie.server.api.model.instance.TaskAttachment;
-import org.kie.server.api.model.instance.TaskAttachmentList;
-import org.kie.server.api.model.instance.TaskComment;
-import org.kie.server.api.model.instance.TaskCommentList;
 import org.kie.server.api.model.instance.TaskEventInstanceList;
-import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.jbpm.RuntimeDataServiceBase;
@@ -244,9 +238,10 @@ public class UserTaskResource {
             @Parameter(description = "identifier of the task instance that should be completed", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId, 
             @Parameter(description = "optional flag that allows to directlu claim and start task (if needed) before completion", required = false) @QueryParam("auto-progress") boolean autoProgress, 
-            @Parameter(description = "optional map of output variables", required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
+            @Parameter(description = "optional map of output variables", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            }) String payload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -334,9 +329,10 @@ public class UserTaskResource {
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the task instance that should be failed", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId, 
-            @Parameter(description = "optional map of output variables", required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
+            @Parameter(description = "optional map of output variables", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            }) String payload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -516,9 +512,10 @@ public class UserTaskResource {
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the task instance that should be suspended", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
-            @Parameter(description = "optional map to pass parameters to suspend. e.g suspendUntil", required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String parametersPayload) {
+            @Parameter(description = "optional map to pass parameters to suspend. e.g suspendUntil", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            }) String parametersPayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -573,9 +570,10 @@ public class UserTaskResource {
     public Response setPriority(@Context HttpHeaders headers, 
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the task instance where priority should be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
-            @Parameter(description = "priority as Integer", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=INTEGER_JSON),
-                    @ExampleProperty(mediaType=XML, value=INTEGER_XML)})) String priorityPayload) {
+            @Parameter(description = "priority as Integer", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = INTEGER_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = INTEGER_XML)})
+            }) String priorityPayload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -602,9 +600,10 @@ public class UserTaskResource {
     public Response setExpirationDate(@Context HttpHeaders headers, 
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the task instance where expiration date should be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
-            @Parameter(description = "expiration date as Date", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=DATE_JSON),
-                    @ExampleProperty(mediaType=XML, value=DATE_XML)})) String datePayload) {
+            @Parameter(description = "expiration date as Date", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = DATE_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = DATE_XML)})
+            }) String datePayload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -631,9 +630,10 @@ public class UserTaskResource {
     public Response setSkipable(@Context HttpHeaders headers, 
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the task instance where skipable flag should be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
-            @Parameter(description = "skipable flag as Boolean", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=BOOLEAN_JSON),
-                    @ExampleProperty(mediaType=XML, value=BOOLEAN_XML)})) String skipablePayload) {
+            @Parameter(description = "skipable flag as Boolean", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = BOOLEAN_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = BOOLEAN_XML)})
+            }) String skipablePayload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -660,9 +660,10 @@ public class UserTaskResource {
     public Response setName(@Context HttpHeaders headers, 
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the task instance where name should be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
-            @Parameter(description = "name as String", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=STRING_JSON),
-                    @ExampleProperty(mediaType=XML, value=STRING_XML)})) String namePayload) {
+            @Parameter(description = "name as String", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = STRING_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = STRING_XML)})
+            }) String namePayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -687,9 +688,10 @@ public class UserTaskResource {
     public Response setDescription(@Context HttpHeaders headers, 
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the task instance where description should be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
-            @Parameter(description = "description as String", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=STRING_JSON),
-                    @ExampleProperty(mediaType=XML, value=STRING_XML)})) String descriptionPayload) {
+            @Parameter(description = "description as String", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = STRING_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = STRING_XML)})
+            }) String descriptionPayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -718,9 +720,10 @@ public class UserTaskResource {
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the task instance that data should be saved into", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
-            @Parameter(description = "output data to be saved as Map ", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
+            @Parameter(description = "output data to be saved as Map ", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            }) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -742,8 +745,9 @@ public class UserTaskResource {
 
     @Operation(summary="Returns output data for a specified task instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_VARS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(TASK_INSTANCE_OUTPUT_DATA_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -769,8 +773,9 @@ public class UserTaskResource {
 
     @Operation(summary="Returns input data for a specified task instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_VARS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(TASK_INSTANCE_INPUT_DATA_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -821,8 +826,9 @@ public class UserTaskResource {
 
     @Operation(summary="Adds a comment to a specified task instance and returns the ID of the new comment.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
-            @ApiResponse(responseCode = "201",  description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=INTEGER_JSON)})) })
+            @ApiResponse(responseCode = "201",  description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = INTEGER_JSON)})
+            }) })
     @POST
     @Path(TASK_INSTANCE_COMMENT_ADD_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -830,9 +836,10 @@ public class UserTaskResource {
     public Response addComment(@Context HttpHeaders headers, 
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the task instance that comment should be added to", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
-            @Parameter(description = "comment data as TaskComment", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=TASK_COMMENT_JSON),
-                    @ExampleProperty(mediaType=XML, value=TASK_COMMENT_XML)})) String payload) {
+            @Parameter(description = "comment data as TaskComment", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = TASK_COMMENT_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = TASK_COMMENT_XML)})
+            }) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -875,8 +882,9 @@ public class UserTaskResource {
 
     @Operation(summary="Returns all comments in a specified task instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_TASK_COMMENTS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_COMMENTS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(TASK_INSTANCE_COMMENTS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -902,8 +910,9 @@ public class UserTaskResource {
 
     @Operation(summary="Returns a specified comment from a specified task instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=TASK_COMMENT_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = TASK_COMMENT_JSON)})
+            }) })
     @GET
     @Path(TASK_INSTANCE_COMMENT_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -931,8 +940,9 @@ public class UserTaskResource {
     
     @Operation(summary="Adds an attachment to a specified task instance and returns the ID of the new attachment.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
-            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=INTEGER_JSON)})) })
+            @ApiResponse(responseCode = "201", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = INTEGER_JSON)})
+            }) })
     @POST
     @Path(TASK_INSTANCE_ATTACHMENT_ADD_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -942,9 +952,10 @@ public class UserTaskResource {
             @Parameter(description = "identifier of the task instance that attachment should be added to", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId, 
             @Parameter(description = "name of the attachment to be added", required = true) @QueryParam("name") String name, 
-            @Parameter(description = "attachment content, any type can be provided", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=TASK_ATTACHMENT_JSON),
-                    @ExampleProperty(mediaType=XML, value=TASK_ATTACHMENT_XML)})) String attachmentPayload) {
+            @Parameter(description = "attachment content, any type can be provided", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = TASK_ATTACHMENT_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = TASK_ATTACHMENT_XML)})
+            }) String attachmentPayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -989,8 +1000,9 @@ public class UserTaskResource {
 
     @Operation(summary="Returns information about a specified attachment for a specified task instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=TASK_ATTACHMENT_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = TASK_ATTACHMENT_JSON)})
+            }) })
     @GET
     @Path(TASK_INSTANCE_ATTACHMENT_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -1017,8 +1029,9 @@ public class UserTaskResource {
 
     @Operation(summary="Returns the content of a specified attachment for a specified task instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_JSON)})
+            }) })
     @GET
     @Path(TASK_INSTANCE_ATTACHMENT_CONTENT_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -1045,8 +1058,9 @@ public class UserTaskResource {
     
     @Operation(summary="Returns all attachments for a specified task instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_TASK_ATTACHMENTS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_ATTACHMENTS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(TASK_INSTANCE_ATTACHMENTS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -1073,8 +1087,9 @@ public class UserTaskResource {
 
     @Operation(summary="Returns information about a specified task instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_TASK_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(TASK_INSTANCE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -1105,8 +1120,9 @@ public class UserTaskResource {
     @Operation(summary="Returns all events for a specified task instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
                             @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
-                            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                                    @ExampleProperty(mediaType=JSON, value=GET_TASK_EVENTS_RESPONSE_JSON)}))})
+                            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_EVENTS_RESPONSE_JSON)})
+                            })})
     @GET
     @Path(TASK_INSTANCE_EVENTS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -1141,9 +1157,10 @@ public class UserTaskResource {
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the task instance that should be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,             
-            @Parameter(description = "task instance with updates as TaskInstance type", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=TASK_JSON),
-                    @ExampleProperty(mediaType=XML, value=TASK_XML)})) String payload) {
+            @Parameter(description = "task instance with updates as TaskInstance type", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = TASK_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = TASK_XML)})
+            }) String payload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);

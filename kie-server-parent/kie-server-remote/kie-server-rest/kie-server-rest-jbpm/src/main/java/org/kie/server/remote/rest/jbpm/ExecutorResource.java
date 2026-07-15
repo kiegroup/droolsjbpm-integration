@@ -17,6 +17,8 @@ package org.kie.server.remote.rest.jbpm;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -37,9 +39,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
-import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.RequestInfoInstanceList;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
@@ -101,16 +100,18 @@ public class ExecutorResource {
     
     @Operation(summary="Schedules a job and returns the ID for the new job.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CREATE_JOB_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "201", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CREATE_JOB_RESPONSE_JSON)})
+            }) })
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response scheduleRequest(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "optional container id that the job should be associated with", required = false) @QueryParam("containerId") String containerId, 
-            @Parameter(description = "asynchronous job definition represented as JobRequestInstance", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=JOB_JSON),
-                    @ExampleProperty(mediaType=XML, value=JOB_XML)})) String payload) {
+            @Parameter(description = "asynchronous job definition represented as JobRequestInstance", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = JOB_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = JOB_XML)})
+            }) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         // no container id available so only used to transfer conversation id if given by client
@@ -184,9 +185,10 @@ public class ExecutorResource {
     public Response updateRequestData(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "identifier of the asynchronous job to be updated", required = true, example = "123") @PathParam("jobId") long requestId,
             @Parameter(description = "optional container id that the job should be associated with", required = false) @QueryParam("containerId") String containerId, 
-            @Parameter(description = "data to be updated on the asynchronous job represented as Map", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
+            @Parameter(description = "data to be updated on the asynchronous job represented as Map", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            }) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         // no container id available so only used to transfer conversation id if given by client
@@ -206,8 +208,9 @@ public class ExecutorResource {
     
     @Operation(summary="Retrieves asynchronous jobs filtered by status")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_REQUESTS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_REQUESTS_RESPONSE_JSON)})
+            }) })
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getRequestsByStatus(@jakarta.ws.rs.core.Context HttpHeaders headers, 
@@ -230,8 +233,9 @@ public class ExecutorResource {
 
     @Operation(summary="Returns information about a job with a specified business key.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_REQUESTS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_REQUESTS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(JOB_INSTANCES_BY_KEY_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -261,8 +265,9 @@ public class ExecutorResource {
 
     @Operation(summary="Returns jobs configured to run job commands, such as a job type org.jbpm.executor.commands.LogCleanupCommand.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_REQUESTS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_REQUESTS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(JOB_INSTANCES_BY_CMD_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -292,8 +297,9 @@ public class ExecutorResource {
 
     @Operation(summary="Returns jobs for specified KIE container.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_REQUESTS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_REQUESTS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(JOB_INSTANCES_BY_CONTAINER_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -318,8 +324,9 @@ public class ExecutorResource {
 
     @Operation(summary="Returns jobs for specified process instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_REQUESTS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_REQUESTS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(JOB_INSTANCES_BY_PROCESS_INSTANCE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -345,8 +352,9 @@ public class ExecutorResource {
     // instance details
     @Operation(summary="Returns information about a specified job.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_REQUEST_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_REQUEST_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(JOB_INSTANCE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})

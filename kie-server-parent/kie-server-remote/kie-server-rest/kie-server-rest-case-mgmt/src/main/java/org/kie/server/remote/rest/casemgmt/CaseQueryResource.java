@@ -17,6 +17,8 @@ package org.kie.server.remote.rest.casemgmt;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -36,8 +38,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.server.api.model.cases.CaseDefinitionList;
 import org.kie.server.api.model.cases.CaseFileDataItemList;
@@ -98,8 +98,9 @@ public class CaseQueryResource extends AbstractCaseResource {
 
     @Operation(summary="Returns cases instances with authentication checks.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_INSTANCES_JSON)})
+            })})
     @GET
     @Path(CASE_ALL_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -142,8 +143,9 @@ public class CaseQueryResource extends AbstractCaseResource {
 
     @Operation(summary="Returns cases instances that involve the querying user in a specified role.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_INSTANCES_JSON)})
+            })})
     @GET
     @Path(CASE_INSTANCES_BY_ROLE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -175,8 +177,9 @@ public class CaseQueryResource extends AbstractCaseResource {
     
     @Operation(summary="Returns a specified case definition from all KIE containers.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_DEFINITIONS_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_DEFINITIONS_JSON)})
+            })})
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseDefinitions(@jakarta.ws.rs.core.Context HttpHeaders headers,
@@ -204,8 +207,9 @@ public class CaseQueryResource extends AbstractCaseResource {
      */
     @Operation(summary="Returns a specified process associated with case definitions from all KIE containers.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEFS_RESPONSE_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_DEFS_RESPONSE_JSON)})
+            })})
     @GET
     @Path(CASE_ALL_PROCESSES_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -231,8 +235,9 @@ public class CaseQueryResource extends AbstractCaseResource {
 
     @Operation(summary="Returns processes associated with case definitions in a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEFS_RESPONSE_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_DEFS_RESPONSE_JSON)})
+            })})
     @GET
     @Path(CASE_PROCESSES_BY_CONTAINER_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -262,8 +267,9 @@ public class CaseQueryResource extends AbstractCaseResource {
 
     @Operation(summary="Returns tasks for potential owners in a specified case instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_SUMMARY_RESPONSE_JSON)})
+            })})
     @GET
     @Path(CASE_TASKS_AS_POT_OWNER_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -290,8 +296,9 @@ public class CaseQueryResource extends AbstractCaseResource {
 
     @Operation(summary="Returns tasks for business administrators in a specified case instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_SUMMARY_RESPONSE_JSON)})
+            })})
     @GET
     @Path(CASE_TASKS_AS_ADMIN_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -318,8 +325,9 @@ public class CaseQueryResource extends AbstractCaseResource {
 
     @Operation(summary="Returns tasks for stakeholders in a specified case instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_SUMMARY_RESPONSE_JSON)})
+            })})
     @GET
     @Path(CASE_TASKS_AS_STAKEHOLDER_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -346,8 +354,9 @@ public class CaseQueryResource extends AbstractCaseResource {
 
     @Operation(summary="Returns case file data items for a specified case instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_CASE_FILE_DATA_RESPONSE_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_CASE_FILE_DATA_RESPONSE_JSON)})
+            })})
     @GET
     @Path(CASE_FILE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})

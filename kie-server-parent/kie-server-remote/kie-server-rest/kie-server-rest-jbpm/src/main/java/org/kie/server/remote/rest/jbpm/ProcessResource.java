@@ -15,10 +15,13 @@
 
 package org.kie.server.remote.rest.jbpm;
 
-import java.text.MessageFormat;
-import java.util.List;
-import java.util.Map;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -35,14 +38,6 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Variant;
-
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 import org.jbpm.services.api.DeploymentNotActiveException;
 import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.ProcessDefinitionNotFoundException;
@@ -50,11 +45,8 @@ import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.WorkItemNotFoundException;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.instance.NodeInstanceList;
-import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.VariableInstanceList;
-import org.kie.server.api.model.instance.WorkItemInstance;
-import org.kie.server.api.model.instance.WorkItemInstanceList;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.jbpm.ProcessServiceBase;
@@ -62,8 +54,12 @@ import org.kie.server.services.jbpm.RuntimeDataServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.MessageFormat;
+import java.util.List;
+
 import static org.kie.server.api.rest.RestURI.ABORT_PROCESS_INSTANCES_DEL_URI;
 import static org.kie.server.api.rest.RestURI.ABORT_PROCESS_INST_DEL_URI;
+import static org.kie.server.api.rest.RestURI.COMPUTE_PROCESS_OUTCOME_POST_URI;
 import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 import static org.kie.server.api.rest.RestURI.CORRELATION_KEY;
 import static org.kie.server.api.rest.RestURI.PROCESS_ID;
@@ -93,7 +89,6 @@ import static org.kie.server.api.rest.RestURI.START_PROCESS_FROM_NODES_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_FROM_NODES_WITH_CORRELATION_KEY_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_POST_URI;
 import static org.kie.server.api.rest.RestURI.START_PROCESS_WITH_CORRELATION_KEY_POST_URI;
-import static org.kie.server.api.rest.RestURI.COMPUTE_PROCESS_OUTCOME_POST_URI;
 import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.conflict;
@@ -103,8 +98,8 @@ import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
 import static org.kie.server.remote.rest.common.util.RestUtils.forbidden;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
-import static org.kie.server.remote.rest.common.util.RestUtils.isCorrelationKeyAlreadyExists;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
+import static org.kie.server.remote.rest.common.util.RestUtils.isCorrelationKeyAlreadyExists;
 import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
 import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.GET_PROCESS_DEFS_RESPONSE_JSON;
@@ -159,9 +154,10 @@ public class ProcessResource  {
 
     @Operation(summary="Starts a new process instance of a specified process.")
     @ApiResponses(value = { 
-            @ApiResponse(responseCode = "201", description = "Process instance started", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=LONG_RESPONSE_JSON),
-                    @ExampleProperty(mediaType=XML, value=LONG_RESPONSE_XML)})),
+            @ApiResponse(responseCode = "201", description = "Process instance started", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = LONG_RESPONSE_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = LONG_RESPONSE_XML)})
+            }),
             @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process ID or Container Id not found"),
             @ApiResponse(responseCode = "403", description = "User does not have permission to access this asset")})
@@ -172,9 +168,10 @@ public class ProcessResource  {
     public Response startProcess(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "process id that new instance should be created from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId, 
-            @Parameter(description = "optional map of process variables", required = false, examples=@Example(value= {
-                                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) @DefaultValue("") String payload) {
+            @Parameter(description = "optional map of process variables", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            }) @DefaultValue("") String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -205,9 +202,10 @@ public class ProcessResource  {
 
     @Operation(summary="Starts a new synchronous process instance of a specified process.")
     @ApiResponses(value = { 
-            @ApiResponse(responseCode = "201", description = "Process instance started", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})),
+            @ApiResponse(responseCode = "201", description = "Process instance started", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            }),
             @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process ID or Container Id not found"),
             @ApiResponse(responseCode = "403", description = "User does not have permission to access this asset")})
@@ -218,9 +216,10 @@ public class ProcessResource  {
     public Response startSynchronousProcess(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "process id that new instance should be created from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId, 
-            @Parameter(description = "optional map of process variables", required = false, examples=@Example(value= {
-                                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) @DefaultValue("") String payload) {
+            @Parameter(description = "optional map of process variables", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            }) @DefaultValue("") String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -250,8 +249,10 @@ public class ProcessResource  {
 
     @Operation(summary = "Starts a new process instance from the specific nodes")
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Process instance created",
-                                        examples = @Example(value = {@ExampleProperty(mediaType = JSON, value = LONG_RESPONSE_JSON),
-                                                                     @ExampleProperty(mediaType = XML, value = LONG_RESPONSE_XML)})),
+                                        content = {
+                                            @Content(mediaType = JSON, examples = {@ExampleObject(value = LONG_RESPONSE_JSON)}),
+                                            @Content(mediaType = XML, examples = {@ExampleObject(value = LONG_RESPONSE_XML)})
+                                        }),
             @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process ID or Container Id not found"),
             @ApiResponse(responseCode = "403", description = "User does not have permission to access this asset")})
@@ -293,8 +294,10 @@ public class ProcessResource  {
 
     @Operation(summary = "Starts a new process instance from the specific nodes")
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Process instance created",
-                                        examples = @Example(value = {@ExampleProperty(mediaType = JSON, value = LONG_RESPONSE_JSON),
-                                                                     @ExampleProperty(mediaType = XML, value = LONG_RESPONSE_XML)})),
+                                        content = {
+                                            @Content(mediaType = JSON, examples = {@ExampleObject(value = LONG_RESPONSE_JSON)}),
+                                            @Content(mediaType = XML, examples = {@ExampleObject(value = LONG_RESPONSE_XML)})
+                                        }),
                            @ApiResponse(responseCode = "500", description = "Unexpected error"),
                            @ApiResponse(responseCode = "404", description = "Process ID or Container Id not found"),
                            @ApiResponse(responseCode = "403", description = "User does not have permission to access this asset"),
@@ -341,9 +344,10 @@ public class ProcessResource  {
     }
 
     @Operation(summary="Starts a new process instance of a specified process and assigns a new correlation key to the process instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Process instance started", examples=@Example(value= {
-            @ExampleProperty(mediaType=JSON, value=LONG_RESPONSE_JSON),
-            @ExampleProperty(mediaType=XML, value=LONG_RESPONSE_XML)})),
+    @ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Process instance started", content = {
+        @Content(mediaType = JSON, examples = {@ExampleObject(value = LONG_RESPONSE_JSON)}),
+        @Content(mediaType = XML, examples = {@ExampleObject(value = LONG_RESPONSE_XML)})
+    }),
             @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process ID or Container Id not found"),
             @ApiResponse(responseCode = "403", description = "User does not have permission to access this asset"),
@@ -356,9 +360,10 @@ public class ProcessResource  {
             @Parameter(description = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "process id that new instance should be created from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId,
             @Parameter(description = "correlation key to be assigned to process instance", required = true, example = "john-evaluation-2019") @PathParam("correlationKey") String correlationKey, 
-            @Parameter(description = "optional map of process variables", required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)}))  @DefaultValue("") String payload) {
+            @Parameter(description = "optional map of process variables", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            })  @DefaultValue("") String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -462,9 +467,10 @@ public class ProcessResource  {
             @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the process instance to be signaled", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
             @Parameter(description = "signal name to be send to process instance", required = true, example = "EventReceived") @PathParam(SIGNAL_NAME) String signalName, 
-            @Parameter(description = "optional event data - any type can be provided", required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_XML)}))  String eventPayload) {
+            @Parameter(description = "optional event data - any type can be provided", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_XML)})
+            })  String eventPayload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -499,9 +505,10 @@ public class ProcessResource  {
             @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "correlation key of the process instance to be signaled", required = true, example = "123") @PathParam(CORRELATION_KEY) String correlationKey, 
             @Parameter(description = "signal name to be sent to process instance", required = true, example = "EventReceived") @PathParam(SIGNAL_NAME) String signalName, 
-            @Parameter(description = "optional event data - any type can be provided", required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_XML)}))  String eventPayload) {
+            @Parameter(description = "optional event data - any type can be provided", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_XML)})
+            })  String eventPayload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -535,9 +542,10 @@ public class ProcessResource  {
             @Parameter(description = "list of identifiers of the process instances to be signaled", required = false) @QueryParam("instanceId") List<Long> processInstanceIds, 
             @Parameter(description = "list of correlationKeys of the process instances to be signaled", required = false) @QueryParam("correlationKey") List<String> correlationKeys, 
             @Parameter(description = "signal name to be send to process instance", required = true, example = "EventReceived") @PathParam(SIGNAL_NAME) String signalName, 
-            @Parameter(description = "optional event data - any type can be provided", required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_XML)})) String eventPayload) {
+            @Parameter(description = "optional event data - any type can be provided", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_XML)})
+            }) String eventPayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -570,8 +578,9 @@ public class ProcessResource  {
     @Operation(summary="Returns information about a specified process instance in a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"),
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(PROCESS_INSTANCE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -611,9 +620,10 @@ public class ProcessResource  {
             @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the process instance to be updated", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
             @Parameter(description = "name of the variable to be set/updated", required = true, example = "name") @PathParam("varName") String varName, 
-            @Parameter(description = "variable data - any type can be provided", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_XML)})) String variablePayload) {
+            @Parameter(description = "variable data - any type can be provided", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_XML)})
+            }) String variablePayload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -646,9 +656,10 @@ public class ProcessResource  {
     public Response setProcessVariables(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the process instance to be updated", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
-            @Parameter(description = "variable data give as map", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)}))  String variablePayload) {
+            @Parameter(description = "variable data give as map", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            })  String variablePayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -673,8 +684,9 @@ public class ProcessResource  {
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"),
             @ApiResponse(responseCode = "403", description = "User does not have permission to access this asset"),
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VAR_RESPONSE_JSON)}) )})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_VAR_RESPONSE_JSON)})
+            } )})
     @GET
     @Path(PROCESS_INSTANCE_VAR_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -710,8 +722,9 @@ public class ProcessResource  {
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"), 
             @ApiResponse(responseCode = "403", description = "User does not have permission to access this asset"),
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_VARS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(PROCESS_INSTANCE_VARS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -747,8 +760,9 @@ public class ProcessResource  {
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"), 
             @ApiResponse(responseCode = "403", description = "User does not have permission to access this asset"),
-            @ApiResponse(responseCode = "200", responseContainer= "List", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_SIGNALS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", responseContainer= "List", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_SIGNALS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(PROCESS_INSTANCE_SIGNALS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -790,9 +804,10 @@ public class ProcessResource  {
             @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the process instance that work item belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
             @Parameter(description = "identifier of the work item to complete", required = true, example = "567") @PathParam("workItemId") Long workItemId, 
-            @Parameter(description = "optional outcome data give as map", required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String resultPayload) {
+            @Parameter(description = "optional outcome data give as map", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            }) String resultPayload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -853,8 +868,9 @@ public class ProcessResource  {
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process instance, Work Item or Container Id not found"), 
             @ApiResponse(responseCode = "403", description = "User does not have permission to access this asset"),
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_WORK_ITEM_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_WORK_ITEM_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(PROCESS_INSTANCE_WORK_ITEM_BY_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -890,8 +906,9 @@ public class ProcessResource  {
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process instance, Work Item or Container Id not found"), 
             @ApiResponse(responseCode = "403", description = "User does not have permission to access this asset"),
-            @ApiResponse(responseCode = "200",  description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_WORK_ITEMS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200",  description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_WORK_ITEMS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(PROCESS_INSTANCE_WORK_ITEMS_BY_PROC_INST_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -922,8 +939,9 @@ public class ProcessResource  {
     @Operation(summary="Returns a list of process instances in a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
                             @ApiResponse(responseCode = "404", description = "Container Id not found"), 
-                            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)}))})
+                            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCES_RESPONSE_JSON)})
+                            })})
     @GET
     @Path(PROCESS_INSTANCES_BY_CONTAINER_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -953,8 +971,9 @@ public class ProcessResource  {
     @Operation(summary="Returns a list of process definitions in a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
                             @ApiResponse(responseCode = "404", description = "Container Id not found"), 
-                            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEFS_RESPONSE_JSON)}))})
+                            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_DEFS_RESPONSE_JSON)})
+                            })})
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessesByDeploymentId(@Context HttpHeaders headers, 
@@ -983,8 +1002,9 @@ public class ProcessResource  {
     @Operation(summary="Returns node instances for the specified process instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
                             @ApiResponse(responseCode = "404", description = "Process Instance or Container Id not found"), 
-                            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_NODES_RESPONSE_JSON)}))})
+                            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_NODES_RESPONSE_JSON)})
+                            })})
     @GET
     @Path(PROCESS_INSTANCES_NODE_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -1022,8 +1042,9 @@ public class ProcessResource  {
     @Operation(summary="Returns the current variable values of a specified process instance in a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
                             @ApiResponse(responseCode = "404", description = "Process Instance or Container Id not found"), 
-                            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_LOG_RESPONSE_JSON)}))})
+                            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_VARS_LOG_RESPONSE_JSON)})
+                            })})
     @GET
     @Path(PROCESS_INSTANCE_VAR_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -1051,8 +1072,9 @@ public class ProcessResource  {
     @Operation(summary="Returns the history of a specified variable in a specified process instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
                             @ApiResponse(responseCode = "404", description = "Process Instance or Container Id not found"), 
-                            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_LOG_RESPONSE_JSON)}))})
+                            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_VARS_LOG_RESPONSE_JSON)})
+                            })})
     @GET
     @Path(PROCESS_INSTANCE_VAR_INSTANCE_BY_VAR_NAME_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -1082,8 +1104,9 @@ public class ProcessResource  {
 
     @Operation(summary="Returns a list of process instances for which a specified process instance is a parent process instance")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCES_RESPONSE_JSON)})
+            })})
     @GET
     @Path(PROCESS_INSTANCES_BY_PARENT_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})

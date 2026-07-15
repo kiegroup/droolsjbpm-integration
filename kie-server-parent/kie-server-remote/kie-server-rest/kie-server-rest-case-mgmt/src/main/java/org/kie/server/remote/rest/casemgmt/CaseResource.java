@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -40,8 +42,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 import org.jbpm.casemgmt.api.CaseCommentNotFoundException;
 import org.jbpm.casemgmt.api.CaseDefinitionNotFoundException;
 import org.jbpm.casemgmt.api.model.CaseStatus;
@@ -50,7 +50,6 @@ import org.kie.server.api.model.cases.CaseAdHocFragmentList;
 import org.kie.server.api.model.cases.CaseCommentList;
 import org.kie.server.api.model.cases.CaseDefinition;
 import org.kie.server.api.model.cases.CaseDefinitionList;
-import org.kie.server.api.model.cases.CaseInstance;
 import org.kie.server.api.model.cases.CaseInstanceList;
 import org.kie.server.api.model.cases.CaseMilestoneList;
 import org.kie.server.api.model.cases.CaseRoleAssignmentList;
@@ -155,8 +154,9 @@ public class CaseResource extends AbstractCaseResource {
     @Operation(summary="Starts a new case instance for a specified case definition.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Case definition or Container Id not found"), 
-            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_ID_JSON)})) })
+            @ApiResponse(responseCode = "201", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_ID_JSON)})
+            }) })
     @POST
     @Path(START_CASE_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -164,9 +164,10 @@ public class CaseResource extends AbstractCaseResource {
     public Response startCase(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @Parameter(description = "container id where the case definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "case definition id that new instance should be created from", required = true, example = "CASE-0000000001") @PathParam(CASE_DEF_ID) String caseDefId, 
-            @Parameter(description = "optional CaseFile with variables and/or case role assignments", required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_FILE_JSON),
-                    @ExampleProperty(mediaType=XML, value=CASE_FILE_XML)})) String payload) {
+            @Parameter(description = "optional CaseFile with variables and/or case role assignments", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_FILE_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = CASE_FILE_XML)})
+            }) String payload) {
 
         return invokeCaseOperation(headers,
                 containerId,
@@ -187,8 +188,9 @@ public class CaseResource extends AbstractCaseResource {
     @Operation(summary="Returns information about a specified case instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Case instance not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_INSTANCE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_INSTANCE_JSON)})
+            }) })
     @GET
     @Path(CASE_INSTANCE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -264,9 +266,10 @@ public class CaseResource extends AbstractCaseResource {
             @Parameter(description = "container id where the case definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "case definition id that new instance should be created from", required = true, example = "evaluation") @PathParam(CASE_DEF_ID) String caseDefId, 
             @Parameter(description = "identifier of the case instance", required = true) @PathParam(CASE_ID) String caseId, 
-            @Parameter(description = "optional CaseFile with variables and/or case role assignments", required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_FILE_JSON),
-                    @ExampleProperty(mediaType=XML, value=CASE_FILE_XML)})) String payload) {
+            @Parameter(description = "optional CaseFile with variables and/or case role assignments", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_FILE_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = CASE_FILE_XML)})
+            }) String payload) {
 
         return invokeCaseOperation(headers,
                 containerId,
@@ -282,8 +285,9 @@ public class CaseResource extends AbstractCaseResource {
     @Operation(summary="Returns data from the case files of a specified case instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Case instance not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)})
+            }) })
     @GET
     @Path(CASE_FILE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -306,8 +310,9 @@ public class CaseResource extends AbstractCaseResource {
     @Operation(summary="Returns the value of a specified case file data item in a specified case instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Case instance not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_JSON)})
+            }) })
     @GET
     @Path(CASE_FILE_BY_NAME_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -338,9 +343,10 @@ public class CaseResource extends AbstractCaseResource {
             @Parameter(description = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @Parameter(description = "optional role name(s) that given data should be restricted to", required = false) @QueryParam("restrictedTo") List<String> restrictions,
-            @Parameter(description = "map of data to be placed in case file as Map", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
+            @Parameter(description = "map of data to be placed in case file as Map", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            }) String payload) {
 
         return invokeCaseOperation(headers,
                 containerId,
@@ -367,9 +373,10 @@ public class CaseResource extends AbstractCaseResource {
             @Parameter(description = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId, 
             @Parameter(description = "name of the data item to be added to case file", required = true) @PathParam(CASE_FILE_ITEM) String caseDataName,
             @Parameter(description = "optional role name(s) that given data should be restricted to", required = false) @QueryParam("restrictedTo") List<String> restrictions,
-            @Parameter(description = "data to be placed in case file, any type can be provided", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_XML)})) String payload) {
+            @Parameter(description = "data to be placed in case file, any type can be provided", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_XML)})
+            }) String payload) {
 
         return invokeCaseOperation(headers,
                 containerId,
@@ -420,9 +427,10 @@ public class CaseResource extends AbstractCaseResource {
     public Response addDynamicTaskToCase(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @Parameter(description = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
-            @Parameter(description = "data for dynamic task (it represents task specification that drives the selection of the type of task)", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
+            @Parameter(description = "data for dynamic task (it represents task specification that drives the selection of the type of task)", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            }) String payload) {
         return invokeCaseOperation(headers,
                 containerId,
                 caseId,
@@ -446,9 +454,10 @@ public class CaseResource extends AbstractCaseResource {
             @Parameter(description = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId, 
             @Parameter(description = "identifier of the stage within case instance where dynamic task should be added", required = true, example = "stageOne") @PathParam(CASE_STAGE_ID) String stageId,
-            @Parameter(description = "data for dynamic task (it represents task specification that drives the selection of the type of task)", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
+            @Parameter(description = "data for dynamic task (it represents task specification that drives the selection of the type of task)", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            }) String payload) {
         return invokeCaseOperation(headers,
                 containerId,
                 caseId,
@@ -472,9 +481,10 @@ public class CaseResource extends AbstractCaseResource {
             @Parameter(description = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @Parameter(description = "process id of the subprocess to be added", required = true, example = "placeOrder") @PathParam(PROCESS_ID) String processId,
-            @Parameter(description = "data for dynamic subprocess", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
+            @Parameter(description = "data for dynamic subprocess", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            }) String payload) {
         return invokeCaseOperation(headers,
                 containerId,
                 caseId,
@@ -500,9 +510,10 @@ public class CaseResource extends AbstractCaseResource {
             @Parameter(description = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @Parameter(description = "identifier of the stage within case instance where dynamic subprocess should be added", required = true, example = "stageOne") @PathParam(CASE_STAGE_ID) String stageId, 
             @Parameter(description = "process id of the subprocess to be added", required = true) @PathParam(PROCESS_ID) String processId,
-            @Parameter(description = "data for dynamic subprocess", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
+            @Parameter(description = "data for dynamic subprocess", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            }) String payload) {
         return invokeCaseOperation(headers,
                 containerId,
                 caseId,
@@ -528,9 +539,10 @@ public class CaseResource extends AbstractCaseResource {
             @Parameter(description = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @Parameter(description = "identifier of the stage within case instance where adhoc fragment should be triggered", required = true, example = "stageOne") @PathParam(CASE_STAGE_ID) String stageId, 
             @Parameter(description = "name of the adhoc fragment to be triggered", required = true) @PathParam(CASE_NODE_NAME) String adHocName,
-            @Parameter(description = "optional data to be given when triggering adhoc fragment", required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
+            @Parameter(description = "optional data to be given when triggering adhoc fragment", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            }) String payload) {
         return invokeCaseOperation(headers,
                 containerId,
                 caseId,
@@ -554,9 +566,10 @@ public class CaseResource extends AbstractCaseResource {
             @Parameter(description = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @Parameter(description = "name of the adhoc fragment to be triggered", required = true, example = "sampleTask") @PathParam(CASE_NODE_NAME) String adHocName,
-            @Parameter(description = "optional data to be given when triggering adhoc fragment", required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
+            @Parameter(description = "optional data to be given when triggering adhoc fragment", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            }) String payload) {
         return invokeCaseOperation(headers,
                 containerId,
                 caseId,
@@ -572,8 +585,9 @@ public class CaseResource extends AbstractCaseResource {
     @Operation(summary="Returns milestones for a specified case instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Case instance not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_MILESTONES_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_MILESTONES_JSON)})
+            }) })
     @GET
     @Path(CASE_MILESTONES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -599,8 +613,9 @@ public class CaseResource extends AbstractCaseResource {
     @Operation(summary="Returns stages for a specified case instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Case instance not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_STAGES_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_STAGES_JSON)})
+            }) })
     @GET
     @Path(CASE_STAGES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -626,8 +641,9 @@ public class CaseResource extends AbstractCaseResource {
     @Operation(summary="Returns ad hoc fragments for a specified case instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Case instance not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_ADHOC_FRAGMENTS_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_ADHOC_FRAGMENTS_JSON)})
+            }) })
     @GET
     @Path(CASE_AD_HOC_FRAGMENTS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -650,8 +666,9 @@ public class CaseResource extends AbstractCaseResource {
     @Operation(summary="Returns process instances in a specified case instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Case instance not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=PROCESS_INSTANCES_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = PROCESS_INSTANCES_JSON)})
+            }) })
     @GET
     @Path(CASE_PROCESS_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -684,8 +701,9 @@ public class CaseResource extends AbstractCaseResource {
     @Operation(summary="Returns node instances for a specified case instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Case instance not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=NODE_INSTANCES_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = NODE_INSTANCES_JSON)})
+            }) })
     @GET
     @Path(CASE_NODE_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -716,8 +734,9 @@ public class CaseResource extends AbstractCaseResource {
     @Operation(summary="Returns role assignments for a specified case instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Case instance not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_ROLES_ASSIGNMENTS_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_ROLES_ASSIGNMENTS_JSON)})
+            }) })
     @GET
     @Path(CASE_ROLES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -788,8 +807,9 @@ public class CaseResource extends AbstractCaseResource {
     @Operation(summary="Returns comments from a specified case instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Case instance not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_COMMENTS_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_COMMENTS_JSON)})
+            }) })
     @GET
     @Path(CASE_COMMENTS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -903,8 +923,9 @@ public class CaseResource extends AbstractCaseResource {
 
     @Operation(summary="Returns case instances in a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_INSTANCES_JSON)})
+            })})
     @GET
     @Path(CASE_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -936,8 +957,9 @@ public class CaseResource extends AbstractCaseResource {
 
     @Operation(summary="Returns case instances for a specified case definition.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_INSTANCES_JSON)})
+            })})
     @GET
     @Path(CASE_INSTANCES_BY_DEF_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -970,8 +992,9 @@ public class CaseResource extends AbstractCaseResource {
 
     @Operation(summary="Returns case definitions in a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_DEFINITIONS_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_DEFINITIONS_JSON)})
+            })})
     @GET
     @Path(CASE_ALL_DEFINITIONS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -997,8 +1020,9 @@ public class CaseResource extends AbstractCaseResource {
 
     @Operation(summary="Returns information about a specified case definition.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CASE_DEFINITION_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CASE_DEFINITION_JSON)})
+            })})
     @GET
     @Path(CASE_DEFINITIONS_BY_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})

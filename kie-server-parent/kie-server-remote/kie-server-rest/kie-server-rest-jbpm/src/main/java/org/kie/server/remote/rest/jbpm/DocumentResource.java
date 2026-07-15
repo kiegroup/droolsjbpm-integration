@@ -18,6 +18,8 @@ package org.kie.server.remote.rest.jbpm;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.mail.internet.MimeUtility;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -41,8 +43,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 import io.swagger.annotations.ResponseHeader;
 import org.kie.server.api.model.instance.DocumentInstance;
 import org.kie.server.api.model.instance.DocumentInstanceList;
@@ -135,8 +135,9 @@ public class DocumentResource {
     @Operation(summary="Returns information about a specified document.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Document with given id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_DOCUMENT_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_DOCUMENT_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(DOCUMENT_INSTANCE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -160,8 +161,9 @@ public class DocumentResource {
 
     @Operation(summary="Returns all documents from KIE Server.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_DOCUMENTS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_DOCUMENTS_RESPONSE_JSON)})
+            }) })
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response listDocuments(@jakarta.ws.rs.core.Context HttpHeaders headers, 
@@ -183,15 +185,17 @@ public class DocumentResource {
 
     @Operation(summary="Uploads a new document to KIE Server.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CREATE_DOC_RESPONSE_JSON)}))})
+            @ApiResponse(responseCode = "201", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CREATE_DOC_RESPONSE_JSON)})
+            })})
     @POST
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response createDocument(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @Parameter(description = "document content represented as DocumentInstance", required = true, type="DocumentInstance", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=DOCUMENT_JSON),
-                    @ExampleProperty(mediaType=XML, value=DOCUMENT_XML)})) String payload) {
+            @Parameter(description = "document content represented as DocumentInstance", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = DOCUMENT_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = DOCUMENT_XML)})
+            }) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         // no container id available so only used to transfer conversation id if given by client
@@ -216,9 +220,10 @@ public class DocumentResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response updateDocument(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "document id of a document that should be updated", required = true, example = "xxx-yyy-zzz") @PathParam("documentId") String documentId, 
-            @Parameter(description = "document content represented as DocumentInstance", required = true, type="DocumentInstance", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=DOCUMENT_JSON),
-                    @ExampleProperty(mediaType=XML, value=DOCUMENT_XML)})) String payload) {
+            @Parameter(description = "document content represented as DocumentInstance", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = DOCUMENT_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = DOCUMENT_XML)})
+            }) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         // no container id available so only used to transfer conversation id if given by client

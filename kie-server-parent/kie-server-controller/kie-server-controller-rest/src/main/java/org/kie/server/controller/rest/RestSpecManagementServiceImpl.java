@@ -15,6 +15,13 @@
 
 package org.kie.server.controller.rest;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -23,7 +30,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
 
-import io.swagger.annotations.*;
 import org.kie.server.controller.api.KieServerControllerException;
 import org.kie.server.controller.api.KieServerControllerIllegalArgumentException;
 import org.kie.server.controller.api.model.spec.*;
@@ -57,11 +63,10 @@ public class RestSpecManagementServiceImpl {
                                       @Parameter(name = "serverTemplateId", value = "ID of the KIE Server template associated with the new KIE container", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
                                       @Parameter(name = "containerId", value = "ID of the new KIE container", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam("containerId") String containerId,
                                       @Parameter(name = "body", value = "A map containing the container-name, relevant release-id (group ID, artifact ID, and version), configuration specifications (rule, process), and other components of the new KIE container",
-                                              required = true, examples =
-                                                    @Example(value = {
-                                                          @ExampleProperty(mediaType = JSON, value = CONTAINER_SPEC_JSON),
-                                                          @ExampleProperty(mediaType = XML, value = CONTAINER_SPEC_XML)
-                                      })) String containerSpecPayload,
+                                              required = true, content = {
+                                                  @Content(mediaType = JSON, examples = {@ExampleObject(value = CONTAINER_SPEC_JSON)}),
+                                                  @Content(mediaType = XML, examples = {@ExampleObject(value = CONTAINER_SPEC_XML)})
+                                              }) String containerSpecPayload,
                                       @Context UriInfo uriInfo) {
 
         String contentType = getContentType(headers);
@@ -96,11 +101,10 @@ public class RestSpecManagementServiceImpl {
     public Response updateContainerSpec(@Context HttpHeaders headers,
                                         @Parameter(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
                                         @Parameter(name = "containerId", value = "ID of the KIE container to be updated", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam("containerId") String containerId,
-                                        @Parameter(name = "body", value = "A map containing the updated specifications for the KIE container", required = true, examples =
-                                        @Example(value = {
-                                                @ExampleProperty(mediaType = JSON, value = CONTAINER_SPEC_JSON),
-                                                @ExampleProperty(mediaType = XML, value = CONTAINER_SPEC_XML)
-                                        })) String containerSpecPayload,
+                                        @Parameter(name = "body", value = "A map containing the updated specifications for the KIE container", required = true, content = {
+                                            @Content(mediaType = JSON, examples = {@ExampleObject(value = CONTAINER_SPEC_JSON)}),
+                                            @Content(mediaType = XML, examples = {@ExampleObject(value = CONTAINER_SPEC_XML)})
+                                        }) String containerSpecPayload,
                                         @Parameter(description = "Determines whether active processes are aborted (reset) before updating when the server runs in development mode") @QueryParam("resetBeforeUpdate")  @DefaultValue("false") boolean resetBeforeUpdate) {
 
         String contentType = getContentType(headers);
@@ -124,10 +128,10 @@ public class RestSpecManagementServiceImpl {
 
     @Operation(summary = "Creates a new KIE Server template with a specified ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "KIE Server template successfully created", examples = @Example(value = {
-                    @ExampleProperty(mediaType = JSON, value = SERVER_TEMPLATE_SAVE_JSON),
-                    @ExampleProperty(mediaType = XML, value = SERVER_TEMPLATE_SAVE_XML)
-            })),
+            @ApiResponse(responseCode = "201", description = "KIE Server template successfully created", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = SERVER_TEMPLATE_SAVE_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = SERVER_TEMPLATE_SAVE_XML)})
+            }),
             @ApiResponse(responseCode = "400", description = "Controller exception"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
@@ -136,11 +140,10 @@ public class RestSpecManagementServiceImpl {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response saveServerTemplate(@Context HttpHeaders headers,
                                        @Parameter(name = "serverTemplateId", value = "ID of the new KIE Server template", required = true, example = "sample-server") @PathParam("serverTemplateId") String serverTemplateId,
-                                       @Parameter(name = "body", value = "A map containing the server-name, capabilities, and other components of the new KIE Server template", required = true, examples =
-                                       @Example(value = {
-                                               @ExampleProperty(mediaType = JSON, value = SERVER_TEMPLATE_JSON),
-                                               @ExampleProperty(mediaType = XML, value = SERVER_TEMPLATE_XML)
-                                       })) String serverTemplatePayload,
+                                       @Parameter(name = "body", value = "A map containing the server-name, capabilities, and other components of the new KIE Server template", required = true, content = {
+                                           @Content(mediaType = JSON, examples = {@ExampleObject(value = SERVER_TEMPLATE_JSON)}),
+                                           @Content(mediaType = XML, examples = {@ExampleObject(value = SERVER_TEMPLATE_XML)})
+                                       }) String serverTemplatePayload,
                                        @Context UriInfo uriInfo) {
         String contentType = getContentType(headers);
         try {
@@ -165,10 +168,10 @@ public class RestSpecManagementServiceImpl {
 
     @Operation(summary = "Returns information about a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "KIE Server template", examples = @Example({
-                    @ExampleProperty(mediaType = JSON, value = SERVER_TEMPLATE_GET_JSON),
-                    @ExampleProperty(mediaType = XML, value = SERVER_TEMPLATE_GET_XML)
-            })),
+            @ApiResponse(responseCode = "200", description = "KIE Server template", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = SERVER_TEMPLATE_GET_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = SERVER_TEMPLATE_GET_XML)})
+            }),
             @ApiResponse(responseCode = "404", description = "KIE Server template not found"),
             @ApiResponse(responseCode = "400", description = "Controller exception"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
@@ -200,10 +203,10 @@ public class RestSpecManagementServiceImpl {
 
     @Operation(summary = "Returns all KIE Server templates")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "KIE Server templates", examples = @Example(value = {
-                    @ExampleProperty(mediaType = JSON, value = SERVER_TEMPLATE_LIST_JSON),
-                    @ExampleProperty(mediaType = XML, value = SERVER_TEMPLATE_LIST_XML)
-            })),
+            @ApiResponse(responseCode = "200", description = "KIE Server templates", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = SERVER_TEMPLATE_LIST_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = SERVER_TEMPLATE_LIST_XML)})
+            }),
             @ApiResponse(responseCode = "404", description = "KIE Server template not found"),
             @ApiResponse(responseCode = "400", description = "Controller exception"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
@@ -234,10 +237,10 @@ public class RestSpecManagementServiceImpl {
 
     @Operation(summary = "Returns all KIE containers for a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "KIE containers", examples = @Example({
-                @ExampleProperty(mediaType = JSON, value = CONTAINER_SPEC_LIST_JSON),
-                @ExampleProperty(mediaType = XML, value = CONTAINER_SPEC_LIST_XML)
-            })),
+            @ApiResponse(responseCode = "200", description = "KIE containers", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CONTAINER_SPEC_LIST_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = CONTAINER_SPEC_LIST_XML)})
+            }),
             @ApiResponse(responseCode = "404", description = "KIE Server template not found"),
             @ApiResponse(responseCode = "400", description = "Controller exception"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
@@ -268,10 +271,10 @@ public class RestSpecManagementServiceImpl {
 
     @Operation(summary = "Returns information about a specified KIE container for a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "KIE container", examples = @Example({
-                    @ExampleProperty(mediaType = JSON, value = CONTAINER_SPEC_GET_JSON),
-                    @ExampleProperty(mediaType = XML, value = CONTAINER_SPEC_GET_XML),
-            })),
+            @ApiResponse(responseCode = "200", description = "KIE container", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CONTAINER_SPEC_GET_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = CONTAINER_SPEC_GET_XML)})
+            }),
             @ApiResponse(responseCode = "404", description = "Container Specification or KIE Server template not found"),
             @ApiResponse(responseCode = "400", description = "Controller exception"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
@@ -374,11 +377,10 @@ public class RestSpecManagementServiceImpl {
                                           @Parameter(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
                                           @Parameter(name = "containerId", value = "ID of the KIE container to be updated", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam("containerId") String containerSpecId,
                                           @Parameter(name = "capability", value = "KIE container capability to be applied (RULE, or PROCESS, case sensitive)", required = true, example = "PROCESS") @PathParam("capability") String capabilityStr,
-                                          @Parameter(name = "body", value = "An org.kie.server.controller.api.model.spec.<capability>Config map containing the configurations for the specified KIE container capability, such as runtimeStrategy, kbase, ksession, and mergeMode for process configuration", required = true, examples =
-                                          @Example(value = {
-                                                  @ExampleProperty(mediaType = JSON, value = CONTAINER_CONFIG_JSON),
-                                                  @ExampleProperty(mediaType = XML, value = CONTAINER_CONFIG_XML)
-                                          })) String containerConfigPayload) {
+                                          @Parameter(name = "body", value = "An org.kie.server.controller.api.model.spec.<capability>Config map containing the configurations for the specified KIE container capability, such as runtimeStrategy, kbase, ksession, and mergeMode for process configuration", required = true, content = {
+                                              @Content(mediaType = JSON, examples = {@ExampleObject(value = CONTAINER_CONFIG_JSON)}),
+                                              @Content(mediaType = XML, examples = {@ExampleObject(value = CONTAINER_CONFIG_XML)})
+                                          }) String containerConfigPayload) {
 
         String contentType = getContentType(headers);
         try {

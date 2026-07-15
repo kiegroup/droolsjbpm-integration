@@ -16,6 +16,13 @@
 
 package org.kie.server.controller.rest;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -26,7 +33,6 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import io.swagger.annotations.*;
 import org.kie.server.controller.api.KieServerControllerException;
 import org.kie.server.controller.api.KieServerControllerIllegalArgumentException;
 import org.kie.server.controller.api.model.runtime.ContainerList;
@@ -49,10 +55,10 @@ public class RestRuntimeManagementServiceImpl {
 
     @Operation(summary = "Returns all KIE Server instances configured with the controller for a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "KIE Server instances", examples = @Example({
-                @ExampleProperty(mediaType = JSON, value = SERVER_INSTANCE_GET_JSON),
-                @ExampleProperty(mediaType = XML, value = SERVER_INSTANCE_GET_XML)
-            })),
+            @ApiResponse(responseCode = "200", description = "KIE Server instances", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = SERVER_INSTANCE_GET_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = SERVER_INSTANCE_GET_XML)})
+            }),
             @ApiResponse(responseCode = "404", description = "KIE Server template not found"),
             @ApiResponse(responseCode = "400", description = "Controller exception"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
@@ -84,10 +90,10 @@ public class RestRuntimeManagementServiceImpl {
 
     @Operation(summary = "Returns all KIE containers for a specified KIE Server template and a specified KIE Server instance")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "KIE container instances", examples = @Example({
-                    @ExampleProperty(mediaType = JSON, value = CONTAINER_INSTANCE_LIST_JSON),
-                    @ExampleProperty(mediaType = XML, value = CONTAINER_INSTANCE_LIST_XML)
-            })),
+            @ApiResponse(responseCode = "200", description = "KIE container instances", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CONTAINER_INSTANCE_LIST_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = CONTAINER_INSTANCE_LIST_XML)})
+            }),
             @ApiResponse(responseCode = "404", description = "Kie Server template or Kie Server instance not found"),
             @ApiResponse(responseCode = "400", description = "Controller exception"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")
@@ -120,10 +126,10 @@ public class RestRuntimeManagementServiceImpl {
 
     @Operation(summary = "Returns all instances of a specified KIE container in a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "KIE container instances", examples = @Example({
-                    @ExampleProperty(mediaType = JSON, value = CONTAINER_INSTANCE_LIST_JSON),
-                    @ExampleProperty(mediaType = XML, value = CONTAINER_INSTANCE_LIST_XML)
-            })),
+            @ApiResponse(responseCode = "200", description = "KIE container instances", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CONTAINER_INSTANCE_LIST_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = CONTAINER_INSTANCE_LIST_XML)})
+            }),
             @ApiResponse(responseCode = "404", description = "KIE Server template or KIE container not found"),
             @ApiResponse(responseCode = "400", description = "Controller exception"),
             @ApiResponse(responseCode = "500", description = "Unexpected error")

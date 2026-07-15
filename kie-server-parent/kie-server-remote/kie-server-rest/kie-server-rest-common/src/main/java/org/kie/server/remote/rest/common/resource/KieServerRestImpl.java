@@ -18,6 +18,8 @@ package org.kie.server.remote.rest.common.resource;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -39,8 +41,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerStatusFilter;
@@ -99,8 +99,9 @@ public class KieServerRestImpl {
 
     @Operation(summary="Returns information about the KIE Server. The endpoint for this request is the base URL for the REST API.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_SERVER_INF_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_SERVER_INF_RESPONSE_JSON)})
+            }) })
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getInfo(@Context HttpHeaders headers) { 
@@ -109,8 +110,9 @@ public class KieServerRestImpl {
 
     @Operation(summary="Returns a list of KIE containers on the KIE Server.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_CONTAINERS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_CONTAINERS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path("containers")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -132,17 +134,19 @@ public class KieServerRestImpl {
 
     @Operation(summary="Creates a new KIE container in the KIE Server with a specified KIE container ID")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "400", description = "container could not be created"), 
-            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=CREATE_CONTAINER_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "201", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CREATE_CONTAINER_RESPONSE_JSON)})
+            }) })
     @PUT
     @Path("containers/{" + CONTAINER_ID + "}")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response createContainer( @Context HttpHeaders headers, 
             @Parameter(description = "Container id to be assigned to deployed KIE Container", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String id, 
-            @Parameter(description = "KIE Container resource to be deployed as KieContainerResource", required = true, examples=@Example(value= {
-                                      @ExampleProperty(mediaType=JSON, value=CREATE_CONTAINER_JSON),
-                                      @ExampleProperty(mediaType=XML, value=CREATE_CONTAINER_XML)})) String containerPayload ) {
+            @Parameter(description = "KIE Container resource to be deployed as KieContainerResource", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = CREATE_CONTAINER_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = CREATE_CONTAINER_XML)})
+            }) String containerPayload ) {
         
         ServiceResponse<?> forbidden = this.server.checkAccessability();
         if (forbidden != null) {                       
@@ -163,8 +167,9 @@ public class KieServerRestImpl {
     
     @Operation(summary="Activates (previously deactivated) KIE container on this server")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "400", description = "container could not be activated"),
-            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=ACTIVATE_CONTAINER_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "201", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = ACTIVATE_CONTAINER_RESPONSE_JSON)})
+            }) })
     @PUT
     @Path("containers/{" + CONTAINER_ID + "}/status/activated")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -188,8 +193,9 @@ public class KieServerRestImpl {
     
     @Operation(summary="Deactivates (previously started) KIE container on this server")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "400", description = "container could not be deactivated"),
-            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=DEACTIVATE_CONTAINER_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "201", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = DEACTIVATE_CONTAINER_RESPONSE_JSON)})
+            }) })
     @PUT
     @Path("containers/{" + CONTAINER_ID + "}/status/deactivated")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -213,8 +219,9 @@ public class KieServerRestImpl {
 
     @Operation(summary="Returns information about a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_CONTAINER_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_CONTAINER_RESPONSE_JSON)})
+            }) })
     @GET
     @Path("containers/{" + CONTAINER_ID + "}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -226,8 +233,9 @@ public class KieServerRestImpl {
 
     @Operation(summary="Disposes a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=DISPOSE_CONTAINER_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = DISPOSE_CONTAINER_RESPONSE_JSON)})
+            }) })
     @DELETE
     @Path("containers/{" + CONTAINER_ID + "}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -245,8 +253,9 @@ public class KieServerRestImpl {
 
     @Operation(summary="Returns information about the KIE scanner used for automatic updates in a specified KIE container, if applicable.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_SCANNER_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_SCANNER_RESPONSE_JSON)})
+            }) })
     @GET
     @Path("containers/{" + CONTAINER_ID + "}/scanner")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -258,17 +267,19 @@ public class KieServerRestImpl {
     
     @Operation(summary="Starts or stops a KIE scanner that controls polling for updated KIE container deployments, if applicable.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=UPDATE_SCANNER_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = UPDATE_SCANNER_RESPONSE_JSON)})
+            }) })
     @POST
     @Path("containers/{" + CONTAINER_ID + "}/scanner")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response updateScanner( @Context HttpHeaders headers, 
             @Parameter(description = "Container id for scanner to be updated", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String id, 
-            @Parameter(description = "Scanner information given as KieScannerResource type", required = true, examples=@Example(value= {
-                                     @ExampleProperty(mediaType=JSON, value=UPDATE_SCANNER_JSON),
-                                     @ExampleProperty(mediaType=XML, value=UPDATE_SCANNER_XML)})) String resourcePayload ) {
+            @Parameter(description = "Scanner information given as KieScannerResource type", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = UPDATE_SCANNER_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = UPDATE_SCANNER_XML)})
+            }) String resourcePayload ) {
         
         ServiceResponse<?> forbidden = this.server.checkAccessability();
         if (forbidden != null) {                       
@@ -284,8 +295,9 @@ public class KieServerRestImpl {
 
     @Operation(summary="Returns release ID information (group ID, artifact ID, version) for a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_RELEASE_ID_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_RELEASE_ID_RESPONSE_JSON)})
+            }) })
     @GET
     @Path("containers/{" + CONTAINER_ID + "}/release-id")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -297,17 +309,19 @@ public class KieServerRestImpl {
 
     @Operation(summary="Updates release ID information (group ID, artifact ID, version) for a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=UPDATE_RELEASE_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = UPDATE_RELEASE_RESPONSE_JSON)})
+            }) })
     @POST
     @Path("containers/{" + CONTAINER_ID + "}/release-id")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response updateReleaseId( @Context HttpHeaders headers, 
             @Parameter(description = "Container id that release id should be upgraded", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String id, 
-            @Parameter(description = "Release Id to be upgraded to as ReleaseId type", required = true, examples=@Example(value= {
-                                   @ExampleProperty(mediaType=JSON, value=UPDATE_RELEASE_ID_JSON),
-                                   @ExampleProperty(mediaType=XML, value=UPDATE_RELEASE_ID_XML)})) String releaseIdPayload,
+            @Parameter(description = "Release Id to be upgraded to as ReleaseId type", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = UPDATE_RELEASE_ID_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = UPDATE_RELEASE_ID_XML)})
+            }) String releaseIdPayload,
             @Parameter(description = "Determines whether active processes are aborted (reset) before updating when the server runs in development mode") @QueryParam("resetBeforeUpdate")  @DefaultValue("false") boolean resetBeforeUpdate) {
         
         ServiceResponse<?> forbidden = this.server.checkAccessability();
@@ -325,8 +339,9 @@ public class KieServerRestImpl {
 
     @Operation(summary="Returns information about the current state and configurations of the KIE Server.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_SERVER_STATE_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_SERVER_STATE_RESPONSE_JSON)})
+            }) })
     @GET
     @Path("state")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})

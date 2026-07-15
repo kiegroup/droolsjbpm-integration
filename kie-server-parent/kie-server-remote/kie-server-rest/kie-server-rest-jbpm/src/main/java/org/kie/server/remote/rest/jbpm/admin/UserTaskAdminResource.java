@@ -19,6 +19,8 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -39,8 +41,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.TaskNotFoundException;
@@ -138,9 +138,10 @@ public class UserTaskAdminResource {
             @Parameter(description = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @Parameter(description = "optional flag that indicates if existing potential owners should be removed, defaults to false", required = false) @QueryParam("remove") @DefaultValue("false") boolean removeExisting, 
-            @Parameter(description = "list of users/groups to be added as potential owners, as OrgEntities type", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=ORG_ENTITIES_LIST_JSON),
-                    @ExampleProperty(mediaType=XML, value=ORG_ENTITIES_LIST_XML)})) String payload) {
+            @Parameter(description = "list of users/groups to be added as potential owners, as OrgEntities type", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = ORG_ENTITIES_LIST_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = ORG_ENTITIES_LIST_XML)})
+            }) String payload) {
 
         return addToTask(headers, userId, containerId, tInstanceId, removeExisting, payload, POT_OWNER);
     }
@@ -157,9 +158,10 @@ public class UserTaskAdminResource {
             @Parameter(description = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @Parameter(description = "optional flag that indicates if existing excluded owners should be removed, defaults to false", required = false) @QueryParam("remove") @DefaultValue("false") boolean removeExisting, 
-            @Parameter(description = "list of users/groups to be added as excluded owners, as OrgEntities type", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=ORG_ENTITIES_LIST_JSON),
-                    @ExampleProperty(mediaType=XML, value=ORG_ENTITIES_LIST_XML)})) String payload) {
+            @Parameter(description = "list of users/groups to be added as excluded owners, as OrgEntities type", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = ORG_ENTITIES_LIST_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = ORG_ENTITIES_LIST_XML)})
+            }) String payload) {
 
         return addToTask(headers, userId,  containerId, tInstanceId, removeExisting, payload, EXL_OWNER);
     }
@@ -176,9 +178,10 @@ public class UserTaskAdminResource {
             @Parameter(description = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @Parameter(description = "optional flag that indicates if existing business admins should be removed, defaults to false", required = false) @QueryParam("remove") @DefaultValue("false") boolean removeExisting, 
-            @Parameter(description = "list of users/groups to be added as business admins, as OrgEntities type", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=ORG_ENTITIES_LIST_JSON),
-                    @ExampleProperty(mediaType=XML, value=ORG_ENTITIES_LIST_XML)})) String payload) {
+            @Parameter(description = "list of users/groups to be added as business admins, as OrgEntities type", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = ORG_ENTITIES_LIST_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = ORG_ENTITIES_LIST_XML)})
+            }) String payload) {
 
         return addToTask(headers, userId, containerId, tInstanceId, removeExisting, payload, ADMIN);
     }
@@ -284,9 +287,10 @@ public class UserTaskAdminResource {
     public Response addTaskInputs(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
-            @Parameter(description = "map of data to be set as task inputs, as Map", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON),
-                    @ExampleProperty(mediaType=XML, value=VAR_MAP_XML)})) String payload) {
+            @Parameter(description = "map of data to be set as task inputs, as Map", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
+            }) String payload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -359,8 +363,9 @@ public class UserTaskAdminResource {
     @Operation(summary="Schedules a specified task instance to be reassigned to specified users or groups and returns the ID of the reassignment.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found"), 
-            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=INTEGER_JSON)})) })
+            @ApiResponse(responseCode = "201", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = INTEGER_JSON)})
+            }) })
     @POST
     @Path(TASK_INSTANCE_REASSIGNMENTS_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -371,9 +376,10 @@ public class UserTaskAdminResource {
             @Parameter(description = "time expression for reassignmnet", required = true) @QueryParam("expiresAt") String expiresAt, 
             @Parameter(description = "optional flag that indicates the type of reassignment, either whenNotStarted or whenNotCompleted must be set", required = false) @QueryParam("whenNotStarted") @DefaultValue("false") boolean whenNotStarted, 
             @Parameter(description = "optional flag that indicates the type of reassignment, either whenNotStarted or whenNotCompleted must be set", required = false) @QueryParam("whenNotCompleted") @DefaultValue("false") boolean whenNotCompleted, 
-            @Parameter(description = "list of users/groups that task should be reassined to, as OrgEntities type", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=ORG_ENTITIES_LIST_JSON),
-                    @ExampleProperty(mediaType=XML, value=ORG_ENTITIES_LIST_XML)})) String payload) {
+            @Parameter(description = "list of users/groups that task should be reassined to, as OrgEntities type", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = ORG_ENTITIES_LIST_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = ORG_ENTITIES_LIST_XML)})
+            }) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -409,8 +415,9 @@ public class UserTaskAdminResource {
     @Operation(summary="Creates an email notification for the specified task instance and returns the ID of the new notification.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found"), 
-            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=INTEGER_JSON)})) })
+            @ApiResponse(responseCode = "201", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = INTEGER_JSON)})
+            }) })
     @POST
     @Path(TASK_INSTANCE_NOTIFICATIONS_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -421,9 +428,10 @@ public class UserTaskAdminResource {
             @Parameter(description = "time expression for notification", required = true) @QueryParam("expiresAt") String expiresAt, 
             @Parameter(description = "optional flag that indicates the type of notification, either whenNotStarted or whenNotCompleted must be set", required = false) @QueryParam("whenNotStarted") @DefaultValue("false") boolean whenNotStarted, 
             @Parameter(description = "optional flag that indicates the type of notification, either whenNotStarted or whenNotCompleted must be set", required = false) @QueryParam("whenNotCompleted") @DefaultValue("false") boolean whenNotCompleted, 
-            @Parameter(description = "email notification details, as EmailNotification type", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=EMAIL_NOTIFICATION_JSON),
-                    @ExampleProperty(mediaType=XML, value=EMAIL_NOTIFICATION_XML)})) String payload) {
+            @Parameter(description = "email notification details, as EmailNotification type", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = EMAIL_NOTIFICATION_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = EMAIL_NOTIFICATION_XML)})
+            }) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -508,8 +516,9 @@ public class UserTaskAdminResource {
     @Operation(summary="Returns task reassignments for a specified task instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_TASK_REASSIGNMENTS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_REASSIGNMENTS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(TASK_INSTANCE_REASSIGNMENTS_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -536,8 +545,9 @@ public class UserTaskAdminResource {
     @Operation(summary="Returns notifications created for a specified task instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_TASK_NOTIFICATIONS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_NOTIFICATIONS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(TASK_INSTANCE_NOTIFICATIONS_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -614,8 +624,9 @@ public class UserTaskAdminResource {
     @Operation(summary="Returns information about a specified task execution error.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERROR_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_EXEC_ERROR_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(ERROR_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -641,8 +652,9 @@ public class UserTaskAdminResource {
     @Operation(summary="Returns task execution errors for a specified task instance.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Container Id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERRORS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_EXEC_ERRORS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(ERRORS_BY_TASK_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -673,8 +685,9 @@ public class UserTaskAdminResource {
     @Operation(summary="Returns all task execution errors for a specified KIE container.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Container Id not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERRORS_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_EXEC_ERRORS_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(ERRORS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})

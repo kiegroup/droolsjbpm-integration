@@ -17,6 +17,8 @@ package org.kie.server.remote.rest.jbpm;
 
 import java.text.MessageFormat;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -38,8 +40,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.dashbuilder.dataset.exception.DataSetLookupException;
 import org.jbpm.services.api.query.QueryAlreadyRegisteredException;
@@ -109,8 +109,9 @@ public class QueryDataResource {
 
     @Operation(summary="Returns all custom query definitions.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=QUERY_DEF_LIST_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = QUERY_DEF_LIST_RESPONSE_JSON)})
+            }) })
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getQueries( @Context HttpHeaders headers,
@@ -135,17 +136,19 @@ public class QueryDataResource {
     @Operation(summary="Registers a custom query definition.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "409", description = "Query with given name already exists"), 
-            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=QUERY_DEF_RESPONSE_JSON)}))})
+            @ApiResponse(responseCode = "201", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = QUERY_DEF_RESPONSE_JSON)})
+            })})
     @POST
     @Path(CREATE_QUERY_DEF_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response createQueryDefinition( @jakarta.ws.rs.core.Context HttpHeaders headers,
             @Parameter(description = "identifier of the query definition to be registered", required = true, example = "customQuery") @PathParam("queryName") String queryName,
-            @Parameter(description = "query definition represented as QueryDefinition", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=QUERY_DEF_JSON),
-                    @ExampleProperty(mediaType=XML, value=QUERY_DEF_XML)})) String payload ) {
+            @Parameter(description = "query definition represented as QueryDefinition", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = QUERY_DEF_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = QUERY_DEF_XML)})
+            }) String payload ) {
         Variant v = getVariant( headers );
         String type = getContentType( headers );
         // no container id available so only used to transfer conversation id if
@@ -181,17 +184,19 @@ public class QueryDataResource {
 
     @Operation(summary="Replaces existing custom query definition or registers it as new if the query does not already exist.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=QUERY_DEF_RESPONSE_JSON)}))})
+            @ApiResponse(responseCode = "201", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = QUERY_DEF_RESPONSE_JSON)})
+            })})
     @PUT
     @Path(REPLACE_QUERY_DEF_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response replaceQueryDefinition( @jakarta.ws.rs.core.Context HttpHeaders headers,
             @Parameter(description = "identifier of the query definition to be replaced", required = true, example = "customQuery") @PathParam("queryName") String queryName,
-            @Parameter(description = "query definition represented as QueryDefinition", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=QUERY_DEF_JSON),
-                    @ExampleProperty(mediaType=XML, value=QUERY_DEF_XML)})) String payload ) {
+            @Parameter(description = "query definition represented as QueryDefinition", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = QUERY_DEF_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = QUERY_DEF_XML)})
+            }) String payload ) {
         Variant v = getVariant( headers );
         String type = getContentType( headers );
         // no container id available so only used to transfer conversation id if
@@ -256,8 +261,9 @@ public class QueryDataResource {
     @Operation(summary="Returns information about a specified custom query.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Query definition with given name not found"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=QUERY_DEF_RESPONSE_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = QUERY_DEF_RESPONSE_JSON)})
+            })})
     @GET
     @Path(QUERY_DEF_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -294,8 +300,9 @@ public class QueryDataResource {
     @Operation(summary="Returns the results of a specified custom query.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Query definition with given name not found"), 
-            @ApiResponse(responseCode = "200", responseContainer = "List", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)}))})
+            @ApiResponse(responseCode = "200", responseContainer = "List", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCES_RESPONSE_JSON)})
+            })})
     @GET
     @Path(RUN_QUERY_DEF_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -329,8 +336,9 @@ public class QueryDataResource {
     @Operation(summary="Returns the results of a specified custom query and filters the results based on a provided builder or filter request body.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "400", description = "Query parameters or filter spec provide invalid conditions"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCES_RESPONSE_JSON)})
+            })})
     @POST
     @Path(RUN_FILTERED_QUERY_DEF_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -341,9 +349,10 @@ public class QueryDataResource {
             @Parameter(description = "optional identifier of the query builder to be used for query conditions", required = false)  @QueryParam("builder") String builder,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @Parameter(description = "optional query filter specification represented as QueryFilterSpec", required = false, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=QUERY_FILTER_SPEC_JSON),
-                    @ExampleProperty(mediaType=XML, value=QUERY_FILTER_SPEC_XML)})) String payload ) {
+            @Parameter(description = "optional query filter specification represented as QueryFilterSpec", required = false, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = QUERY_FILTER_SPEC_JSON)}),
+                @Content(mediaType = XML, examples = {@ExampleObject(value = QUERY_FILTER_SPEC_XML)})
+            }) String payload ) {
         
         String type = getContentType( headers );
         // no container id available so only used to transfer conversation id if
@@ -407,8 +416,9 @@ public class QueryDataResource {
     @Operation(summary="Returns the results of a specified custom query on a specified KIE container and filters the results based on a provided builder or filter request body.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "400", description = "Query parameters or filter spec provide invalid conditions"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)}))})
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCES_RESPONSE_JSON)})
+            })})
     @POST
     @Path(RUN_FILTERED_QUERY_DEF_BY_CONTAINER_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -420,9 +430,10 @@ public class QueryDataResource {
                                                     @Parameter(description = "optional identifier of the query builder to be used for query conditions", required = false)  @QueryParam("builder") String builder,
                                                     @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
                                                     @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-                                                    @Parameter(description = "optional query filter specification represented as QueryFilterSpec", required = false, examples=@Example(value= {
-                                                            @ExampleProperty(mediaType=JSON, value=QUERY_FILTER_SPEC_JSON),
-                                                            @ExampleProperty(mediaType=XML, value=QUERY_FILTER_SPEC_XML)})) String payload ) {
+                                                    @Parameter(description = "optional query filter specification represented as QueryFilterSpec", required = false, content = {
+                                                        @Content(mediaType = JSON, examples = {@ExampleObject(value = QUERY_FILTER_SPEC_JSON)}),
+                                                        @Content(mediaType = XML, examples = {@ExampleObject(value = QUERY_FILTER_SPEC_XML)})
+                                                    }) String payload ) {
 
         String type = getContentType( headers );
         Header conversationIdHeader = buildConversationIdHeader( containerId,

@@ -20,6 +20,8 @@ import static org.kie.server.remote.rest.common.docs.ParameterSamples.EXECUTE_CM
 import static org.kie.server.remote.rest.common.docs.ParameterSamples.EXECUTE_CMD_RESPONSE_JSON;
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -39,8 +41,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 
 @Tag(name="KIE Server and KIE containers")
 @Path("server/config")
@@ -59,14 +59,16 @@ public class KieServerResource {
 
     @Operation(summary="Executes one or more KIE Server commands for server-related or container-related operations")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
-            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=EXECUTE_CMD_RESPONSE_JSON)})) })
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = EXECUTE_CMD_RESPONSE_JSON)})
+            }) })
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response executeCommands(@Context HttpHeaders headers, 
-            @Parameter(description = "command script payload", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=EXECUTE_CMD_JSON)})) String commandScriptPayload ) {
+            @Parameter(description = "command script payload", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = EXECUTE_CMD_JSON)})
+            }) String commandScriptPayload ) {
 
         String contentType = getContentType(headers);
 
