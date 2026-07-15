@@ -18,8 +18,10 @@ package org.kie.server.remote.rest.common.resource;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -363,8 +365,15 @@ public class KieServerRestImpl {
         return serviceUnavailable();
     }
     
-    @Operation(summary="Liveness check for KIE Server that validates both kie server and all extensions, optionally produces report", responseContainer="List")
-    @ApiResponses(value = { @ApiResponse(responseCode = "503", description = "If any of the checks failed") })
+    @Operation(summary="Liveness check for KIE Server that validates both kie server and all extensions, optionally produces report")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    content = @Content(
+                            array = @ArraySchema(schema = @Schema(implementation = List.class))
+                    )
+            ),
+            @ApiResponse(responseCode = "503", description = "If any of the checks failed")
+    })
     @GET
     @Path("healthcheck")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})

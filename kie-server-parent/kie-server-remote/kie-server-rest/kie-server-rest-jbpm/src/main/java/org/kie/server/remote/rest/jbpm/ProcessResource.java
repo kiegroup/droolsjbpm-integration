@@ -17,6 +17,7 @@ package org.kie.server.remote.rest.jbpm;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -769,8 +770,14 @@ public class ProcessResource  {
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"), 
             @ApiResponse(responseCode = "403", description = "User does not have permission to access this asset"),
-            @ApiResponse(responseCode = "200", responseContainer= "List", description = "Successful response", content = {
-                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_SIGNALS_RESPONSE_JSON)})
+            @ApiResponse(responseCode = "200",
+                    description = "Successful response",
+                    content = {
+                    @Content(mediaType = JSON,
+                            array = @ArraySchema(schema = @Schema(implementation = List.class)),
+                            examples = {
+                            @ExampleObject(value = GET_PROCESS_INSTANCE_SIGNALS_RESPONSE_JSON)
+                    })
             }) })
     @GET
     @Path(PROCESS_INSTANCE_SIGNALS_GET_URI)

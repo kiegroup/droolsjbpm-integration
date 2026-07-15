@@ -16,9 +16,12 @@
 package org.kie.server.remote.rest.jbpm;
 
 import java.text.MessageFormat;
+import java.util.List;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -301,8 +304,13 @@ public class QueryDataResource {
     @Operation(summary="Returns the results of a specified custom query.")
     @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Query definition with given name not found"), 
-            @ApiResponse(responseCode = "200", responseContainer = "List", description = "Successful response", content = {
-                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCES_RESPONSE_JSON)})
+            @ApiResponse(responseCode = "200", description = "Successful response",
+                    content = {
+                    @Content(mediaType = JSON,
+                            array = @ArraySchema(schema = @Schema(implementation = List.class)),
+                            examples = {
+                            @ExampleObject(value = GET_PROCESS_INSTANCES_RESPONSE_JSON)
+                    })
             })})
     @GET
     @Path(RUN_QUERY_DEF_GET_URI)
