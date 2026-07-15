@@ -6,9 +6,9 @@ import java.util.Set;
 
 public class PojoWithCollections {
 
-    private final Collection fieldCollection;
-    private final List fieldList;
-    private final Set fieldSet;
+    private Collection fieldCollection;
+    private List fieldList;
+    private Set fieldSet;
 
     public PojoWithCollections(Collection fieldCollection,
                                List fieldList,

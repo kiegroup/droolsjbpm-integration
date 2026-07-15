@@ -21,7 +21,7 @@ import java.util.Set;
 public class TMFileSet {
 
     private final String name;
-    private final Set<TMFile> members = new HashSet<TMFile>();
+    private Set<TMFile> members = new HashSet<TMFile>();
 
     public TMFileSet(String name) {
         this.name = name;
