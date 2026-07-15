@@ -19,6 +19,7 @@ import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -88,7 +89,7 @@ public class CaseAdminResource extends AbstractCaseResource {
     @Path(ADMIN_CASE_ALL_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstances(@jakarta.ws.rs.core.Context HttpHeaders headers,
-                                     @Parameter(description = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, allowableValues="open,closed,cancelled") @QueryParam("status") List<String> status,
+                                     @Parameter(description = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, schema = @Schema(allowableValues = {"open", "closed", "cancelled"})) @QueryParam("status") List<String> status,
                                      @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
                                      @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
                                      @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort,

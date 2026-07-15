@@ -22,6 +22,7 @@ import java.util.Map;
 
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -675,7 +676,7 @@ public class CaseResource extends AbstractCaseResource {
     public Response getCaseInstanceProcessInstance(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @Parameter(description = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of the case instance", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
-            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, allowableValues="1,2,3") @QueryParam("status") List<Integer> status,
+            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, schema = @Schema(allowableValues = {"1", "2", "3"})) @QueryParam("status") List<Integer> status,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
@@ -931,7 +932,7 @@ public class CaseResource extends AbstractCaseResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstancesByContainer(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @Parameter(description = "container id that should be used to filter case instances", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
-            @Parameter(description = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, allowableValues="open,closed,cancelled") @QueryParam("status") List<String> status,
+            @Parameter(description = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, schema = @Schema(allowableValues = {"open", "closed", "cancelled"})) @QueryParam("status") List<String> status,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
@@ -966,7 +967,7 @@ public class CaseResource extends AbstractCaseResource {
     public Response getCaseInstancesByDefinition(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @Parameter(description = "container id that should be used to filter case instances", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "case definition id that should be used to filter case instances", required = true, example = "CASE-00000000001") @PathParam(CASE_DEF_ID) String caseDefId,
-            @Parameter(description = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, allowableValues="open,closed,cancelled") @QueryParam("status") List<String> status,
+            @Parameter(description = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, schema = @Schema(allowableValues = {"open", "closed", "cancelled"})) @QueryParam("status") List<String> status,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 

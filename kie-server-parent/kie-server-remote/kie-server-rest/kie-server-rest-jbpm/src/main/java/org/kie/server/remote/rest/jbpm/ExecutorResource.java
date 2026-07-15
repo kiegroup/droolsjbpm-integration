@@ -19,6 +19,7 @@ import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -214,7 +215,7 @@ public class ExecutorResource {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getRequestsByStatus(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @Parameter(description = "optional job status (QUEUED, DONE, CANCELLED, ERROR, RETRYING, RUNNING)", required = true, allowableValues="QUEUED,DONE,CANCELLED,ERROR,RETRYING,RUNNING") @QueryParam("status") List<String> statuses,
+            @Parameter(description = "optional job status (QUEUED, DONE, CANCELLED, ERROR, RETRYING, RUNNING)", required = true, schema = @Schema(allowableValues = {"QUEUED", "DONE", "CANCELLED", "ERROR", "RETRYING", "RUNNING"})) @QueryParam("status") List<String> statuses,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
         Variant v = getVariant(headers);
@@ -241,7 +242,7 @@ public class ExecutorResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getRequestsByBusinessKey(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "identifier of the business key that asynchornous jobs should be found for", required = true, example = "custom-job") @PathParam("key") String businessKey,
-            @Parameter(description = "optional job status (QUEUED, DONE, CANCELLED, ERROR, RETRYING, RUNNING)", required = false, allowableValues="QUEUED,DONE,CANCELLED,ERROR,RETRYING,RUNNING") @QueryParam("status") List<String> statuses,
+            @Parameter(description = "optional job status (QUEUED, DONE, CANCELLED, ERROR, RETRYING, RUNNING)", required = false, schema = @Schema(allowableValues = {"QUEUED", "DONE", "CANCELLED", "ERROR", "RETRYING", "RUNNING"})) @QueryParam("status") List<String> statuses,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
@@ -273,7 +274,7 @@ public class ExecutorResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getRequestsByCommand(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "name of the command that asynchornous jobs should be found for", required = true, example = "com.sample.CommandImpl") @PathParam("cmd") String command,
-            @Parameter(description = "optional job status (QUEUED, DONE, CANCELLED, ERROR, RETRYING, RUNNING)", required = false, allowableValues="QUEUED,DONE,CANCELLED,ERROR,RETRYING,RUNNING") @QueryParam("status") List<String> statuses,
+            @Parameter(description = "optional job status (QUEUED, DONE, CANCELLED, ERROR, RETRYING, RUNNING)", required = false, schema = @Schema(allowableValues = {"QUEUED", "DONE", "CANCELLED", "ERROR", "RETRYING", "RUNNING"})) @QueryParam("status") List<String> statuses,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
         Variant v = getVariant(headers);
@@ -305,7 +306,7 @@ public class ExecutorResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getRequestsByContainer(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "identifier of the container that asynchornous jobs should be found for", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
-            @Parameter(description = "optional job status (QUEUED, DONE, CANCELLED, ERROR, RETRYING, RUNNING)", required = false, allowableValues="QUEUED,DONE,CANCELLED,ERROR,RETRYING,RUNNING") @QueryParam("status") List<String> statuses,
+            @Parameter(description = "optional job status (QUEUED, DONE, CANCELLED, ERROR, RETRYING, RUNNING)", required = false, schema = @Schema(allowableValues = {"QUEUED", "DONE", "CANCELLED", "ERROR", "RETRYING", "RUNNING"})) @QueryParam("status") List<String> statuses,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
@@ -332,7 +333,7 @@ public class ExecutorResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getRequestsByProcessInstance(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "identifier of the process instance that asynchornous jobs should be found for", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId,
-            @Parameter(description = "optional job status (QUEUED, DONE, CANCELLED, ERROR, RETRYING, RUNNING)", required = false, allowableValues="QUEUED,DONE,CANCELLED,ERROR,RETRYING,RUNNING") @QueryParam("status") List<String> statuses,
+            @Parameter(description = "optional job status (QUEUED, DONE, CANCELLED, ERROR, RETRYING, RUNNING)", required = false, schema = @Schema(allowableValues = {"QUEUED", "DONE", "CANCELLED", "ERROR", "RETRYING", "RUNNING"})) @QueryParam("status") List<String> statuses,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
         Variant v = getVariant(headers);

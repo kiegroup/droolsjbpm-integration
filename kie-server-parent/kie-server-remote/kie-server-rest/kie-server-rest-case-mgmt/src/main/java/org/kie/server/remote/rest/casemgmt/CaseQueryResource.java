@@ -19,6 +19,7 @@ import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -108,7 +109,7 @@ public class CaseQueryResource extends AbstractCaseResource {
             @Parameter(description = "data item name that case instances will be filtered by", required = false) @QueryParam("dataItemName") String dataItemName, 
             @Parameter(description = "data item value that case instances will be filtered by", required = false) @QueryParam("dataItemValue") String dataItemValue,
             @Parameter(description = "case instance owner that case instances will be filtered by", required = false) @QueryParam("owner") String owner,
-            @Parameter(description = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, allowableValues="open,closed,cancelled") @QueryParam("status") List<String> status,
+            @Parameter(description = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, schema = @Schema(allowableValues = {"open", "closed", "cancelled"})) @QueryParam("status") List<String> status,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
@@ -151,7 +152,7 @@ public class CaseQueryResource extends AbstractCaseResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getCaseInstancesByRole(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @Parameter(description = "case role that instances should be found for", required = true, example = "owner") @PathParam(CASE_ROLE_NAME) String roleName, 
-            @Parameter(description = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, allowableValues="open,closed,cancelled") @QueryParam("status") List<String> status,
+            @Parameter(description = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, schema = @Schema(allowableValues = {"open", "closed", "cancelled"})) @QueryParam("status") List<String> status,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
@@ -276,7 +277,7 @@ public class CaseQueryResource extends AbstractCaseResource {
     public Response getCaseInstanceTasksAsPotentialOwner(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @Parameter(description = "case instance identifier that tasks should belong to", required = true, example = "CASE-00000000011") @PathParam(CASE_ID) String caseId,
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String user, 
-            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
+            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, schema = @Schema(allowableValues = {"Created", "Ready", "Reserved", "InProgress", "Suspended", "Completed", "Failed", "Error", "Exited", "Obsolete"})) @QueryParam("status") List<String> status,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
@@ -305,7 +306,7 @@ public class CaseQueryResource extends AbstractCaseResource {
     public Response getCaseInstanceTasksAsAdmin(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @Parameter(description = "case instance identifier that tasks should belong to", required = true, example = "CASE-00000000001") @PathParam(CASE_ID) String caseId,
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String user, 
-            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
+            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, schema = @Schema(allowableValues = {"Created", "Ready", "Reserved", "InProgress", "Suspended", "Completed", "Failed", "Error", "Exited", "Obsolete"})) @QueryParam("status") List<String> status,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
@@ -334,7 +335,7 @@ public class CaseQueryResource extends AbstractCaseResource {
     public Response getCaseInstanceTasksAsStakeholder(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @Parameter(description = "case instance identifier that tasks should belong to", required = true, example = "CASE-0000000001") @PathParam(CASE_ID) String caseId,
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String user, 
-            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
+            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, schema = @Schema(allowableValues = {"Created", "Ready", "Reserved", "InProgress", "Suspended", "Completed", "Failed", "Error", "Exited", "Obsolete"})) @QueryParam("status") List<String> status,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 

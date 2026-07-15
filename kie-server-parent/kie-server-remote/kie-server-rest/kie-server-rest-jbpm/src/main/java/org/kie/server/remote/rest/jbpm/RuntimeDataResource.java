@@ -20,6 +20,7 @@ import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -149,7 +150,7 @@ public class RuntimeDataResource {
     @Path(PROCESS_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstances(@Context HttpHeaders headers,
-            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, allowableValues="1,2,3") @QueryParam("status") List<Integer> status, 
+            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, schema = @Schema(allowableValues = {"1", "2", "3"})) @QueryParam("status") List<Integer> status, 
             @Parameter(description = "optional process instance initiator - user who started process instance to filter process instances", required = false) @QueryParam("initiator") String initiator, 
             @Parameter(description = "optional process name to filter process instances", required = false) @QueryParam("processName") String processName,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
@@ -174,7 +175,7 @@ public class RuntimeDataResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstancesByProcessId(@Context HttpHeaders headers, 
             @Parameter(description = "process id to filter process instance", required = true) @PathParam(PROCESS_ID)String processId,
-            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, allowableValues="1,2,3") @QueryParam("status") List<Integer> status, 
+            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, schema = @Schema(allowableValues = {"1", "2", "3"})) @QueryParam("status") List<Integer> status, 
             @Parameter(description = "optinal process instance initiator - user who started process instance to filtr process instances", required = false) @QueryParam("initiator") String initiator,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
@@ -200,7 +201,7 @@ public class RuntimeDataResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstancesByDeploymentId(@Context HttpHeaders headers, 
             @Parameter(description = "container id to filter process instance", required = true) @PathParam(CONTAINER_ID) String containerId, 
-            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, allowableValues="1,2,3") @QueryParam("status")List<Integer> status,
+            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, schema = @Schema(allowableValues = {"1", "2", "3"})) @QueryParam("status")List<Integer> status,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
@@ -234,7 +235,7 @@ public class RuntimeDataResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response countProcessInstancesByDeploymentId(@Context HttpHeaders headers,
                                                       @Parameter(description = "container id to filter process instance", required = true) @PathParam(CONTAINER_ID) String containerId,
-                                                      @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, allowableValues="1,2,3") @QueryParam("status")List<Integer> status) {
+                                                      @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, schema = @Schema(allowableValues = {"1", "2", "3"})) @QueryParam("status")List<Integer> status) {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -311,7 +312,7 @@ public class RuntimeDataResource {
     public Response getProcessInstanceByVariables(@Context HttpHeaders headers, 
             @Parameter(description = "variable name to filter process instance", required = true) @PathParam("varName") String variableName, 
             @Parameter(description = "variable value to filter process instance, optional when filtering by name only required when filtering by name and value", required = false) @QueryParam("varValue") String variableValue,
-            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, allowableValues="1,2,3") @QueryParam("status")List<Integer> status, 
+            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, schema = @Schema(allowableValues = {"1", "2", "3"})) @QueryParam("status")List<Integer> status, 
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
@@ -590,7 +591,7 @@ public class RuntimeDataResource {
     @Path(TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTasksAssignedAsBusinessAdministratorByStatus(@Context HttpHeaders headers, 
-            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
+            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, schema = @Schema(allowableValues = {"Created", "Ready", "Reserved", "InProgress", "Suspended", "Completed", "Failed", "Error", "Exited", "Obsolete"})) @QueryParam("status") List<String> status,
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId, 
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
@@ -620,7 +621,7 @@ public class RuntimeDataResource {
     @Path(TASKS_ASSIGN_POT_OWNERS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTasksAssignedAsPotentialOwner(@Context HttpHeaders headers,
-            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,  
+            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, schema = @Schema(allowableValues = {"Created", "Ready", "Reserved", "InProgress", "Suspended", "Completed", "Failed", "Error", "Exited", "Obsolete"})) @QueryParam("status") List<String> status,  
             @Parameter(description = "optional group names to include in the query", required = false, allowMultiple=true) @QueryParam("groups") List<String> groupIds,
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
@@ -655,7 +656,7 @@ public class RuntimeDataResource {
     @Path(TASKS_OWNED_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTasksOwnedByStatus(@Context HttpHeaders headers,
-            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status, 
+            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, schema = @Schema(allowableValues = {"Created", "Ready", "Reserved", "InProgress", "Suspended", "Completed", "Failed", "Error", "Exited", "Obsolete"})) @QueryParam("status") List<String> status, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
@@ -687,7 +688,7 @@ public class RuntimeDataResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTasksByStatusByProcessInstanceId(@Context HttpHeaders headers, 
             @Parameter(description = "process instance id to filter task instances", required = true) @PathParam(PROCESS_INST_ID) Long processInstanceId,
-            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
+            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, schema = @Schema(allowableValues = {"Created", "Ready", "Reserved", "InProgress", "Suspended", "Completed", "Failed", "Error", "Exited", "Obsolete"})) @QueryParam("status") List<String> status,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
@@ -776,7 +777,7 @@ public class RuntimeDataResource {
     public Response getTasksByVariables(@Context HttpHeaders headers, 
             @Parameter(description = "name of the variable used to fiter tasks", required = true) @PathParam("varName") String variableName, 
             @Parameter(description = "value of the variable used to fiter tasks, optional when filtering only by name, required when filtering by both name and value", required = false) @QueryParam("varValue") String variableValue,
-            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status")List<String> status, 
+            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, schema = @Schema(allowableValues = {"Created", "Ready", "Reserved", "InProgress", "Suspended", "Completed", "Failed", "Error", "Exited", "Obsolete"})) @QueryParam("status")List<String> status, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId, 
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,

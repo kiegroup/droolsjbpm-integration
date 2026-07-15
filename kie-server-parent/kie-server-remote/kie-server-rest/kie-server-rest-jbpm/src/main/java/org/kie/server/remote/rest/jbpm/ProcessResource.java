@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -947,7 +948,7 @@ public class ProcessResource  {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstancesByDeploymentId(@Context HttpHeaders headers, 
             @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, allowableValues="1,2,3") @QueryParam("status") List<Integer> status,
+            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, schema = @Schema(allowableValues = {"1", "2", "3"})) @QueryParam("status") List<Integer> status,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
@@ -1113,7 +1114,7 @@ public class ProcessResource  {
     public Response getProcessInstances(@Context HttpHeaders headers, 
             @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of the parent process instance that process instances should be collected for", required = true, example = "123") @PathParam(PROCESS_INST_ID) long parentProcessInstanceId,
-            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, allowableValues="1,2,3") @QueryParam("status") List<Integer> status,
+            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, schema = @Schema(allowableValues = {"1", "2", "3"})) @QueryParam("status") List<Integer> status,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
