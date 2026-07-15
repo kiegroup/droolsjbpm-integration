@@ -110,7 +110,7 @@
     
     <dependency>
       <groupId>io.swagger.parser.v3</groupId>
-      <artifactId>swagger-parser</artifactId>
+      <artifactId>swagger-parser-v3</artifactId>
       <scope>test</scope>
     </dependency>
     
