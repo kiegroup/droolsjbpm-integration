@@ -78,8 +78,6 @@ public class SwaggerKieServerExtension implements KieServerExtension {
 
         try {
             new JaxrsOpenApiContextBuilder()
-                    //.servletConfig(servletConfig)
-                    //.application(this)
                     .openApiConfiguration(oasConfig)
                     .buildContext(true);
         } catch (OpenApiConfigurationException e) {

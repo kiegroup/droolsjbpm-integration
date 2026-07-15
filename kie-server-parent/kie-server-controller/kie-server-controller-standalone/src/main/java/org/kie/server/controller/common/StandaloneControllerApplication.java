@@ -18,10 +18,11 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import io.swagger.v3.jaxrs2.SwaggerSerializers;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 
-import io.swagger.jaxrs.listing.SwaggerSerializers;
 import org.kie.server.controller.service.StandaloneKieServerControllerImpl;
 import org.kie.server.controller.service.StandaloneRuntimeManagementServiceImpl;
 import org.kie.server.controller.service.StandaloneSpecManagementServiceImpl;
@@ -41,7 +42,10 @@ public class StandaloneControllerApplication extends Application {
                 add(new StandaloneRuntimeManagementServiceImpl());
                 if(SwaggerAPIScanner.SWAGGER_DISABLED == false) {
                     add(new SwaggerSerializers());
+                    // kept for backward compatibility, to still have the swagger.() rest
                     add(new KieSwaggerApiListingResource());
+                    // provides the new /openapi.() rest
+                    add(new OpenApiResource());
                 }
             }
         };
