@@ -57,7 +57,15 @@ import org.kie.server.api.model.instance.TaskEventInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.model.instance.VariableInstanceList;
-import org.kie.server.api.rest.RestURI;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.CORRELATION_KEY;
+import static org.kie.server.api.rest.RestURI.PROCESS_ID;
+import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ID;
+import static org.kie.server.api.rest.RestURI.VARIABLES_PROCESSES_URI;
+import static org.kie.server.api.rest.RestURI.VARIABLES_TASKS_PROCESSES_URI;
+import static org.kie.server.api.rest.RestURI.VAR_NAME;
+import static org.kie.server.api.rest.RestURI.WORK_ITEM_ID;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.remote.rest.common.marker.KieServerEndpoint;
 import org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType;
@@ -312,7 +320,7 @@ public class RuntimeDataResource {
     @Path(PROCESS_INSTANCE_BY_VAR_NAME_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstanceByVariables(@Context HttpHeaders headers, 
-            @Parameter(description = "variable name to filter process instance", required = true) @PathParam("varName") String variableName, 
+            @Parameter(description = "variable name to filter process instance", required = true) @PathParam(VAR_NAME) String variableName, 
             @Parameter(description = "variable value to filter process instance, optional when filtering by name only required when filtering by name and value", required = false) @QueryParam("varValue") String variableValue,
             @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, schema = @Schema(allowableValues = {"1", "2", "3"})) @QueryParam("status")List<Integer> status, 
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
@@ -430,7 +438,7 @@ public class RuntimeDataResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getVariableHistory(@Context HttpHeaders headers, 
             @Parameter(description = "process instance id to load variable history for", required = true) @PathParam(PROCESS_INST_ID) long processInstanceId,
-            @Parameter(description = "variable name that history should be loaded for", required = true) @PathParam("varName") String variableName,
+            @Parameter(description = "variable name that history should be loaded for", required = true) @PathParam(VAR_NAME) String variableName,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
@@ -777,7 +785,7 @@ public class RuntimeDataResource {
     @Path(TASKS_BY_VAR_NAME_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTasksByVariables(@Context HttpHeaders headers, 
-            @Parameter(description = "name of the variable used to fiter tasks", required = true) @PathParam("varName") String variableName, 
+            @Parameter(description = "name of the variable used to fiter tasks", required = true) @PathParam(VAR_NAME) String variableName, 
             @Parameter(description = "value of the variable used to fiter tasks, optional when filtering only by name, required when filtering by both name and value", required = false) @QueryParam("varValue") String variableValue,
             @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, schema = @Schema(allowableValues = {"Created", "Ready", "Reserved", "InProgress", "Suspended", "Completed", "Failed", "Error", "Exited", "Obsolete"})) @QueryParam("status")List<String> status, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId, 
@@ -804,7 +812,7 @@ public class RuntimeDataResource {
 
     @Operation(summary = "Queries processes by variables and tasks")
     @POST
-    @Path(RestURI.VARIABLES_PROCESSES_URI)
+    @Path(VARIABLES_PROCESSES_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @KieServerEndpoint(categories = {EndpointType.DEFAULT, EndpointType.HISTORY})
@@ -837,7 +845,7 @@ public class RuntimeDataResource {
 
     @Operation(summary = "Queries process tasks by variables")
     @POST
-    @Path(RestURI.VARIABLES_TASKS_PROCESSES_URI)
+    @Path(VARIABLES_TASKS_PROCESSES_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @KieServerEndpoint(categories = {EndpointType.DEFAULT, EndpointType.HISTORY})

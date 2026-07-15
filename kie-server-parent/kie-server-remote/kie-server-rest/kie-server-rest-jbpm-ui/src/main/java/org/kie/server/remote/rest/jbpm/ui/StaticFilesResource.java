@@ -41,6 +41,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import static org.kie.server.api.rest.RestURI.RENDERER_ID;
 
 @Tag(name="Static files endpoint :: BPM")
 @Path("server/" + STATIC_FILES_URI)
@@ -87,7 +88,7 @@ public class StaticFilesResource {
     @GET
     @Path(STATIC_RENDERER_BY_TYPE_GET_URI)
     public Response getProviderSpecificContent(
-            @Parameter(description = "Name of the provider that manages given resource", required = true) @PathParam("provider") String provider, 
+            @Parameter(description = "Name of the provider that manages given resource", required = true) @PathParam(RENDERER_ID) String provider, 
             @Parameter(description = "Type of the resource e.g. js, css, etc", required = true) @PathParam("type") String type, 
             @Parameter(description = "Name of the resource to look up", required = true) @PathParam("file") String file) {
         

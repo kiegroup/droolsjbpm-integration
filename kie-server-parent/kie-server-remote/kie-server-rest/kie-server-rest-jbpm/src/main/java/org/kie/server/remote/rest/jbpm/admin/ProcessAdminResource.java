@@ -67,14 +67,18 @@ import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 import static org.kie.server.api.rest.RestURI.ERRORS_BY_PROCESS_INST_GET_URI;
 import static org.kie.server.api.rest.RestURI.ERRORS_GET_URI;
 import static org.kie.server.api.rest.RestURI.ERROR_GET_URI;
+import static org.kie.server.api.rest.RestURI.ERROR_ID;
 import static org.kie.server.api.rest.RestURI.MIGRATE_PROCESS_INSTANCES_PUT_URI;
 import static org.kie.server.api.rest.RestURI.MIGRATE_PROCESS_INST_PUT_URI;
 import static org.kie.server.api.rest.RestURI.MIGRATE_PROCESS_SUBPROCESS_INST_PUT_URI;
 import static org.kie.server.api.rest.RestURI.NODES_PROCESS_INST_GET_URI;
+import static org.kie.server.api.rest.RestURI.NODE_ID;
 import static org.kie.server.api.rest.RestURI.NODE_INSTANCES_PROCESS_INST_GET_URI;
+import static org.kie.server.api.rest.RestURI.NODE_INSTANCE_ID;
 import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
 import static org.kie.server.api.rest.RestURI.RETRIGGER_NODE_INST_PROCESS_INST_PUT_URI;
 import static org.kie.server.api.rest.RestURI.TIMERS_PROCESS_INST_GET_URI;
+import static org.kie.server.api.rest.RestURI.TIMER_INSTANCE_ID;
 import static org.kie.server.api.rest.RestURI.TRIGGER_NODE_PROCESS_INST_POST_URI;
 import static org.kie.server.api.rest.RestURI.UPDATE_TIMER_PROCESS_INST_PUT_URI;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
@@ -256,7 +260,7 @@ public class ProcessAdminResource {
     public Response cancelNodeInstance(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of process instance that node instance belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId,
-            @Parameter(description = "identifier of node instance that should be canceled", required = true, example = "567") @PathParam("nodeInstanceId") Long nodeInstanceId) {
+            @Parameter(description = "identifier of node instance that should be canceled", required = true, example = "567") @PathParam(NODE_INSTANCE_ID) Long nodeInstanceId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -288,7 +292,7 @@ public class ProcessAdminResource {
     public Response retriggerNodeInstance(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of process instance that node instance belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId,
-            @Parameter(description = "identifier of node instance that should be retriggered", required = true, example = "567") @PathParam("nodeInstanceId") Long nodeInstanceId) {
+            @Parameter(description = "identifier of node instance that should be retriggered", required = true, example = "567") @PathParam(NODE_INSTANCE_ID) Long nodeInstanceId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -321,7 +325,7 @@ public class ProcessAdminResource {
     public Response updateTimer(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of process instance that timer belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId,
-            @Parameter(description = "identifier of timer instance to be updated", required = true, example = "99") @PathParam("timerId") Long timerId, 
+            @Parameter(description = "identifier of timer instance to be updated", required = true, example = "99") @PathParam(TIMER_INSTANCE_ID) Long timerId, 
             @Parameter(description = "optional flag that indicates if the time expression is relative to the current date or not, defaults to true", required = false) @QueryParam("relative") @DefaultValue("true") boolean relative, 
             @Parameter(description = "Map of timer expressions - deplay, perios and repeat are allowed values in the map", required = true, content = {
                 @Content(mediaType = JSON, examples = {@ExampleObject(value = TIMER_VAR_MAP_JSON)}),
@@ -359,7 +363,7 @@ public class ProcessAdminResource {
     public Response triggerNode(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of process instance where node should be triggered", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId,
-            @Parameter(description = "identifier of the node to be triggered", required = true, example = "567") @PathParam("nodeId") Long nodeId) {
+            @Parameter(description = "identifier of the node to be triggered", required = true, example = "567") @PathParam(NODE_ID) Long nodeId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -481,7 +485,7 @@ public class ProcessAdminResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response acknowledgeError(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that error belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @Parameter(description = "identifier of error to be acknowledged", required = true, example = "xxx-yyy-zzz") @PathParam("errorId") String errorId) {
+            @Parameter(description = "identifier of error to be acknowledged", required = true, example = "xxx-yyy-zzz") @PathParam(ERROR_ID) String errorId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -534,7 +538,7 @@ public class ProcessAdminResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getExecutionErrorById(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that process error belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @Parameter(description = "identifier of error to be loaded", required = true, example = "xxx-yyy-zzz") @PathParam("errorId") String errorId) {
+            @Parameter(description = "identifier of error to be loaded", required = true, example = "xxx-yyy-zzz") @PathParam(ERROR_ID) String errorId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {

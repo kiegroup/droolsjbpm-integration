@@ -47,13 +47,17 @@ import org.kie.server.services.jbpm.ExecutorServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 import static org.kie.server.api.rest.RestURI.CANCEL_JOB_DEL_URI;
 import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.JOB_CMD_NAME;
+import static org.kie.server.api.rest.RestURI.JOB_ID;
 import static org.kie.server.api.rest.RestURI.JOB_INSTANCES_BY_CMD_GET_URI;
 import static org.kie.server.api.rest.RestURI.JOB_INSTANCES_BY_CONTAINER_GET_URI;
 import static org.kie.server.api.rest.RestURI.JOB_INSTANCES_BY_KEY_GET_URI;
 import static org.kie.server.api.rest.RestURI.JOB_INSTANCES_BY_PROCESS_INSTANCE_GET_URI;
 import static org.kie.server.api.rest.RestURI.JOB_INSTANCE_GET_URI;
+import static org.kie.server.api.rest.RestURI.JOB_KEY;
 import static org.kie.server.api.rest.RestURI.JOB_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
 import static org.kie.server.api.rest.RestURI.REQUEUE_JOB_PUT_URI;
@@ -142,7 +146,7 @@ public class ExecutorResource {
     @Path(CANCEL_JOB_DEL_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response cancelRequest(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @Parameter(description = "identifier of the asynchronous job to be canceled", required = true, example = "123") @PathParam("jobId") long requestId) {
+            @Parameter(description = "identifier of the asynchronous job to be canceled", required = true, example = "123") @PathParam(JOB_ID) long requestId) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -163,7 +167,7 @@ public class ExecutorResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response requeueRequest(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @Parameter(description = "identifier of the asynchronous job to be requeued", required = true, example = "123") @PathParam("jobId") long requestId){
+            @Parameter(description = "identifier of the asynchronous job to be requeued", required = true, example = "123") @PathParam(JOB_ID) long requestId){
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -184,7 +188,7 @@ public class ExecutorResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response updateRequestData(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @Parameter(description = "identifier of the asynchronous job to be updated", required = true, example = "123") @PathParam("jobId") long requestId,
+            @Parameter(description = "identifier of the asynchronous job to be updated", required = true, example = "123") @PathParam(JOB_ID) long requestId,
             @Parameter(description = "optional container id that the job should be associated with", required = false) @QueryParam("containerId") String containerId, 
             @Parameter(description = "data to be updated on the asynchronous job represented as Map", required = true, content = {
                 @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
@@ -241,7 +245,7 @@ public class ExecutorResource {
     @Path(JOB_INSTANCES_BY_KEY_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getRequestsByBusinessKey(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @Parameter(description = "identifier of the business key that asynchornous jobs should be found for", required = true, example = "custom-job") @PathParam("key") String businessKey,
+            @Parameter(description = "identifier of the business key that asynchornous jobs should be found for", required = true, example = "custom-job") @PathParam(JOB_KEY) String businessKey,
             @Parameter(description = "optional job status (QUEUED, DONE, CANCELLED, ERROR, RETRYING, RUNNING)", required = false, schema = @Schema(allowableValues = {"QUEUED", "DONE", "CANCELLED", "ERROR", "RETRYING", "RUNNING"})) @QueryParam("status") List<String> statuses,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
@@ -273,7 +277,7 @@ public class ExecutorResource {
     @Path(JOB_INSTANCES_BY_CMD_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getRequestsByCommand(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @Parameter(description = "name of the command that asynchornous jobs should be found for", required = true, example = "com.sample.CommandImpl") @PathParam("cmd") String command,
+            @Parameter(description = "name of the command that asynchornous jobs should be found for", required = true, example = "com.sample.CommandImpl") @PathParam(JOB_CMD_NAME) String command,
             @Parameter(description = "optional job status (QUEUED, DONE, CANCELLED, ERROR, RETRYING, RUNNING)", required = false, schema = @Schema(allowableValues = {"QUEUED", "DONE", "CANCELLED", "ERROR", "RETRYING", "RUNNING"})) @QueryParam("status") List<String> statuses,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
@@ -360,7 +364,7 @@ public class ExecutorResource {
     @Path(JOB_INSTANCE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getRequestById(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @Parameter(description = "identifier of the asynchronous job to be retrieved", required = true, example = "123") @PathParam("jobId") Long requestId,
+            @Parameter(description = "identifier of the asynchronous job to be retrieved", required = true, example = "123") @PathParam(JOB_ID) Long requestId,
             @Parameter(description = "optional flag that indicats if errors should be loaded as well", required = false) @QueryParam("withErrors") boolean withErrors, 
             @Parameter(description = "optional flag that indicats if input/output data should be loaded as well", required = false) @QueryParam("withData") boolean withData) {
 

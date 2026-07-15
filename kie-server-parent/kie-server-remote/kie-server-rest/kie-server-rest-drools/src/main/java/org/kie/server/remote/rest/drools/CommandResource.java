@@ -34,7 +34,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.rest.RestURI;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServerRegistry;
@@ -53,7 +53,7 @@ import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 
 @Tag(name="KIE session assets")
-@Path("server/containers/instances/{" + RestURI.CONTAINER_ID + "}")
+@Path("server/containers/instances/{" + CONTAINER_ID + "}")
 public class CommandResource {
 
     private static final Logger logger = LoggerFactory.getLogger(CommandResource.class);
@@ -80,7 +80,7 @@ public class CommandResource {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response manageContainer(@Context HttpHeaders headers, 
-            @Parameter(description = "Container id where rules should be evaluated on", required = true) @PathParam(RestURI.CONTAINER_ID) String id, 
+            @Parameter(description = "Container id where rules should be evaluated on", required = true) @PathParam(CONTAINER_ID) String id, 
             @Parameter(description = "Commands to be executed on rule engine given as BatchExecutionCommand type", required = true) String cmdPayload) {
 
         Variant v = getVariant(headers);

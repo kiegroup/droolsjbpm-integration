@@ -126,6 +126,14 @@ import static org.kie.server.remote.rest.jbpm.resources.Messages.CREATE_RESPONSE
 import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_DEFINITION_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_INSTANCE_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.WORK_ITEM_NOT_FOUND;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.CORRELATION_KEY;
+import static org.kie.server.api.rest.RestURI.PROCESS_ID;
+import static org.kie.server.api.rest.RestURI.PROCESS_INST_HISTORY_TYPE;
+import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
+import static org.kie.server.api.rest.RestURI.SIGNAL_NAME;
+import static org.kie.server.api.rest.RestURI.VAR_NAME;
+import static org.kie.server.api.rest.RestURI.WORK_ITEM_ID;
 
 @Tag(name="Process instances")
 @Path("server/" + PROCESS_URI)
@@ -360,7 +368,7 @@ public class ProcessResource  {
     public Response startProcessWithCorrelation(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "process id that new instance should be created from", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId,
-            @Parameter(description = "correlation key to be assigned to process instance", required = true, example = "john-evaluation-2019") @PathParam("correlationKey") String correlationKey, 
+            @Parameter(description = "correlation key to be assigned to process instance", required = true, example = "john-evaluation-2019") @PathParam(CORRELATION_KEY) String correlationKey, 
             @Parameter(description = "optional map of process variables", required = false, content = {
                 @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
                 @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
@@ -620,7 +628,7 @@ public class ProcessResource  {
     public Response setProcessVariable(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the process instance to be updated", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
-            @Parameter(description = "name of the variable to be set/updated", required = true, example = "name") @PathParam("varName") String varName, 
+            @Parameter(description = "name of the variable to be set/updated", required = true, example = "name") @PathParam(VAR_NAME) String varName, 
             @Parameter(description = "variable data - any type can be provided", required = true, content = {
                 @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_JSON)}),
                 @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_XML)})
@@ -694,7 +702,7 @@ public class ProcessResource  {
     public Object getProcessInstanceVariable(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the process instance that variable should be retrieved from", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
-            @Parameter(description = "variable name to be retrieved", required = true, example = "person") @PathParam("varName") String varName) {
+            @Parameter(description = "variable name to be retrieved", required = true, example = "person") @PathParam(VAR_NAME) String varName) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -804,7 +812,7 @@ public class ProcessResource  {
     public Response completeWorkItem(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the process instance that work item belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
-            @Parameter(description = "identifier of the work item to complete", required = true, example = "567") @PathParam("workItemId") Long workItemId, 
+            @Parameter(description = "identifier of the work item to complete", required = true, example = "567") @PathParam(WORK_ITEM_ID) Long workItemId, 
             @Parameter(description = "optional outcome data give as map", required = false, content = {
                 @Content(mediaType = JSON, examples = {@ExampleObject(value = VAR_MAP_JSON)}),
                 @Content(mediaType = XML, examples = {@ExampleObject(value = VAR_MAP_XML)})
@@ -842,7 +850,7 @@ public class ProcessResource  {
     public Response abortWorkItem(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the process instance that work item belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
-            @Parameter(description = "identifier of the work item to abort", required = true, example = "567") @PathParam("workItemId") Long workItemId) {
+            @Parameter(description = "identifier of the work item to abort", required = true, example = "567") @PathParam(WORK_ITEM_ID) Long workItemId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -878,7 +886,7 @@ public class ProcessResource  {
     public Response getWorkItem(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the process instance that work item belongs to", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long processInstanceId, 
-            @Parameter(description = "identifier of the work item to retrieve", required = true, example = "567") @PathParam("workItemId") Long workItemId) {
+            @Parameter(description = "identifier of the work item to retrieve", required = true, example = "567") @PathParam(WORK_ITEM_ID) Long workItemId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -1082,7 +1090,7 @@ public class ProcessResource  {
     public Response getVariableHistory(@Context HttpHeaders headers,  
             @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of the process instance that variable history should be collected for", required = true, example = "123") @PathParam(PROCESS_INST_ID) long processInstanceId,
-            @Parameter(description = "name of the variables that history should be collected for", required = true, example = "person") @PathParam("varName") String variableName,
+            @Parameter(description = "name of the variables that history should be collected for", required = true, example = "person") @PathParam(VAR_NAME) String variableName,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 

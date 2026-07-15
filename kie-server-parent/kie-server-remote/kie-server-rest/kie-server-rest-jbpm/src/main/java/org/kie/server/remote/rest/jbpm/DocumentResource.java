@@ -58,6 +58,7 @@ import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_DELETE_URI;
 import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_GET_URI;
 import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_PUT_URI;
 import static org.kie.server.api.rest.RestURI.DOCUMENT_URI;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_ID;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
@@ -100,7 +101,7 @@ public class DocumentResource {
     @Path(DOCUMENT_INSTANCE_CONTENT_GET_URI)
     @Produces({MediaType.APPLICATION_OCTET_STREAM})
     public Response getDocumentContent(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @Parameter(description = "document id of a document that content should be retruned from", required = true, example = "xxx-yyy-zzz") @PathParam("documentId") String documentId) {
+            @Parameter(description = "document id of a document that content should be returned from", required = true, example = "xxx-yyy-zzz") @PathParam(DOCUMENT_ID) String documentId) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -142,7 +143,7 @@ public class DocumentResource {
     @Path(DOCUMENT_INSTANCE_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getDocument(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @Parameter(description = "document id of a document that should be retruned", required = true, example = "xxx-yyy-zzz") @PathParam("documentId") String documentId) {
+            @Parameter(description = "document id of a document that should be retruned", required = true, example = "xxx-yyy-zzz") @PathParam(DOCUMENT_ID) String documentId) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -219,7 +220,7 @@ public class DocumentResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response updateDocument(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @Parameter(description = "document id of a document that should be updated", required = true, example = "xxx-yyy-zzz") @PathParam("documentId") String documentId, 
+            @Parameter(description = "document id of a document that should be updated", required = true, example = "xxx-yyy-zzz") @PathParam(DOCUMENT_ID) String documentId, 
             @Parameter(description = "document content represented as DocumentInstance", required = true, content = {
                 @Content(mediaType = JSON, examples = {@ExampleObject(value = DOCUMENT_JSON)}),
                 @Content(mediaType = XML, examples = {@ExampleObject(value = DOCUMENT_XML)})
@@ -248,7 +249,7 @@ public class DocumentResource {
     @Path(DOCUMENT_INSTANCE_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response deleteDocument(@jakarta.ws.rs.core.Context HttpHeaders headers, 
-            @Parameter(description = "document id of a document that should be deleted", required = true, example = "xxxx-yyy-zzz") @PathParam("documentId") String documentId) {
+            @Parameter(description = "document id of a document that should be deleted", required = true, example = "xxxx-yyy-zzz") @PathParam(DOCUMENT_ID) String documentId) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);

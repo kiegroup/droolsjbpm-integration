@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.kie.server.api.rest.RestURI.ADMIN_CASE_ALL_INSTANCES_GET_URI;
 import static org.kie.server.api.rest.RestURI.ADMIN_CASE_URI;
+import static org.kie.server.api.rest.RestURI.CASE_ID;
 import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 import static org.kie.server.api.rest.RestURI.MIGRATE_CASE_INST_PUT_URI;
 import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_INSTANCES_JSON;
@@ -132,7 +133,7 @@ public class CaseAdminResource extends AbstractCaseResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response migrateCaseInstance(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that case instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @Parameter(description = "identifier of case instance to be migrated", required = true, example = "CASE-000000001") @PathParam("caseId") String caseId,
+            @Parameter(description = "identifier of case instance to be migrated", required = true, example = "CASE-000000001") @PathParam(CASE_ID) String caseId,
             @Parameter(description = "container id that new case definition should be migrated to to", required = true) @QueryParam("targetContainerId") String targetContainerId,             
             @Parameter(description = "process and node mapping - unique ids of old definition to new definition given as Map of Maps - ProcessMapping should provide map of process definitions (mandatory), NodeMapping should provide map of node mappings (optional)",
             required = false, content = {

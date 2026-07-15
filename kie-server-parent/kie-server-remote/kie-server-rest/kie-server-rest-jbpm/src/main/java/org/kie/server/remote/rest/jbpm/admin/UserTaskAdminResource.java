@@ -103,6 +103,10 @@ import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_XML;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.CONTAINER_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
+import static org.kie.server.api.rest.RestURI.ENTITY_ID;
+import static org.kie.server.api.rest.RestURI.ERROR_ID;
+import static org.kie.server.api.rest.RestURI.NOTIFICATION_ID;
+import static org.kie.server.api.rest.RestURI.REASSIGNMENT_ID;
 
 @Tag(name="Task instance administration")
 @Path("server/" + ADMIN_TASK_URI)
@@ -197,7 +201,7 @@ public class UserTaskAdminResource {
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
-            @Parameter(description = "list of users to be removed from potantial owners list", required = true, example = "john") @PathParam("entityId") String users) {
+            @Parameter(description = "list of users to be removed from potantial owners list", required = true, example = "john") @PathParam(ENTITY_ID) String users) {
 
         return removeFromTask(headers, userId, containerId, tInstanceId, true, users, POT_OWNER);
     }
@@ -212,7 +216,7 @@ public class UserTaskAdminResource {
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
-            @Parameter(description = "list of users to be removed from excluded owners list", required = true, example = "john") @PathParam("entityId") String users) {
+            @Parameter(description = "list of users to be removed from excluded owners list", required = true, example = "john") @PathParam(ENTITY_ID) String users) {
 
         return removeFromTask(headers, userId, containerId, tInstanceId, true, users, EXL_OWNER);
     }
@@ -227,7 +231,7 @@ public class UserTaskAdminResource {
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
-            @Parameter(description = "list of users to be removed from business admin list", required = true, example = "john") @PathParam("entityId") String users) {
+            @Parameter(description = "list of users to be removed from business admin list", required = true, example = "john") @PathParam(ENTITY_ID) String users) {
 
         return removeFromTask(headers, userId, containerId, tInstanceId, true, users, ADMIN);
     }
@@ -242,7 +246,7 @@ public class UserTaskAdminResource {
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
-            @Parameter(description = "list of groups to be removed from potantial owners list", required = true, example = "HR") @PathParam("entityId") String groups) {
+            @Parameter(description = "list of groups to be removed from potantial owners list", required = true, example = "HR") @PathParam(ENTITY_ID) String groups) {
 
         return removeFromTask(headers, userId, containerId, tInstanceId, false, groups, POT_OWNER);
     }
@@ -257,7 +261,7 @@ public class UserTaskAdminResource {
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
-            @Parameter(description = "list of groups to be removed from excluded owners list", required = true, example = "HR") @PathParam("entityId") String groups) {
+            @Parameter(description = "list of groups to be removed from excluded owners list", required = true, example = "HR") @PathParam(ENTITY_ID) String groups) {
 
         return removeFromTask(headers, userId, containerId, tInstanceId, false, groups, EXL_OWNER);
     }
@@ -272,7 +276,7 @@ public class UserTaskAdminResource {
             @Parameter(description = "container id that task instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of task instance to be updated", required = true) @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
-            @Parameter(description = "list of groups to be removed from business admin list", required = true, example = "HR") @PathParam("entityId") String groups) {
+            @Parameter(description = "list of groups to be removed from business admin list", required = true, example = "HR") @PathParam(ENTITY_ID) String groups) {
 
         return removeFromTask(headers, userId, containerId, tInstanceId, false, groups, ADMIN);
     }
@@ -470,7 +474,7 @@ public class UserTaskAdminResource {
     public Response cancelReassignment(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
-            @Parameter(description = "identifier of reassignment to be canceled", required = true, example = "567") @PathParam("reassignmentId") Long reassignmentId) {
+            @Parameter(description = "identifier of reassignment to be canceled", required = true, example = "567") @PathParam(REASSIGNMENT_ID) Long reassignmentId) {
         Variant v = getVariant(headers);
 
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -496,7 +500,7 @@ public class UserTaskAdminResource {
     public Response cancelNotification(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "identifier of task instance to be updated", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long tInstanceId, 
-            @Parameter(description = "identifier of notification to be canceled", required = true, example = "567") @PathParam("notificationId") Long notificationId) {
+            @Parameter(description = "identifier of notification to be canceled", required = true, example = "567") @PathParam(NOTIFICATION_ID) Long notificationId) {
         Variant v = getVariant(headers);
 
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -579,7 +583,7 @@ public class UserTaskAdminResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response acknowledgeError(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that error belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @Parameter(description = "identifier of the execution error to be acknowledged", required = true, example = "xxx-yyy-zzz") @PathParam("errorId") String errorId) {
+            @Parameter(description = "identifier of the execution error to be acknowledged", required = true, example = "xxx-yyy-zzz") @PathParam(ERROR_ID) String errorId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -632,7 +636,7 @@ public class UserTaskAdminResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getExecutionErrorById(@jakarta.ws.rs.core.Context HttpHeaders headers, 
             @Parameter(description = "container id that error belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @Parameter(description = "identifier of the execution error to load", required = true, example = "xxx-yyy-zzz") @PathParam("errorId") String errorId) {
+            @Parameter(description = "identifier of the execution error to load", required = true, example = "xxx-yyy-zzz") @PathParam(ERROR_ID) String errorId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {

@@ -86,6 +86,7 @@ import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.BAD_REQUEST;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.QUERY_ALREADY_EXISTS;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.QUERY_NOT_FOUND;
+import static org.kie.server.api.rest.RestURI.QUERY_NAME;
 
 @Tag(name="Custom queries")
 @Path("server/" + QUERY_DEF_URI)
@@ -144,7 +145,7 @@ public class QueryDataResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response createQueryDefinition( @jakarta.ws.rs.core.Context HttpHeaders headers,
-            @Parameter(description = "identifier of the query definition to be registered", required = true, example = "customQuery") @PathParam("queryName") String queryName,
+            @Parameter(description = "identifier of the query definition to be registered", required = true, example = "customQuery") @PathParam(QUERY_NAME) String queryName,
             @Parameter(description = "query definition represented as QueryDefinition", required = true, content = {
                 @Content(mediaType = JSON, examples = {@ExampleObject(value = QUERY_DEF_JSON)}),
                 @Content(mediaType = XML, examples = {@ExampleObject(value = QUERY_DEF_XML)})
@@ -192,7 +193,7 @@ public class QueryDataResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response replaceQueryDefinition( @jakarta.ws.rs.core.Context HttpHeaders headers,
-            @Parameter(description = "identifier of the query definition to be replaced", required = true, example = "customQuery") @PathParam("queryName") String queryName,
+            @Parameter(description = "identifier of the query definition to be replaced", required = true, example = "customQuery") @PathParam(QUERY_NAME) String queryName,
             @Parameter(description = "query definition represented as QueryDefinition", required = true, content = {
                 @Content(mediaType = JSON, examples = {@ExampleObject(value = QUERY_DEF_JSON)}),
                 @Content(mediaType = XML, examples = {@ExampleObject(value = QUERY_DEF_XML)})
@@ -231,7 +232,7 @@ public class QueryDataResource {
     @Path(DROP_QUERY_DEF_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response dropQueryDefinition( @jakarta.ws.rs.core.Context HttpHeaders headers,
-            @Parameter(description = "identifier of the query definition to be deleted", required = true, example = "customQuery") @PathParam("queryName") String queryName ) {
+            @Parameter(description = "identifier of the query definition to be deleted", required = true, example = "customQuery") @PathParam(QUERY_NAME) String queryName ) {
         Variant v = getVariant( headers );
         // no container id available so only used to transfer conversation id if
         // given by client
@@ -268,7 +269,7 @@ public class QueryDataResource {
     @Path(QUERY_DEF_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getQuery( @Context HttpHeaders headers,
-            @Parameter(description = "identifier of the query definition to be retrieved", required = true, example = "customQuery") @PathParam("queryName") String queryName ) {
+            @Parameter(description = "identifier of the query definition to be retrieved", required = true, example = "customQuery") @PathParam(QUERY_NAME) String queryName ) {
         Variant v = getVariant( headers );
         // no container id available so only used to transfer conversation id if
         // given by client
@@ -307,7 +308,7 @@ public class QueryDataResource {
     @Path(RUN_QUERY_DEF_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response runQuery( @Context HttpHeaders headers,
-            @Parameter(description = "identifier of the query definition to be used for query", required = true, example = "customQuery") @PathParam("queryName") String queryName,
+            @Parameter(description = "identifier of the query definition to be used for query", required = true, example = "customQuery") @PathParam(QUERY_NAME) String queryName,
             @Parameter(description = "identifier of the query mapper to be used when transforming results", required = true) @QueryParam("mapper") String mapper,
             @Parameter(description = "optional sort order", required = false) @QueryParam("orderBy") String orderBy,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
@@ -344,7 +345,7 @@ public class QueryDataResource {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response runQueryFiltered( @Context HttpHeaders headers,
-            @Parameter(description = "identifier of the query definition to be used for query", required = true, example = "customQuery") @PathParam("queryName") String queryName,
+            @Parameter(description = "identifier of the query definition to be used for query", required = true, example = "customQuery") @PathParam(QUERY_NAME) String queryName,
             @Parameter(description = "identifier of the query mapper to be used when transforming results", required = true) @QueryParam("mapper") String mapper,
             @Parameter(description = "optional identifier of the query builder to be used for query conditions", required = false)  @QueryParam("builder") String builder,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
@@ -425,7 +426,7 @@ public class QueryDataResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response runQueryFilteredByDeploymentId( @Context HttpHeaders headers,
                                                     @Parameter(description = "container id to filter queries", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
-                                                    @Parameter(description = "identifier of the query definition to be used for query", required = true, example = "customQuery") @PathParam("queryName") String queryName,
+                                                    @Parameter(description = "identifier of the query definition to be used for query", required = true, example = "customQuery") @PathParam(QUERY_NAME) String queryName,
                                                     @Parameter(description = "identifier of the query mapper to be used when transforming results", required = true) @QueryParam("mapper") String mapper,
                                                     @Parameter(description = "optional identifier of the query builder to be used for query conditions", required = false)  @QueryParam("builder") String builder,
                                                     @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,

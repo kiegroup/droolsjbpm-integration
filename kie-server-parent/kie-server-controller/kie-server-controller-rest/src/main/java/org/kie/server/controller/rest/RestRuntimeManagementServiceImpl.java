@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.kie.server.controller.rest.ControllerUtils.*;
 import static org.kie.server.controller.rest.docs.ParameterSamples.*;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 
 @Tag(name = "Controller :: KIE Server instances and KIE containers")
 @Path("/controller/runtime")
@@ -140,7 +141,7 @@ public class RestRuntimeManagementServiceImpl {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getServerTemplateContainers(@Context HttpHeaders headers,
                                                 @Parameter(name = "serverTemplateId", value = "ID of the KIE Server template for which you are retrieving KIE containers", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
-                                                @Parameter(name = "containerId", value = "ID of the KIE container to be retrieved", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam("containerId") String containerId) {
+                                                @Parameter(name = "containerId", value = "ID of the KIE container to be retrieved", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId) {
         String contentType = getContentType(headers);
         try {
             logger.debug("Received get container {} for server template with id {}", containerId, serverTemplateId);

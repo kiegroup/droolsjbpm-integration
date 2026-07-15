@@ -15,7 +15,7 @@
 
 package org.kie.server.remote.rest.jbpm.ui;
 
-
+import static org.kie.server.api.rest.RestURI.CASE_DEF_ID;
 import static org.kie.server.api.rest.RestURI.CASE_FORM_CONTENT_GET_URI;
 import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 import static org.kie.server.api.rest.RestURI.FORM_URI;
@@ -259,7 +259,7 @@ public class FormResource {
     @Produces({MediaType.TEXT_HTML})
     public Response getCaseRenderedForm(@jakarta.ws.rs.core.Context HttpHeaders headers,
             @Parameter(description = "container id that case definition belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
-            @Parameter(description = "identifier of case definition that form should be fetched for", required = true, example = "orderhardware") @PathParam("caseDefId") String caseDefId, 
+            @Parameter(description = "identifier of case definition that form should be fetched for", required = true, example = "orderhardware") @PathParam(CASE_DEF_ID) String caseDefId, 
             @Parameter(description = "optional renderer name that the form should be rendered with", required = false) @QueryParam("renderer") @DefaultValue("patternfly") String renderer) {
         Variant variant = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);

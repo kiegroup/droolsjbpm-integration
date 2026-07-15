@@ -57,6 +57,7 @@ import static org.kie.server.api.rest.RestURI.PROCESS_DEF_USER_TASK_INPUT_GET_UR
 import static org.kie.server.api.rest.RestURI.PROCESS_DEF_USER_TASK_OUTPUT_GET_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_DEF_VARIABLES_GET_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_ID;
+import static org.kie.server.api.rest.RestURI.TASK_NAME;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
@@ -266,7 +267,7 @@ public class DefinitionResource {
     public Response getTaskInputMappings(@Context HttpHeaders headers, 
             @Parameter(description = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "process id that given task belongs to", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId, 
-            @Parameter(description = "task name that input variable definitions should be retrieved for", required = true, example = "Review") @PathParam("taskName") String taskName) {
+            @Parameter(description = "task name that input variable definitions should be retrieved for", required = true, example = "Review") @PathParam(TASK_NAME) String taskName) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -295,7 +296,7 @@ public class DefinitionResource {
     public Response getTaskOutputMappings(@Context HttpHeaders headers, 
             @Parameter(description = "container id where the process definition resides", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId, 
             @Parameter(description = "process id that given task belongs to", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId, 
-            @Parameter(description = "task name that output variable definitions should be retrieved for", required = true, example = "Review") @PathParam("taskName") String taskName) {
+            @Parameter(description = "task name that output variable definitions should be retrieved for", required = true, example = "Review") @PathParam(TASK_NAME) String taskName) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {

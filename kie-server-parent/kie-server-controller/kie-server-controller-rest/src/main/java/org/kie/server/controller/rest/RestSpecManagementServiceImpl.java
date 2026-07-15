@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.kie.server.controller.rest.ControllerUtils.*;
 import static org.kie.server.controller.rest.docs.ParameterSamples.*;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 
 @Tag(name = "Controller :: KIE Server templates and KIE containers")
 @Path("/controller/management")
@@ -61,7 +62,7 @@ public class RestSpecManagementServiceImpl {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response saveContainerSpec(@Context HttpHeaders headers,
                                       @Parameter(name = "serverTemplateId", value = "ID of the KIE Server template associated with the new KIE container", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
-                                      @Parameter(name = "containerId", value = "ID of the new KIE container", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam("containerId") String containerId,
+                                      @Parameter(name = "containerId", value = "ID of the new KIE container", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
                                       @Parameter(name = "body", value = "A map containing the container-name, relevant release-id (group ID, artifact ID, and version), configuration specifications (rule, process), and other components of the new KIE container",
                                               required = true, content = {
                                                   @Content(mediaType = JSON, examples = {@ExampleObject(value = CONTAINER_SPEC_JSON)}),
@@ -100,7 +101,7 @@ public class RestSpecManagementServiceImpl {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response updateContainerSpec(@Context HttpHeaders headers,
                                         @Parameter(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
-                                        @Parameter(name = "containerId", value = "ID of the KIE container to be updated", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam("containerId") String containerId,
+                                        @Parameter(name = "containerId", value = "ID of the KIE container to be updated", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
                                         @Parameter(name = "body", value = "A map containing the updated specifications for the KIE container", required = true, content = {
                                             @Content(mediaType = JSON, examples = {@ExampleObject(value = CONTAINER_SPEC_JSON)}),
                                             @Content(mediaType = XML, examples = {@ExampleObject(value = CONTAINER_SPEC_XML)})
@@ -285,7 +286,7 @@ public class RestSpecManagementServiceImpl {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getContainerSpec(@Context HttpHeaders headers,
                                      @Parameter(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
-                                     @Parameter(name = "containerId", value = "ID of the KIE container to be retrieved", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam("containerId") String containerId) {
+                                     @Parameter(name = "containerId", value = "ID of the KIE container to be retrieved", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId) {
         String contentType = getContentType(headers);
         try {
             logger.debug("Received get container {} for server template with id {}", containerId, serverTemplateId);
@@ -320,7 +321,7 @@ public class RestSpecManagementServiceImpl {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response deleteContainerSpec(@Context HttpHeaders headers,
                                         @Parameter(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
-                                        @Parameter(name = "containerId", value = "ID of the KIE container to be disposed", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam("containerId") String containerSpecId) {
+                                        @Parameter(name = "containerId", value = "ID of the KIE container to be disposed", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerSpecId) {
 
         try {
 
@@ -375,7 +376,7 @@ public class RestSpecManagementServiceImpl {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response updateContainerConfig(@Context HttpHeaders headers,
                                           @Parameter(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
-                                          @Parameter(name = "containerId", value = "ID of the KIE container to be updated", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam("containerId") String containerSpecId,
+                                          @Parameter(name = "containerId", value = "ID of the KIE container to be updated", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerSpecId,
                                           @Parameter(name = "capability", value = "KIE container capability to be applied (RULE, or PROCESS, case sensitive)", required = true, example = "PROCESS") @PathParam("capability") String capabilityStr,
                                           @Parameter(name = "body", value = "An org.kie.server.controller.api.model.spec.<capability>Config map containing the configurations for the specified KIE container capability, such as runtimeStrategy, kbase, ksession, and mergeMode for process configuration", required = true, content = {
                                               @Content(mediaType = JSON, examples = {@ExampleObject(value = CONTAINER_CONFIG_JSON)}),
@@ -425,7 +426,7 @@ public class RestSpecManagementServiceImpl {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response stopContainer(@Context HttpHeaders headers,
                                   @Parameter(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
-                                  @Parameter(name = "containerId", value = "ID of the KIE container to be stopped", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam("containerId") String containerId) {
+                                  @Parameter(name = "containerId", value = "ID of the KIE container to be stopped", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId) {
         logger.debug("Requesting stop container with id {} server instance: {}", containerId, serverTemplateId);
         try {
             ContainerSpecKey containerSpecKey = new ContainerSpecKey();
@@ -455,7 +456,7 @@ public class RestSpecManagementServiceImpl {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response startContainer(@Context HttpHeaders headers,
                                    @Parameter(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
-                                   @Parameter(name = "containerId", value = "ID of the KIE container to be started", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam("containerId") String containerId) {
+                                   @Parameter(name = "containerId", value = "ID of the KIE container to be started", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId) {
         logger.debug("Requesting start container with id {} server instance: {}", containerId, serverTemplateId);
         try {
             ContainerSpecKey containerSpecKey = new ContainerSpecKey();
@@ -485,7 +486,7 @@ public class RestSpecManagementServiceImpl {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response activateContainer(@Context HttpHeaders headers,
                                       @Parameter(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
-                                      @Parameter(name = "containerId", value = "ID of the KIE container to be activated", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam("containerId") String containerId) {
+                                      @Parameter(name = "containerId", value = "ID of the KIE container to be activated", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId) {
         logger.debug("Requesting activate container with id {} server instance: {}", containerId, serverTemplateId);
         try {
             ContainerSpecKey containerSpecKey = new ContainerSpecKey();
@@ -515,7 +516,7 @@ public class RestSpecManagementServiceImpl {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response deactivateContainer(@Context HttpHeaders headers,
                                         @Parameter(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE container", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
-                                        @Parameter(name = "containerId", value = "ID of the KIE container to be deactivated", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam("containerId") String containerId) {
+                                        @Parameter(name = "containerId", value = "ID of the KIE container to be deactivated", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId) {
         logger.debug("Requesting deactivate container with id {} server instance: {}", containerId, serverTemplateId);
         try {
             ContainerSpecKey containerSpecKey = new ContainerSpecKey();

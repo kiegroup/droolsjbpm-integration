@@ -125,6 +125,11 @@ import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_JSON
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.VAR_MAP_XML;
 import static org.kie.server.remote.rest.jbpm.docs.ParameterSamples.XML;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
+import static org.kie.server.api.rest.RestURI.ATTACHMENT_ID;
+import static org.kie.server.api.rest.RestURI.COMMENT_ID;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.CONTENT_ID;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ID;
 
 @Tag(name="Task instances")
 @Path("server/" + TASK_URI)
@@ -807,7 +812,7 @@ public class UserTaskResource {
     public Response deleteContent(@Context HttpHeaders headers, 
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the task instance that content belongs to", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
-            @Parameter(description = "identifier of the content to be deleted", required = true, example = "567") @PathParam("contentId") Long contentId) {
+            @Parameter(description = "identifier of the content to be deleted", required = true, example = "567") @PathParam(CONTENT_ID) Long contentId) {
 
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -864,7 +869,7 @@ public class UserTaskResource {
     public Response deleteComment(@Context HttpHeaders headers, 
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the task instance that comment belongs to", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
-            @Parameter(description = "identifier of the comment to be deleted", required = true, example = "567") @PathParam("commentId") Long commentId) {
+            @Parameter(description = "identifier of the comment to be deleted", required = true, example = "567") @PathParam(COMMENT_ID) Long commentId) {
 
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -919,7 +924,7 @@ public class UserTaskResource {
     public Response getCommentById(@Context HttpHeaders headers, 
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the task instance that comment belongs to", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
-            @Parameter(description = "identifier of the comment to be loaded", required = true, example = "567") @PathParam("commentId") Long commentId) {
+            @Parameter(description = "identifier of the comment to be loaded", required = true, example = "567") @PathParam(COMMENT_ID) Long commentId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -981,7 +986,7 @@ public class UserTaskResource {
     public Response deleteAttachment(@Context HttpHeaders headers,
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the task instance that attachment belongs to", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
-            @Parameter(description = "identifier of the attachment to be deleted", required = true, example = "567") @PathParam("attachmentId") Long attachmentId) {
+            @Parameter(description = "identifier of the attachment to be deleted", required = true, example = "567") @PathParam(ATTACHMENT_ID) Long attachmentId) {
 
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -1009,7 +1014,7 @@ public class UserTaskResource {
     public Response getAttachmentById(@Context HttpHeaders headers, 
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the task instance that attachment belongs to", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
-            @Parameter(description = "identifier of the attachment to be loaded", required = true, example = "567") @PathParam("attachmentId") Long attachmentId) {
+            @Parameter(description = "identifier of the attachment to be loaded", required = true, example = "567") @PathParam(ATTACHMENT_ID) Long attachmentId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -1038,7 +1043,7 @@ public class UserTaskResource {
     public Response getAttachmentContentById(@Context HttpHeaders headers, 
             @Parameter(description = "container id that task instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
             @Parameter(description = "identifier of the task instance that attachment belongs to", required = true, example = "123") @PathParam(TASK_INSTANCE_ID) Long taskId, 
-            @Parameter(description = "identifier of the attachment that content should be loaded from", required = true, example = "567") @PathParam("attachmentId") Long attachmentId) {
+            @Parameter(description = "identifier of the attachment that content should be loaded from", required = true, example = "567") @PathParam(ATTACHMENT_ID) Long attachmentId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);

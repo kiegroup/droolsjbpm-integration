@@ -68,6 +68,8 @@ import static org.kie.server.api.rest.RestURI.CASE_TASKS_AS_ADMIN_GET_URI;
 import static org.kie.server.api.rest.RestURI.CASE_TASKS_AS_POT_OWNER_GET_URI;
 import static org.kie.server.api.rest.RestURI.CASE_TASKS_AS_STAKEHOLDER_GET_URI;
 import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.VARIABLES_CASES_URI;
+import static org.kie.server.api.rest.RestURI.VARIABLES_TASKS_CASES_URI;
 import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_DEFINITIONS_JSON;
 import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.CASE_INSTANCES_JSON;
 import static org.kie.server.remote.rest.casemgmt.docs.ParameterSamples.GET_CASE_FILE_DATA_RESPONSE_JSON;
@@ -381,7 +383,7 @@ public class CaseQueryResource extends AbstractCaseResource {
 
     @Operation(summary = "Queries cases by variables and tasks")
     @POST
-    @Path(RestURI.VARIABLES_CASES_URI)
+    @Path(VARIABLES_CASES_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @KieServerEndpoint(categories = {EndpointType.DEFAULT, EndpointType.HISTORY})
@@ -407,7 +409,7 @@ public class CaseQueryResource extends AbstractCaseResource {
 
     @Operation(summary = "Queries cases tasks by variables")
     @POST
-    @Path(RestURI.VARIABLES_TASKS_CASES_URI)
+    @Path(VARIABLES_TASKS_CASES_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @KieServerEndpoint(categories = {EndpointType.DEFAULT, EndpointType.HISTORY})
