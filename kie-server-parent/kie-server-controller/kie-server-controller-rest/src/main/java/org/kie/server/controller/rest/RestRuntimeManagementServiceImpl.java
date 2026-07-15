@@ -47,15 +47,15 @@ public class RestRuntimeManagementServiceImpl {
 
     private RuntimeManagementServiceImpl runtimeManagementService;
 
-    @Operation(summary = "Returns all KIE Server instances configured with the controller for a specified KIE Server template", response = ServerInstanceKeyList.class)
+    @Operation(summary = "Returns all KIE Server instances configured with the controller for a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = 200, message = "KIE Server instances", examples = @Example({
+            @ApiResponse(responseCode = "200", description = "KIE Server instances", examples = @Example({
                 @ExampleProperty(mediaType = JSON, value = SERVER_INSTANCE_GET_JSON),
                 @ExampleProperty(mediaType = XML, value = SERVER_INSTANCE_GET_XML)
             })),
-            @ApiResponse(responseCode = 404, message = "KIE Server template not found"),
-            @ApiResponse(responseCode = 400, message = "Controller exception"),
-            @ApiResponse(responseCode = 500, message = "Unexpected error")
+            @ApiResponse(responseCode = "404", description = "KIE Server template not found"),
+            @ApiResponse(responseCode = "400", description = "Controller exception"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @GET
     @Path("servers/{serverTemplateId}/instances")
@@ -82,15 +82,15 @@ public class RestRuntimeManagementServiceImpl {
 
     }
 
-    @Operation(summary = "Returns all KIE containers for a specified KIE Server template and a specified KIE Server instance", response = ContainerList.class)
+    @Operation(summary = "Returns all KIE containers for a specified KIE Server template and a specified KIE Server instance")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = 200, message = "KIE container instances", examples = @Example({
+            @ApiResponse(responseCode = "200", description = "KIE container instances", examples = @Example({
                     @ExampleProperty(mediaType = JSON, value = CONTAINER_INSTANCE_LIST_JSON),
                     @ExampleProperty(mediaType = XML, value = CONTAINER_INSTANCE_LIST_XML)
             })),
-            @ApiResponse(responseCode = 404, message = "Kie Server template or Kie Server instance not found"),
-            @ApiResponse(responseCode = 400, message = "Controller exception"),
-            @ApiResponse(responseCode = 500, message = "Unexpected error")
+            @ApiResponse(responseCode = "404", description = "Kie Server template or Kie Server instance not found"),
+            @ApiResponse(responseCode = "400", description = "Controller exception"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @GET
     @Path("servers/{serverTemplateId}/instances/{serverInstanceId}/containers")
@@ -118,15 +118,15 @@ public class RestRuntimeManagementServiceImpl {
         }
     }
 
-    @Operation(summary = "Returns all instances of a specified KIE container in a specified KIE Server template", response = ContainerList.class)
+    @Operation(summary = "Returns all instances of a specified KIE container in a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = 200, message = "KIE container instances", examples = @Example({
+            @ApiResponse(responseCode = "200", description = "KIE container instances", examples = @Example({
                     @ExampleProperty(mediaType = JSON, value = CONTAINER_INSTANCE_LIST_JSON),
                     @ExampleProperty(mediaType = XML, value = CONTAINER_INSTANCE_LIST_XML)
             })),
-            @ApiResponse(responseCode = 404, message = "KIE Server template or KIE container not found"),
-            @ApiResponse(responseCode = 400, message = "Controller exception"),
-            @ApiResponse(responseCode = 500, message = "Unexpected error")
+            @ApiResponse(responseCode = "404", description = "KIE Server template or KIE container not found"),
+            @ApiResponse(responseCode = "400", description = "Controller exception"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @GET
     @Path("servers/{serverTemplateId}/containers/{containerId}/instances")

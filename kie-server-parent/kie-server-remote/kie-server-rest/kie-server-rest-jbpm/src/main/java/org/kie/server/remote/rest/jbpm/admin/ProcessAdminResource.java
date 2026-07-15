@@ -127,10 +127,10 @@ public class ProcessAdminResource {
     }
 
     @Operation(summary="Migrates a specified process instance to a process definition in another KIE container.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process instance or Container Id not found"),
-            @ApiResponse(responseCode = 404, message = "Container Id not found"), 
-            @ApiResponse(responseCode = 201, response = MigrationReportInstance.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"),
+            @ApiResponse(responseCode = "404", description = "Container Id not found"), 
+            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_MIGRATION_REPORT_RESPONSE_JSON)})) })
     @PUT
     @Path(MIGRATE_PROCESS_INST_PUT_URI)
@@ -165,10 +165,10 @@ public class ProcessAdminResource {
     }
 
     @Operation(summary="Migrates a specified process instance with all subprocesses to process definition in another KIE container.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process instance or Container Id not found"),
-            @ApiResponse(responseCode = 404, message = "Container Id not found"), 
-            @ApiResponse(responseCode = 201, response = MigrationReportInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"),
+            @ApiResponse(responseCode = "404", description = "Container Id not found"), 
+            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_MIGRATION_REPORTS_RESPONSE_JSON)})) })
     @PUT
     @Path(MIGRATE_PROCESS_SUBPROCESS_INST_PUT_URI)
@@ -203,10 +203,10 @@ public class ProcessAdminResource {
 
 
     @Operation(summary="Migrates multiple process instances to process definition in another KIE container.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process instance or Container Id not found"),
-            @ApiResponse(responseCode = 404, message = "Container Id not found"), 
-            @ApiResponse(responseCode = 201, response = MigrationReportInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"),
+            @ApiResponse(responseCode = "404", description = "Container Id not found"), 
+            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_MIGRATION_REPORTS_RESPONSE_JSON)})) })
     @PUT
     @Path(MIGRATE_PROCESS_INSTANCES_PUT_URI)
@@ -241,10 +241,9 @@ public class ProcessAdminResource {
 
 
 
-    @Operation(summary="Aborts a specified node instance within a specified process instance.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process instance, node instance or Container Id not found") })
+    @Operation(summary="Aborts a specified node instance within a specified process instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process instance, node instance or Container Id not found") })
     @DELETE
     @Path(CANCEL_NODE_INST_PROCESS_INST_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -274,10 +273,9 @@ public class ProcessAdminResource {
         }
     }
 
-    @Operation(summary="Re-triggers a specified node instance for a specified process instance. If the node is not active in the process instance, it becomes active upon re-triggering.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process instance, node instance or Container Id not found") })
+    @Operation(summary="Re-triggers a specified node instance for a specified process instance. If the node is not active in the process instance, it becomes active upon re-triggering.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process instance, node instance or Container Id not found") })
     @PUT
     @Path(RETRIGGER_NODE_INST_PROCESS_INST_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -307,10 +305,9 @@ public class ProcessAdminResource {
         }
     }
 
-    @Operation(summary="Updates a specified timer for a specified process instance.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process instance, node instance or Container Id not found") })
+    @Operation(summary="Updates a specified timer for a specified process instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process instance, node instance or Container Id not found") })
     @PUT
     @Path(UPDATE_TIMER_PROCESS_INST_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -346,10 +343,9 @@ public class ProcessAdminResource {
         }
     }
 
-    @Operation(summary="Triggers a specified node for a specified process instance. If the node is not active in the process instance, it becomes active upon triggering.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process instance, node instance or Container Id not found") })
+    @Operation(summary="Triggers a specified node for a specified process instance. If the node is not active in the process instance, it becomes active upon triggering.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process instance, node instance or Container Id not found") })
     @POST
     @Path(TRIGGER_NODE_PROCESS_INST_POST_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -380,10 +376,10 @@ public class ProcessAdminResource {
     }
 
     @Operation(summary="Returns all timers for a specified process instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process instance or Container Id not found"),
-            @ApiResponse(responseCode = 404, message = "Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = TimerInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"),
+            @ApiResponse(responseCode = "404", description = "Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TIMERS_RESPONSE_JSON)})) })
     @GET
     @Path(TIMERS_PROCESS_INST_GET_URI)
@@ -410,9 +406,9 @@ public class ProcessAdminResource {
     }
 
     @Operation(summary="Returns all the active node instances in a specified process instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process instance or Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = NodeInstanceList.class , message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"), 
+            @ApiResponse(responseCode = "200" , description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_NODES_RESPONSE_JSON)})) })
     @GET
     @Path(NODE_INSTANCES_PROCESS_INST_GET_URI)
@@ -439,9 +435,9 @@ public class ProcessAdminResource {
     }
 
     @Operation(summary="Returns all nodes in a specified process instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process instance or Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = ProcessNodeList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_NODES_RESPONSE_JSON)})) })
     @GET
     @Path(NODES_PROCESS_INST_GET_URI)
@@ -467,10 +463,9 @@ public class ProcessAdminResource {
         }
     }
 
-    @Operation(summary="Acknowledges a specified process execution error (sets acknowledged to true for the error).",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Execution error or Container Id not found") })
+    @Operation(summary="Acknowledges a specified process execution error (sets acknowledged to true for the error).")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Execution error or Container Id not found") })
     @PUT
     @Path(ACK_ERROR_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -493,10 +488,9 @@ public class ProcessAdminResource {
         }
     }
 
-    @Operation(summary="Acknowledges multiple process execution errors (sets acknowledged to true for the errors).",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Execution error or Container Id not found") })
+    @Operation(summary="Acknowledges multiple process execution errors (sets acknowledged to true for the errors).")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Execution error or Container Id not found") })
     @PUT
     @Path(ACK_ERRORS_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -520,9 +514,9 @@ public class ProcessAdminResource {
     }
 
     @Operation(summary="Returns information about a specified process execution error.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process instance or Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = ExecutionErrorInstance.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERROR_RESPONSE_JSON)})) })
     @GET
     @Path(ERROR_GET_URI)
@@ -548,9 +542,9 @@ public class ProcessAdminResource {
     }
 
     @Operation(summary="Returns all process execution errors for a specified process instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = ExecutionErrorInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERRORS_RESPONSE_JSON)})) })
     @GET
     @Path(ERRORS_BY_PROCESS_INST_GET_URI)
@@ -583,9 +577,9 @@ public class ProcessAdminResource {
     }
 
     @Operation(summary="Returns all process execution errors for a specified KIE container.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process instance or Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = ExecutionErrorInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process instance or Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERRORS_RESPONSE_JSON)})) })
     @GET
     @Path(ERRORS_GET_URI)

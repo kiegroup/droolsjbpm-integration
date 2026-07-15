@@ -100,8 +100,8 @@ public class ExecutorResource {
     
     
     @Operation(summary="Schedules a job and returns the ID for the new job.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-            @ApiResponse(responseCode = 201, response = Long.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CREATE_JOB_RESPONSE_JSON)})) })
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -134,9 +134,8 @@ public class ExecutorResource {
 
     }
 
-    @Operation(summary="Deletes a specified job.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error") })
+    @Operation(summary="Deletes a specified job.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error") })
     @DELETE
     @Path(CANCEL_JOB_DEL_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -155,9 +154,8 @@ public class ExecutorResource {
         }
     }
 
-    @Operation(summary="Re-queues a specified job.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error") })
+    @Operation(summary="Re-queues a specified job.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error") })
     @PUT
     @Path(REQUEUE_JOB_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -177,9 +175,8 @@ public class ExecutorResource {
         }
     }
 
-    @Operation(summary="Updates parameters for job commands, if used.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error") })
+    @Operation(summary="Updates parameters for job commands, if used.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error") })
     @POST
     @Path(UPDATE_JOB_DATA_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -208,8 +205,8 @@ public class ExecutorResource {
     // queries
     
     @Operation(summary="Retrieves asynchronous jobs filtered by status")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-            @ApiResponse(responseCode = 200, response = RequestInfoInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_REQUESTS_RESPONSE_JSON)})) })
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -232,8 +229,8 @@ public class ExecutorResource {
     }
 
     @Operation(summary="Returns information about a job with a specified business key.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-            @ApiResponse(responseCode = 200, response = RequestInfoInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_REQUESTS_RESPONSE_JSON)})) })
     @GET
     @Path(JOB_INSTANCES_BY_KEY_GET_URI)
@@ -263,8 +260,8 @@ public class ExecutorResource {
     }
 
     @Operation(summary="Returns jobs configured to run job commands, such as a job type org.jbpm.executor.commands.LogCleanupCommand.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-            @ApiResponse(responseCode = 200, response = RequestInfoInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_REQUESTS_RESPONSE_JSON)})) })
     @GET
     @Path(JOB_INSTANCES_BY_CMD_GET_URI)
@@ -294,8 +291,8 @@ public class ExecutorResource {
     }
 
     @Operation(summary="Returns jobs for specified KIE container.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-            @ApiResponse(responseCode = 200, response = RequestInfoInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_REQUESTS_RESPONSE_JSON)})) })
     @GET
     @Path(JOB_INSTANCES_BY_CONTAINER_GET_URI)
@@ -320,8 +317,8 @@ public class ExecutorResource {
     }
 
     @Operation(summary="Returns jobs for specified process instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-            @ApiResponse(responseCode = 200, response = RequestInfoInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_REQUESTS_RESPONSE_JSON)})) })
     @GET
     @Path(JOB_INSTANCES_BY_PROCESS_INSTANCE_GET_URI)
@@ -347,8 +344,8 @@ public class ExecutorResource {
 
     // instance details
     @Operation(summary="Returns information about a specified job.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-            @ApiResponse(responseCode = 200, response = RequestInfoInstance.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_REQUEST_RESPONSE_JSON)})) })
     @GET
     @Path(JOB_INSTANCE_GET_URI)

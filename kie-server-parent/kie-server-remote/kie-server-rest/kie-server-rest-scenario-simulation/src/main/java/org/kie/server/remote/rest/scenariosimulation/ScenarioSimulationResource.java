@@ -57,9 +57,8 @@ public class ScenarioSimulationResource {
         this.scenarioSimulationService = scenarioSimulationService;
     }
 
-    @Operation(summary = "Execute given test scenario against specified container",
-            response = ServiceResponse.class, code = 200)
-    @ApiResponses(value = {@ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Container not found"), @ApiResponse(responseCode = 400, message = "Malformed test scenario file")})
+    @Operation(summary = "Execute given test scenario against specified container")
+    @ApiResponses(value = {@ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Container not found"), @ApiResponse(responseCode = "400", description = "Malformed test scenario file")})
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})

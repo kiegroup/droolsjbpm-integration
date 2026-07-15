@@ -58,8 +58,8 @@ public class KieServerResource {
     }
 
     @Operation(summary="Executes one or more KIE Server commands for server-related or container-related operations")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-            @ApiResponse(responseCode = 200, response=ServiceResponsesList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=EXECUTE_CMD_RESPONSE_JSON)})) })
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})

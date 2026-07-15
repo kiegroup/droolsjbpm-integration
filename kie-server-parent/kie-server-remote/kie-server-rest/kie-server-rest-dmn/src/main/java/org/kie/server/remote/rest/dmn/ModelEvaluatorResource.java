@@ -17,6 +17,8 @@ package org.kie.server.remote.rest.dmn;
 
 import java.text.MessageFormat;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -72,8 +74,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
+/*import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;*/
 
 @Tag(name="DMN models")
 @Path("server/"+ RestURI.DMN_URI )
@@ -93,13 +95,18 @@ public class ModelEvaluatorResource {
     }
 
     @Operation(summary="Retrieves DMN model for given container",
-                  response = ServiceResponse.class, code = 200,
-                  notes = REF_KIESERVER_DMN_API_DOC)
-    @ApiResponses(value = {@ApiResponse(responseCode = 500, message = "Unexpected error"),
-                           @ApiResponse(responseCode = 404, message = "Models or container not found"),
-                           @ApiResponse(responseCode = 200, response = String.class, message = "Successful response",
-                                        examples = @Example(value = {@ExampleProperty(mediaType = MediaType.APPLICATION_JSON, value = EXAMPLE_KIESERVER_GET_RESPONSE_JSON),
-                                                                     @ExampleProperty(mediaType = MediaType.APPLICATION_XML, value = EXAMPLE_KIESERVER_GET_RESPONSE_XML)}))})
+                  description = REF_KIESERVER_DMN_API_DOC)
+    @ApiResponses(value = {@ApiResponse(responseCode = "500", description = "Unexpected error"),
+                           @ApiResponse(responseCode = "404", description = "Models or container not found"),
+                           @ApiResponse(responseCode = "200", description = "Successful response",
+                                   content = {
+                                           @Content(mediaType = MediaType.APPLICATION_JSON, examples = {
+                                                   @ExampleObject(value = EXAMPLE_KIESERVER_GET_RESPONSE_JSON)
+                                           }),
+                                           @Content(mediaType = MediaType.APPLICATION_XML, examples = {
+                                                   @ExampleObject(value = EXAMPLE_KIESERVER_GET_RESPONSE_XML)
+                                           })
+                           })})
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getModels(@jakarta.ws.rs.core.Context HttpHeaders headers, 
@@ -119,21 +126,32 @@ public class ModelEvaluatorResource {
     }
 
     @Operation(summary="Evaluates decisions for given input",
-                  response = ServiceResponse.class, code = 200,
-                  notes = REF_KIESERVER_DMN_API_DOC)
-    @ApiResponses(value = {@ApiResponse(responseCode = 500, message = "Unexpected error"),
-                           @ApiResponse(responseCode = 404, message = "Container not found"),
-                           @ApiResponse(responseCode = 200, response = String.class, message = "Successful response",
-                                        examples = @Example(value = {@ExampleProperty(mediaType = MediaType.APPLICATION_JSON, value = EXAMPLE_KIESERVER_POST_RESPONSE_JSON),
-                                                                     @ExampleProperty(mediaType = MediaType.APPLICATION_XML, value = EXAMPLE_KIESERVER_POST_RESPONSE_XML)}))})
+                  description = REF_KIESERVER_DMN_API_DOC)
+    @ApiResponses(value = {@ApiResponse(responseCode = "500", description = "Unexpected error"),
+                           @ApiResponse(responseCode = "404", description = "Container not found"),
+            @ApiResponse(responseCode = "200", description = "Successful response",
+                    content = {
+                            @Content(mediaType = MediaType.APPLICATION_JSON, examples = {
+                                    @ExampleObject(value = EXAMPLE_KIESERVER_POST_RESPONSE_JSON)
+                            }),
+                            @Content(mediaType = MediaType.APPLICATION_XML, examples = {
+                                    @ExampleObject(value = EXAMPLE_KIESERVER_POST_RESPONSE_XML)
+                            })
+                    })})
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response evaluateDecisions(@jakarta.ws.rs.core.Context HttpHeaders headers, 
                                       @Parameter(description = PARAM_CONTAINER_ID_EVAL, required = true, example = EXAMPLE_CONTAINER_ID) @PathParam(CONTAINER_ID) String containerId,
                                       @Parameter(description = "DMN context to be used while evaluation decisions as DMNContextKS type", required = true,
-                                                examples = @Example(value = {@ExampleProperty(mediaType = MediaType.APPLICATION_JSON, value = EXAMPLE_KIESERVER_POST_REQ_JSON),
-                                                                             @ExampleProperty(mediaType = MediaType.APPLICATION_XML, value = EXAMPLE_KIESERVER_POST_REQ_XML)})) String payload) {
+                                              content = {
+                                                      @Content(mediaType = MediaType.APPLICATION_JSON, examples = {
+                                                              @ExampleObject(value = EXAMPLE_KIESERVER_POST_REQ_JSON)
+                                                      }),
+                                                      @Content(mediaType = MediaType.APPLICATION_XML, examples = {
+                                                              @ExampleObject(value = EXAMPLE_KIESERVER_POST_REQ_XML)
+                                                      })
+                                              }) String payload) {
         LOG.debug( "About to evaluateDecisions() on container {}", containerId );
         Variant v = getVariant( headers );
         Header conversationIdHeader = buildConversationIdHeader(containerId, modelEvaluatorService.getKieServerRegistry(), headers);
@@ -154,7 +172,7 @@ public class ModelEvaluatorResource {
 
     @Path(DMN_MODEL_URI)
     @Operation(summary = MODEL_SPECIFIC_DMN_EVALUATION_EP,
-                  notes = REF_TE)
+                  description = REF_TE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -167,7 +185,7 @@ public class ModelEvaluatorResource {
 
     @Path(DMN_MODEL_URI)
     @Operation(summary = MODEL_SPECIFIC_DEFINITIONS_EP,
-                  notes = REF_TE)
+                  description = REF_TE)
     @GET
     @Produces(MediaType.APPLICATION_XML)
     public Response getModel(@Parameter(description = PARAM_CONTAINER_ID_DEFS, required = true) @PathParam(CONTAINER_ID) String containerId,
@@ -178,7 +196,7 @@ public class ModelEvaluatorResource {
 
     @Path(DMN_MODEL_DMNRESULT_URI)
     @Operation(summary = MODEL_SPECIFIC_DMN_EVALUATION_EP,
-                  notes = REF_TE)
+                  description = REF_TE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -191,7 +209,7 @@ public class ModelEvaluatorResource {
 
     @Path(DMN_MODEL_DS_URI)
     @Operation(summary = MODEL_SPECIFIC_DMN_EVALUATION_EP,
-                  notes = REF_TE)
+                  description = REF_TE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -205,7 +223,7 @@ public class ModelEvaluatorResource {
 
     @Path(DMN_MODEL_DS_DMNRESULT_URI)
     @Operation(summary = MODEL_SPECIFIC_DMN_EVALUATION_EP,
-                  notes = REF_TE)
+                  description = REF_TE)
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -219,7 +237,7 @@ public class ModelEvaluatorResource {
 
     @Path(OPENAPI + ".{type:json|yaml}")
     @Operation(summary = MODEL_SPECIFIC_DEFINITIONS_EP,
-                  notes = REF_GET_OAS)
+                  description = REF_GET_OAS)
     @GET
     @Produces({MediaType.APPLICATION_JSON, "application/yaml"})
     public Response getOASType(@Parameter(description = PARAM_CONTAINER_ID_DEFS, required = true) @PathParam(CONTAINER_ID) String containerId,
@@ -234,7 +252,7 @@ public class ModelEvaluatorResource {
 
     @Path(OPENAPI)
     @Operation(summary = MODEL_SPECIFIC_DEFINITIONS_EP,
-                  notes = REF_GET_OAS)
+                  description = REF_GET_OAS)
     @GET
     @Produces({MediaType.APPLICATION_JSON, "application/yaml"})
     public Response getOAS(@Parameter(description = PARAM_CONTAINER_ID_DEFS, required = true) @PathParam(CONTAINER_ID) String containerId) {

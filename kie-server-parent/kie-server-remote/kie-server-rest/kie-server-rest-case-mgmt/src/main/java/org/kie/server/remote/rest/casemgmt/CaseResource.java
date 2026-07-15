@@ -153,9 +153,9 @@ public class CaseResource extends AbstractCaseResource {
     }
 
     @Operation(summary="Starts a new case instance for a specified case definition.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case definition or Container Id not found"), 
-            @ApiResponse(responseCode = 201, response = String.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case definition or Container Id not found"), 
+            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_ID_JSON)})) })
     @POST
     @Path(START_CASE_POST_URI)
@@ -185,9 +185,9 @@ public class CaseResource extends AbstractCaseResource {
     }
 
     @Operation(summary="Returns information about a specified case instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found"), 
-            @ApiResponse(responseCode = 200, response = CaseInstance.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_INSTANCE_JSON)})) })
     @GET
     @Path(CASE_INSTANCE_GET_URI)
@@ -211,10 +211,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @Operation(summary="Aborts or permanently destroys a specified case instance.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found") })
+    @Operation(summary="Aborts or permanently destroys a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found") })
     @DELETE
     @Path(CASE_INSTANCE_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -233,10 +232,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
     
-    @Operation(summary="Closes a specified case instance.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found") })
+    @Operation(summary="Closes a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found") })
     @POST
     @Path(CASE_INSTANCE_POST_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -255,10 +253,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @Operation(summary="Reopens a closed case instance for a specified case definition.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found") })
+    @Operation(summary="Reopens a closed case instance for a specified case definition.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found") })
     @PUT
     @Path(REOPEN_CASE_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -283,9 +280,9 @@ public class CaseResource extends AbstractCaseResource {
     }
 
     @Operation(summary="Returns data from the case files of a specified case instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found"), 
-            @ApiResponse(responseCode = 200, response = Map.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_MAP_JSON)})) })
     @GET
     @Path(CASE_FILE_GET_URI)
@@ -307,9 +304,9 @@ public class CaseResource extends AbstractCaseResource {
     }
 
     @Operation(summary="Returns the value of a specified case file data item in a specified case instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found"), 
-            @ApiResponse(responseCode = 200, response = Object.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_JSON)})) })
     @GET
     @Path(CASE_FILE_BY_NAME_GET_URI)
@@ -330,10 +327,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @Operation(summary="Adds data as case files in a specified case instance.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found") })
+    @Operation(summary="Adds data as case files in a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found") })
     @POST
     @Path(CASE_FILE_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -359,10 +355,9 @@ public class CaseResource extends AbstractCaseResource {
 
     }
 
-    @Operation(summary="Adds a single data item as a case file in a specified case instance.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found") })
+    @Operation(summary="Adds a single data item as a case file in a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found") })
     @POST
     @Path(CASE_FILE_BY_NAME_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -388,10 +383,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @Operation(summary="Deletes one or more specified case file data items from a specified case instance.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found") })
+    @Operation(summary="Deletes one or more specified case file data items from a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found") })
     @DELETE
     @Path(CASE_FILE_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -416,10 +410,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @Operation(summary="Adds a dynamic user task or service task to the specified case instance.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found") })
+    @Operation(summary="Adds a dynamic user task or service task to the specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found") })
     @POST
     @Path(CASE_DYNAMIC_TASK_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -442,10 +435,9 @@ public class CaseResource extends AbstractCaseResource {
         });
     }
 
-    @Operation(summary="Adds a dynamic user task or service task to the specified stage in a specified case instance.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found") })
+    @Operation(summary="Adds a dynamic user task or service task to the specified stage in a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found") })
     @POST
     @Path(CASE_DYNAMIC_TASK_IN_STAGE_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -469,10 +461,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @Operation(summary="Adds a dynamic subprocess to a specified case instance.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found") })
+    @Operation(summary="Adds a dynamic subprocess to a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found") })
     @POST
     @Path(CASE_DYNAMIC_PROCESS_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -497,10 +488,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @Operation(summary="Adds dynamic subprocess identified by process id to stage within case instance",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found") })
+    @Operation(summary="Adds dynamic subprocess identified by process id to stage within case instance")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found") })
     @POST
     @Path(CASE_DYNAMIC_PROCESS_IN_STAGE_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -526,10 +516,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @Operation(summary="Triggers a specified ad hoc fragment in the specified stage of a specified case instance.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found") })
+    @Operation(summary="Triggers a specified ad hoc fragment in the specified stage of a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found") })
     @PUT
     @Path(CASE_DYNAMIC_TASK_IN_STAGE_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -554,10 +543,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @Operation(summary="Triggers a specified ad hoc fragment in a specified case instance.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found") })
+    @Operation(summary="Triggers a specified ad hoc fragment in a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found") })
     @PUT
     @Path(CASE_DYNAMIC_TASK_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -582,9 +570,9 @@ public class CaseResource extends AbstractCaseResource {
     }
 
     @Operation(summary="Returns milestones for a specified case instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found"), 
-            @ApiResponse(responseCode = 200, response = CaseMilestoneList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_MILESTONES_JSON)})) })
     @GET
     @Path(CASE_MILESTONES_GET_URI)
@@ -609,9 +597,9 @@ public class CaseResource extends AbstractCaseResource {
     }
 
     @Operation(summary="Returns stages for a specified case instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found"), 
-            @ApiResponse(responseCode = 200, response = CaseStageList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_STAGES_JSON)})) })
     @GET
     @Path(CASE_STAGES_GET_URI)
@@ -636,9 +624,9 @@ public class CaseResource extends AbstractCaseResource {
     }
 
     @Operation(summary="Returns ad hoc fragments for a specified case instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found"), 
-            @ApiResponse(responseCode = 200, response = CaseAdHocFragmentList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_ADHOC_FRAGMENTS_JSON)})) })
     @GET
     @Path(CASE_AD_HOC_FRAGMENTS_GET_URI)
@@ -660,9 +648,9 @@ public class CaseResource extends AbstractCaseResource {
     }
 
     @Operation(summary="Returns process instances in a specified case instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found"), 
-            @ApiResponse(responseCode = 200, response = ProcessInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=PROCESS_INSTANCES_JSON)})) })
     @GET
     @Path(CASE_PROCESS_INSTANCES_GET_URI)
@@ -694,9 +682,9 @@ public class CaseResource extends AbstractCaseResource {
     }
 
     @Operation(summary="Returns node instances for a specified case instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found"), 
-            @ApiResponse(responseCode = 200, response = NodeInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=NODE_INSTANCES_JSON)})) })
     @GET
     @Path(CASE_NODE_INSTANCES_GET_URI)
@@ -726,9 +714,9 @@ public class CaseResource extends AbstractCaseResource {
     }
 
     @Operation(summary="Returns role assignments for a specified case instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found"), 
-            @ApiResponse(responseCode = 200, response = CaseRoleAssignmentList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_ROLES_ASSIGNMENTS_JSON)})) })
     @GET
     @Path(CASE_ROLES_GET_URI)
@@ -749,10 +737,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @Operation(summary="Assigns a specified case role to a specified user and group for a specified case instance.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found") })
+    @Operation(summary="Assigns a specified case role to a specified user and group for a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found") })
     @PUT
     @Path(CASE_ROLES_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -774,10 +761,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @Operation(summary="Removes an assigned case role from a specified user and group for a specified case instance.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found") })
+    @Operation(summary="Removes an assigned case role from a specified user and group for a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found") })
     @DELETE
     @Path(CASE_ROLES_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -800,9 +786,9 @@ public class CaseResource extends AbstractCaseResource {
     }
 
     @Operation(summary="Returns comments from a specified case instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found"), 
-            @ApiResponse(responseCode = 200, response = CaseCommentList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_COMMENTS_JSON)})) })
     @GET
     @Path(CASE_COMMENTS_GET_URI)
@@ -826,10 +812,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @Operation(summary="Adds a comment to a specified case instance.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found") })
+    @Operation(summary="Adds a comment to a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found") })
     @POST
     @Path(CASE_COMMENTS_POST_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -852,10 +837,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @Operation(summary="Updates a specified comment in a specified case instance.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found") })
+    @Operation(summary="Updates a specified comment in a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found") })
     @PUT
     @Path(CASE_COMMENTS_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -885,10 +869,9 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
-    @Operation(summary="Deletes a specified comment in a specified case instance.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Case instance not found") })
+    @Operation(summary="Deletes a specified comment in a specified case instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Case instance not found") })
     @DELETE
     @Path(CASE_COMMENTS_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -919,8 +902,8 @@ public class CaseResource extends AbstractCaseResource {
      */
 
     @Operation(summary="Returns case instances in a specified KIE container.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-            @ApiResponse(responseCode = 200, response = CaseInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
     @GET
     @Path(CASE_INSTANCES_GET_URI)
@@ -952,8 +935,8 @@ public class CaseResource extends AbstractCaseResource {
     }
 
     @Operation(summary="Returns case instances for a specified case definition.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-            @ApiResponse(responseCode = 200, response = CaseInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_INSTANCES_JSON)}))})
     @GET
     @Path(CASE_INSTANCES_BY_DEF_GET_URI)
@@ -986,8 +969,8 @@ public class CaseResource extends AbstractCaseResource {
     }
 
     @Operation(summary="Returns case definitions in a specified KIE container.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-            @ApiResponse(responseCode = 200, response = CaseDefinitionList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_DEFINITIONS_JSON)}))})
     @GET
     @Path(CASE_ALL_DEFINITIONS_GET_URI)
@@ -1013,8 +996,8 @@ public class CaseResource extends AbstractCaseResource {
     }
 
     @Operation(summary="Returns information about a specified case definition.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-            @ApiResponse(responseCode = 200, response = CaseDefinition.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CASE_DEFINITION_JSON)}))})
     @GET
     @Path(CASE_DEFINITIONS_BY_ID_GET_URI)

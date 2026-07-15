@@ -93,9 +93,9 @@ public class DocumentResource {
     }
 
     @Operation(summary="Retrieves document's content identified by given documentId",
-            response=byte[].class, code=200, responseHeaders={@ResponseHeader(name="Content-Disposition", description="provides file name of the document")})
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Document with given id not found") })
+            response=byte[].class, responseHeaders={@ResponseHeader(name="Content-Disposition", description="provides file name of the document")})
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Document with given id not found") })
     @GET
     @Path(DOCUMENT_INSTANCE_CONTENT_GET_URI)
     @Produces({MediaType.APPLICATION_OCTET_STREAM})
@@ -133,9 +133,9 @@ public class DocumentResource {
     }
 
     @Operation(summary="Returns information about a specified document.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Document with given id not found"), 
-            @ApiResponse(responseCode = 200, response = DocumentInstance.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Document with given id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_DOCUMENT_RESPONSE_JSON)})) })
     @GET
     @Path(DOCUMENT_INSTANCE_GET_URI)
@@ -159,8 +159,8 @@ public class DocumentResource {
     }
 
     @Operation(summary="Returns all documents from KIE Server.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-            @ApiResponse(responseCode = 200, response = DocumentInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_DOCUMENTS_RESPONSE_JSON)})) })
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -182,8 +182,8 @@ public class DocumentResource {
     }
 
     @Operation(summary="Uploads a new document to KIE Server.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-            @ApiResponse(responseCode = 201, response = String.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=CREATE_DOC_RESPONSE_JSON)}))})
     @POST
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -207,10 +207,9 @@ public class DocumentResource {
         }
     }
 
-    @Operation(summary="Updates a specified document in KIE Server.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Document with given id not found")})
+    @Operation(summary="Updates a specified document in KIE Server.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Document with given id not found")})
     @PUT
     @Path(DOCUMENT_INSTANCE_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -237,10 +236,9 @@ public class DocumentResource {
         }
     }
 
-    @Operation(summary="Deletes a specified document from KIE Server.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Document with given id not found") })
+    @Operation(summary="Deletes a specified document from KIE Server.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Document with given id not found") })
     @DELETE
     @Path(DOCUMENT_INSTANCE_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})

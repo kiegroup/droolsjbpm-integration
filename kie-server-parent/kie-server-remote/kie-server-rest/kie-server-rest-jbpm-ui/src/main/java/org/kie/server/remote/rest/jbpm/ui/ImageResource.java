@@ -67,10 +67,9 @@ public class ImageResource {
         this.context = context;
     }
 
-    @Operation(summary = "Returns an SVG image file of a specified process definition diagram.",
-            response = String.class, code = 200)
-    @ApiResponses(value = {@ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process definition, image or Container Id not found")})
+    @Operation(summary = "Returns an SVG image file of a specified process definition diagram.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process definition, image or Container Id not found")})
     @GET
     @Path(PROCESS_IMG_GET_URI)
     @Produces({MediaType.APPLICATION_SVG_XML})
@@ -92,10 +91,9 @@ public class ImageResource {
         }
     }
 
-    @Operation(summary = "Returns an annotated SVG image file of a specified process instance diagram.",
-            response = String.class, code = 200)
-    @ApiResponses(value = {@ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process instance, image or Container Id not found")})
+    @Operation(summary = "Returns an annotated SVG image file of a specified process instance diagram.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process instance, image or Container Id not found")})
     @GET
     @Path(PROCESS_INST_IMG_GET_URI)
     @Produces({MediaType.APPLICATION_SVG_XML})

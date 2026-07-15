@@ -93,9 +93,9 @@ public class DefinitionResource {
 
 
     @Operation(summary="Returns entity and task information for a specified process.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = ProcessDefinition.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process or Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEF_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_GET_URI)
@@ -120,9 +120,9 @@ public class DefinitionResource {
     }
 
     @Operation(summary="Retrieves sub process definitions that are defined in given process within given container")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = SubProcessesDefinition.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process or Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_SUBP_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_SUBPROCESS_GET_URI)
@@ -146,9 +146,9 @@ public class DefinitionResource {
     }
 
     @Operation(summary="Retrieves process variables definitions that are present in given process and container")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = VariablesDefinition.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process or Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_VARS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_VARIABLES_GET_URI)
@@ -172,9 +172,9 @@ public class DefinitionResource {
     }
 
     @Operation(summary="Retrieves service tasks definitions that are present in given process and container")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = ServiceTasksDefinition.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process or Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_SERVICE_TASKS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_SERVICE_TASKS_GET_URI)
@@ -198,9 +198,9 @@ public class DefinitionResource {
     }
 
     @Operation(summary="Retrieves actors and groups that are involved in given process and container")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = AssociatedEntitiesDefinition.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process or Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_ENTITIES_RESPONSE_JSON)})) })    
     @GET
     @Path(PROCESS_DEF_ASSOCIATED_ENTITIES_GET_URI)
@@ -224,9 +224,9 @@ public class DefinitionResource {
     }
 
     @Operation(summary="Retrieves user tasks definitions that are present in given process and container")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = UserTaskDefinitionList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process or Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASKS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_USER_TASKS_GET_URI)
@@ -250,9 +250,9 @@ public class DefinitionResource {
     }
 
     @Operation(summary="Retrieves input variables defined on a given user task")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = TaskInputsDefinition.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process or Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_INPUTS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_USER_TASK_INPUT_GET_URI)
@@ -278,9 +278,9 @@ public class DefinitionResource {
     }
 
     @Operation(summary="Retrieves output variables defined on a given user task")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Process or Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = TaskOutputsDefinition.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process or Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_OUTPUTS_RESPONSE_JSON)})) })
     @GET
     @Path(PROCESS_DEF_USER_TASK_OUTPUT_GET_URI)

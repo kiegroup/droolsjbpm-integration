@@ -52,10 +52,9 @@ public class StaticFilesResource {
         this.formRendererBase = formRendererBase;
     }
 
-    @Operation(summary="Retrieves given resource/file based on the type and file name",
-            response=String.class, code=200)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "resource/file not found") })
+    @Operation(summary="Retrieves given resource/file based on the type and file name")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "resource/file not found") })
     @GET
     @Path(STATIC_BY_TYPE_GET_URI)
     public Response getSharedContent(
@@ -82,10 +81,9 @@ public class StaticFilesResource {
         
     }
 
-    @Operation(summary="Retrieves given resource/file based on the type and file name managed by given provider",
-            response=String.class, code=200)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "resource/file not found") })
+    @Operation(summary="Retrieves given resource/file based on the type and file name managed by given provider")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "resource/file not found") })
     @GET
     @Path(STATIC_RENDERER_BY_TYPE_GET_URI)
     public Response getProviderSpecificContent(

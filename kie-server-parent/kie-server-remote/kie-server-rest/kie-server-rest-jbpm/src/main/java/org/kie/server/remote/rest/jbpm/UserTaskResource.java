@@ -153,8 +153,8 @@ public class UserTaskResource {
     }
 
 
-    @Operation(summary = "Activates a specified task instance to be progressed.", response = Void.class, code = 201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found") })
+    @Operation(summary = "Activates a specified task instance to be progressed.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_ACTIVATE_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -179,10 +179,10 @@ public class UserTaskResource {
 
     }
 
-    @Operation(summary = "Claims (reserves) a specified task instance for the user sending the request.", response = Void.class, code = 201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-                            @ApiResponse(responseCode = 404, message = "Task with given id not found"), 
-                            @ApiResponse(responseCode = 403, message = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
+    @Operation(summary = "Claims (reserves) a specified task instance for the user sending the request.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+                            @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
+                            @ApiResponse(responseCode = "403", description = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
     @PUT
     @Path(TASK_INSTANCE_CLAIM_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -208,9 +208,9 @@ public class UserTaskResource {
     }
     
     
-    @Operation(summary = "Claims (reserves) multiple task instances for the user sending the request", response = Void.class, code = 200)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),  
-                            @ApiResponse(responseCode = 403, message = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
+    @Operation(summary = "Claims (reserves) multiple task instances for the user sending the request")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),  
+                            @ApiResponse(responseCode = "403", description = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
     @POST
     @Path(TASK_INSTANCE_CLAIM_BULK_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -231,10 +231,10 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary = "Completes a specified task instance.", response = Void.class, code = 201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-                            @ApiResponse(responseCode = 404, message = "Task with given id not found"), 
-                            @ApiResponse(responseCode = 403, message = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
+    @Operation(summary = "Completes a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+                            @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
+                            @ApiResponse(responseCode = "403", description = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
     @PUT
     @Path(TASK_INSTANCE_COMPLETE_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -268,10 +268,10 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary = "Delegates a specified task instance to a specified target user as the new task owner.", response = Void.class, code = 201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-                            @ApiResponse(responseCode = 404, message = "Task with given id not found"), 
-                            @ApiResponse(responseCode = 403, message = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
+    @Operation(summary = "Delegates a specified task instance to a specified target user as the new task owner.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+                            @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
+                            @ApiResponse(responseCode = "403", description = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
     @PUT
     @Path(TASK_INSTANCE_DELEGATE_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -299,8 +299,8 @@ public class UserTaskResource {
 
     }
 
-    @Operation(summary = "Exits a specified task instance.", response = Void.class, code = 201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found") })
+    @Operation(summary = "Exits a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_EXIT_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -324,8 +324,8 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary = "Fails a specified task instance.", response = Void.class, code = 201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found") })
+    @Operation(summary = "Fails a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_FAIL_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -353,11 +353,10 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary="Forwards a specified task instance to a specified target user for review or for suggested delegation.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-                            @ApiResponse(responseCode = 404, message = "Task with given id not found"), 
-                            @ApiResponse(responseCode = 403, message = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
+    @Operation(summary="Forwards a specified task instance to a specified target user for review or for suggested delegation.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+                            @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
+                            @ApiResponse(responseCode = "403", description = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
     @PUT
     @Path(TASK_INSTANCE_FORWARD_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -384,10 +383,10 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary = "Releases a specified task instance from being claimed by the task owner.", response = Void.class, code = 201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-                            @ApiResponse(responseCode = 404, message = "Task with given id not found"), 
-                            @ApiResponse(responseCode = 403, message = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
+    @Operation(summary = "Releases a specified task instance from being claimed by the task owner.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+                            @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
+                            @ApiResponse(responseCode = "403", description = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
     @PUT
     @Path(TASK_INSTANCE_RELEASE_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -411,8 +410,8 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary = "Resumes a specified task instance.", response = Void.class, code = 201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found") })
+    @Operation(summary = "Resumes a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_RESUME_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -435,9 +434,8 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary="Skips a specified task instance within the sequence of tasks in the process instance",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found") })
+    @Operation(summary="Skips a specified task instance within the sequence of tasks in the process instance")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_SKIP_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -460,8 +458,8 @@ public class UserTaskResource {
         }
     }
     
-    @Operation(summary = "Starts a specified task instance.", response = Void.class, code = 201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found") })
+    @Operation(summary = "Starts a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_START_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -484,8 +482,8 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary = "Stops a specified task instance.", response = Void.class, code = 201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found") })
+    @Operation(summary = "Stops a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_STOP_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -509,8 +507,8 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary = "Suspends a specified task instance.", response = Void.class, code = 201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found") })
+    @Operation(summary = "Suspends a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_SUSPEND_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -536,10 +534,10 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary = "Nominates one or more potential owners to whom the task instance should be assigned.", response = Void.class, code = 201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), 
-                            @ApiResponse(responseCode = 404, message = "Task with given id not found"), 
-                            @ApiResponse(responseCode = 403, message = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
+    @Operation(summary = "Nominates one or more potential owners to whom the task instance should be assigned.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+                            @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
+                            @ApiResponse(responseCode = "403", description = "User was unable to execute current operation on task with given id due to a no 'current status' match or insufficient permissions")})
     @PUT
     @Path(TASK_INSTANCE_NOMINATE_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -566,8 +564,8 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary = "Updates the priority of a specified task instance.", response = Void.class, code = 201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found") })
+    @Operation(summary = "Updates the priority of a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_PRIORITY_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -595,8 +593,8 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary = "Updates the expiration date for a specified task instance.", response = Void.class, code = 201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found") })
+    @Operation(summary = "Updates the expiration date for a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_EXPIRATION_DATE_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -624,8 +622,8 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary = "Marks a specified task instance that can be skipped in a sequence of tasks.", response = Void.class, code = 201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found") })
+    @Operation(summary = "Marks a specified task instance that can be skipped in a sequence of tasks.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_SKIPABLE_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -653,8 +651,8 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary = "Updates the name of a specified task instance.", response = Void.class, code = 201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found") })
+    @Operation(summary = "Updates the name of a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_NAME_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -680,8 +678,8 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary = "Updates the description of a specified task instance.", response = Void.class, code = 201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found") })
+    @Operation(summary = "Updates the description of a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_DESCRIPTION_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -708,10 +706,10 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary = "Adds output data to a specified task instance and returns the ID of the new output content.", response = Void.class, code = 201)
-    @ApiResponses(value = {@ApiResponse(responseCode = 500, message = "Unexpected error"),
-                           @ApiResponse(responseCode = 403, message = "User is not allowed to perform the operation"),
-                           @ApiResponse(responseCode = 404, message = "Task with given id not found")})
+    @Operation(summary = "Adds output data to a specified task instance and returns the ID of the new output content.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "500", description = "Unexpected error"),
+                           @ApiResponse(responseCode = "403", description = "User is not allowed to perform the operation"),
+                           @ApiResponse(responseCode = "404", description = "Task with given id not found")})
     @PUT
     @Path(TASK_INSTANCE_OUTPUT_DATA_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -743,8 +741,8 @@ public class UserTaskResource {
     }
 
     @Operation(summary="Returns output data for a specified task instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found"), 
-            @ApiResponse(responseCode = 200, response = Map.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_RESPONSE_JSON)})) })
     @GET
     @Path(TASK_INSTANCE_OUTPUT_DATA_GET_URI)
@@ -770,8 +768,8 @@ public class UserTaskResource {
     }
 
     @Operation(summary="Returns input data for a specified task instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found"), 
-            @ApiResponse(responseCode = 200, response = Map.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_RESPONSE_JSON)})) })
     @GET
     @Path(TASK_INSTANCE_INPUT_DATA_GET_URI)
@@ -796,9 +794,8 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary="Deletes output data by content ID from a specified task instance.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found") })
+    @Operation(summary="Deletes output data by content ID from a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found") })
     @DELETE
     @Path(TASK_INSTANCE_CONTENT_DATA_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -823,8 +820,8 @@ public class UserTaskResource {
     }
 
     @Operation(summary="Adds a comment to a specified task instance and returns the ID of the new comment.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found"), 
-            @ApiResponse(responseCode = 201, response = Long.class,  message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
+            @ApiResponse(responseCode = "201",  description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=INTEGER_JSON)})) })
     @POST
     @Path(TASK_INSTANCE_COMMENT_ADD_POST_URI)
@@ -852,9 +849,8 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary="Deletes a specified comment from a specified task instance.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found") })
+    @Operation(summary="Deletes a specified comment from a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found") })
     @DELETE
     @Path(TASK_INSTANCE_COMMENT_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -878,8 +874,8 @@ public class UserTaskResource {
     }
 
     @Operation(summary="Returns all comments in a specified task instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found"), 
-            @ApiResponse(responseCode = 200, response = TaskCommentList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_COMMENTS_RESPONSE_JSON)})) })
     @GET
     @Path(TASK_INSTANCE_COMMENTS_GET_URI)
@@ -905,8 +901,8 @@ public class UserTaskResource {
     }
 
     @Operation(summary="Returns a specified comment from a specified task instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found"), 
-            @ApiResponse(responseCode = 200, response=TaskComment.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=TASK_COMMENT_JSON)})) })
     @GET
     @Path(TASK_INSTANCE_COMMENT_GET_URI)
@@ -934,8 +930,8 @@ public class UserTaskResource {
 
     
     @Operation(summary="Adds an attachment to a specified task instance and returns the ID of the new attachment.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found"), 
-            @ApiResponse(responseCode = 201, response = Long.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
+            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=INTEGER_JSON)})) })
     @POST
     @Path(TASK_INSTANCE_ATTACHMENT_ADD_POST_URI)
@@ -966,9 +962,8 @@ public class UserTaskResource {
         }
     }
 
-    @Operation(summary="Deletes a specified attachment from a specified task instance.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found") })
+    @Operation(summary="Deletes a specified attachment from a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found") })
     @DELETE
     @Path(TASK_INSTANCE_ATTACHMENT_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -993,8 +988,8 @@ public class UserTaskResource {
     }
 
     @Operation(summary="Returns information about a specified attachment for a specified task instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found"), 
-            @ApiResponse(responseCode = 200, response = TaskAttachment.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=TASK_ATTACHMENT_JSON)})) })
     @GET
     @Path(TASK_INSTANCE_ATTACHMENT_GET_URI)
@@ -1021,8 +1016,8 @@ public class UserTaskResource {
     }
 
     @Operation(summary="Returns the content of a specified attachment for a specified task instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found"), 
-            @ApiResponse(responseCode = 200, response = Object.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=VAR_JSON)})) })
     @GET
     @Path(TASK_INSTANCE_ATTACHMENT_CONTENT_GET_URI)
@@ -1049,8 +1044,8 @@ public class UserTaskResource {
     }
     
     @Operation(summary="Returns all attachments for a specified task instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found"), 
-            @ApiResponse(responseCode = 200, response = TaskAttachmentList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_ATTACHMENTS_RESPONSE_JSON)})) })
     @GET
     @Path(TASK_INSTANCE_ATTACHMENTS_GET_URI)
@@ -1077,8 +1072,8 @@ public class UserTaskResource {
     }
 
     @Operation(summary="Returns information about a specified task instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found"), 
-            @ApiResponse(responseCode = 200, response = TaskInstance.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_RESPONSE_JSON)})) })
     @GET
     @Path(TASK_INSTANCE_GET_URI)
@@ -1108,9 +1103,9 @@ public class UserTaskResource {
     }
 
     @Operation(summary="Returns all events for a specified task instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-                            @ApiResponse(responseCode = 404, message = "Task with given id not found"), 
-                            @ApiResponse(responseCode = 200, response = TaskEventInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+                            @ApiResponse(responseCode = "404", description = "Task with given id not found"), 
+                            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                                     @ExampleProperty(mediaType=JSON, value=GET_TASK_EVENTS_RESPONSE_JSON)}))})
     @GET
     @Path(TASK_INSTANCE_EVENTS_GET_URI)
@@ -1136,9 +1131,8 @@ public class UserTaskResource {
         }
     }
     
-    @Operation(summary="Updates information in a specified task instance.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"), @ApiResponse(responseCode = 404, message = "Task with given id not found") })
+    @Operation(summary="Updates information in a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task with given id not found") })
     @PUT
     @Path(TASK_INSTANCE_PUT_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})

@@ -73,10 +73,9 @@ public class CommandResource {
     }
 
     @Operation(summary = "Executes one or more runtime commands" )
-    @ApiResponses({@ApiResponse(responseCode = 200, message = "Successful execution", response = ServiceResponse.class),
-                   @ApiResponse(responseCode = 500, message = "Unexpected error", response = ServiceResponse.class),
-                   @ApiResponse(responseCode = 204, message = "Command execute successfully, but without response",
-                                response = ServiceResponse.class)})
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful execution"),
+                   @ApiResponse(responseCode = "500", description = "Unexpected error"),
+                   @ApiResponse(responseCode = "204", description = "Command execute successfully, but without response")})
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})

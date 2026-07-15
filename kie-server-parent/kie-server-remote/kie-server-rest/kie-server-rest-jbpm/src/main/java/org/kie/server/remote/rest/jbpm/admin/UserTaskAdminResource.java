@@ -126,10 +126,9 @@ public class UserTaskAdminResource {
         this.context = context;
     }
 
-    @Operation(summary="Adds users and groups as potential owners to a specified task instance.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found") })
+    @Operation(summary="Adds users and groups as potential owners to a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found") })
     @PUT
     @Path(TASK_INSTANCE_POT_OWNERS_USERS_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -146,10 +145,9 @@ public class UserTaskAdminResource {
         return addToTask(headers, userId, containerId, tInstanceId, removeExisting, payload, POT_OWNER);
     }
 
-    @Operation(summary="Adds users and groups to be excluded from being owners for a specified task instance.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found") })
+    @Operation(summary="Adds users and groups to be excluded from being owners for a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found") })
     @PUT
     @Path(TASK_INSTANCE_EXL_OWNERS_USERS_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -166,10 +164,9 @@ public class UserTaskAdminResource {
         return addToTask(headers, userId,  containerId, tInstanceId, removeExisting, payload, EXL_OWNER);
     }
 
-    @Operation(summary="Adds business administrator users or groups to a specified task instance.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found") })
+    @Operation(summary="Adds business administrator users or groups to a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found") })
     @PUT
     @Path(TASK_INSTANCE_ADMINS_USERS_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -187,10 +184,9 @@ public class UserTaskAdminResource {
     }
 
     
-    @Operation(summary="Deletes specified users previously added as potential owners for a specified task instance.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found") })
+    @Operation(summary="Deletes specified users previously added as potential owners for a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_POT_OWNERS_USERS_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -203,10 +199,9 @@ public class UserTaskAdminResource {
         return removeFromTask(headers, userId, containerId, tInstanceId, true, users, POT_OWNER);
     }
 
-    @Operation(summary="Deletes specified users previously added as excluded owners for a specified task instance. ",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found") })
+    @Operation(summary="Deletes specified users previously added as excluded owners for a specified task instance. ")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_EXL_OWNERS_USERS_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -219,10 +214,9 @@ public class UserTaskAdminResource {
         return removeFromTask(headers, userId, containerId, tInstanceId, true, users, EXL_OWNER);
     }
 
-    @Operation(summary="Deletes specified users previously added as business administrators for a specified task instance.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found") })
+    @Operation(summary="Deletes specified users previously added as business administrators for a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_ADMINS_USERS_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -235,10 +229,9 @@ public class UserTaskAdminResource {
         return removeFromTask(headers, userId, containerId, tInstanceId, true, users, ADMIN);
     }
 
-    @Operation(summary="Deletes specified groups previously added as potential owners for a specified task instance.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found") })
+    @Operation(summary="Deletes specified groups previously added as potential owners for a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_POT_OWNERS_GROUPS_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -251,10 +244,9 @@ public class UserTaskAdminResource {
         return removeFromTask(headers, userId, containerId, tInstanceId, false, groups, POT_OWNER);
     }
 
-    @Operation(summary="Deletes specified groups previously added as excluded owners for a specified task instance.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found") })
+    @Operation(summary="Deletes specified groups previously added as excluded owners for a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_EXL_OWNERS_GROUPS_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -267,10 +259,9 @@ public class UserTaskAdminResource {
         return removeFromTask(headers, userId, containerId, tInstanceId, false, groups, EXL_OWNER);
     }
 
-    @Operation(summary="Deletes specified groups previously added as business administrators for a specified task instance.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found") })
+    @Operation(summary="Deletes specified groups previously added as business administrators for a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_ADMINS_GROUPS_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -283,10 +274,9 @@ public class UserTaskAdminResource {
         return removeFromTask(headers, userId, containerId, tInstanceId, false, groups, ADMIN);
     }
 
-    @Operation(summary="Adds input data to a specified task instance.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found") })
+    @Operation(summary="Adds input data to a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found") })
     @PUT
     @Path(TASK_INSTANCE_INPUTS_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -314,10 +304,9 @@ public class UserTaskAdminResource {
         }
     }
 
-    @Operation(summary="Deletes input data by parameter name from a specified task instance.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found") })
+    @Operation(summary="Deletes input data by parameter name from a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_INPUTS_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -341,10 +330,9 @@ public class UserTaskAdminResource {
         }
     }
 
-    @Operation(summary="Deletes output data by parameter name from a specified task instance.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found") })
+    @Operation(summary="Deletes output data by parameter name from a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_OUTPUTS_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -369,9 +357,9 @@ public class UserTaskAdminResource {
     }
 
     @Operation(summary="Schedules a specified task instance to be reassigned to specified users or groups and returns the ID of the reassignment.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found"), 
-            @ApiResponse(responseCode = 201, response = Long.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found"), 
+            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=INTEGER_JSON)})) })
     @POST
     @Path(TASK_INSTANCE_REASSIGNMENTS_URI)
@@ -419,9 +407,9 @@ public class UserTaskAdminResource {
     }
 
     @Operation(summary="Creates an email notification for the specified task instance and returns the ID of the new notification.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found"), 
-            @ApiResponse(responseCode = 201, response = Long.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found"), 
+            @ApiResponse(responseCode = "201", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=INTEGER_JSON)})) })
     @POST
     @Path(TASK_INSTANCE_NOTIFICATIONS_URI)
@@ -465,10 +453,9 @@ public class UserTaskAdminResource {
         }
     }
 
-    @Operation(summary="Deletes a specified reassignment for a specified task instance.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found") })
+    @Operation(summary="Deletes a specified reassignment for a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_REASSIGNMENT_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -492,10 +479,9 @@ public class UserTaskAdminResource {
         }
     }
 
-    @Operation(summary="Deletes a specified email notification from a specified task instance.",
-            response=Void.class, code=204)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found") })
+    @Operation(summary="Deletes a specified email notification from a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_NOTIFICATION_DELETE_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -520,9 +506,9 @@ public class UserTaskAdminResource {
     }
 
     @Operation(summary="Returns task reassignments for a specified task instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = TaskReassignmentList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_REASSIGNMENTS_RESPONSE_JSON)})) })
     @GET
     @Path(TASK_INSTANCE_REASSIGNMENTS_URI)
@@ -548,9 +534,9 @@ public class UserTaskAdminResource {
     }
 
     @Operation(summary="Returns notifications created for a specified task instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = TaskNotificationList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_TASK_NOTIFICATIONS_RESPONSE_JSON)})) })
     @GET
     @Path(TASK_INSTANCE_NOTIFICATIONS_URI)
@@ -575,10 +561,9 @@ public class UserTaskAdminResource {
         }
     }
 
-    @Operation(summary="Acknowledges a specified task execution error.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found") })
+    @Operation(summary="Acknowledges a specified task execution error.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found") })
     @PUT
     @Path(ACK_ERROR_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -601,10 +586,9 @@ public class UserTaskAdminResource {
         }
     }
 
-    @Operation(summary="Acknowledges one or more task execution errors in a specified KIE container.",
-            response=Void.class, code=201)
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found") })
+    @Operation(summary="Acknowledges one or more task execution errors in a specified KIE container.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found") })
     @PUT
     @Path(ACK_ERRORS_PUT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -628,9 +612,9 @@ public class UserTaskAdminResource {
     }
 
     @Operation(summary="Returns information about a specified task execution error.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Task instance or Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = ExecutionErrorInstance.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Task instance or Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERROR_RESPONSE_JSON)})) })
     @GET
     @Path(ERROR_GET_URI)
@@ -655,9 +639,9 @@ public class UserTaskAdminResource {
     }
 
     @Operation(summary="Returns task execution errors for a specified task instance.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = ExecutionErrorInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERRORS_RESPONSE_JSON)})) })
     @GET
     @Path(ERRORS_BY_TASK_ID_GET_URI)
@@ -687,9 +671,9 @@ public class UserTaskAdminResource {
     }
 
     @Operation(summary="Returns all task execution errors for a specified KIE container.")
-    @ApiResponses(value = { @ApiResponse(responseCode = 500, message = "Unexpected error"),
-            @ApiResponse(responseCode = 404, message = "Container Id not found"), 
-            @ApiResponse(responseCode = 200, response = ExecutionErrorInstanceList.class, message = "Successful response", examples=@Example(value= {
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Container Id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", examples=@Example(value= {
                     @ExampleProperty(mediaType=JSON, value=GET_EXEC_ERRORS_RESPONSE_JSON)})) })
     @GET
     @Path(ERRORS_GET_URI)

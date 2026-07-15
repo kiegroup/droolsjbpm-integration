@@ -43,12 +43,12 @@ public class RestSpecManagementServiceImpl {
 
     private SpecManagementServiceImpl specManagementService;
 
-    @Operation(summary = "Creates a KIE container in a specified KIE Server template", notes = "You set the KIE container configurations in the request body", code = 201)
+    @Operation(summary = "Creates a KIE container in a specified KIE Server template", description = "You set the KIE container configurations in the request body")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = 201, message = "KIE container successfully deployed"),
-            @ApiResponse(responseCode = 404, message = "KIE Server template not found"),
-            @ApiResponse(responseCode = 400, message = "Controller exception"),
-            @ApiResponse(responseCode = 500, message = "Unexpected error")
+            @ApiResponse(responseCode = "201", description = "KIE container successfully deployed"),
+            @ApiResponse(responseCode = "404", description = "KIE Server template not found"),
+            @ApiResponse(responseCode = "400", description = "Controller exception"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @PUT
     @Path("servers/{serverTemplateId}/containers/{containerId}")
@@ -83,12 +83,12 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @Operation(summary = "Updates information about a specified KIE container in a specified KIE Server template", code = 201)
+    @Operation(summary = "Updates information about a specified KIE container in a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = 201, message = "KIE container successfully updated"),
-            @ApiResponse(responseCode = 404, message = "KIE Server template or KIE container not found"),
-            @ApiResponse(responseCode = 400, message = "Controller exception"),
-            @ApiResponse(responseCode = 500, message = "Unexpected error")
+            @ApiResponse(responseCode = "201", description = "KIE container successfully updated"),
+            @ApiResponse(responseCode = "404", description = "KIE Server template or KIE container not found"),
+            @ApiResponse(responseCode = "400", description = "Controller exception"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @POST
     @Path("servers/{serverTemplateId}/containers/{containerId}")
@@ -122,14 +122,14 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @Operation(summary = "Creates a new KIE Server template with a specified ID", code = 201)
+    @Operation(summary = "Creates a new KIE Server template with a specified ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = 201, message = "KIE Server template successfully created", examples = @Example(value = {
+            @ApiResponse(responseCode = "201", description = "KIE Server template successfully created", examples = @Example(value = {
                     @ExampleProperty(mediaType = JSON, value = SERVER_TEMPLATE_SAVE_JSON),
                     @ExampleProperty(mediaType = XML, value = SERVER_TEMPLATE_SAVE_XML)
             })),
-            @ApiResponse(responseCode = 400, message = "Controller exception"),
-            @ApiResponse(responseCode = 500, message = "Unexpected error")
+            @ApiResponse(responseCode = "400", description = "Controller exception"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @PUT
     @Path("servers/{serverTemplateId}")
@@ -163,15 +163,15 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @Operation(summary = "Returns information about a specified KIE Server template", response = ServerTemplate.class)
+    @Operation(summary = "Returns information about a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = 200, message = "KIE Server template", examples = @Example({
+            @ApiResponse(responseCode = "200", description = "KIE Server template", examples = @Example({
                     @ExampleProperty(mediaType = JSON, value = SERVER_TEMPLATE_GET_JSON),
                     @ExampleProperty(mediaType = XML, value = SERVER_TEMPLATE_GET_XML)
             })),
-            @ApiResponse(responseCode = 404, message = "KIE Server template not found"),
-            @ApiResponse(responseCode = 400, message = "Controller exception"),
-            @ApiResponse(responseCode = 500, message = "Unexpected error")
+            @ApiResponse(responseCode = "404", description = "KIE Server template not found"),
+            @ApiResponse(responseCode = "400", description = "Controller exception"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @GET
     @Path("servers/{serverTemplateId}")
@@ -198,15 +198,15 @@ public class RestSpecManagementServiceImpl {
 
     }
 
-    @Operation(summary = "Returns all KIE Server templates", response = ServerTemplateList.class)
+    @Operation(summary = "Returns all KIE Server templates")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = 200, message = "KIE Server templates", examples = @Example(value = {
+            @ApiResponse(responseCode = "200", description = "KIE Server templates", examples = @Example(value = {
                     @ExampleProperty(mediaType = JSON, value = SERVER_TEMPLATE_LIST_JSON),
                     @ExampleProperty(mediaType = XML, value = SERVER_TEMPLATE_LIST_XML)
             })),
-            @ApiResponse(responseCode = 404, message = "KIE Server template not found"),
-            @ApiResponse(responseCode = 400, message = "Controller exception"),
-            @ApiResponse(responseCode = 500, message = "Unexpected error")
+            @ApiResponse(responseCode = "404", description = "KIE Server template not found"),
+            @ApiResponse(responseCode = "400", description = "Controller exception"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @GET
     @Path("servers")
@@ -232,15 +232,15 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @Operation(summary = "Returns all KIE containers for a specified KIE Server template", response = ContainerSpecList.class)
+    @Operation(summary = "Returns all KIE containers for a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = 200, message = "KIE containers", examples = @Example({
+            @ApiResponse(responseCode = "200", description = "KIE containers", examples = @Example({
                 @ExampleProperty(mediaType = JSON, value = CONTAINER_SPEC_LIST_JSON),
                 @ExampleProperty(mediaType = XML, value = CONTAINER_SPEC_LIST_XML)
             })),
-            @ApiResponse(responseCode = 404, message = "KIE Server template not found"),
-            @ApiResponse(responseCode = 400, message = "Controller exception"),
-            @ApiResponse(responseCode = 500, message = "Unexpected error")
+            @ApiResponse(responseCode = "404", description = "KIE Server template not found"),
+            @ApiResponse(responseCode = "400", description = "Controller exception"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @GET
     @Path("servers/{serverTemplateId}/containers")
@@ -266,15 +266,15 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @Operation(summary = "Returns information about a specified KIE container for a specified KIE Server template", response = ContainerSpec.class)
+    @Operation(summary = "Returns information about a specified KIE container for a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = 200, message = "KIE container", examples = @Example({
+            @ApiResponse(responseCode = "200", description = "KIE container", examples = @Example({
                     @ExampleProperty(mediaType = JSON, value = CONTAINER_SPEC_GET_JSON),
                     @ExampleProperty(mediaType = XML, value = CONTAINER_SPEC_GET_XML),
             })),
-            @ApiResponse(responseCode = 404, message = "Container Specification or KIE Server template not found"),
-            @ApiResponse(responseCode = 400, message = "Controller exception"),
-            @ApiResponse(responseCode = 500, message = "Unexpected error")
+            @ApiResponse(responseCode = "404", description = "Container Specification or KIE Server template not found"),
+            @ApiResponse(responseCode = "400", description = "Controller exception"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @GET
     @Path("servers/{serverTemplateId}/containers/{containerId}")
@@ -305,12 +305,12 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @Operation(summary = "Disposes a specified KIE container in a specified KIE Server template.", code = 204)
+    @Operation(summary = "Disposes a specified KIE container in a specified KIE Server template.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = 204, message = "KIE container successfully disposed"),
-            @ApiResponse(responseCode = 404, message = "Container Specification or KIE Server template not found"),
-            @ApiResponse(responseCode = 400, message = "Controller exception"),
-            @ApiResponse(responseCode = 500, message = "Unexpected error")
+            @ApiResponse(responseCode = "204", description = "KIE container successfully disposed"),
+            @ApiResponse(responseCode = "404", description = "Container Specification or KIE Server template not found"),
+            @ApiResponse(responseCode = "400", description = "Controller exception"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @DELETE
     @Path("servers/{serverTemplateId}/containers/{containerId}")
@@ -334,12 +334,12 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @Operation(summary = "Deletes a specified KIE Server template", code = 204)
+    @Operation(summary = "Deletes a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = 204, message = "KIE Server template successfully deleted"),
-            @ApiResponse(responseCode = 404, message = "KIE Server template not found"),
-            @ApiResponse(responseCode = 400, message = "Controller exception"),
-            @ApiResponse(responseCode = 500, message = "Unexpected error")
+            @ApiResponse(responseCode = "204", description = "KIE Server template successfully deleted"),
+            @ApiResponse(responseCode = "404", description = "KIE Server template not found"),
+            @ApiResponse(responseCode = "400", description = "Controller exception"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @DELETE
     @Path("servers/{serverTemplateId}")
@@ -360,12 +360,12 @@ public class RestSpecManagementServiceImpl {
         }
     }
 
-    @Operation(summary = "Updates configurations for a specified KIE container in a specified KIE Server template", code = 201)
+    @Operation(summary = "Updates configurations for a specified KIE container in a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = 201, message = "KIE container successfully updated"),
-            @ApiResponse(responseCode = 404, message = "KIE container or KIE Server template not found"),
-            @ApiResponse(responseCode = 400, message = "Controller exception"),
-            @ApiResponse(responseCode = 500, message = "Unexpected error")
+            @ApiResponse(responseCode = "201", description = "KIE container successfully updated"),
+            @ApiResponse(responseCode = "404", description = "KIE container or KIE Server template not found"),
+            @ApiResponse(responseCode = "400", description = "Controller exception"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @POST
     @Path("servers/{serverTemplateId}/containers/{containerId}/config/{capability}")
@@ -413,10 +413,10 @@ public class RestSpecManagementServiceImpl {
 
     @Operation(summary = "Stops a specified KIE container in a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = 200, message = "KIE container successfully stopped"),
-            @ApiResponse(responseCode = 404, message = "KIE container or KIE Server template not found"),
-            @ApiResponse(responseCode = 400, message = "Controller exception"),
-            @ApiResponse(responseCode = 500, message = "Unexpected error")
+            @ApiResponse(responseCode = "200", description = "KIE container successfully stopped"),
+            @ApiResponse(responseCode = "404", description = "KIE container or KIE Server template not found"),
+            @ApiResponse(responseCode = "400", description = "Controller exception"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @POST
     @Path("servers/{serverTemplateId}/containers/{containerId}/status/stopped")
@@ -443,10 +443,10 @@ public class RestSpecManagementServiceImpl {
 
     @Operation(summary = "Starts a specified KIE container in a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = 200, message = "KIE Container successfully started"),
-            @ApiResponse(responseCode = 404, message = "KIE container or KIE Server template not found"),
-            @ApiResponse(responseCode = 400, message = "Controller exception"),
-            @ApiResponse(responseCode = 500, message = "Unexpected error")
+            @ApiResponse(responseCode = "200", description = "KIE Container successfully started"),
+            @ApiResponse(responseCode = "404", description = "KIE container or KIE Server template not found"),
+            @ApiResponse(responseCode = "400", description = "Controller exception"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @POST
     @Path("servers/{serverTemplateId}/containers/{containerId}/status/started")
@@ -473,10 +473,10 @@ public class RestSpecManagementServiceImpl {
 
     @Operation(summary = "Activates a specified KIE container in a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = 200, message = "KIE container successfully activated"),
-            @ApiResponse(responseCode = 404, message = "KIE container or KIE Server template not found"),
-            @ApiResponse(responseCode = 400, message = "Controller exception"),
-            @ApiResponse(responseCode = 500, message = "Unexpected error")
+            @ApiResponse(responseCode = "200", description = "KIE container successfully activated"),
+            @ApiResponse(responseCode = "404", description = "KIE container or KIE Server template not found"),
+            @ApiResponse(responseCode = "400", description = "Controller exception"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @POST
     @Path("servers/{serverTemplateId}/containers/{containerId}/status/activated")
@@ -503,10 +503,10 @@ public class RestSpecManagementServiceImpl {
 
     @Operation(summary = "Deactivates a specified KIE container in a specified KIE Server template")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = 200, message = "KIE container successfully deactivated"),
-            @ApiResponse(responseCode = 404, message = "KIE container or KIE Server template not found"),
-            @ApiResponse(responseCode = 400, message = "Controller exception"),
-            @ApiResponse(responseCode = 500, message = "Unexpected error")
+            @ApiResponse(responseCode = "200", description = "KIE container successfully deactivated"),
+            @ApiResponse(responseCode = "404", description = "KIE container or KIE Server template not found"),
+            @ApiResponse(responseCode = "400", description = "Controller exception"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @POST
     @Path("servers/{serverTemplateId}/containers/{containerId}/status/deactivated")
