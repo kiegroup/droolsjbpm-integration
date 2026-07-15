@@ -69,7 +69,7 @@ public class RestRuntimeManagementServiceImpl {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getServerInstances(@Context HttpHeaders headers,
-                                       @Parameter(name = "serverTemplateId", value = "ID of the KIE Server template for which you are retrieving KIE Server instances", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId) {
+                                       @Parameter(name = "serverTemplateId", description = "ID of the KIE Server template for which you are retrieving KIE Server instances", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId) {
         String contentType = getContentType(headers);
         try {
             logger.debug("Received get server template with id {}", serverTemplateId);
@@ -104,8 +104,8 @@ public class RestRuntimeManagementServiceImpl {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getServerInstanceContainers(@Context HttpHeaders headers,
-                                                @Parameter(name = "serverTemplateId", value = "ID of the KIE Server template associated with the KIE Server instance", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
-                                                @Parameter(name = "serverInstanceId", value = "ID of the KIE Server instance for which you are retrieving KIE containers (example: default-kieserver-instance@localhost:8080)", required = true, example = "test-kie-server@localhost:8080") @PathParam("serverInstanceId") String instanceId) {
+                                                @Parameter(name = "serverTemplateId", description = "ID of the KIE Server template associated with the KIE Server instance", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
+                                                @Parameter(name = "serverInstanceId", description = "ID of the KIE Server instance for which you are retrieving KIE containers (example: default-kieserver-instance@localhost:8080)", required = true, example = "test-kie-server@localhost:8080") @PathParam("serverInstanceId") String instanceId) {
         String contentType = getContentType(headers);
         try {
             logger.debug("Received get containers for server template with id {} and instance id {}", serverTemplateId, instanceId);
@@ -140,8 +140,8 @@ public class RestRuntimeManagementServiceImpl {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getServerTemplateContainers(@Context HttpHeaders headers,
-                                                @Parameter(name = "serverTemplateId", value = "ID of the KIE Server template for which you are retrieving KIE containers", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
-                                                @Parameter(name = "containerId", value = "ID of the KIE container to be retrieved", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId) {
+                                                @Parameter(name = "serverTemplateId", description = "ID of the KIE Server template for which you are retrieving KIE containers", required = true, example = "test-kie-server") @PathParam("serverTemplateId") String serverTemplateId,
+                                                @Parameter(name = "containerId", description = "ID of the KIE container to be retrieved", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId) {
         String contentType = getContentType(headers);
         try {
             logger.debug("Received get container {} for server template with id {}", containerId, serverTemplateId);
