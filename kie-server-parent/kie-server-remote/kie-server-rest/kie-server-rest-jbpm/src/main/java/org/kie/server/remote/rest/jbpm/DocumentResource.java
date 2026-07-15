@@ -17,9 +17,12 @@ package org.kie.server.remote.rest.jbpm;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.mail.internet.MimeUtility;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -43,7 +46,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.annotations.ResponseHeader;
 import org.kie.server.api.model.instance.DocumentInstance;
 import org.kie.server.api.model.instance.DocumentInstanceList;
 import org.kie.server.remote.rest.common.Header;
@@ -93,9 +95,18 @@ public class DocumentResource {
         this.context = context;
     }
 
-    @Operation(summary="Retrieves document's content identified by given documentId",
-            response=byte[].class, responseHeaders={@ResponseHeader(name="Content-Disposition", description="provides file name of the document")})
-    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+    @Operation(summary="Retrieves document's content identified by given documentId")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    headers = {
+                            @io.swagger.v3.oas.annotations.headers.Header(name = "Content-Disposition", description = "provides file name of the document",
+                                    schema = @Schema(implementation = String.class))
+                    },
+                    content = @Content(
+                            schema = @Schema(implementation = byte[].class)
+                    )
+            ),
+            @ApiResponse(responseCode = "500", description = "Unexpected error"),
             @ApiResponse(responseCode = "404", description = "Document with given id not found") })
     @GET
     @Path(DOCUMENT_INSTANCE_CONTENT_GET_URI)
