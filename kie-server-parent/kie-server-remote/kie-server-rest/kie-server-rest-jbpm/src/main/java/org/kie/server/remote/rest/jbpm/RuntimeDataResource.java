@@ -67,6 +67,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.CORRELATION_KEY;
 import static org.kie.server.api.rest.RestURI.NODE_INSTANCES_BY_INSTANCE_ID_GET_URI;
 import static org.kie.server.api.rest.RestURI.NODE_INSTANCES_BY_WORK_ITEM_ID_GET_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_DEFINITIONS_BY_CONTAINER_ID_DEF_ID_GET_URI;
@@ -96,6 +97,7 @@ import static org.kie.server.api.rest.RestURI.TASK_GET_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ID;
 import static org.kie.server.api.rest.RestURI.VAR_INSTANCES_BY_INSTANCE_ID_GET_URI;
 import static org.kie.server.api.rest.RestURI.VAR_INSTANCES_BY_VAR_INSTANCE_ID_GET_URI;
+import static org.kie.server.api.rest.RestURI.WORK_ITEM_ID;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
@@ -263,7 +265,7 @@ public class RuntimeDataResource {
     @Path(PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstanceByCorrelationKey(@Context HttpHeaders headers, 
-            @Parameter(description = "correlation key associated with process instance", required = true) @PathParam("correlationKey") String correlationKey) {
+            @Parameter(description = "correlation key associated with process instance", required = true) @PathParam(CORRELATION_KEY) String correlationKey) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -286,7 +288,7 @@ public class RuntimeDataResource {
     @Path(PROCESS_INSTANCES_BY_CORRELATION_KEY_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstancesByCorrelationKey(@Context HttpHeaders headers, 
-            @Parameter(description = "correlation key to filter process instance, can be given as partial correlation key like in starts with approach", required = true) @PathParam("correlationKey") String correlationKey, 
+            @Parameter(description = "correlation key to filter process instance, can be given as partial correlation key like in starts with approach", required = true) @PathParam(CORRELATION_KEY) String correlationKey, 
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
@@ -361,7 +363,7 @@ public class RuntimeDataResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getNodeInstanceForWorkItem(@Context HttpHeaders headers, 
             @Parameter(description = "process instance id that work item belongs to", required = true) @PathParam(PROCESS_INST_ID) long processInstanceId, 
-            @Parameter(description = "work item id to retrieve node instance for", required = true) @PathParam("workItemId") long workItemId) {
+            @Parameter(description = "work item id to retrieve node instance for", required = true) @PathParam(WORK_ITEM_ID) long workItemId) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -539,7 +541,7 @@ public class RuntimeDataResource {
     @Path(TASK_BY_WORK_ITEM_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTaskByWorkItemId(@Context HttpHeaders headers, 
-            @Parameter(description = "work item id to load task associated with", required = true) @PathParam("workItemId") Long workItemId) {
+            @Parameter(description = "work item id to load task associated with", required = true) @PathParam(WORK_ITEM_ID) Long workItemId) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -622,7 +624,7 @@ public class RuntimeDataResource {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTasksAssignedAsPotentialOwner(@Context HttpHeaders headers,
             @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, schema = @Schema(allowableValues = {"Created", "Ready", "Reserved", "InProgress", "Suspended", "Completed", "Failed", "Error", "Exited", "Obsolete"})) @QueryParam("status") List<String> status,  
-            @Parameter(description = "optional group names to include in the query", required = false, allowMultiple=true) @QueryParam("groups") List<String> groupIds,
+            @Parameter(description = "optional group names to include in the query", required = false) @QueryParam("groups") List<String> groupIds,
             @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
             @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
             @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
