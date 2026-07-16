@@ -16,9 +16,6 @@
 package org.kie.server.client;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -207,30 +204,12 @@ public class UIServicesClientTest extends BaseKieServicesClientTest {
         assertEquals(dummyFormContent, form);
     }
 
-    /**
-     * Uses reflection to set the value of BYPASS_AUTH_USER config on client
-     * class
-     *
-     * @param newValue
-     */
     private void setBypassAuthUserConfig(Boolean newValue) {
-
         try {
             Field field = uiClient.getClass().getSuperclass().getDeclaredField("BYPASS_AUTH_USER");
             field.setAccessible(true);
-            Method getDeclaredFields0 = Class.class.getDeclaredMethod("getDeclaredFields0", boolean.class);
-            getDeclaredFields0.setAccessible(true);
-            Field[] fields = (Field[]) getDeclaredFields0.invoke(Field.class, false);
-            Field modifiersField= Arrays.stream(fields)
-                    .filter(f -> f.getName().equals("modifiers"))
-                    .findFirst()
-                    .orElseThrow(() -> new NoSuchFieldException("No 'modifiers' field found"));
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-            field.set(uiClient, newValue);
-            field.setAccessible(true);
-        } catch (NoSuchMethodException | InvocationTargetException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
-            // Tests will misbehave
+            field.set(null, newValue);
+        } catch (NoSuchFieldException | IllegalAccessException ex) {
             throw new RuntimeException(ex);
         }
     }
