@@ -48,23 +48,6 @@ public class SwaggerAPIScanner implements ServletContextListener {
         }
 
         LOGGER.info("Starting Swagger API discovery");
-// Old implementation
-     /*   JaxrsScanner jaxrsScanner = new DefaultJaxrsScanner();
-        jaxrsScanner.setPrettyPrint(true);
-        *//*
-         * Set our JAX-RS Scanner with SCANNER_ID_DEFAULT.
-         * We need to do this before creating the BeanConfig, as this prevents the BeanConfig to register itself as the default scanner.
-         * The first one wins.
-         *//*
-        SwaggerScannerLocator.getInstance().putScanner((SwaggerContextService.SCANNER_ID_DEFAULT), jaxrsScanner);
-
-        BeanConfig beanConfig = new BeanConfig();
-        beanConfig.setBasePath(sce.getServletContext().getContextPath() + "/rest");
-        beanConfig.setVersion("7.0");
-        beanConfig.setTitle("Controller API");
-        beanConfig.setPrettyPrint(true);
-        beanConfig.setScan();*/
-
         OpenAPI oas = new OpenAPI();
         oas.info(getInfo());
         oas.addServersItem(new Server().url(sce.getServletContext().getContextPath() + "/rest"));

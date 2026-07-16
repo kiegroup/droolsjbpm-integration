@@ -83,28 +83,6 @@ public class SwaggerKieServerExtension implements KieServerExtension {
         } catch (OpenApiConfigurationException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-
-        // Old implementation
-    	/*JaxrsScanner jaxrsScanner = new DefaultJaxrsScanner();
-    	jaxrsScanner.setPrettyPrint(true);
-    	*//*
-    	 * Set our JAX-RS Scanner with SCANNER_ID_DEFAULT.
-    	 * We need to do this before creating the BeanConfig, as this prevents the BeanConfig to register itself as the default scanner.
-    	 * The first one wins.
-    	 *//*
-    	SwaggerScannerLocator.getInstance().putScanner((SwaggerContextService.SCANNER_ID_DEFAULT), jaxrsScanner);
-
-    	BeanConfig beanConfig = new BeanConfig();
-		
-    	String contextRoot = KieServerEnvironment.getContextRoot();
-    	if (contextRoot != null) {
-    		beanConfig.setBasePath(contextRoot + "/services/rest");
-    	}
-		
-    	//Set the Info on the Swagger object, not on the BeanConfig ... otherwise the Info on Swagger (which will be 'null') will override the Info we set on the BeanConfig.
-    	beanConfig.getSwagger().setInfo(getInfo());
-    	beanConfig.setScan(true);*/
-		
     	initialized = true;
     }
     

@@ -20,8 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
-/*import io.swagger.v3.oas.models.Swagger;
-import io.swagger.parser.SwaggerParser;*/
 
 import java.util.Arrays;
 import java.util.HashMap;
