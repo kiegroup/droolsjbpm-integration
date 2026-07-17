@@ -15,7 +15,8 @@
 
 package org.kie.server.services.impl;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.kie.server.api.KieServerEnvironment;
@@ -46,7 +47,7 @@ public class ContainerManager {
 
         String str = containers.stream().map(KieContainerResource::toString).collect(joining("\n\t"));
         logger.info("About to install containers on kie server \n\t{}:\n\t{}", kieServer, str);
-        Set<KieContainerResource> copiedContainers = new HashSet<>(containers);
+        List<KieContainerResource> copiedContainers = new ArrayList<KieContainerResource>(containers);
         try {
             for (KieContainerResource containerResource : copiedContainers) {
                 if (KieContainerStatus.STARTED.equals(containerResource.getStatus())) {
