@@ -79,7 +79,7 @@
     <!-- Swagger -->
     <dependency>
       <groupId>io.swagger.core.v3</groupId>
-    	<artifactId>swagger-annotations</artifactId>
+      <artifactId>swagger-annotations</artifactId>
     </dependency>
 
     <!-- Prometheus -->
