@@ -126,10 +126,10 @@ public class KieServerRouterControllerRecoveryTest {
             wireMockServer.addMockServiceRequestListener(new RequestListener() {                
                 @Override
                 public void requestReceived(Request request, com.github.tomakehurst.wiremock.http.Response response) {
-                    if (request.getUrl().equals("/management/servers/kie-server-router/containers/test") && request.getMethod().name().equalsIgnoreCase("PUT")) {
+                    if (request.getUrl().equals("/management/servers/kie-server-router/containers/test") && request.getMethod().getName().equalsIgnoreCase("PUT")) {
                         latch.countDown();
                     }
-                    if (request.getUrl().equals("/management/servers/kie-server-router/containers/test") && request.getMethod().name().equalsIgnoreCase("DELETE")) {
+                    if (request.getUrl().equals("/management/servers/kie-server-router/containers/test") && request.getMethod().getName().equalsIgnoreCase("DELETE")) {
                         deleteLatch.countDown();
                     } 
                 }

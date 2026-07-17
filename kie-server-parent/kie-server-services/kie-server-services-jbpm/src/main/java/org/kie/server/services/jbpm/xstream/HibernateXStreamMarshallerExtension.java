@@ -16,15 +16,15 @@
 package org.kie.server.services.jbpm.xstream;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.hibernate.converter.HibernatePersistentCollectionConverter;
-import com.thoughtworks.xstream.hibernate.converter.HibernatePersistentMapConverter;
-import com.thoughtworks.xstream.hibernate.converter.HibernatePersistentSortedMapConverter;
-import com.thoughtworks.xstream.hibernate.converter.HibernatePersistentSortedSetConverter;
 import com.thoughtworks.xstream.hibernate.converter.HibernateProxyConverter;
-import com.thoughtworks.xstream.hibernate.mapper.HibernateMapper;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
 import org.kie.server.api.marshalling.xstream.XStreamMarshaller;
 import org.kie.server.api.marshalling.xstream.XStreamMarshallerExtension;
+import org.kie.server.services.jbpm.xstream.kieadapters.KieHibernateMapper;
+import org.kie.server.services.jbpm.xstream.kieadapters.KieHibernatePersistentCollectionConverter;
+import org.kie.server.services.jbpm.xstream.kieadapters.KieHibernatePersistentMapConverter;
+import org.kie.server.services.jbpm.xstream.kieadapters.KieHibernatePersistentSortedMapConverter;
+import org.kie.server.services.jbpm.xstream.kieadapters.KieHibernatePersistentSortedSetConverter;
 
 public class HibernateXStreamMarshallerExtension implements XStreamMarshallerExtension {
 
@@ -32,15 +32,15 @@ public class HibernateXStreamMarshallerExtension implements XStreamMarshallerExt
     public void extend(XStreamMarshaller marshaller) {
         XStream xstream = marshaller.getXstream();
         xstream.registerConverter(new HibernateProxyConverter());
-        xstream.registerConverter(new HibernatePersistentCollectionConverter(xstream.getMapper()));
-        xstream.registerConverter(new HibernatePersistentMapConverter(xstream.getMapper()));
-        xstream.registerConverter(new HibernatePersistentSortedMapConverter(xstream.getMapper()));
-        xstream.registerConverter(new HibernatePersistentSortedSetConverter(xstream.getMapper()));
+        xstream.registerConverter(new KieHibernatePersistentCollectionConverter(xstream.getMapper()));
+        xstream.registerConverter(new KieHibernatePersistentMapConverter(xstream.getMapper()));
+        xstream.registerConverter(new KieHibernatePersistentSortedMapConverter(xstream.getMapper()));
+        xstream.registerConverter(new KieHibernatePersistentSortedSetConverter(xstream.getMapper()));
     }
 
     @Override
     public MapperWrapper chainMapperWrapper(MapperWrapper next) {
-        return new HibernateMapper(next);
+        return new KieHibernateMapper(next);
     }
 
 }

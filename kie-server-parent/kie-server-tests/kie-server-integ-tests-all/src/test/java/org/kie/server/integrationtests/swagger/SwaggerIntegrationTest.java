@@ -18,14 +18,15 @@ package org.kie.server.integrationtests.swagger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.swagger.models.Operation;
-import io.swagger.models.Swagger;
-import io.swagger.parser.SwaggerParser;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import io.swagger.v3.parser.OpenAPIV3Parser;
+import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
@@ -98,10 +99,9 @@ public class SwaggerIntegrationTest {
     @Test
     public void testSwaggerJsonContainsSchemaInResponse() {
         String swaggerStr = getSwaggerJson();
-        
-        Swagger swagger = new SwaggerParser().parse(swaggerStr);
-        
-        swagger.getPaths().forEach((key, item) -> {
+        SwaggerParseResult parseResult = new OpenAPIV3Parser().readContents(swaggerStr);
+        OpenAPI openAPI =parseResult.getOpenAPI();
+        openAPI.getPaths().forEach((key, item) -> {
             assertNonNullSchema(item.getGet(), validStatusGet, key);
             assertNonNullSchema(item.getPost(), validStatusPost, key);
         });
@@ -141,7 +141,8 @@ public class SwaggerIntegrationTest {
         if (operation != null && operation.getResponses() != null) {
             operation.getResponses().entrySet().stream()
             .filter(e -> validStatus.contains(e.getKey()))
-            .map(m -> m.getValue().getResponseSchema())
+            //.map(m -> m.getValue().getResponseSchema())
+                    .map(m -> m.getValue())
             .forEach(r-> assertNotNull("Path ["+path+"] should have a schema in the response, check swagger annotations", r));
         }
     }

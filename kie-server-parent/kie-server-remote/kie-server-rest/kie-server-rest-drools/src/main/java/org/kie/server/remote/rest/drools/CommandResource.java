@@ -27,14 +27,14 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.Variant;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.rest.RestURI;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServerRegistry;
@@ -52,8 +52,8 @@ import static org.kie.server.remote.rest.common.util.RestUtils.getClassType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 
-@Api(value="KIE session assets")
-@Path("server/containers/instances/{" + RestURI.CONTAINER_ID + "}")
+@Tag(name="KIE session assets")
+@Path("server/containers/instances/{" + CONTAINER_ID + "}")
 public class CommandResource {
 
     private static final Logger logger = LoggerFactory.getLogger(CommandResource.class);
@@ -72,17 +72,16 @@ public class CommandResource {
         this.marshallerHelper = new MarshallerHelper(registry);
     }
 
-    @ApiOperation(value = "Executes one or more runtime commands" )
-    @ApiResponses({@ApiResponse(code = 200, message = "Successful execution", response = ServiceResponse.class),
-                   @ApiResponse(code = 500, message = "Unexpected error", response = ServiceResponse.class),
-                   @ApiResponse(code = 204, message = "Command execute successfully, but without response",
-                                response = ServiceResponse.class)})
+    @Operation(summary = "Executes one or more runtime commands" )
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Successful execution"),
+                   @ApiResponse(responseCode = "500", description = "Unexpected error"),
+                   @ApiResponse(responseCode = "204", description = "Command execute successfully, but without response")})
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response manageContainer(@Context HttpHeaders headers, 
-            @ApiParam(value = "Container id where rules should be evaluated on", required = true) @PathParam(RestURI.CONTAINER_ID) String id, 
-            @ApiParam(value = "Commands to be executed on rule engine given as BatchExecutionCommand type", required = true) String cmdPayload) {
+            @Parameter(description = "Container id where rules should be evaluated on", required = true) @PathParam(CONTAINER_ID) String id, 
+            @Parameter(description = "Commands to be executed on rule engine given as BatchExecutionCommand type", required = true) String cmdPayload) {
 
         Variant v = getVariant(headers);
         String contentType = getContentType(headers);

@@ -21,7 +21,7 @@ import java.util.List;
 public class TMDirectory {
 
     private final String name;
-    private final List<TMFile> members = new ArrayList<TMFile>();
+    private List<TMFile> members = new ArrayList<TMFile>();
 
     public TMDirectory(String name) {
         this.name = name;

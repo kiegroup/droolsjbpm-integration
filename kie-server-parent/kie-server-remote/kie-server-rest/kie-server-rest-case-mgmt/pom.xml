@@ -46,8 +46,8 @@
     </dependency>
     
     <dependency>
-    	<groupId>io.swagger</groupId>
-    	<artifactId>swagger-annotations</artifactId>
+      <groupId>io.swagger.core.v3</groupId>
+      <artifactId>swagger-annotations</artifactId>
     </dependency>
 
     <dependency>
@@ -64,6 +64,14 @@
       <artifactId>jaxb-core</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!-- Test - JAX-RS runtime implementation (needed for RuntimeDelegate) -->
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>

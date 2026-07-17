@@ -65,8 +65,7 @@
     <!-- TEMP DISABLED DUE TO REQUIRED kie-spring - TO BE RESTORED !! ->
     <module>kie-camel</module> -->
     <module>kie-tomcat-integration</module>
-    <!-- TEMP DISABLED - TO BE RESTORED BY TEST FIXING >
-    <module>kie-integration-test-coverage</module> -->
+    <module>kie-integration-test-coverage</module>
     <module>kie-plugins-testing</module>
     <!-- TEMP DISABLED - TO BE RESTORED !! ->
     <module>kie-spring-boot</module>-->

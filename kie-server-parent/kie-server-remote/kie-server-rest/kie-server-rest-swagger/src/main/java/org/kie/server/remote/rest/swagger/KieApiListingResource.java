@@ -15,18 +15,38 @@
 
 package org.kie.server.remote.rest.swagger;
 
-import jakarta.ws.rs.Path;
-
 import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationModule;
+import io.swagger.v3.core.util.Json;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 
-import io.swagger.jaxrs.listing.ApiListingResource;
-import io.swagger.util.Json;
-
+// This class is kept for backward compatibility, to still have the server/swagger.() rest available
 @Path("server/swagger.{type:json|yaml}")
-public class KieApiListingResource extends ApiListingResource {
+public class KieApiListingResource extends OpenApiResource {
 	
     
     public KieApiListingResource() {
         Json.mapper().registerModule(new JakartaXmlBindAnnotationModule());
+    }
+
+    @GET
+    @Produces({MediaType.APPLICATION_JSON, "application/yaml"})
+    public Response getOpenApi(@Context HttpHeaders headers,
+                               @Context UriInfo uriInfo,
+                               @PathParam("type") String type) throws Exception {
+
+        String acceptType = "yaml".equalsIgnoreCase(type)
+                ? "application/yaml"
+                : MediaType.APPLICATION_JSON;
+
+        return super.getOpenApi(headers, uriInfo, acceptType);
     }
 }

@@ -36,13 +36,14 @@ import jakarta.ws.rs.core.StreamingOutput;
 import org.apache.commons.io.IOUtils;
 import org.kie.server.services.jbpm.ui.FormRendererBase;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import static org.kie.server.api.rest.RestURI.RENDERER_ID;
 
-@Api(value="Static files endpoint :: BPM")
+@Tag(name="Static files endpoint :: BPM")
 @Path("server/" + STATIC_FILES_URI)
 public class StaticFilesResource {
     
@@ -52,15 +53,14 @@ public class StaticFilesResource {
         this.formRendererBase = formRendererBase;
     }
 
-    @ApiOperation(value="Retrieves given resource/file based on the type and file name",
-            response=String.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "resource/file not found") })
+    @Operation(summary="Retrieves given resource/file based on the type and file name")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "resource/file not found") })
     @GET
     @Path(STATIC_BY_TYPE_GET_URI)
     public Response getSharedContent(
-            @ApiParam(value = "Type of the resource e.g. js, css, etc", required = true) @PathParam("type") String type,
-            @ApiParam(value = "Name of the resource to look up", required = true) @PathParam("file") String file) {
+            @Parameter(description = "Type of the resource e.g. js, css, etc", required = true) @PathParam("type") String type,
+            @Parameter(description = "Name of the resource to look up", required = true) @PathParam("file") String file) {
         
         InputStream resourceStream = formRendererBase.readResources("/" + type + "/" + file);
         if (resourceStream == null) {
@@ -82,16 +82,15 @@ public class StaticFilesResource {
         
     }
 
-    @ApiOperation(value="Retrieves given resource/file based on the type and file name managed by given provider",
-            response=String.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "resource/file not found") })
+    @Operation(summary="Retrieves given resource/file based on the type and file name managed by given provider")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "resource/file not found") })
     @GET
     @Path(STATIC_RENDERER_BY_TYPE_GET_URI)
     public Response getProviderSpecificContent(
-            @ApiParam(value = "Name of the provider that manages given resource", required = true) @PathParam("provider") String provider, 
-            @ApiParam(value = "Type of the resource e.g. js, css, etc", required = true) @PathParam("type") String type, 
-            @ApiParam(value = "Name of the resource to look up", required = true) @PathParam("file") String file) {
+            @Parameter(description = "Name of the provider that manages given resource", required = true) @PathParam(RENDERER_ID) String provider, 
+            @Parameter(description = "Type of the resource e.g. js, css, etc", required = true) @PathParam("type") String type, 
+            @Parameter(description = "Name of the resource to look up", required = true) @PathParam("file") String file) {
         
         InputStream resourceStream = formRendererBase.readResources("/" + provider + "/" + type + "/" + file);
         if (resourceStream == null) {

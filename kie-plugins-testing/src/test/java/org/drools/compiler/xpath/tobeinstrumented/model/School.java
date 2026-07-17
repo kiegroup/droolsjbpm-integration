@@ -22,7 +22,7 @@ public class School {
 
     private final String name;
 
-    private final List<Child> children = new ArrayList<Child>();
+    private List<Child> children = new ArrayList<Child>();
 
     public School(String name) {
         this.name = name;

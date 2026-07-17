@@ -18,6 +18,9 @@ package org.kie.server.remote.rest.jbpm;
 import java.text.MessageFormat;
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -32,13 +35,11 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Variant;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.TaskNotFoundException;
@@ -56,7 +57,15 @@ import org.kie.server.api.model.instance.TaskEventInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.model.instance.VariableInstanceList;
-import org.kie.server.api.rest.RestURI;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.CORRELATION_KEY;
+import static org.kie.server.api.rest.RestURI.PROCESS_ID;
+import static org.kie.server.api.rest.RestURI.PROCESS_INST_ID;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ID;
+import static org.kie.server.api.rest.RestURI.VARIABLES_PROCESSES_URI;
+import static org.kie.server.api.rest.RestURI.VARIABLES_TASKS_PROCESSES_URI;
+import static org.kie.server.api.rest.RestURI.VAR_NAME;
+import static org.kie.server.api.rest.RestURI.WORK_ITEM_ID;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.remote.rest.common.marker.KieServerEndpoint;
 import org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType;
@@ -66,6 +75,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.CORRELATION_KEY;
 import static org.kie.server.api.rest.RestURI.NODE_INSTANCES_BY_INSTANCE_ID_GET_URI;
 import static org.kie.server.api.rest.RestURI.NODE_INSTANCES_BY_WORK_ITEM_ID_GET_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_DEFINITIONS_BY_CONTAINER_ID_DEF_ID_GET_URI;
@@ -95,6 +105,7 @@ import static org.kie.server.api.rest.RestURI.TASK_GET_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ID;
 import static org.kie.server.api.rest.RestURI.VAR_INSTANCES_BY_INSTANCE_ID_GET_URI;
 import static org.kie.server.api.rest.RestURI.VAR_INSTANCES_BY_VAR_INSTANCE_ID_GET_URI;
+import static org.kie.server.api.rest.RestURI.WORK_ITEM_ID;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.errorMessage;
@@ -121,7 +132,7 @@ import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_INSTANC
 import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND_FOR_WORKITEM;
 
-@Api(value="Process queries")
+@Tag(name="Process queries")
 @Path("server/" + QUERY_URI)
 public class RuntimeDataResource {
 
@@ -140,21 +151,22 @@ public class RuntimeDataResource {
     }
 
 
-    @ApiOperation(value="Returns all process instances filtered by optional parameters.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successful response", response = ProcessInstanceList.class, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)})) })
+    @Operation(summary="Returns all process instances filtered by optional parameters.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCES_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(PROCESS_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstances(@Context HttpHeaders headers,
-            @ApiParam(value = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, allowableValues="1,2,3") @QueryParam("status") List<Integer> status, 
-            @ApiParam(value = "optional process instance initiator - user who started process instance to filter process instances", required = false) @QueryParam("initiator") String initiator, 
-            @ApiParam(value = "optional process name to filter process instances", required = false) @QueryParam("processName") String processName,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, schema = @Schema(allowableValues = {"1", "2", "3"})) @QueryParam("status") List<Integer> status, 
+            @Parameter(description = "optional process instance initiator - user who started process instance to filter process instances", required = false) @QueryParam("initiator") String initiator, 
+            @Parameter(description = "optional process name to filter process instances", required = false) @QueryParam("processName") String processName,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstances(status, initiator, processName, page, pageSize, sort, sortOrder);
@@ -163,21 +175,22 @@ public class RuntimeDataResource {
     }
 
 
-    @ApiOperation(value="Returns all process instances for a specified process.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = ProcessInstanceList.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)})) })
+    @Operation(summary="Returns all process instances for a specified process.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCES_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(PROCESS_INSTANCES_BY_PROCESS_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstancesByProcessId(@Context HttpHeaders headers, 
-            @ApiParam(value = "process id to filter process instance", required = true) @PathParam(PROCESS_ID)String processId,
-            @ApiParam(value = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, allowableValues="1,2,3") @QueryParam("status") List<Integer> status, 
-            @ApiParam(value = "optinal process instance initiator - user who started process instance to filtr process instances", required = false) @QueryParam("initiator") String initiator,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "process id to filter process instance", required = true) @PathParam(PROCESS_ID)String processId,
+            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, schema = @Schema(allowableValues = {"1", "2", "3"})) @QueryParam("status") List<Integer> status, 
+            @Parameter(description = "optinal process instance initiator - user who started process instance to filtr process instances", required = false) @QueryParam("initiator") String initiator,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
 
@@ -187,21 +200,22 @@ public class RuntimeDataResource {
         return createCorrectVariant(processInstanceList, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns all process instances for a specified KIE container.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-                            @ApiResponse(code = 404, message = "Container Id not found"), 
-                            @ApiResponse(code = 200, response = ProcessInstanceList.class, message = "Successful response", examples=@Example(value= {
-                                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)}))})
+    @Operation(summary="Returns all process instances for a specified KIE container.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+                            @ApiResponse(responseCode = "404", description = "Container Id not found"), 
+                            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCES_RESPONSE_JSON)})
+                            })})
     @GET
     @Path(PROCESS_INSTANCES_BY_CONTAINER_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstancesByDeploymentId(@Context HttpHeaders headers, 
-            @ApiParam(value = "container id to filter process instance", required = true) @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, allowableValues="1,2,3") @QueryParam("status")List<Integer> status,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "container id to filter process instance", required = true) @PathParam(CONTAINER_ID) String containerId, 
+            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, schema = @Schema(allowableValues = {"1", "2", "3"})) @QueryParam("status")List<Integer> status,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -220,17 +234,18 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Returns the count of all process instances for a specified KIE container.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Container Id not found"),
-            @ApiResponse(code = 200, response = CountDefinition.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=COUNT_PROCESS_INSTANCES_RESPONSE_JSON)}))})
+    @Operation(summary="Returns the count of all process instances for a specified KIE container.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Container Id not found"),
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = COUNT_PROCESS_INSTANCES_RESPONSE_JSON)})
+            })})
     @GET
     @Path(PROCESS_INSTANCES_BY_CONTAINER_ID_COUNT_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response countProcessInstancesByDeploymentId(@Context HttpHeaders headers,
-                                                      @ApiParam(value = "container id to filter process instance", required = true) @PathParam(CONTAINER_ID) String containerId,
-                                                      @ApiParam(value = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, allowableValues="1,2,3") @QueryParam("status")List<Integer> status) {
+                                                      @Parameter(description = "container id to filter process instance", required = true) @PathParam(CONTAINER_ID) String containerId,
+                                                      @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, schema = @Schema(allowableValues = {"1", "2", "3"})) @QueryParam("status")List<Integer> status) {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -249,15 +264,16 @@ public class RuntimeDataResource {
         }
     }
     
-    @ApiOperation(value="Returns information about a single process instance with a specified correlation key.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = ProcessInstance.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_RESPONSE_JSON)})) })
+    @Operation(summary="Returns information about a single process instance with a specified correlation key.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstanceByCorrelationKey(@Context HttpHeaders headers, 
-            @ApiParam(value = "correlation key associated with process instance", required = true) @PathParam("correlationKey") String correlationKey) {
+            @Parameter(description = "correlation key associated with process instance", required = true) @PathParam(CORRELATION_KEY) String correlationKey) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -271,19 +287,20 @@ public class RuntimeDataResource {
 
     }
 
-    @ApiOperation(value="Returns process instances with a specified correlation key.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successful response", response = ProcessInstanceList.class, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)})) })
+    @Operation(summary="Returns process instances with a specified correlation key.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCES_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(PROCESS_INSTANCES_BY_CORRELATION_KEY_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstancesByCorrelationKey(@Context HttpHeaders headers, 
-            @ApiParam(value = "correlation key to filter process instance, can be given as partial correlation key like in starts with approach", required = true) @PathParam("correlationKey") String correlationKey, 
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "correlation key to filter process instance, can be given as partial correlation key like in starts with approach", required = true) @PathParam(CORRELATION_KEY) String correlationKey, 
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -294,21 +311,22 @@ public class RuntimeDataResource {
 
     }
 
-    @ApiOperation(value="Returns process instances with a specified variable.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, message = "Successful response", response = ProcessInstanceList.class, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCES_RESPONSE_JSON)})) })
+    @Operation(summary="Returns process instances with a specified variable.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCES_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(PROCESS_INSTANCE_BY_VAR_NAME_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstanceByVariables(@Context HttpHeaders headers, 
-            @ApiParam(value = "variable name to filter process instance", required = true) @PathParam("varName") String variableName, 
-            @ApiParam(value = "variable value to filter process instance, optional when filtering by name only required when filtering by name and value", required = false) @QueryParam("varValue") String variableValue,
-            @ApiParam(value = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, allowableValues="1,2,3") @QueryParam("status")List<Integer> status, 
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "variable name to filter process instance", required = true) @PathParam(VAR_NAME) String variableName, 
+            @Parameter(description = "variable value to filter process instance, optional when filtering by name only required when filtering by name and value", required = false) @QueryParam("varValue") String variableValue,
+            @Parameter(description = "optional process instance status (active, completed, aborted) - defaults ot active (1) only", required = false, schema = @Schema(allowableValues = {"1", "2", "3"})) @QueryParam("status")List<Integer> status, 
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -319,16 +337,17 @@ public class RuntimeDataResource {
         return createCorrectVariant(processInstanceList, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns information about a specified process instance.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Process instance id not found"), 
-            @ApiResponse(code = 200, response = ProcessInstance.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_RESPONSE_JSON)})) })
+    @Operation(summary="Returns information about a specified process instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Process instance id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(PROCESS_INSTANCE_BY_INSTANCE_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstanceById(@Context HttpHeaders headers, 
-            @ApiParam(value = "process instance id to retrieve process instance", required = true) @PathParam(PROCESS_INST_ID) long processInstanceId, 
-            @ApiParam(value = "load process instance variables or not, defaults to false", required = false) @QueryParam("withVars") boolean withVars) {
+            @Parameter(description = "process instance id to retrieve process instance", required = true) @PathParam(PROCESS_INST_ID) long processInstanceId, 
+            @Parameter(description = "load process instance variables or not, defaults to false", required = false) @QueryParam("withVars") boolean withVars) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -342,16 +361,17 @@ public class RuntimeDataResource {
         return createCorrectVariant(processInstanceDesc, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns node instances for a specified work item in a specified process instance.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Node instance id not found"), 
-            @ApiResponse(code = 200, response = NodeInstance.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_NODE_RESPONSE_JSON)})) })
+    @Operation(summary="Returns node instances for a specified work item in a specified process instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Node instance id not found"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_NODE_RESPONSE_JSON)})
+            }) })
     @GET
     @Path(NODE_INSTANCES_BY_WORK_ITEM_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getNodeInstanceForWorkItem(@Context HttpHeaders headers, 
-            @ApiParam(value = "process instance id that work item belongs to", required = true) @PathParam(PROCESS_INST_ID) long processInstanceId, 
-            @ApiParam(value = "work item id to retrieve node instance for", required = true) @PathParam("workItemId") long workItemId) {
+            @Parameter(description = "process instance id that work item belongs to", required = true) @PathParam(PROCESS_INST_ID) long processInstanceId, 
+            @Parameter(description = "work item id to retrieve node instance for", required = true) @PathParam(WORK_ITEM_ID) long workItemId) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -365,19 +385,20 @@ public class RuntimeDataResource {
         return createCorrectVariant(nodeInstanceDesc, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns node instances for a specified process instance.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = NodeInstanceList.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_NODES_RESPONSE_JSON)}))})
+    @Operation(summary="Returns node instances for a specified process instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_NODES_RESPONSE_JSON)})
+            })})
     @GET
     @Path(NODE_INSTANCES_BY_INSTANCE_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessInstanceHistory(@Context HttpHeaders headers, 
-            @ApiParam(value = "process instance id to to retrive history for", required = true) @PathParam(PROCESS_INST_ID) long processInstanceId,
-            @ApiParam(value = "include active nodes only", required = false) @QueryParam("activeOnly") Boolean active, 
-            @ApiParam(value = "include completed nodes only", required = false) @QueryParam("completedOnly")Boolean completed,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @Parameter(description = "process instance id to to retrive history for", required = true) @PathParam(PROCESS_INST_ID) long processInstanceId,
+            @Parameter(description = "include active nodes only", required = false) @QueryParam("activeOnly") Boolean active, 
+            @Parameter(description = "include completed nodes only", required = false) @QueryParam("completedOnly")Boolean completed,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -387,15 +408,16 @@ public class RuntimeDataResource {
         return createCorrectVariant(nodeInstanceList, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns current variable values of a specified process instance.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = VariableInstanceList.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_LOG_RESPONSE_JSON)}))})
+    @Operation(summary="Returns current variable values of a specified process instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_VARS_LOG_RESPONSE_JSON)})
+            })})
     @GET
     @Path(VAR_INSTANCES_BY_INSTANCE_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getVariablesCurrentState(@Context HttpHeaders headers, 
-            @ApiParam(value = "process instance id to load variables current state (latest value) for", required = true) @PathParam(PROCESS_INST_ID) long processInstanceId) {
+            @Parameter(description = "process instance id to load variables current state (latest value) for", required = true) @PathParam(PROCESS_INST_ID) long processInstanceId) {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -406,18 +428,19 @@ public class RuntimeDataResource {
         return createCorrectVariant(variableInstanceList, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns the history of a specified variable in a specified process instance.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = VariableInstanceList.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_INSTANCE_VARS_LOG_RESPONSE_JSON)}))})
+    @Operation(summary="Returns the history of a specified variable in a specified process instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_INSTANCE_VARS_LOG_RESPONSE_JSON)})
+            })})
     @GET
     @Path(VAR_INSTANCES_BY_VAR_INSTANCE_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getVariableHistory(@Context HttpHeaders headers, 
-            @ApiParam(value = "process instance id to load variable history for", required = true) @PathParam(PROCESS_INST_ID) long processInstanceId,
-            @ApiParam(value = "variable name that history should be loaded for", required = true) @PathParam("varName") String variableName,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @Parameter(description = "process instance id to load variable history for", required = true) @PathParam(PROCESS_INST_ID) long processInstanceId,
+            @Parameter(description = "variable name that history should be loaded for", required = true) @PathParam(VAR_NAME) String variableName,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -428,19 +451,20 @@ public class RuntimeDataResource {
         return createCorrectVariant(variableInstanceList, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns all process definitions in a specified KIE container.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = ProcessDefinitionList.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEFS_RESPONSE_JSON)}))})
+    @Operation(summary="Returns all process definitions in a specified KIE container.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_DEFS_RESPONSE_JSON)})
+            })})
     @GET
     @Path(PROCESS_DEFINITIONS_BY_CONTAINER_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessesByDeploymentId(@Context HttpHeaders headers, 
-            @ApiParam(value = "container id to filter process definitions", required = true) @PathParam(CONTAINER_ID) String containerId,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "container id to filter process definitions", required = true) @PathParam(CONTAINER_ID) String containerId,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -449,19 +473,20 @@ public class RuntimeDataResource {
         return createCorrectVariant(processDefinitionList, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns all process definitions.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = ProcessDefinitionList.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEFS_RESPONSE_JSON)}))})
+    @Operation(summary="Returns all process definitions.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_DEFS_RESPONSE_JSON)})
+            })})
     @GET
     @Path(PROCESS_DEFINITIONS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessesByFilter(@Context HttpHeaders headers, 
-            @ApiParam(value = "process id or name to filter process definitions", required = false) @QueryParam("filter") String filter,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "process id or name to filter process definitions", required = false) @QueryParam("filter") String filter,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -472,15 +497,16 @@ public class RuntimeDataResource {
         return createCorrectVariant(processDefinitionList, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns all process definitions for a specified process.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = ProcessDefinitionList.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEFS_RESPONSE_JSON)}))})
+    @Operation(summary="Returns all process definitions for a specified process.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_DEFS_RESPONSE_JSON)})
+            })})
     @GET
     @Path(PROCESS_DEFINITIONS_BY_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessesById(@Context HttpHeaders headers, 
-            @ApiParam(value = "process id to load process definition", required = true) @PathParam(PROCESS_ID) String processId) {
+            @Parameter(description = "process id to load process definition", required = true) @PathParam(PROCESS_ID) String processId) {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -491,16 +517,17 @@ public class RuntimeDataResource {
         return createCorrectVariant(processDefinitionList, headers, Response.Status.OK, conversationIdHeader);
     }
 
-    @ApiOperation(value="Returns information about a specified process definition in a specified KIE container.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = ProcessDefinition.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_PROCESS_DEF_RESPONSE_JSON)}))})
+    @Operation(summary="Returns information about a specified process definition in a specified KIE container.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_PROCESS_DEF_RESPONSE_JSON)})
+            })})
     @GET
     @Path(PROCESS_DEFINITIONS_BY_CONTAINER_ID_DEF_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProcessesByDeploymentIdProcessId(@Context HttpHeaders headers, 
-            @ApiParam(value = "container id that process definition belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
-            @ApiParam(value = "process id to load process definition", required = true) @PathParam(PROCESS_ID) String processId) {
+            @Parameter(description = "container id that process definition belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
+            @Parameter(description = "process id to load process definition", required = true) @PathParam(PROCESS_ID) String processId) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -513,15 +540,16 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Returns task instances with a specified work item.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task not found for given work item id"), 
-            @ApiResponse(code = 200, response = TaskInstance.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_TASK_RESPONSE_JSON)}))})
+    @Operation(summary="Returns task instances with a specified work item.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task not found for given work item id"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_RESPONSE_JSON)})
+            })})
     @GET
     @Path(TASK_BY_WORK_ITEM_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTaskByWorkItemId(@Context HttpHeaders headers, 
-            @ApiParam(value = "work item id to load task associated with", required = true) @PathParam("workItemId") Long workItemId) {
+            @Parameter(description = "work item id to load task associated with", required = true) @PathParam(WORK_ITEM_ID) Long workItemId) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -538,16 +566,17 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Returns information about a specified task instance.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task not found for given id"), 
-                           @ApiResponse(code = 200, response = TaskInstance.class, message = "Successful response", examples = @Example(value = {
-                    @ExampleProperty(mediaType=JSON, value=GET_TASK_RESPONSE_JSON)}))})
+    @Operation(summary="Returns information about a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Task not found for given id"), 
+                           @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                               @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_RESPONSE_JSON)})
+                           })})
     @GET
     @Path(TASK_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTaskById(@Context HttpHeaders headers, 
-            @ApiParam(value = "task id to load task instance", required = true) @PathParam(TASK_INSTANCE_ID) Long taskId,
-            @ApiParam(value = "optional include SLA data - defaults to false", required = false) @QueryParam("withSLA") @DefaultValue("false") boolean withSLA) {
+            @Parameter(description = "task id to load task instance", required = true) @PathParam(TASK_INSTANCE_ID) Long taskId,
+            @Parameter(description = "optional include SLA data - defaults to false", required = false) @QueryParam("withSLA") @DefaultValue("false") boolean withSLA) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -563,20 +592,21 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Returns task instances assigned to business administrators.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-                           @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples = @Example(value = {
-                    @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
+    @Operation(summary="Returns task instances assigned to business administrators.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+                           @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                               @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_SUMMARY_RESPONSE_JSON)})
+                           })})
     @GET
     @Path(TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTasksAssignedAsBusinessAdministratorByStatus(@Context HttpHeaders headers, 
-            @ApiParam(value = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
-            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId, 
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, schema = @Schema(allowableValues = {"Created", "Ready", "Reserved", "InProgress", "Suspended", "Completed", "Failed", "Error", "Exited", "Obsolete"})) @QueryParam("status") List<String> status,
+            @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId, 
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -592,22 +622,23 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Returns tasks with a user defined as a potential owner.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-                           @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples = @Example(value = {
-                    @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
+    @Operation(summary="Returns tasks with a user defined as a potential owner.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+                           @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                               @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_SUMMARY_RESPONSE_JSON)})
+                           })})
     @GET
     @Path(TASKS_ASSIGN_POT_OWNERS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTasksAssignedAsPotentialOwner(@Context HttpHeaders headers,
-            @ApiParam(value = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,  
-            @ApiParam(value = "optional group names to include in the query", required = false, allowMultiple=true) @QueryParam("groups") List<String> groupIds,
-            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder,
-            @ApiParam(value = "optional custom filter for task data", required = false) @QueryParam("filter") String filter) {
+            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, schema = @Schema(allowableValues = {"Created", "Ready", "Reserved", "InProgress", "Suspended", "Completed", "Failed", "Error", "Exited", "Obsolete"})) @QueryParam("status") List<String> status,  
+            @Parameter(description = "optional group names to include in the query", required = false) @QueryParam("groups") List<String> groupIds,
+            @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder,
+            @Parameter(description = "optional custom filter for task data", required = false) @QueryParam("filter") String filter) {
 
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
@@ -626,20 +657,21 @@ public class RuntimeDataResource {
 
     }
 
-    @ApiOperation(value="Returns task instances that the querying user owns.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
+    @Operation(summary="Returns task instances that the querying user owns.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_SUMMARY_RESPONSE_JSON)})
+            })})
     @GET
     @Path(TASKS_OWNED_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTasksOwnedByStatus(@Context HttpHeaders headers,
-            @ApiParam(value = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status, 
-            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, schema = @Schema(allowableValues = {"Created", "Ready", "Reserved", "InProgress", "Suspended", "Completed", "Failed", "Error", "Exited", "Obsolete"})) @QueryParam("status") List<String> status, 
+            @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -656,20 +688,21 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Returns task instances associated with a specified process instance.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
+    @Operation(summary="Returns task instances associated with a specified process instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_SUMMARY_RESPONSE_JSON)})
+            })})
     @GET
     @Path(TASK_BY_PROCESS_INST_ID_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTasksByStatusByProcessInstanceId(@Context HttpHeaders headers, 
-            @ApiParam(value = "process instance id to filter task instances", required = true) @PathParam(PROCESS_INST_ID) Long processInstanceId,
-            @ApiParam(value = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status") List<String> status,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "process instance id to filter task instances", required = true) @PathParam(PROCESS_INST_ID) Long processInstanceId,
+            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, schema = @Schema(allowableValues = {"Created", "Ready", "Reserved", "InProgress", "Suspended", "Completed", "Failed", "Error", "Exited", "Obsolete"})) @QueryParam("status") List<String> status,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -685,19 +718,20 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Returns all task instances.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
+    @Operation(summary="Returns all task instances.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_SUMMARY_RESPONSE_JSON)})
+            })})
     @GET
     @Path(TASKS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getAllAuditTask(@Context HttpHeaders headers, 
-            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -714,19 +748,20 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Returns events for a specified task instance.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = TaskEventInstanceList.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_TASK_EVENTS_RESPONSE_JSON)}))})
+    @Operation(summary="Returns events for a specified task instance.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_EVENTS_RESPONSE_JSON)})
+            })})
     @GET
     @Path(TASKS_EVENTS_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTaskEvents(@Context HttpHeaders headers, 
-            @ApiParam(value = "task id to load task events for", required = true) @PathParam(TASK_INSTANCE_ID) Long taskId,
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "task id to load task events for", required = true) @PathParam(TASK_INSTANCE_ID) Long taskId,
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -741,22 +776,23 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value="Returns task instances with a specified variable.")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response = TaskSummaryList.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=GET_TASK_SUMMARY_RESPONSE_JSON)}))})
+    @Operation(summary="Returns task instances with a specified variable.")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = GET_TASK_SUMMARY_RESPONSE_JSON)})
+            })})
     @GET
     @Path(TASKS_BY_VAR_NAME_GET_URI)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getTasksByVariables(@Context HttpHeaders headers, 
-            @ApiParam(value = "name of the variable used to fiter tasks", required = true) @PathParam("varName") String variableName, 
-            @ApiParam(value = "value of the variable used to fiter tasks, optional when filtering only by name, required when filtering by both name and value", required = false) @QueryParam("varValue") String variableValue,
-            @ApiParam(value = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, allowableValues="Created, Ready, Reserved,InProgress,Suspended,Completed,Failed,Error,Exited,Obsolete") @QueryParam("status")List<String> status, 
-            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId, 
-            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
-            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort,
-            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @Parameter(description = "name of the variable used to fiter tasks", required = true) @PathParam(VAR_NAME) String variableName, 
+            @Parameter(description = "value of the variable used to fiter tasks, optional when filtering only by name, required when filtering by both name and value", required = false) @QueryParam("varValue") String variableValue,
+            @Parameter(description = "optional task status (Created, Ready, Reserved, InProgress, Suspended, Completed, Failed, Error, Exited, Obsolete)", required = false, schema = @Schema(allowableValues = {"Created", "Ready", "Reserved", "InProgress", "Suspended", "Completed", "Failed", "Error", "Exited", "Obsolete"})) @QueryParam("status")List<String> status, 
+            @Parameter(description = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId, 
+            @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @Parameter(description = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @Parameter(description = "optional sort column, no default", required = false) @QueryParam("sort") String sort,
+            @Parameter(description = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
@@ -774,21 +810,21 @@ public class RuntimeDataResource {
         }
     }
 
-    @ApiOperation(value = "Queries processes by variables and tasks", response = ProcessInstanceCustomVarsList.class)
+    @Operation(summary = "Queries processes by variables and tasks")
     @POST
-    @Path(RestURI.VARIABLES_PROCESSES_URI)
+    @Path(VARIABLES_PROCESSES_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @KieServerEndpoint(categories = {EndpointType.DEFAULT, EndpointType.HISTORY})
     public Response queryProcessesByVariables(@Context HttpHeaders headers,
                                               String payload,
-                                              @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)",
+                                              @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)",
                                                         required = false) @QueryParam("page") @DefaultValue("0") Integer page,
-                                              @ApiParam(value = "optional pagination - size of the result, defaults to 10",
+                                              @Parameter(description = "optional pagination - size of the result, defaults to 10",
                                                         required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-                                              @ApiParam(value = "optional sort column",
+                                              @Parameter(description = "optional sort column",
                                                         required = false) @QueryParam("orderBy") String orderBy,
-                                              @ApiParam(value = "optional sort direction - true ascending, false descending",
+                                              @Parameter(description = "optional sort direction - true ascending, false descending",
                                                         required = false) @QueryParam("asc") @DefaultValue("true") boolean asc) {
 
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -807,21 +843,21 @@ public class RuntimeDataResource {
 
     }
 
-    @ApiOperation(value = "Queries process tasks by variables", response = ProcessInstanceUserTaskWithVariablesList.class)
+    @Operation(summary = "Queries process tasks by variables")
     @POST
-    @Path(RestURI.VARIABLES_TASKS_PROCESSES_URI)
+    @Path(VARIABLES_TASKS_PROCESSES_URI)
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @KieServerEndpoint(categories = {EndpointType.DEFAULT, EndpointType.HISTORY})
     public Response queryUserTasksByVariables(@Context HttpHeaders headers,
                                               String payload,
-                                              @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)",
+                                              @Parameter(description = "optional pagination - at which page to start, defaults to 0 (meaning first)",
                                                         required = false) @QueryParam("page") @DefaultValue("0") Integer page,
-                                              @ApiParam(value = "optional pagination - size of the result, defaults to 10",
+                                              @Parameter(description = "optional pagination - size of the result, defaults to 10",
                                                         required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-                                              @ApiParam(value = "optional sort column",
+                                              @Parameter(description = "optional sort column",
                                                         required = false) @QueryParam("orderBy") String orderBy,
-                                              @ApiParam(value = "optional sort direction - true ascending, false descending",
+                                              @Parameter(description = "optional sort direction - true ascending, false descending",
                                                         required = false) @QueryParam("asc") @DefaultValue("true") boolean asc) {
 
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);

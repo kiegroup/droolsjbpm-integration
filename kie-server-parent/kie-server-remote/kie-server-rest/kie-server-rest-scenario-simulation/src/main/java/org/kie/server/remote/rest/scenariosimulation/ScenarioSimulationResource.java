@@ -25,11 +25,11 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Variant;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.drools.scenariosimulation.api.model.ScenarioSimulationModel;
 import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.model.KieServiceResponse;
@@ -46,7 +46,7 @@ import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVari
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 
-@Api(value = "Test scenario execution")
+@Tag(name = "Test scenario execution")
 @Path("server/" + SCENARIO_SIMULATION_URI)
 public class ScenarioSimulationResource {
 
@@ -57,15 +57,14 @@ public class ScenarioSimulationResource {
         this.scenarioSimulationService = scenarioSimulationService;
     }
 
-    @ApiOperation(value = "Execute given test scenario against specified container",
-            response = ServiceResponse.class, code = 200)
-    @ApiResponses(value = {@ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Container not found"), @ApiResponse(code = 400, message = "Malformed test scenario file")})
+    @Operation(summary = "Execute given test scenario against specified container")
+    @ApiResponses(value = {@ApiResponse(responseCode = "500", description = "Unexpected error"), @ApiResponse(responseCode = "404", description = "Container not found"), @ApiResponse(responseCode = "400", description = "Malformed test scenario file")})
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response executeSimulation(@Context HttpHeaders headers,
-                                      @ApiParam(value = "Container id", required = true) @PathParam(CONTAINER_ID) String containerId,
-                                      @ApiParam(value = "Test scenario file content to be executed", required = true) String rawContent) {
+                                      @Parameter(description = "Container id", required = true) @PathParam(CONTAINER_ID) String containerId,
+                                      @Parameter(description = "Test scenario file content to be executed", required = true) String rawContent) {
         KieContainer kieContainer = null;
         ScenarioSimulationModel model = null;
 

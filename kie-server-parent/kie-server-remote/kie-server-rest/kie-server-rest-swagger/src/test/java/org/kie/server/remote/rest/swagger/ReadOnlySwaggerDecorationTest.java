@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.kie.server.remote.rest.common.marker.KieServerEndpoint;
 import org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType;
 
-import io.swagger.models.Operation;
+import io.swagger.v3.oas.models.Operation;
 
 public class ReadOnlySwaggerDecorationTest {
 
@@ -77,8 +77,8 @@ public class ReadOnlySwaggerDecorationTest {
         ReadOnlySwaggerDecoration decoration = new ReadOnlySwaggerDecoration();
         Operation operation = new Operation();
         decoration.decorateOperation(operation, TestSimpleOperations.class.getMethod("test1"), emptyListIterator());
-
-        Assert.assertThat(operation.getVendorExtensions().keySet(), hasItems(SWAGGER_EXTENSION_READ_ONLY));
+        Assert.assertNotNull(operation.getExtensions());
+        Assert.assertThat(operation.getExtensions().keySet(), hasItems(SWAGGER_EXTENSION_READ_ONLY));
     }
 
     @Test
@@ -86,8 +86,7 @@ public class ReadOnlySwaggerDecorationTest {
         ReadOnlySwaggerDecoration decoration = new ReadOnlySwaggerDecoration();
         Operation operation = new Operation();
         decoration.decorateOperation(operation, TestSimpleOperations.class.getMethod("test2"), emptyListIterator());
-
-        Assert.assertThat(operation.getVendorExtensions().keySet(), not(hasItems(SWAGGER_EXTENSION_READ_ONLY)));
+        Assert.assertNull(operation.getExtensions());
     }
 
     @Test
@@ -95,9 +94,7 @@ public class ReadOnlySwaggerDecorationTest {
         ReadOnlySwaggerDecoration decoration = new ReadOnlySwaggerDecoration();
         Operation operation = new Operation();
         decoration.decorateOperation(operation, TestAnnotationOperations.class.getMethod("test1"), emptyListIterator());
-
-        Assert.assertThat(operation.getVendorExtensions().keySet(), not(hasItems(SWAGGER_EXTENSION_READ_ONLY)));
-
+        Assert.assertNull(operation.getExtensions());
     }
 
     @Test
@@ -105,8 +102,8 @@ public class ReadOnlySwaggerDecorationTest {
         ReadOnlySwaggerDecoration decoration = new ReadOnlySwaggerDecoration();
         Operation operation = new Operation();
         decoration.decorateOperation(operation, TestAnnotationOperations.class.getMethod("test2"), emptyListIterator());
-
-        Assert.assertThat(operation.getVendorExtensions().keySet(), hasItems(SWAGGER_EXTENSION_READ_ONLY));
+        Assert.assertNotNull(operation.getExtensions());
+        Assert.assertThat(operation.getExtensions().keySet(), hasItems(SWAGGER_EXTENSION_READ_ONLY));
     }
 
     @Test
@@ -114,7 +111,7 @@ public class ReadOnlySwaggerDecorationTest {
         ReadOnlySwaggerDecoration decoration = new ReadOnlySwaggerDecoration();
         Operation operation = new Operation();
         decoration.decorateOperation(operation, TestTypeAnnotationOperations.class.getMethod("test1"), emptyListIterator());
-        Assert.assertThat(operation.getVendorExtensions().keySet(), not(hasItems(SWAGGER_EXTENSION_READ_ONLY)));
+        Assert.assertNull(operation.getExtensions());
 
     }
 
@@ -123,6 +120,7 @@ public class ReadOnlySwaggerDecorationTest {
         ReadOnlySwaggerDecoration decoration = new ReadOnlySwaggerDecoration();
         Operation operation = new Operation();
         decoration.decorateOperation(operation, TestTypeAnnotationOperations.class.getMethod("test2"), emptyListIterator());
-        Assert.assertThat(operation.getVendorExtensions().keySet(), hasItems(SWAGGER_EXTENSION_READ_ONLY));
+        Assert.assertNotNull(operation.getExtensions());
+        Assert.assertThat(operation.getExtensions().keySet(), hasItems(SWAGGER_EXTENSION_READ_ONLY));
     }
 }

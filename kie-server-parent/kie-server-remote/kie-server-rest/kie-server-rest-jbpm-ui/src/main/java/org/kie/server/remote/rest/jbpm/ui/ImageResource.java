@@ -44,13 +44,13 @@ import org.kie.server.services.jbpm.ui.ImageServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
-@Api(value = "Process images")
+@Tag(name = "Process images")
 @Path("server/" + IMAGE_URI)
 public class ImageResource {
 
@@ -67,16 +67,15 @@ public class ImageResource {
         this.context = context;
     }
 
-    @ApiOperation(value = "Returns an SVG image file of a specified process definition diagram.",
-            response = String.class, code = 200)
-    @ApiResponses(value = {@ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process definition, image or Container Id not found")})
+    @Operation(summary = "Returns an SVG image file of a specified process definition diagram.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process definition, image or Container Id not found")})
     @GET
     @Path(PROCESS_IMG_GET_URI)
     @Produces({MediaType.APPLICATION_SVG_XML})
     public Response getProcessImage(@jakarta.ws.rs.core.Context HttpHeaders headers,
-            @ApiParam(value = "container id that process definition belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
-            @ApiParam(value = "identifier of the process definition that image should be loaded for", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId) {
+            @Parameter(description = "container id that process definition belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+            @Parameter(description = "identifier of the process definition that image should be loaded for", required = true, example = "evaluation") @PathParam(PROCESS_ID) String processId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -92,21 +91,20 @@ public class ImageResource {
         }
     }
 
-    @ApiOperation(value = "Returns an annotated SVG image file of a specified process instance diagram.",
-            response = String.class, code = 200)
-    @ApiResponses(value = {@ApiResponse(code = 500, message = "Unexpected error"),
-            @ApiResponse(code = 404, message = "Process instance, image or Container Id not found")})
+    @Operation(summary = "Returns an annotated SVG image file of a specified process instance diagram.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "500", description = "Unexpected error"),
+            @ApiResponse(responseCode = "404", description = "Process instance, image or Container Id not found")})
     @GET
     @Path(PROCESS_INST_IMG_GET_URI)
     @Produces({MediaType.APPLICATION_SVG_XML})
     public Response getProcessInstanceImage(@jakarta.ws.rs.core.Context HttpHeaders headers,
-                                            @ApiParam(value = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
-                                            @ApiParam(value = "identifier of the process instance that image should be loaded for", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long procInstId,
-                                            @ApiParam(value = "svg completed node color", required = false, example = COMPLETED_COLOR) @QueryParam(SVG_NODE_COMPLETED_COLOR) @DefaultValue(COMPLETED_COLOR) String svgNodeCompletedColor,
-                                            @ApiParam(value = "svg completed node border color", required = false, example = COMPLETED_BORDER_COLOR) @QueryParam(SVG_NODE_COMPLETED_BORDER_COLOR) @DefaultValue(COMPLETED_BORDER_COLOR) String svgNodeCompletedBorderColor,
-                                            @ApiParam(value = "svg active node border color", required = false, example = ACTIVE_BORDER_COLOR) @QueryParam(SVG_NODE_ACTIVE_COLOR) @DefaultValue(ACTIVE_BORDER_COLOR) String svgActiveNodeBorderColor,
-                                            @ApiParam(value = "show or hidden instance badges", required = false, example = SHOW_INSTANCE_BADGES_DEFAULT) @QueryParam(SVG_INSTANCE_BADGES_SHOW) @DefaultValue(SHOW_INSTANCE_BADGES_DEFAULT) boolean showBadges,
-                                            @ApiParam(value = "svg active async node border color", required = false, example = ACTIVE_ASYNC_BORDER_COLOR) @QueryParam(SVG_NODE_ACTIVE_ASYNC_BORDER_COLOR) @DefaultValue(ACTIVE_ASYNC_BORDER_COLOR) String svgActiveAsyncNodeBorderColor) {
+                                            @Parameter(description = "container id that process instance belongs to", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String containerId,
+                                            @Parameter(description = "identifier of the process instance that image should be loaded for", required = true, example = "123") @PathParam(PROCESS_INST_ID) Long procInstId,
+                                            @Parameter(description = "svg completed node color", required = false, example = COMPLETED_COLOR) @QueryParam(SVG_NODE_COMPLETED_COLOR) @DefaultValue(COMPLETED_COLOR) String svgNodeCompletedColor,
+                                            @Parameter(description = "svg completed node border color", required = false, example = COMPLETED_BORDER_COLOR) @QueryParam(SVG_NODE_COMPLETED_BORDER_COLOR) @DefaultValue(COMPLETED_BORDER_COLOR) String svgNodeCompletedBorderColor,
+                                            @Parameter(description = "svg active node border color", required = false, example = ACTIVE_BORDER_COLOR) @QueryParam(SVG_NODE_ACTIVE_COLOR) @DefaultValue(ACTIVE_BORDER_COLOR) String svgActiveNodeBorderColor,
+                                            @Parameter(description = "show or hidden instance badges", required = false, example = SHOW_INSTANCE_BADGES_DEFAULT) @QueryParam(SVG_INSTANCE_BADGES_SHOW) @DefaultValue(SHOW_INSTANCE_BADGES_DEFAULT) boolean showBadges,
+                                            @Parameter(description = "svg active async node border color", required = false, example = ACTIVE_ASYNC_BORDER_COLOR) @QueryParam(SVG_NODE_ACTIVE_ASYNC_BORDER_COLOR) @DefaultValue(ACTIVE_ASYNC_BORDER_COLOR) String svgActiveAsyncNodeBorderColor) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {

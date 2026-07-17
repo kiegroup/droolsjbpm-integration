@@ -31,10 +31,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import javassist.bytecode.DuplicateMemberException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -175,13 +175,17 @@ public class InjectReactiveMojo extends AbstractKieMojo {
             byte[] enhancedBytecode;
             try {
                 enhancedBytecode = enhancer.injectReactive(ctClass.getName());
-                
-                writeOutEnhancedClass( enhancedBytecode, ctClass, file );
 
-                getLog().info( "Successfully enhanced class [" + ctClass.getName() + "]" );
+                writeOutEnhancedClass(enhancedBytecode, ctClass, file);
+
+                getLog().info("Successfully enhanced class [" + ctClass.getName() + "]");
+            } catch (DuplicateMemberException e) {
+                // Class was already instrumented (e.g. from stale jar re-exploded into target/classes).
+                // This is idempotent — skip silently.
+                getLog().warn("Skipping already-instrumented class: " + ctClass.getName() + " due to " + e.getMessage() );
             } catch (Exception e) {
                 getLog().error( "ERROR while trying to enhanced class [" + ctClass.getName() + "]" );
-                e.printStackTrace();
+                getLog().error( e.getMessage(), e );
                 if (failOnError) {
                     throw new MojoExecutionException("ERROR while trying to enhanced class [" + ctClass.getName() + "]", e);
                 } else {
@@ -191,7 +195,7 @@ public class InjectReactiveMojo extends AbstractKieMojo {
             
         }
     }
-    
+
     private CtClass toCtClass(File file, ClassPool classPool) throws MojoExecutionException {
         try {
             final InputStream is = new FileInputStream( file.getAbsolutePath() );

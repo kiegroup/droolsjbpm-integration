@@ -16,18 +16,22 @@
 
 package org.kie.server.controller.common;
 
+import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
+import io.swagger.v3.oas.integration.OpenApiConfigurationException;
+import io.swagger.v3.oas.integration.SwaggerConfiguration;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.servers.Server;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
-import io.swagger.jaxrs.config.BeanConfig;
-import io.swagger.jaxrs.config.DefaultJaxrsScanner;
-import io.swagger.jaxrs.config.JaxrsScanner;
-import io.swagger.jaxrs.config.SwaggerContextService;
-import io.swagger.jaxrs.config.SwaggerScannerLocator;
 import org.kie.server.controller.api.KieServerControllerConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @WebListener
 public class SwaggerAPIScanner implements ServletContextListener {
@@ -44,25 +48,34 @@ public class SwaggerAPIScanner implements ServletContextListener {
         }
 
         LOGGER.info("Starting Swagger API discovery");
+        OpenAPI oas = new OpenAPI();
+        oas.info(getInfo());
+        oas.addServersItem(new Server().url(sce.getServletContext().getContextPath() + "/rest"));
 
-        JaxrsScanner jaxrsScanner = new DefaultJaxrsScanner();
-        jaxrsScanner.setPrettyPrint(true);
-        /*
-         * Set our JAX-RS Scanner with SCANNER_ID_DEFAULT.
-         * We need to do this before creating the BeanConfig, as this prevents the BeanConfig to register itself as the default scanner.
-         * The first one wins.
-         */
-        SwaggerScannerLocator.getInstance().putScanner((SwaggerContextService.SCANNER_ID_DEFAULT), jaxrsScanner);
+        SwaggerConfiguration oasConfig = new SwaggerConfiguration()
+                .openAPI(oas)
+                .prettyPrint(true)
+                .resourcePackages(Stream.of("org.kie.server").collect(Collectors.toSet())); // chek packages here
 
-        BeanConfig beanConfig = new BeanConfig();
-        beanConfig.setBasePath(sce.getServletContext().getContextPath() + "/rest");
-        beanConfig.setVersion("7.0");
-        beanConfig.setTitle("Controller API");
-        beanConfig.setPrettyPrint(true);
-        beanConfig.setScan();
+        try {
+            new JaxrsOpenApiContextBuilder()
+                    .openApiConfiguration(oasConfig)
+                    .buildContext(true);
+        } catch (OpenApiConfigurationException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+    }
+
+    private Info getInfo() {
+        Info info = new Info();
+        // version in general refers to major version of the project (kie server) though it uses minor as well to allow emergency type of changesinfo.setTitle("KIE-Server API");
+        // must be updated with every major release
+        info.setVersion("7.0");
+        info.setTitle("Controller API");
+        return info;
     }
 }

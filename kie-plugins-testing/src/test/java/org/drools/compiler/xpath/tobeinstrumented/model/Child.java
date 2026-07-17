@@ -20,7 +20,7 @@ import java.util.List;
 
 public class Child extends Person {
 
-    private final List<Toy> toys = new ArrayList<Toy>();
+    private List<Toy> toys = new ArrayList<Toy>();
     private String mother;
 
     public Child(String name,

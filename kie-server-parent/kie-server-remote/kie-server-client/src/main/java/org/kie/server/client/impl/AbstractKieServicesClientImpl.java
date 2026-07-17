@@ -68,7 +68,7 @@ public abstract class AbstractKieServicesClientImpl {
 
     private static Logger logger = LoggerFactory.getLogger(AbstractKieServicesClientImpl.class);
 
-    protected static final Boolean BYPASS_AUTH_USER = Boolean.parseBoolean(System.getProperty(KieServerConstants.CFG_BYPASS_AUTH_USER, "false"));
+    protected static Boolean BYPASS_AUTH_USER = Boolean.parseBoolean(System.getProperty(KieServerConstants.CFG_BYPASS_AUTH_USER, "false"));
 
     protected LoadBalancer loadBalancer;
     protected final KieServicesConfiguration config;

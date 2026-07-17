@@ -61,7 +61,8 @@ public abstract class BaseKieServicesClientTest {
             .keystorePath("src/test/resources/2wayssl/wiremock.jks")
             .keystorePassword("password")
             .trustStorePath("src/test/resources/2wayssl/server-truststore.jks")
-            .trustStorePassword("password")
+            .trustStorePassword("password"),
+            false
     );
 
     public static int findFreePort() {

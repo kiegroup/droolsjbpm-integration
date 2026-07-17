@@ -19,7 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
+import io.swagger.v3.oas.integration.OpenApiConfigurationException;
+import io.swagger.v3.oas.integration.SwaggerConfiguration;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.servers.Server;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.model.Message;
@@ -30,13 +38,6 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
-
-import io.swagger.jaxrs.config.BeanConfig;
-import io.swagger.jaxrs.config.DefaultJaxrsScanner;
-import io.swagger.jaxrs.config.JaxrsScanner;
-import io.swagger.jaxrs.config.SwaggerContextService;
-import io.swagger.jaxrs.config.SwaggerScannerLocator;
-import io.swagger.models.Info;
 
 public class SwaggerKieServerExtension implements KieServerExtension {
 
@@ -62,27 +63,26 @@ public class SwaggerKieServerExtension implements KieServerExtension {
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {    	
     	this.context = registry;
-    	
-    	JaxrsScanner jaxrsScanner = new DefaultJaxrsScanner();
-    	jaxrsScanner.setPrettyPrint(true);
-    	/*
-    	 * Set our JAX-RS Scanner with SCANNER_ID_DEFAULT.
-    	 * We need to do this before creating the BeanConfig, as this prevents the BeanConfig to register itself as the default scanner.
-    	 * The first one wins.
-    	 */
-    	SwaggerScannerLocator.getInstance().putScanner((SwaggerContextService.SCANNER_ID_DEFAULT), jaxrsScanner);
+        OpenAPI oas = new OpenAPI();
+        oas.info(getInfo());
 
-    	BeanConfig beanConfig = new BeanConfig();
-		
-    	String contextRoot = KieServerEnvironment.getContextRoot();
-    	if (contextRoot != null) {
-    		beanConfig.setBasePath(contextRoot + "/services/rest");
-    	}
-		
-    	//Set the Info on the Swagger object, not on the BeanConfig ... otherwise the Info on Swagger (which will be 'null') will override the Info we set on the BeanConfig.
-    	beanConfig.getSwagger().setInfo(getInfo());
-    	beanConfig.setScan(true);
-		
+        String contextRoot = KieServerEnvironment.getContextRoot();
+        if (contextRoot != null) {
+            oas.addServersItem(new Server().url(contextRoot + "/services/rest"));
+        }
+
+        SwaggerConfiguration oasConfig = new SwaggerConfiguration()
+                .openAPI(oas)
+                .prettyPrint(true)
+                .resourcePackages(Stream.of("org.kie.server.remote.rest").collect(Collectors.toSet())); // chek packages here
+
+        try {
+            new JaxrsOpenApiContextBuilder()
+                    .openApiConfiguration(oasConfig)
+                    .buildContext(true);
+        } catch (OpenApiConfigurationException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     	initialized = true;
     }
     

@@ -20,6 +20,8 @@ import static org.kie.server.remote.rest.common.docs.ParameterSamples.EXECUTE_CM
 import static org.kie.server.remote.rest.common.docs.ParameterSamples.EXECUTE_CMD_RESPONSE_JSON;
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -34,15 +36,13 @@ import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
-@Api(value="KIE Server and KIE containers")
+@Tag(name="KIE Server and KIE containers")
 @Path("server/config")
 public class KieServerResource {
 
@@ -57,16 +57,18 @@ public class KieServerResource {
         this.delegate = delegate;
     }
 
-    @ApiOperation(value="Executes one or more KIE Server commands for server-related or container-related operations")
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), 
-            @ApiResponse(code = 200, response=ServiceResponsesList.class, message = "Successful response", examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=EXECUTE_CMD_RESPONSE_JSON)})) })
+    @Operation(summary="Executes one or more KIE Server commands for server-related or container-related operations")
+    @ApiResponses(value = { @ApiResponse(responseCode = "500", description = "Unexpected error"), 
+            @ApiResponse(responseCode = "200", description = "Successful response", content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = EXECUTE_CMD_RESPONSE_JSON)})
+            }) })
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response executeCommands(@Context HttpHeaders headers, 
-            @ApiParam(value = "command script payload", required = true, examples=@Example(value= {
-                    @ExampleProperty(mediaType=JSON, value=EXECUTE_CMD_JSON)})) String commandScriptPayload ) {
+            @Parameter(description = "command script payload", required = true, content = {
+                @Content(mediaType = JSON, examples = {@ExampleObject(value = EXECUTE_CMD_JSON)})
+            }) String commandScriptPayload ) {
 
         String contentType = getContentType(headers);
 
