@@ -15,6 +15,7 @@
 
 package org.kie.server.services.impl;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 import org.kie.server.api.KieServerEnvironment;
@@ -44,7 +45,7 @@ public class ContainerManager {
         String str = containers.stream().map(KieContainerResource::toString).collect(joining("\n\t"));
         logger.info("About to install containers on kie server \n\t{}:\n\t{}", kieServer, str);
 
-        for (KieContainerResource containerResource : containers) {
+        for (KieContainerResource containerResource : new ArrayList<KieContainerResource>(containers)) {
             if (KieContainerStatus.STARTED.equals(containerResource.getStatus())) {
                 kieServer.createContainer(containerResource.getContainerId(), containerResource);
             } else if (KieContainerStatus.DEACTIVATED.equals(containerResource.getStatus())) {
