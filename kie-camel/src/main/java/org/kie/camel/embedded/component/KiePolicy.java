@@ -27,7 +27,9 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
-import org.apache.camel.component.cxf.CxfConstants;
+import org.apache.camel.Route;
+import org.apache.camel.NamedNode;
+import org.apache.camel.component.cxf.common.message.CxfConstants;
 import org.apache.camel.component.cxf.CxfSpringEndpoint;
 import org.apache.camel.model.BeanDefinition;
 import org.apache.camel.model.DataFormatDefinition;
@@ -39,7 +41,6 @@ import org.apache.camel.model.UnmarshalDefinition;
 import org.apache.camel.model.dataformat.JaxbDataFormat;
 import org.apache.camel.model.dataformat.XStreamDataFormat;
 import org.apache.camel.spi.Policy;
-import org.apache.camel.spi.RouteContext;
 import org.drools.compiler.runtime.pipeline.impl.DroolsJaxbHelperProviderImpl;
 import org.drools.core.util.StringUtils;
 import org.kie.api.runtime.CommandExecutor;
@@ -55,22 +56,25 @@ public class KiePolicy implements Policy {
     // this should be the same namespace defined in META-INF/org.apache.camel.component file
     public static final String URI_PREFIX = "kie-local:";
 
-    public void beforeWrap(RouteContext routeContext, ProcessorDefinition<?> processorDefinition) {
-        augmentNodes(routeContext, processorDefinition, new HashSet<Object>());
+    @Override
+    public void beforeWrap(Route route, NamedNode definition) {
+        if (definition instanceof ProcessorDefinition) {
+            augmentNodes(route, (ProcessorDefinition<?>) definition, new HashSet<Object>());
+        }
     }
 
-    public Processor wrap(RouteContext routeContext, Processor processor) {
-        RouteDefinition routeDef = routeContext.getRoute();
+    @Override
+    public Processor wrap(Route route, Processor processor) {
+        NamedNode routeNode = route.getRoute();
+        if (routeNode instanceof RouteDefinition) {
+            RouteDefinition routeDef = (RouteDefinition) routeNode;
+            ToDefinition toKie = getKieNode(routeDef);
 
-        ToDefinition toKie = getKieNode(routeDef);
-
-        Processor returnedProcessor;
-        if (toKie != null) {
-            returnedProcessor = new KieProcess(toKie.getUri(), processor);
-        } else {
-            returnedProcessor = processor;
+            if (toKie != null) {
+                return new KieProcess(toKie.getUri(), processor);
+            }
         }
-        return returnedProcessor;
+        return processor;
     }
 
     private ToDefinition getKieNode(RouteDefinition routeDef) {
@@ -84,7 +88,7 @@ public class KiePolicy implements Policy {
         return toDrools;
     }
 
-    public static void augmentNodes(RouteContext routeContext, ProcessorDefinition<?> nav, Set visited) {
+    public static void augmentNodes(Route route, ProcessorDefinition<?> nav, Set visited) {
         if (!nav.getOutputs().isEmpty()) {
 
             List<ProcessorDefinition<?>> outputs = nav.getOutputs();
@@ -113,19 +117,19 @@ public class KiePolicy implements Policy {
                 } else if (child instanceof MarshalDefinition) {
                     MarshalDefinition m = (MarshalDefinition)child;
                     DataFormatDefinition dformatDefinition = m.getDataFormatType();
-                    dformatDefinition = processDataFormatType(routeContext, m.getRef(), dformatDefinition);
+                    dformatDefinition = processDataFormatType(route, null, dformatDefinition);
                     m.setDataFormatType(dformatDefinition); // repoint the marshaller, if it was cloned
                 } else if (child instanceof UnmarshalDefinition) {
                     UnmarshalDefinition m = (UnmarshalDefinition)child;
                     DataFormatDefinition dformatDefinition = m.getDataFormatType();
-                    dformatDefinition = processDataFormatType(routeContext, m.getRef(), dformatDefinition);
+                    dformatDefinition = processDataFormatType(route, null, dformatDefinition);
                     m.setDataFormatType(dformatDefinition); // repoint the marshaller, if it was cloned
                 }
             }
 
             for (Iterator<ProcessorDefinition<?>> it = nav.getOutputs().iterator(); it.hasNext();) {
                 ProcessorDefinition child = it.next();
-                augmentNodes(routeContext, child, visited);
+                augmentNodes(route, child, visited);
             }
         }
     }
@@ -151,7 +155,7 @@ public class KiePolicy implements Policy {
         }
     }
 
-    private static DataFormatDefinition processDataFormatType(RouteContext routeContext,
+    private static DataFormatDefinition processDataFormatType(Route route,
                                                               String ref,
                                                               DataFormatDefinition dformatDefinition) {
         if ( dformatDefinition == null ) {
@@ -165,7 +169,8 @@ public class KiePolicy implements Policy {
             } else if ( "jaxb".equals( ref ) ) {
                 dformatDefinition = new JaxbDataFormat();
             } else {
-                dformatDefinition = routeContext.getCamelContext().resolveDataFormatDefinition(ref);
+                // For other refs, leave the data format definition unchanged in Camel 3.x
+                return dformatDefinition;
             }
         }
         // always clone before changing

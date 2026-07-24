@@ -91,15 +91,15 @@ public class XStreamBatchExecutionTest extends CamelTestSupport {
     }
 
     @Override
-    protected Context createJndiContext() throws Exception {
-        Context context = super.createJndiContext();
+    protected org.apache.camel.spi.Registry createCamelRegistry() throws Exception {
+        org.apache.camel.spi.Registry registry = super.createCamelRegistry();
         if (exec != null) {
-            context.bind("ksession1", this.exec);
+            registry.bind("ksession1", this.exec);
         }
         if (exec2 != null) {
-            context.bind("ksession2", this.exec2);
+            registry.bind("ksession2", this.exec2);
         }
-        return context;
+        return registry;
     }
 
     @Override

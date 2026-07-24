@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.apache.camel.impl.DefaultProducer;
+import org.apache.camel.support.DefaultProducer;
 import org.kie.api.KieServices;
 import org.kie.api.command.Command;
 import org.kie.server.api.model.ServiceResponse;

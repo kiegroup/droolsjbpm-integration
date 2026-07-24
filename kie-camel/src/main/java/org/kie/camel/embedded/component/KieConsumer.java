@@ -18,7 +18,7 @@ package org.kie.camel.embedded.component;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.apache.camel.impl.DefaultConsumer;
+import org.apache.camel.support.DefaultConsumer;
 import org.drools.core.command.runtime.RegisterChannelCommand;
 import org.drools.core.command.runtime.UnregisterChannelCommand;
 import org.kie.api.runtime.Channel;

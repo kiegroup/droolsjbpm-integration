@@ -76,14 +76,11 @@ public abstract class KieCamelTestSupport extends CamelTestSupport {
     }
 
     @Override
-    protected Context createJndiContext() throws Exception {
-        // Overriding this method is necessary in the absence of a spring application context
-        // to bootstrap the whole thing. Create another Spring based unit test with all the beans
-        // defined as below and remove this comment from here.
-        // create
-        jndiContext = super.createJndiContext();
-        configureDroolsContext(jndiContext);
-        return jndiContext;
+    protected org.apache.camel.spi.Registry createCamelRegistry() throws Exception {
+        org.apache.camel.spi.Registry registry = super.createCamelRegistry();
+        this.jndiContext = new RegistryContext(registry);
+        configureDroolsContext(this.jndiContext);
+        return registry;
     }
 
     protected abstract void configureDroolsContext(Context jndiContext);
@@ -129,7 +126,7 @@ public abstract class KieCamelTestSupport extends CamelTestSupport {
     public JAXBContext getJaxbContext() {
         if (this.jaxbContext == null) {
             JaxbDataFormat def = new JaxbDataFormat();
-            def.setPrettyPrint(true);
+            def.setPrettyPrint("true");
             // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
             def.setContextPath("org.drools.model:org.kie.pipeline.camel");
             // def.setContextPath( "org.kie.pipeline.camel" );
@@ -149,8 +146,7 @@ public abstract class KieCamelTestSupport extends CamelTestSupport {
 
                 def = KiePolicy.augmentJaxbDataFormatDefinition(def);
 
-                org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = (org.apache.camel.converter.jaxb.JaxbDataFormat)def.getDataFormat(this.context.getRoutes().get(0)
-                    .getRouteContext());
+                org.apache.camel.converter.jaxb.JaxbDataFormat jaxbDataformat = (org.apache.camel.converter.jaxb.JaxbDataFormat)def.getDataFormat();
 
                 jaxbDataformat.setCamelContext(routeBuilder.getContext());
                 try {
@@ -165,5 +161,165 @@ public abstract class KieCamelTestSupport extends CamelTestSupport {
         }
 
         return jaxbContext;
+    }
+
+
+    protected static class RegistryContext implements javax.naming.Context {
+
+        private final org.apache.camel.spi.Registry registry;
+
+        RegistryContext(org.apache.camel.spi.Registry registry) {
+            this.registry = registry;
+        }
+
+        @Override
+        public Object lookup(String name) throws javax.naming.NamingException {
+            return registry.lookupByName(name);
+        }
+
+        @Override
+        public Object lookup(javax.naming.Name name) throws javax.naming.NamingException {
+            return lookup(name.toString());
+        }
+
+        @Override
+        public void bind(String name, Object obj) throws javax.naming.NamingException {
+            registry.bind(name, obj);
+        }
+
+        @Override
+        public void bind(javax.naming.Name name, Object obj) throws javax.naming.NamingException {
+            bind(name.toString(), obj);
+        }
+
+        @Override
+        public void rebind(String name, Object obj) throws javax.naming.NamingException {
+            bind(name, obj);
+        }
+
+        @Override
+        public void rebind(javax.naming.Name name, Object obj) throws javax.naming.NamingException {
+            bind(name.toString(), obj);
+        }
+
+        @Override
+        public void unbind(String name) throws javax.naming.NamingException {
+            throw new javax.naming.OperationNotSupportedException();
+        }
+
+        @Override
+        public void unbind(javax.naming.Name name) throws javax.naming.NamingException {
+            unbind(name.toString());
+        }
+
+        @Override
+        public void rename(String oldName, String newName) throws javax.naming.NamingException {
+            throw new javax.naming.OperationNotSupportedException();
+        }
+
+        @Override
+        public void rename(javax.naming.Name oldName, javax.naming.Name newName) throws javax.naming.NamingException {
+            rename(oldName.toString(), newName.toString());
+        }
+
+        @Override
+        public javax.naming.NamingEnumeration<javax.naming.NameClassPair> list(String name)
+                throws javax.naming.NamingException {
+            throw new javax.naming.OperationNotSupportedException();
+        }
+
+        @Override
+        public javax.naming.NamingEnumeration<javax.naming.NameClassPair> list(javax.naming.Name name)
+                throws javax.naming.NamingException {
+            return list(name.toString());
+        }
+
+        @Override
+        public javax.naming.NamingEnumeration<javax.naming.Binding> listBindings(String name)
+                throws javax.naming.NamingException {
+            throw new javax.naming.OperationNotSupportedException();
+        }
+
+        @Override
+        public javax.naming.NamingEnumeration<javax.naming.Binding> listBindings(javax.naming.Name name)
+                throws javax.naming.NamingException {
+            return listBindings(name.toString());
+        }
+
+        @Override
+        public void destroySubcontext(String name) throws javax.naming.NamingException {
+            throw new javax.naming.OperationNotSupportedException();
+        }
+
+        @Override
+        public void destroySubcontext(javax.naming.Name name) throws javax.naming.NamingException {
+            destroySubcontext(name.toString());
+        }
+
+        @Override
+        public javax.naming.Context createSubcontext(String name) throws javax.naming.NamingException {
+            throw new javax.naming.OperationNotSupportedException();
+        }
+
+        @Override
+        public javax.naming.Context createSubcontext(javax.naming.Name name) throws javax.naming.NamingException {
+            return createSubcontext(name.toString());
+        }
+
+        @Override
+        public Object lookupLink(String name) throws javax.naming.NamingException {
+            return lookup(name);
+        }
+
+        @Override
+        public Object lookupLink(javax.naming.Name name) throws javax.naming.NamingException {
+            return lookup(name.toString());
+        }
+
+        @Override
+        public javax.naming.NameParser getNameParser(String name) throws javax.naming.NamingException {
+            throw new javax.naming.OperationNotSupportedException();
+        }
+
+        @Override
+        public javax.naming.NameParser getNameParser(javax.naming.Name name) throws javax.naming.NamingException {
+            return getNameParser(name.toString());
+        }
+
+        @Override
+        public javax.naming.Name composeName(javax.naming.Name name, javax.naming.Name prefix)
+                throws javax.naming.NamingException {
+            throw new javax.naming.OperationNotSupportedException();
+        }
+
+        @Override
+        public String composeName(String name, String prefix) throws javax.naming.NamingException {
+            throw new javax.naming.OperationNotSupportedException();
+        }
+
+        @Override
+        public Object addToEnvironment(String propName, Object propVal) throws javax.naming.NamingException {
+            return null;
+        }
+
+        @Override
+        public Object removeFromEnvironment(String propName) throws javax.naming.NamingException {
+            return null;
+        }
+
+        @Override
+        public java.util.Hashtable<?, ?> getEnvironment() throws javax.naming.NamingException {
+            return new java.util.Hashtable<>();
+        }
+
+        @Override
+        public void close() throws javax.naming.NamingException {
+            // no-op
+        }
+
+        @Override
+        public String getNameInNamespace() throws javax.naming.NamingException {
+            return "";
+        }
     }
 }

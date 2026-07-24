@@ -162,7 +162,7 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends KieCamelTestSuppo
         routeBuilder = new RouteBuilder() {
             public void configure() throws Exception {
                 JaxbDataFormat def = new JaxbDataFormat();
-                def.setPrettyPrint(true);
+                def.setPrettyPrint("true");
                 // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
                 def.setContextPath("org.kie.pipeline.camel");
 

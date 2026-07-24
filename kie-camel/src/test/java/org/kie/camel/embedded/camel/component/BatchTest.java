@@ -127,10 +127,13 @@ public abstract class BatchTest extends CamelTestSupport {
         }
     }
 
-    protected Context createJndiContext() throws Exception {
-        Context context = super.createJndiContext();
-        context.bind("ksession1", this.exec);
-        return context;
+    @Override
+    protected org.apache.camel.spi.Registry createCamelRegistry() throws Exception {
+        org.apache.camel.spi.Registry registry = super.createCamelRegistry();
+        if (this.exec != null) {
+            registry.bind("ksession1", this.exec);
+        }
+        return registry;
     }
 
     public void setUp() throws Exception {
