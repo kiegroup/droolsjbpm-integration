@@ -1112,7 +1112,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
 
             List<ExecutionErrorInstance> errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
             assertNotNull(errors);
-            assertEquals(0, errors.size());
+            Assertions.assertThat(errors).as("Check there are no errors before.").isEmpty();
 
             try {
                 processClient.signalProcessInstance(CONTAINER_ID, processInstanceId, "Signal1", null);
@@ -1123,7 +1123,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
 
             errors = processAdminClient.getErrorsByProcessInstance(CONTAINER_ID, processInstanceId, false, 0, 10);
             assertNotNull(errors);
-            assertEquals(1, errors.size());
+            Assertions.assertThat(errors).as("Check that the previous error is returned.").hasSize(1);
             ExecutionErrorInstance errorInstance = errors.get(0);
             assertNotNull(errorInstance.getErrorId());
             assertNull(errorInstance.getError());
