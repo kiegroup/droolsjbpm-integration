@@ -32,9 +32,11 @@
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.poi/${karaf.servicemix.version.org.apache.poi}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlbeans/${karaf.servicemix.version.org.apache.xmlbeans}</bundle>
     <bundle>mvn:org.apache.commons/commons-compress/${version.org.apache.commons.compress}</bundle>
+    <bundle>mvn:commons-io/commons-io/${version.commons-io}</bundle>
     <bundle>mvn:org.apache.commons/commons-math3/${version.org.apache.commons.math3}</bundle>
     <bundle>mvn:org.apache.santuario/xmlsec/${karaf.version.org.apache.santurio}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlresolver/${karaf.servicemix.version.xmlresolver}</bundle>
+    <bundle start-level="100">mvn:org.apache.logging.log4j/log4j-api/${karaf.version.org.apache.logging.log4j}</bundle>
   </feature>
 
   <feature name="drools-wb-guided-decisiontables" description="Drools Workbench Guided Decision Tables" version="${project.version}">
@@ -66,7 +68,7 @@
     <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.scripting-api-1.0/${karaf.servicemix.version.scripting-api}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.quartz/${karaf.servicemix.version.org.quartz-scheduler}</bundle>
     <bundle>mvn:jakarta.security.jacc/jakarta.security.jacc-api/${version.jakarta.security.jacc-api}</bundle>
-    <bundle>mvn:joda-time/joda-time/${karaf.version.joda-time}</bundle>
+    <bundle>wrap:mvn:joda-time/joda-time/${karaf.version.joda-time}</bundle>
     <bundle>mvn:jakarta.interceptor/jakarta.interceptor-api/${version.jakarta.interceptor-api}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${karaf.version.org.apache.geronimo.specs.jms}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jpa_2.1_spec/${karaf.version.org.apache.geronimo.specs.jpa}</bundle>
