@@ -220,7 +220,7 @@
     </dependency>
     <!-- test persistence -->
     <dependency>
-      <groupId>org.hibernate</groupId>
+      <groupId>org.hibernate.orm</groupId>
       <artifactId>hibernate-core</artifactId>
       <scope>test</scope>
       <!-- collides with org.glassfish.jaxb:jaxb-runtime -->

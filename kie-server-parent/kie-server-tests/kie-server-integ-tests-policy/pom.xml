@@ -227,7 +227,7 @@
         </dependency>
         <!-- Excluding javax.activation-api as it collides with javax.activation:activation -->
         <dependency>
-          <groupId>org.hibernate</groupId>
+          <groupId>org.hibernate.orm</groupId>
           <artifactId>hibernate-core</artifactId>
           <scope>test</scope>
           <exclusions>

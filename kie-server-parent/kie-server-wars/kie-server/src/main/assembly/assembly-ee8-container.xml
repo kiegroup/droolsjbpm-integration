@@ -70,7 +70,7 @@
 
         <include>org.hibernate.common:hibernate-commons-annotations</include>
         <include>org.hibernate:hibernate-entitymanager</include>
-        <include>org.hibernate:hibernate-core</include>
+        <include>org.hibernate.orm:hibernate-core</include>
         <include>org.hibernate:hibernate-validator</include>
         <include>org.dom4j:dom4j</include>
 
