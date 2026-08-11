@@ -8,7 +8,7 @@
     <imports>
       <import name="org.kie.spring.beans.persistence.MyEntity" />
       <import name="org.kie.spring.beans.persistence.MyVariableSerializable" />
-        <import name="javax.persistence.EntityManager" />
+        <import name="jakarta.persistence.EntityManager" />
         <import name="org.kie.api.runtime.EnvironmentName" />
     </imports>
     <variables>

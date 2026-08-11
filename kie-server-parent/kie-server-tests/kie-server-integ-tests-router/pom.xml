@@ -92,10 +92,10 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- User to mock Kie server and controller responses -->
+    <!-- Used to mock Kie server and controller responses -->
     <dependency>
       <groupId>org.wiremock</groupId>
-      <artifactId>wiremock</artifactId>
+      <artifactId>wiremock-jetty12</artifactId>
       <scope>test</scope>
     </dependency>
 

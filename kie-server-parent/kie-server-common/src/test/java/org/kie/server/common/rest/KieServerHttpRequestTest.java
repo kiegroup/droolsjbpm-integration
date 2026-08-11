@@ -60,6 +60,7 @@ import static org.kie.server.common.rest.KieServerHttpRequest.postRequest;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Base64;
@@ -74,11 +75,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.GZIPOutputStream;
 
 import javax.net.ssl.HttpsURLConnection;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
+import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
+import org.eclipse.jetty.util.Fields;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -103,16 +104,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         url = setUp(new RequestHandler() {
 
             @Override
-            public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
-                    throws IOException, ServletException {
+            public void handle( Request request, Response response ) throws Exception {
                 if( handler != null )
-                    handler.handle(target, baseRequest, request, response);
-            }
-
-            @Override
-            public void handle( Request request, HttpServletResponse response ) {
-                if( handler != null )
-                    handler.handle(request, response);
+                    handler.invokeWith(request, response);
             }
         });
     }
@@ -172,7 +166,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
                 response.setStatus(HTTP_OK);
             }
@@ -208,7 +202,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
                 response.setStatus(HTTP_OK);
             }
@@ -234,7 +228,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
                 response.setStatus(HTTP_NO_CONTENT);
             }
@@ -273,12 +267,15 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
-                path.set(request.getPathInfo());
+            public void handle( Request request, Response response ) {
+                path.set(Request.getPathInContext(request));
                 response.setStatus(HTTP_OK);
             }
         };
-        KieServerHttpRequest request = newRequest(url + unencoded);
+        // Jetty 12 requires percent-encoded paths; URI encodes non-ASCII path segments
+        URL base = new URL(url);
+        URI uri = new URI(base.getProtocol(), null, base.getHost(), base.getPort(), unencoded, null, null);
+        KieServerHttpRequest request = newRequest(new URL(uri.toASCIIString()));
         assertEquals(200, request.get().response().code());
         assertEquals(unencoded, path.get());
     }
@@ -306,7 +303,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
                 response.setStatus(HTTP_OK);
             }
@@ -330,7 +327,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
                 response.setStatus(HTTP_OK);
             }
@@ -353,7 +350,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
                 response.setStatus(HTTP_CREATED);
             }
@@ -374,7 +371,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
                 response.setStatus(HTTP_CREATED);
             }
@@ -395,7 +392,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 body.set(new String(read()));
                 response.setStatus(HTTP_OK);
             }
@@ -417,9 +414,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 body.set(new String(read()));
-                length.set(request.getContentLength());
+                length.set((int) request.getLength());
                 response.setStatus(HTTP_OK);
             }
         };
@@ -443,9 +440,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 body.set(new String(read()));
-                contentType.set(request.getContentType());
+                contentType.set(request.getHeaders().get(HttpHeader.CONTENT_TYPE));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -455,7 +452,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         int code = postRequest(new URL(url)).form(data).form("zip", "12345").response().code();
         assertEquals(HTTP_OK, code);
         assertEquals("name=user&number=100&zip=12345", body.get());
-        assertEquals("application/x-www-form-urlencoded; charset=UTF-8", contentType.get());
+        assertEquals("application/x-www-form-urlencoded; charset=utf-8", contentType.get());
     }
 
     /**
@@ -470,9 +467,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 body.set(new String(read()));
-                contentType.set(request.getContentType());
+                contentType.set(request.getHeaders().get(HttpHeader.CONTENT_TYPE));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -496,7 +493,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 body.set(new String(read()));
                 response.setStatus(HTTP_OK);
             }
@@ -516,7 +513,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
                 write("hello");
             }
@@ -538,9 +535,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                response.setContentType("text/html; charset=UTF-8");
+                response.getHeaders().put(HttpHeader.CONTENT_TYPE, "text/html; charset=UTF-8");
             }
         };
         KieServerHttpRequest request = newRequest(url);
@@ -558,9 +555,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                response.setContentType("text/html; param1=val1; charset=UTF-8");
+                response.getHeaders().put(HttpHeader.CONTENT_TYPE, "text/html; param1=val1; charset=UTF-8");
             }
         };
         KieServerHttpRequest request = newRequest(url);
@@ -580,8 +577,8 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
-                String auth = request.getHeader("Authorization");
+            public void handle( Request request, Response response ) {
+                String auth = request.getHeaders().get("Authorization");
                 auth = auth.substring(auth.indexOf(' ') + 1);
 
                 //auth = B64Code.decode(auth, CHARSET_UTF8);
@@ -614,7 +611,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 finalHostReached.set(true);
                 response.setStatus(HTTP_OK);
             }
@@ -637,7 +634,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
                 write("hello");
             }
@@ -657,13 +654,13 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            public void handle( Request request, Response response ) {
+                response.setStatus(404);
                 write("error");
             }
         };
         KieServerHttpRequest request = newRequest(url);
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, request.get().response().code());
+        assertEquals(404, request.get().response().code());
         assertEquals("error", request.response().body());
     }
 
@@ -677,7 +674,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
             }
         };
@@ -696,9 +693,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                response.setHeader("Content-Encoding", "gzip");
+                response.getHeaders().put("Content-Encoding", "gzip");
             }
         };
         assertEquals("gzip", newRequest(url).get().response().contentEncoding());
@@ -714,9 +711,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                response.setHeader("Content-Type", "text/html");
+                response.getHeaders().put(HttpHeader.CONTENT_TYPE, "text/html");
             }
         };
         assertEquals("text/html", newRequest(url).get().response().contentType());
@@ -733,14 +730,14 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
-                contentType.set(request.getContentType());
+            public void handle( Request request, Response response ) {
+                contentType.set(request.getHeaders().get(HttpHeader.CONTENT_TYPE));
                 response.setStatus(HTTP_OK);
             }
         };
         KieServerHttpRequest request = newRequest(url).contentType("text/html", "UTF-8");
         assertEquals(HTTP_OK, request.post().response().code());
-        assertEquals("text/html; charset=UTF-8", contentType.get());
+        assertEquals("text/html; charset=utf-8", contentType.get());
     }
 
     /**
@@ -754,8 +751,8 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
-                contentType.set(request.getContentType());
+            public void handle( Request request, Response response ) {
+                contentType.set(request.getHeaders().get(HttpHeader.CONTENT_TYPE));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -775,8 +772,8 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
-                contentType.set(request.getContentType());
+            public void handle( Request request, Response response ) {
+                contentType.set(request.getHeaders().get(HttpHeader.CONTENT_TYPE));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -797,10 +794,10 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                h1.set(request.getHeader("h1"));
-                h2.set(request.getHeader("h2"));
+                h1.set(request.getHeaders().get("h1"));
+                h2.set(request.getHeaders().get("h2"));
             }
         };
         Map<String, String> headers = new HashMap<String, String>();
@@ -822,7 +819,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
             }
         };
@@ -840,11 +837,11 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                response.setHeader("a", "a");
-                response.setHeader("b", "b");
-                response.addHeader("a", "another");
+                response.getHeaders().put("a", "a");
+                response.getHeaders().put("b", "b");
+                response.getHeaders().add("a", "another");
             }
         };
         Map<String, List<String>> headers = newRequest(url).get().response().headers();
@@ -865,10 +862,10 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                h1.set(request.getHeader("h1"));
-                h2.set(request.getHeader("h2"));
+                h1.set(request.getHeaders().get("h1"));
+                h2.set(request.getHeaders().get("h2"));
             }
         };
         KieServerHttpRequest request = newRequest(url).header("h1", 5).header("h2", (Number) null);
@@ -888,9 +885,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                header.set(request.getHeader("User-Agent"));
+                header.set(request.getHeaders().get("User-Agent"));
             }
         };
         KieServerHttpRequest request = newRequest(url).header(USER_AGENT, "browser 1.0");
@@ -909,9 +906,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                header.set(request.getHeader("Accept"));
+                header.set(request.getHeaders().get("Accept"));
             }
         };
         KieServerHttpRequest request = newRequest(url).accept("application/json");
@@ -930,9 +927,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                header.set(request.getHeader("Accept"));
+                header.set(request.getHeaders().get("Accept"));
             }
         };
         KieServerHttpRequest request = newRequest(url).accept(APPLICATION_JSON);
@@ -951,9 +948,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                header.set(request.getHeader("If-None-Match"));
+                header.set(request.getHeaders().get("If-None-Match"));
             }
         };
         KieServerHttpRequest request = newRequest(url).header(IF_NONE_MATCH, "eid");
@@ -972,9 +969,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                header.set(request.getHeader("Accept-Charset"));
+                header.set(request.getHeaders().get("Accept-Charset"));
             }
         };
         KieServerHttpRequest request = newRequest(url).acceptCharset(CHARSET_UTF8);
@@ -993,9 +990,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                header.set(request.getHeader("Accept-Encoding"));
+                header.set(request.getHeaders().get("Accept-Encoding"));
             }
         };
         KieServerHttpRequest request = newRequest(url).acceptEncoding("compress");
@@ -1071,28 +1068,16 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                if( !"gzip".equals(request.getHeader("Accept-Encoding")) )
+                if( !"gzip".equals(request.getHeaders().get("Accept-Encoding")) )
                     return;
 
-                response.setHeader("Content-Encoding", "gzip");
-                GZIPOutputStream output;
-                try {
-                    output = new GZIPOutputStream(response.getOutputStream());
-                } catch( IOException e ) {
-                    throw new RuntimeException(e);
-                }
-                try {
+                response.getHeaders().put("Content-Encoding", "gzip");
+                try (GZIPOutputStream output = new GZIPOutputStream(Response.asBufferedOutputStream(request, response))) {
                     output.write("hello compressed".getBytes(CHARSET_UTF8));
                 } catch( IOException e ) {
                     throw new RuntimeException(e);
-                } finally {
-                    try {
-                        output.close();
-                    } catch( IOException ignored ) {
-                        // Ignored
-                    }
                 }
             }
         };
@@ -1111,9 +1096,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                if( !"gzip".equals(request.getHeader("Accept-Encoding")) )
+                if( !"gzip".equals(request.getHeaders().get("Accept-Encoding")) )
                     return;
 
                 write("hello not compressed");
@@ -1134,10 +1119,10 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                response.addHeader("a", "1");
-                response.addHeader("a", "2");
+                response.getHeaders().add("a", "1");
+                response.getHeaders().add("a", "2");
             }
         };
         KieServerHttpRequest request = getRequest(url);
@@ -1159,7 +1144,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
             }
         };
@@ -1180,9 +1165,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                response.setHeader("a", "b;c=d");
+                response.getHeaders().put("a", "b;c=d");
             }
         };
         KieServerHttpRequest request = getRequest(url);
@@ -1200,9 +1185,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                response.setHeader("a", "b;c=d;e=f");
+                response.getHeaders().put("a", "b;c=d;e=f");
             }
         };
         KieServerHttpRequest request = getRequest(url);
@@ -1221,9 +1206,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                response.setHeader("a", "b;c=\"d\"");
+                response.getHeaders().put("a", "b;c=\"d\"");
             }
         };
         KieServerHttpRequest request = getRequest(url);
@@ -1241,9 +1226,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                response.setHeader("a", "b;c=\"d\";e=\"f\"");
+                response.getHeaders().put("a", "b;c=\"d\";e=\"f\"");
             }
         };
         KieServerHttpRequest request = getRequest(url);
@@ -1262,9 +1247,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                response.setHeader("a", "b;c=d");
+                response.getHeaders().put("a", "b;c=d");
             }
         };
         KieServerHttpRequest request = newRequest(url);
@@ -1282,9 +1267,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                response.setHeader("a", "b;c=d");
+                response.getHeaders().put("a", "b;c=d");
             }
         };
         KieServerHttpRequest request = newRequest(url);
@@ -1303,9 +1288,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                response.setHeader("a", "b;c=");
+                response.getHeaders().put("a", "b;c=");
             }
         };
         KieServerHttpRequest request = newRequest(url);
@@ -1324,9 +1309,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                response.setHeader("a", "b;");
+                response.getHeaders().put("a", "b;");
             }
         };
         KieServerHttpRequest request = newRequest(url);
@@ -1345,9 +1330,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                response.setHeader("a", "value;b=c;d=e");
+                response.getHeaders().put("a", "value;b=c;d=e");
             }
         };
         KieServerHttpRequest request = newRequest(url);
@@ -1369,9 +1354,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                response.setHeader("a", "value;b=\"c\";d=\"e\"");
+                response.getHeaders().put("a", "value;b=\"c\";d=\"e\"");
             }
         };
         KieServerHttpRequest request = newRequest(url);
@@ -1393,9 +1378,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_OK);
-                response.setHeader("a", "value; b=c; d=\"e\"");
+                response.getHeaders().put("a", "value; b=c; d=\"e\"");
             }
         };
         KieServerHttpRequest request = newRequest(url);
@@ -1418,7 +1403,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 body.set(new String(read()));
                 response.setStatus(HTTP_OK);
             }
@@ -1443,7 +1428,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 body.set(new String(read()));
                 response.setStatus(HTTP_OK);
             }
@@ -1471,10 +1456,11 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
-                outputParams.put("name", request.getParameter("name"));
-                outputParams.put("number", request.getParameter("number"));
+                Fields fields = Request.extractQueryParameters(request);
+                outputParams.put("name", fields.getValue("name"));
+                outputParams.put("number", fields.getValue("number"));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -1497,10 +1483,11 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
-                outputParams.put("name", request.getParameter("name"));
-                outputParams.put("number", request.getParameter("number"));
+                Fields fields = Request.extractQueryParameters(request);
+                outputParams.put("name", fields.getValue("name"));
+                outputParams.put("number", fields.getValue("number"));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -1526,10 +1513,11 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
-                outputParams.put("name", request.getParameter("name"));
-                outputParams.put("number", request.getParameter("number"));
+                Fields fields = Request.extractQueryParameters(request);
+                outputParams.put("name", fields.getValue("name"));
+                outputParams.put("number", fields.getValue("number"));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -1552,10 +1540,11 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
-                outputParams.put("name", request.getParameter("name"));
-                outputParams.put("number", request.getParameter("number"));
+                Fields fields = Request.extractQueryParameters(request);
+                outputParams.put("name", fields.getValue("name"));
+                outputParams.put("number", fields.getValue("number"));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -1581,10 +1570,11 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
-                outputParams.put("1", request.getParameter("1"));
-                outputParams.put("3", request.getParameter("3"));
+                Fields fields = Request.extractQueryParameters(request);
+                outputParams.put("1", fields.getValue("1"));
+                outputParams.put("3", fields.getValue("3"));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -1610,10 +1600,11 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
-                outputParams.put("name", request.getParameter("name"));
-                outputParams.put("number", request.getParameter("number"));
+                Fields fields = Request.extractQueryParameters(request);
+                outputParams.put("name", fields.getValue("name"));
+                outputParams.put("number", fields.getValue("number"));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -1636,10 +1627,11 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
-                outputParams.put("name", request.getParameter("name"));
-                outputParams.put("number", request.getParameter("number"));
+                Fields fields = Request.extractQueryParameters(request);
+                outputParams.put("name", fields.getValue("name"));
+                outputParams.put("number", fields.getValue("number"));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -1665,10 +1657,11 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
-                outputParams.put("name", request.getParameter("name"));
-                outputParams.put("number", request.getParameter("number"));
+                Fields fields = Request.extractQueryParameters(request);
+                outputParams.put("name", fields.getValue("name"));
+                outputParams.put("number", fields.getValue("number"));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -1691,10 +1684,11 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
-                outputParams.put("name", request.getParameter("name"));
-                outputParams.put("number", request.getParameter("number"));
+                Fields fields = Request.extractQueryParameters(request);
+                outputParams.put("name", fields.getValue("name"));
+                outputParams.put("number", fields.getValue("number"));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -1720,10 +1714,11 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
-                outputParams.put("name", request.getParameter("name"));
-                outputParams.put("number", request.getParameter("number"));
+                Fields fields = Request.extractQueryParameters(request);
+                outputParams.put("name", fields.getValue("name"));
+                outputParams.put("number", fields.getValue("number"));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -1746,10 +1741,11 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
-                outputParams.put("name", request.getParameter("name"));
-                outputParams.put("number", request.getParameter("number"));
+                Fields fields = Request.extractQueryParameters(request);
+                outputParams.put("name", fields.getValue("name"));
+                outputParams.put("number", fields.getValue("number"));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -1775,10 +1771,11 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
-                outputParams.put("name", request.getParameter("name"));
-                outputParams.put("number", request.getParameter("number"));
+                Fields fields = Request.extractQueryParameters(request);
+                outputParams.put("name", fields.getValue("name"));
+                outputParams.put("number", fields.getValue("number"));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -1801,10 +1798,11 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
-                outputParams.put("name", request.getParameter("name"));
-                outputParams.put("number", request.getParameter("number"));
+                Fields fields = Request.extractQueryParameters(request);
+                outputParams.put("name", fields.getValue("name"));
+                outputParams.put("number", fields.getValue("number"));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -1827,10 +1825,11 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 method.set(request.getMethod());
-                outputParams.put("name", request.getParameter("name"));
-                outputParams.put("number", request.getParameter("number"));
+                Fields fields = Request.extractQueryParameters(request);
+                outputParams.put("name", fields.getValue("name"));
+                outputParams.put("number", fields.getValue("number"));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -2025,7 +2024,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_BAD_REQUEST);
             }
         };
@@ -2045,13 +2044,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 body.set(new String(read()));
-                try {
-                    response.getWriter().write("world");
-                } catch( IOException ignored ) {
-                    // Ignored
-                }
+                write("world");
                 response.setStatus(HTTP_OK);
             }
         };
@@ -2072,10 +2067,10 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 body.set(new String(read()));
-                response.setHeader("h1", "v1");
-                response.setHeader("h2", "v2");
+                response.getHeaders().put("h1", "v1");
+                response.getHeaders().put("h2", "v2");
                 response.setStatus(HTTP_OK);
             }
         };
@@ -2099,9 +2094,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 body.set(new String(read()));
-                response.setIntHeader("Width", 9876);
+                response.getHeaders().put("Width", String.valueOf(9876));
                 response.setStatus(HTTP_OK);
             }
         };
@@ -2121,7 +2116,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(200);
             }
         };
@@ -2138,7 +2133,7 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_BAD_REQUEST);
             }
         };
@@ -2155,13 +2150,9 @@ public class KieServerHttpRequestTest extends ServerTestCase {
         handler = new RequestHandler() {
 
             @Override
-            public void handle( Request request, HttpServletResponse response ) {
+            public void handle( Request request, Response response ) {
                 response.setStatus(HTTP_BAD_REQUEST);
-                try {
-                    response.getWriter().write("error");
-                } catch( IOException ignored ) {
-                    // Ignored
-                }
+                write("error");
             }
         };
         assertEquals("error", newRequest(url).get().response().body());

@@ -7,7 +7,7 @@
 |---|---|
 | `com.sun.xml.bind:*` (JAXB RI) | `org.glassfish.jaxb:jaxb-runtime` |
 | `com.fasterxml.jackson.module:jackson-module-jaxb-annotations` | `com.fasterxml.jackson.module:jackson-module-jakarta-xmlbind-annotations` |
-| `com.github.tomakehurst:wiremock-jre8` | `org.wiremock:wiremock` 3.13.2 |
+| `com.github.tomakehurst:wiremock-jre8` | `org.wiremock:wiremock-jetty12` 3.13.2 |
 
 ### `kie-server-controller-rest`
 | Before | After |
@@ -71,7 +71,7 @@
 ### WireMock consumers: `kie-camel`, `kie-karaf-itests`, `kie-server-client`, `kie-server-router-client`, `kie-server-integ-tests-router`
 | Before | After |
 |---|---|
-| `com.github.tomakehurst:wiremock-jre8` | `org.wiremock:wiremock` 3.13.2 |
+| `com.github.tomakehurst:wiremock-jre8` | `org.wiremock:wiremock-jetty12` 3.13.2 |
 
 ---
 
@@ -183,3 +183,89 @@
 9. **`javax.security.auth.Subject.container` key** — Despite the global `javax` → `jakarta` rename, the JACC `PolicyContext` key string **remains `"javax.security.auth.Subject.container"`** (defined by the Jakarta EE spec for compatibility with Tomcat/WildFly containers). Changing it to `"jakarta.*"` would break security integration.
 
 10. **ResteasyClientBuilder** — `org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder` is deprecated; usage replaced by `ResteasyClientBuilderImpl`. Code directly constructing `new ResteasyClientBuilder()` will fail at runtime in RESTEasy 6+.
+
+11. **WireMock + Jetty 12** — The standard `org.wiremock:wiremock` artifact is built on Jetty 11. Projects standardising on Jetty 12 should depend on `org.wiremock:wiremock-jetty12` rather than the default `wiremock` artifact to avoid Jetty version conflicts. The `standalone` classifier no longer exists for `wiremock-jetty12`; drop it.
+
+---
+
+## 4. Jetty 12 Test Migration
+
+### Background
+
+The tests in [`ServerTestCase.java`](kie-server-parent/kie-server-common/src/test/java/org/kie/server/common/rest/ServerTestCase.java) and [`KieServerHttpRequestTest.java`](kie-server-parent/kie-server-common/src/test/java/org/kie/server/common/rest/KieServerHttpRequestTest.java) were originally written against the Jetty 9/11 server APIs. When the project moved to Jetty 12 those APIs were removed, and the tests stopped compiling. Separately, three tests that depend on WireMock and on precise HTTP response headers started failing at runtime once compilation was restored.
+
+### Why things broke
+
+**Handler API — compilation**
+
+Jetty 12 introduces a different handler API centred around `Handler.Abstract`, replacing the older `AbstractHandler` style used by these tests. Along with that change, the APIs for reading request paths, content length, query parameters, and response headers were all revised. The existing test handlers relied on the old contracts throughout, so they did not compile against Jetty 12.
+
+**WireMock artifact — runtime**
+
+`org.wiremock:wiremock` bundles Jetty 11 as transitive dependencies. On a Jetty 12 classpath, WireMock's SPI implementation (`Jetty11HttpServerFactory`) cannot locate the required Jetty 11 classes and fails to start. In `KieServicesClientErrorHandlingTest.testError500Handling`, because WireMock failed to start, the test connected to another Jetty server already listening on the expected port — which returned a `WebSockets request was expected` body that `HttpAdminClient` could not parse as JSON.
+
+**Chunked encoding — runtime**
+
+`ServerTestCase.write()` passed `false` as the first argument to `response.write()`, telling Jetty the write was not the final one. That allows Jetty 12 to use chunked transfer encoding, omitting a `Content-Length` header. `HttpURLConnection.getContentLength()` returns `-1` when the header is absent, causing the `contentLength() == 5` assertion to fail.
+
+### What was changed
+
+#### Compilation fix — `ServerTestCase.java` and `KieServerHttpRequestTest.java`
+
+**[`ServerTestCase.java`](kie-server-parent/kie-server-common/src/test/java/org/kie/server/common/rest/ServerTestCase.java)**
+
+| Before (Jetty 11) | After (Jetty 12) |
+|---|---|
+| `extends AbstractHandler` | [`extends Handler.Abstract`](kie-server-parent/kie-server-common/src/test/java/org/kie/server/common/rest/ServerTestCase.java:64) |
+| `handle(String target, Request baseRequest, HttpServletRequest req, HttpServletResponse res)` | [`handle(Request request, Response response, Callback callback)`](kie-server-parent/kie-server-common/src/test/java/org/kie/server/common/rest/ServerTestCase.java:104) |
+| `baseRequest.getInputStream()` | [`Content.Source.asInputStream(request)`](kie-server-parent/kie-server-common/src/test/java/org/kie/server/common/rest/ServerTestCase.java:87) |
+| `ProxyHandler` / old proxy setup | [`setupProxy()` rewritten with Jetty 12 `ProxyHandler.Reverse`](kie-server-parent/kie-server-common/src/test/java/org/kie/server/common/rest/ServerTestCase.java:138) |
+
+**[`KieServerHttpRequestTest.java`](kie-server-parent/kie-server-common/src/test/java/org/kie/server/common/rest/KieServerHttpRequestTest.java)** — all anonymous handlers updated to the same `handle(Request, Response, Callback)` contract, with the following accessor replacements:
+
+| Before (Jetty 11) | After (Jetty 12) |
+|---|---|
+| `request.getPathInfo()` | [`Request.getPathInContext(request)`](kie-server-parent/kie-server-common/src/test/java/org/kie/server/common/rest/KieServerHttpRequestTest.java:272) |
+| `request.getContentLength()` | [`request.getLength()`](kie-server-parent/kie-server-common/src/test/java/org/kie/server/common/rest/KieServerHttpRequestTest.java:417) |
+| `request.getContentType()` | [`request.getHeaders().get(HttpHeader.CONTENT_TYPE)`](kie-server-parent/kie-server-common/src/test/java/org/kie/server/common/rest/KieServerHttpRequestTest.java:443) |
+| `request.getHeader(name)` | [`request.getHeaders().get(name)`](kie-server-parent/kie-server-common/src/test/java/org/kie/server/common/rest/KieServerHttpRequestTest.java:584) |
+| `request.getParameterValues(name)` | [`Request.extractQueryParameters(request)`](kie-server-parent/kie-server-common/src/test/java/org/kie/server/common/rest/KieServerHttpRequestTest.java:1469) |
+
+#### Runtime fix 1 & 2 — WireMock: `kie-parent` BOM (`kiegroup-droolsjbpm-build-bootstrap/pom.xml`)
+
+| Before | After |
+|---|---|
+| `org.wiremock:wiremock` (two entries, one with `standalone` classifier) | `org.wiremock:wiremock-jetty12` at `${version.com.github.wiremock}` (single entry, no classifier) |
+
+Added `dependencyManagement` entries to override the Jetty `12.0.30` transitive dependencies brought in by `wiremock-jetty12`, ensuring they align with the project's Jetty `12.1.10` version:
+
+| Artifact |
+|---|
+| `org.eclipse.jetty:jetty-session` |
+| `org.eclipse.jetty:jetty-ee` |
+| `org.eclipse.jetty:jetty-alpn-server` |
+| `org.eclipse.jetty:jetty-alpn-java-server` |
+| `org.eclipse.jetty:jetty-alpn-java-client` |
+| `org.eclipse.jetty:jetty-alpn-client` |
+| `org.eclipse.jetty.ee10:jetty-ee10-servlet` |
+| `org.eclipse.jetty.ee10:jetty-ee10-servlets` |
+| `org.eclipse.jetty.ee10:jetty-ee10-webapp` |
+
+Five child `pom.xml` files updated (`org.wiremock:wiremock` → `org.wiremock:wiremock-jetty12`):
+
+| Module | File |
+|---|---|
+| `kie-server-router-client` | [`kie-server-parent/kie-server-router/kie-server-router-client/pom.xml`](kie-server-parent/kie-server-router/kie-server-router-client/pom.xml) |
+| `kie-server-client` | [`kie-server-parent/kie-server-remote/kie-server-client/pom.xml`](kie-server-parent/kie-server-remote/kie-server-client/pom.xml) |
+| `kie-server-integ-tests-router` | [`kie-server-parent/kie-server-tests/kie-server-integ-tests-router/pom.xml`](kie-server-parent/kie-server-tests/kie-server-integ-tests-router/pom.xml) |
+| `kie-camel` | [`kie-camel/pom.xml`](kie-camel/pom.xml) |
+| `kie-karaf-itests` | [`kie-osgi/kie-karaf-itests/pom.xml`](kie-osgi/kie-karaf-itests/pom.xml) — also removed the now-obsolete `standalone` classifier |
+
+#### Runtime fix 3 — `Content-Length`: `ServerTestCase.write()`
+
+In [`ServerTestCase.java`](kie-server-parent/kie-server-common/src/test/java/org/kie/server/common/rest/ServerTestCase.java):
+
+| Before | After |
+|---|---|
+| `response.write(false, buffer, callback)` | `response.write(true, buffer, callback)` — marks the write as final, preventing chunked encoding |
+| *(no `Content-Length` header set)* | `response.getHeaders().put(HttpHeader.CONTENT_LENGTH, bytes.length)` — sends a fixed-length response |

@@ -35,11 +35,17 @@
  */
 package org.kie.server.common.rest;
 
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.io.Content;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
+import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.util.Callback;
+import org.junit.AfterClass;
 import org.junit.Before;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.servlet.ServletHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -52,17 +58,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static org.kie.server.common.rest.KieServerHttpRequest.CHARSET_UTF8;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.junit.AfterClass;
-
 /**
  * Base test case that provides a running HTTP server
  * </p>
@@ -73,11 +68,11 @@ public class ServerTestCase {
     /**
      * Simplified handler
      */
-    protected static abstract class RequestHandler extends AbstractHandler {
+    protected static abstract class RequestHandler extends Handler.Abstract {
 
         private Request request;
 
-        private HttpServletResponse response;
+        private Response response;
 
         /**
          * Handle request
@@ -85,7 +80,18 @@ public class ServerTestCase {
          * @param request
          * @param response
          */
-        public abstract void handle(Request request, HttpServletResponse response);
+        public abstract void handle(Request request, Response response) throws Exception;
+
+        /**
+         * Set instance fields and delegate to {@link #handle(Request, Response)}.
+         * Use this instead of calling {@link #handle(Request, Response)} directly so that
+         * {@link #read()} and {@link #write(String)} can access the current request/response.
+         */
+        protected final void invokeWith(Request request, Response response) throws Exception {
+            this.request = request;
+            this.response = response;
+            handle(request, response);
+        }
 
         /**
          * Read content
@@ -97,7 +103,7 @@ public class ServerTestCase {
             final byte[] buffer = new byte[8196];
             int read;
             try {
-                InputStream input = request.getInputStream();
+                InputStream input = Content.Source.asInputStream(request);
                 while ((read = input.read(buffer)) != -1)
                     content.write(buffer, 0, read);
             } catch (IOException e) {
@@ -113,8 +119,10 @@ public class ServerTestCase {
          */
         protected void write(String value) {
             try {
-                response.getWriter().print(value);
-            } catch (IOException e) {
+                byte[] bytes = value.getBytes(CHARSET_UTF8);
+                response.getHeaders().put(HttpHeader.CONTENT_LENGTH, bytes.length);
+                response.write(true, java.nio.ByteBuffer.wrap(bytes), Callback.NOOP);
+            } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
         }
@@ -125,20 +133,16 @@ public class ServerTestCase {
          * @param value
          */
         protected void writeln(String value) {
-            try {
-                response.getWriter().println(value);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            write(value + System.lineSeparator());
         }
 
-        public void handle(String target, Request baseRequest,
-                           HttpServletRequest request, HttpServletResponse response)
-                throws IOException, ServletException {
-            this.request = (Request) request;
-            this.response = response;
-            this.request.setHandled(true);
-            handle(this.request, response);
+        @Override
+        public boolean handle(final Request request,
+                              final Response response,
+                              final Callback callback) throws Exception {
+            invokeWith(request, response);
+            callback.succeeded();
+            return true;
         }
 
     }
@@ -180,34 +184,31 @@ public class ServerTestCase {
         proxyConnector.setPort(0);
         proxy.setConnectors(new Connector[]{proxyConnector});
 
-        ServletHandler proxyHandler = new ServletHandler();
-
-        RequestHandler proxyCountingHandler = new RequestHandler() {
-
-            @Override
-            public void handle(Request request, HttpServletResponse response) {
-                proxyHitCount.incrementAndGet();
-                String auth = request.getHeader("Proxy-Authorization");
-                auth = auth.substring(auth.indexOf(' ') + 1);
-                try {
-                    auth = new String(Base64.getDecoder().decode(auth), CHARSET_UTF8);
-                    int colon = auth.indexOf(':');
-                    proxyUser.set(auth.substring(0, colon));
-                    proxyPassword.set(auth.substring(colon + 1));
-                    request.setHandled(false);
-                } catch (UnsupportedEncodingException e) {
-                    response.setStatus(HTTP_BAD_REQUEST);
-                }
-            }
-        };
-
-        HandlerList handlerList = new HandlerList();
-        handlerList.addHandler(proxyCountingHandler);
-        handlerList.addHandler(proxyHandler);
+        Handler.Sequence handlerList = new Handler.Sequence(
+                new RequestHandler() {
+                    @Override
+                    public void handle(Request request, Response response) {
+                        proxyHitCount.incrementAndGet();
+                        String auth = request.getHeaders().get("Proxy-Authorization");
+                        if (auth != null) {
+                            auth = auth.substring(auth.indexOf(' ') + 1);
+                            try {
+                                auth = new String(Base64.getDecoder().decode(auth), CHARSET_UTF8);
+                                int colon = auth.indexOf(':');
+                                proxyUser.set(auth.substring(0, colon));
+                                proxyPassword.set(auth.substring(colon + 1));
+                            } catch (UnsupportedEncodingException e) {
+                                response.setStatus(HTTP_BAD_REQUEST);
+                            }
+                        }
+                    }
+                },
+                new org.eclipse.jetty.proxy.ProxyHandler.Reverse(
+                        request -> org.eclipse.jetty.http.HttpURI.build(request.getHttpURI())
+                                .scheme("http")
+                                .host("localhost")
+                                .port(server.getURI().getPort())));
         proxy.setHandler(handlerList);
-
-        ServletHolder proxyHolder = proxyHandler.addServletWithMapping("org.eclipse.jetty.proxy.ProxyServlet", "/");
-        proxyHolder.setAsyncSupported(true);
 
         proxy.start();
         proxyPort = proxyConnector.getLocalPort();
