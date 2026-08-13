@@ -16,9 +16,9 @@
     <maven.compiler.target>17</maven.compiler.target>
     <maven.compiler.source>17</maven.compiler.source>
     <junit.version>4.13.2</junit.version>
-    <assertj.version>3.14.0</assertj.version>
-    <surefire.plugin.version>2.18.1</surefire.plugin.version>
-    <failsafe.plugin.version>2.18.1</failsafe.plugin.version>
+    <assertj.version>3.27.7</assertj.version>
+    <surefire.plugin.version>3.5.4</surefire.plugin.version>
+    <failsafe.plugin.version>3.5.4</failsafe.plugin.version>
   </properties>
 
   <dependencies>
