@@ -69,7 +69,7 @@ public class ControllerConnectRunnable implements Runnable {
                 Set<KieContainerResource> containers = startupStrategy.prepareContainers(kieServerSetup.getContainers());
                 // add status message when connected
                 kieServer.addServerStatusMessage(kieServerInfo);
-
+                logger.info("Installing containers {} in kieserver {}", containers.hashCode(), kieServerInfo);
                 containerManager.installContainers(kieServer, containers, currentState, kieServerSetup);
 
                 break;

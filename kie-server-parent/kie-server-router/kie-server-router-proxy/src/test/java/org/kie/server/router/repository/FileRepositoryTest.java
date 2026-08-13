@@ -185,7 +185,7 @@ public class FileRepositoryTest {
     public void testWatchServiceOnLatelyCreatedConfigFile() throws Exception {
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(8);
         // Start watcher service with not existing config file
-        String fileDir = "target" + File.separator + UUID.randomUUID().toString();
+        String fileDir = "target" + File.separator + UUID.randomUUID();
         System.setProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR, fileDir);
         File repositoryDirectory = new File(fileDir);
         repositoryDirectory.mkdirs();
@@ -226,7 +226,7 @@ public class FileRepositoryTest {
         }
 
         // delay it a bit for the watcher to be triggered
-        latch.await(5, TimeUnit.SECONDS);
+        assertTrue(latch.await(15, TimeUnit.SECONDS));
 
         assertNotNull(loaded);
         assertNotNull(loaded.getHostsPerContainer());

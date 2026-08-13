@@ -150,10 +150,6 @@ public class PersistenceUnitInfoLoader {
     }
 
     public static Boolean isValidPersistenceKey(String propertyName) {
-        if (propertyName.startsWith("hibernate.") || propertyName.startsWith("javax.persistence")) {
-            return true;
-        }
-
-        return false;
+        return propertyName.startsWith("hibernate.") || propertyName.startsWith("jakarta.persistence");
     }
 }

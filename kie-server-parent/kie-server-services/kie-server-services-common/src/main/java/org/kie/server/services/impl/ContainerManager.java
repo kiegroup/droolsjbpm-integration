@@ -15,6 +15,7 @@
 
 package org.kie.server.services.impl;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.kie.server.api.KieServerEnvironment;
@@ -32,10 +33,12 @@ public class ContainerManager {
     private static final Logger logger = LoggerFactory.getLogger(ContainerManager.class);
 
     public void installContainers(KieServerImpl kieServer, Set<KieContainerResource> containers, KieServerState currentState, KieServerSetup kieServerSetup) {
+        logger.info("installContainers on kie server \n\t{}:\n\t{}", kieServer, containers.hashCode());
         installContainersSync(kieServer, containers, currentState, kieServerSetup);
     }
 
     public void installContainersSync(KieServerImpl kieServer, Set<KieContainerResource> containers, KieServerState currentState, KieServerSetup kieServerSetup) {
+        logger.info("installContainersSync on kie server \n\t{}:\n\t{}", kieServer, containers.hashCode());
         if (containers == null) {
             kieServer.markAsReady();
             return;
@@ -43,15 +46,19 @@ public class ContainerManager {
 
         String str = containers.stream().map(KieContainerResource::toString).collect(joining("\n\t"));
         logger.info("About to install containers on kie server \n\t{}:\n\t{}", kieServer, str);
-
-        for (KieContainerResource containerResource : containers) {
-            if (KieContainerStatus.STARTED.equals(containerResource.getStatus())) {
-                kieServer.createContainer(containerResource.getContainerId(), containerResource);
-            } else if (KieContainerStatus.DEACTIVATED.equals(containerResource.getStatus())) {
-                kieServer.createContainer(containerResource.getContainerId(), containerResource);
-                kieServer.deactivateContainer(containerResource.getContainerId());
-                containerResource.setStatus(KieContainerStatus.DEACTIVATED);
+        Set<KieContainerResource> copiedContainers = new HashSet<>(containers);
+        try {
+            for (KieContainerResource containerResource : copiedContainers) {
+                if (KieContainerStatus.STARTED.equals(containerResource.getStatus())) {
+                    kieServer.createContainer(containerResource.getContainerId(), containerResource);
+                } else if (KieContainerStatus.DEACTIVATED.equals(containerResource.getStatus())) {
+                    kieServer.createContainer(containerResource.getContainerId(), containerResource);
+                    kieServer.deactivateContainer(containerResource.getContainerId());
+                    containerResource.setStatus(KieContainerStatus.DEACTIVATED);
+                }
             }
+        } catch (Exception e) {
+            logger.error("Error while installing containers on kie server", e);
         }
         currentState.setContainers(containers);
         if (kieServerSetup.getServerConfig() != null) {

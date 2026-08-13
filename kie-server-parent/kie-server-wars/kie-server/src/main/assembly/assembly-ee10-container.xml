@@ -67,6 +67,7 @@
         <include>org.kie.server:kie-server-services-openshift</include>
 
         <include>org.jbpm:jbpm-services-ejb-timer</include>
+        <include>org.jbpm:jbpm-persistence-jpa</include>
 
         <include>org.hibernate.common:hibernate-commons-annotations</include>
         <include>org.hibernate:hibernate-entitymanager</include>
@@ -79,8 +80,6 @@
         <include>com.google.inject.extensions:guice-servlet</include>
         
         <include>xerces:xercesImpl</include>
-
-        <include>com.sun.xml.bind:jaxb-xjc</include>
 
         <include>org.jboss.resteasy:resteasy-jackson2-provider</include>
       </includes>

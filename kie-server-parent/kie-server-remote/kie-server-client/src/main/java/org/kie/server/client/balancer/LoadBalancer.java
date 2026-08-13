@@ -86,7 +86,7 @@ public class LoadBalancer {
             return selectedUrl;
         } catch (NoEndpointFoundException e) {
             checkFailedEndpoints();
-            throw e;
+            throw new KieServerHttpRequestException(e.getMessage(), e);
         }
     }
 

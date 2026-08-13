@@ -17,7 +17,6 @@ package org.kie.server.remote.rest.common;
 
 import static org.kie.server.api.KieServerConstants.KIE_SERVER_REST_MODE_READONLY;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -31,13 +30,18 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationPath("/")
 public class KieServerApplication extends Application {
 
+	private static final Logger logger = LoggerFactory.getLogger(KieServerApplication.class);
+
 	private final Set<Object> instances;
 	
 	public KieServerApplication() {
+		logger.debug("KieServerApplication started");
 		instances = new CopyOnWriteArraySet<Object>() {
 			private static final long serialVersionUID = 1763183096852523317L;
 			{
@@ -49,6 +53,7 @@ public class KieServerApplication extends Application {
 				List<KieServerExtension> extensions = server.getServerExtensions();
 
 				for (KieServerExtension extension : extensions) {
+					logger.debug("Adding extension " + extension.toString());
 					addAll(extension.getAppComponents(SupportedTransports.REST));
 				}
                 // add filter only if the history mode is active
@@ -57,11 +62,7 @@ public class KieServerApplication extends Application {
                 }
 			}
 		};
-	}
-
-	@Override
-	public Set<Class<?>> getClasses() {
-		return Collections.emptySet();
+		logger.debug("Instances discovered: " + instances.size());
 	}
 
 	@Override

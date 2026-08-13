@@ -179,6 +179,10 @@
       <artifactId>xstream-hibernate</artifactId>
       <exclusions>
         <exclusion>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-core</artifactId>
+        </exclusion>
+        <exclusion>
           <groupId>dom4j</groupId>
           <artifactId>dom4j</artifactId>
         </exclusion>

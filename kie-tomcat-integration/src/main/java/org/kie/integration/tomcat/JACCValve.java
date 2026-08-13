@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Set;
 
 import javax.security.auth.Subject;
-import javax.security.jacc.PolicyContext;
-import javax.security.jacc.PolicyContextException;
-import javax.security.jacc.PolicyContextHandler;
+import jakarta.security.jacc.PolicyContext;
+import jakarta.security.jacc.PolicyContextException;
+import jakarta.security.jacc.PolicyContextHandler;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequestEvent;
 import jakarta.servlet.ServletRequestListener;

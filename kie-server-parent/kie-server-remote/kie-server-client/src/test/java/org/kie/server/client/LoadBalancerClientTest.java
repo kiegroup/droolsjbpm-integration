@@ -92,6 +92,7 @@ public class LoadBalancerClientTest {
 
     @Before
     public void startServers() {
+        logger.info("Starting servers");
         int port1 = BaseKieServicesClientTest.findFreePort();
         wireMockServer1 = createMockServer("1", port1);
         wireMockServer1.start();
@@ -116,6 +117,7 @@ public class LoadBalancerClientTest {
 
     @After
     public void stopServers() {
+        logger.info("Stopping servers");
         wireMockServer1.stop();
         wireMockServer2.stop();
         wireMockServer3.stop();

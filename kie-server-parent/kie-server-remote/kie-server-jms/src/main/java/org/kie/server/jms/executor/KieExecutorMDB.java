@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 @TransactionManagement(TransactionManagementType.BEAN)
 @MessageDriven(name = "KieExecutorMDB", activationConfig = {
         @ActivationConfigProperty(propertyName = "destination", propertyValue = "queue/KIE.SERVER.EXECUTOR"),
-        @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
+        @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "jakarta.jms.Queue"),
         @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge")})
 public class KieExecutorMDB extends JmsAvailableJobsExecutor {
 

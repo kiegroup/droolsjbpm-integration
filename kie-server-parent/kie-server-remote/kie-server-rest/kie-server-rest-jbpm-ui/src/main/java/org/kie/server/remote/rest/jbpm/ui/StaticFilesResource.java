@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -49,6 +50,10 @@ public class StaticFilesResource {
     
     private FormRendererBase formRendererBase;
 
+    public StaticFilesResource() {
+    }
+
+    @Inject
     public StaticFilesResource(FormRendererBase formRendererBase) {
         this.formRendererBase = formRendererBase;
     }

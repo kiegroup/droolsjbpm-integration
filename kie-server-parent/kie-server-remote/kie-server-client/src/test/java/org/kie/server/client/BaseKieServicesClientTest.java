@@ -65,7 +65,7 @@ public abstract class BaseKieServicesClientTest {
             false
     );
 
-    public static int findFreePort() {
+    public static synchronized int findFreePort() {
         int port = 0;
         try {
             ServerSocket server =

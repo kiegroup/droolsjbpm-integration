@@ -17,17 +17,18 @@
   ~ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
   ~ MA  02110-1301, USA.
   -->
-<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.1">
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.3">
   <deployment>
     <exclusions>
-      <module name="com.fasterxml.jackson.core.jackson-core" />
-      <module name="com.fasterxml.jackson.core.jackson-databind" />
-      <module name="com.fasterxml.jackson.core.jackson-annotations" />
+      <module name="com.fasterxml.jackson.core" />
+      <module name="com.fasterxml.jackson.databind" />
+      <module name="com.fasterxml.jackson.annotations" />
       <module name="com.fasterxml.jackson.datatype.jackson-datatype-jdk8" />
       <module name="com.fasterxml.jackson.datatype.jackson-datatype-jsr310" />
-      <module name="com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider" />
-      <module name="com.fasterxml.jackson.dataformat.jackson-dataformat-yaml" />
+      <module name="com.fasterxml.jackson.jakarta.rs.json" />
+      <module name="com.fasterxml.jackson.dataformat.yaml" />
       <module name="org.jboss.resteasy.resteasy-jackson2-provider" />
+      <module name="org.hibernate" />
     </exclusions>
     <dependencies>
       <!-- IMPORTANT: when adding dependency (module) here, make sure it is a public one.
@@ -35,7 +36,6 @@
            removed in future. EAP also generates warning(s) during the deployment if
            the WAR depends on private modules. -->
       <!-- Keep the alphabetical order! -->
-      <module name="org.apache.xerces"/>
       <!-- required jdk dependencies for batik/svg transformation -->
       <system export="true">
         <paths>

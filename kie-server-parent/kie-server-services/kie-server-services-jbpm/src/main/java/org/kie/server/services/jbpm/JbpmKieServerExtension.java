@@ -780,7 +780,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
         persistenceProperties.put("hibernate.dialect", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DIALECT, "org.hibernate.dialect.H2Dialect"));
         persistenceProperties.put("hibernate.default_schema", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DEFAULT_SCHEMA));
         persistenceProperties.put("hibernate.transaction.jta.platform", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_TM, "JBossAS"));
-        persistenceProperties.put("javax.persistence.jtaDataSource", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DS, "java:jboss/datasources/ExampleDS"));
+        persistenceProperties.put("jakarta.persistence.jtaDataSource", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DS, "java:jboss/datasources/ExampleDS"));
 
         System.getProperties().stringPropertyNames()
                 .stream()
@@ -805,7 +805,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 ((PersistenceUnitInfoImpl) info).setPersistenceUnitRootUrl(root);
             }
             // Need to explicitly set jtaDataSource here, its value is fetched in Hibernate logger before configuration
-            ((PersistenceUnitInfoImpl) info).setJtaDataSource(properties.get("javax.persistence.jtaDataSource"));
+            ((PersistenceUnitInfoImpl) info).setJtaDataSource(properties.get("jakarta.persistence.jtaDataSource"));
             getPersistenceUnitExtensionLoaders(this.getClass().getClassLoader()).stream()
                     .filter(PersistenceUnitExtensionsLoader::isEnabled)
                     .forEach(extensionsLoader -> extensionsLoader.loadExtensions(info));

@@ -69,8 +69,8 @@
 
     <!-- security -->
     <dependency>
-      <groupId>jakarta.security.jacc</groupId>
-      <artifactId>jakarta.security.jacc-api</artifactId>
+      <groupId>jakarta.authorization</groupId>
+      <artifactId>jakarta.authorization-api</artifactId>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
@@ -137,6 +137,13 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <parallel>none</parallel>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>

@@ -81,8 +81,8 @@
 
     <!-- security -->
     <dependency>
-      <groupId>jakarta.security.jacc</groupId>
-      <artifactId>jakarta.security.jacc-api</artifactId>
+      <groupId>jakarta.authorization</groupId>
+      <artifactId>jakarta.authorization-api</artifactId>
     </dependency>
 
     <!-- Needed by aether-http stuff, but mistakenly excluded in assemblies so adding it here explicitly -->

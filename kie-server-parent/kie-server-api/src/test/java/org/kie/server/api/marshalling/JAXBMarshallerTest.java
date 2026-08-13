@@ -23,9 +23,11 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.objects.DateObject;
@@ -38,6 +40,13 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class JAXBMarshallerTest {
+
+    @BeforeClass
+    public static void setup() {
+        // Needed because tests expect error messages in english,
+        // which could be not the case for machines with a different locale
+        Locale.setDefault(new Locale("en", "EN"));
+    }
 
     @Test
     public void testMarshallDateObject() {

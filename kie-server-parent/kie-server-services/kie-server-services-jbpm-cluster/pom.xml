@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <project
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <parent>
         <groupId>org.kie.server</groupId>
@@ -50,15 +50,21 @@
         </dependency>
 
         <dependency>
-          <groupId>jakarta.annotation</groupId>
-          <artifactId>jakarta.annotation-api</artifactId>
-          <scope>provided</scope>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
-          <groupId>jakarta.enterprise</groupId>
-          <artifactId>jakarta.enterprise.cdi-api</artifactId>
-          <scope>provided</scope>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

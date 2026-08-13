@@ -24,9 +24,9 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.security.auth.Subject;
-import javax.security.jacc.PolicyContext;
-import javax.security.jacc.PolicyContextException;
-import javax.security.jacc.PolicyContextHandler;
+import jakarta.security.jacc.PolicyContext;
+import jakarta.security.jacc.PolicyContextException;
+import jakarta.security.jacc.PolicyContextHandler;
 
 import org.junit.Before;
 import org.junit.Test;

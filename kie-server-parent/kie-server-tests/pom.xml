@@ -608,8 +608,8 @@
                       <artifactId>slf4j-api</artifactId>
                     </dependency>
                     <dependency>
-                      <groupId>jakarta.security.jacc</groupId>
-                      <artifactId>jakarta.security.jacc-api</artifactId>
+                      <groupId>jakarta.authorization</groupId>
+                      <artifactId>jakarta.authorization-api</artifactId>
                     </dependency>
                     <dependency>
                       <groupId>org.kie</groupId>
@@ -701,8 +701,8 @@
           <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>jakarta.security.jacc</groupId>
-          <artifactId>jakarta.security.jacc-api</artifactId>
+          <groupId>jakarta.authorization</groupId>
+          <artifactId>jakarta.authorization-api</artifactId>
           <scope>test</scope>
         </dependency>
         <dependency>
@@ -1160,17 +1160,17 @@
                     <!-- Qs -->
                     <cargo.resource.resource.jms.queue.request>
                       cargo.resource.name=jms/KIE.SERVER.REQUEST|
-                      cargo.resource.type=javax.jms.Queue|
+                      cargo.resource.type=jakarta.jms.Queue|
                       cargo.resource.id=KIE.SERVER.REQUEST
                     </cargo.resource.resource.jms.queue.request>
                     <cargo.resource.resource.jms.queue.response>
                       cargo.resource.name=jms/KIE.SERVER.RESPONSE|
-                      cargo.resource.type=javax.jms.Queue|
+                      cargo.resource.type=jakarta.jms.Queue|
                       cargo.resource.id=KIE.SERVER.RESPONSE
                     </cargo.resource.resource.jms.queue.response>
                     <cargo.resource.resource.jms.executor.queue.request>
                       cargo.resource.name=jms/KIE.SERVER.EXECUTOR|
-                      cargo.resource.type=javax.jms.Queue|
+                      cargo.resource.type=jakarta.jms.Queue|
                       cargo.resource.id=KIE.SERVER.EXECUTOR
                     </cargo.resource.resource.jms.executor.queue.request>
                     <!-- Datasource -->
@@ -1297,17 +1297,17 @@
                     <!-- Qs -->
                     <cargo.resource.resource.jms.queue.request>
                       cargo.resource.name=jms/KIE.SERVER.REQUEST|
-                      cargo.resource.type=javax.jms.Queue|
+                      cargo.resource.type=jakarta.jms.Queue|
                       cargo.resource.id=KIE.SERVER.REQUEST
                     </cargo.resource.resource.jms.queue.request>
                     <cargo.resource.resource.jms.queue.response>
                       cargo.resource.name=jms/KIE.SERVER.RESPONSE|
-                      cargo.resource.type=javax.jms.Queue|
+                      cargo.resource.type=jakarta.jms.Queue|
                       cargo.resource.id=KIE.SERVER.RESPONSE
                     </cargo.resource.resource.jms.queue.response>
                     <cargo.resource.resource.jms.executor.queue.request>
                       cargo.resource.name=jms/KIE.SERVER.EXECUTOR|
-                      cargo.resource.type=javax.jms.Queue|
+                      cargo.resource.type=jakarta.jms.Queue|
                       cargo.resource.id=KIE.SERVER.EXECUTOR
                     </cargo.resource.resource.jms.executor.queue.request>
                     <!-- Datasource -->

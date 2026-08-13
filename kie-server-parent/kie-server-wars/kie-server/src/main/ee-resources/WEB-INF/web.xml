@@ -1,23 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         version="3.1"
-         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+         version="6.0"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+             https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
   <display-name>KieServer</display-name>
   <servlet>
     <servlet-name>org.kie.server.remote.rest.common.KieServerApplication</servlet-name>
+    <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+    <init-param>
+      <param-name>jakarta.ws.rs.Application</param-name>
+      <param-value>org.kie.server.remote.rest.common.KieServerApplication</param-value>
+    </init-param>
+    <init-param>
+      <param-name>resteasy.servlet.mapping.prefix</param-name>
+      <param-value>/rest</param-value>
+    </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>org.kie.server.remote.rest.common.KieServerApplication</servlet-name>
-    <url-pattern>/services/rest/*</url-pattern>
+    <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
-
+  <context-param>
+    <param-name>resteasy.preferJacksonOverJsonB</param-name>
+    <param-value>true</param-value>
+  </context-param>
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>Swagger web resources</web-resource-name>
-      <url-pattern>/services/rest/server/swagger.json/*</url-pattern>
-      <url-pattern>/services/rest/server/files/*</url-pattern>
+      <url-pattern>/rest/server/swagger.json/*</url-pattern>
+      <url-pattern>/rest/server/files/*</url-pattern>
       <url-pattern>/docs/*</url-pattern>
       <http-method>GET</http-method>
     </web-resource-collection>
@@ -26,8 +39,8 @@
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>KIE Server Health and Readiness Probes</web-resource-name>
-      <url-pattern>/services/rest/server/readycheck</url-pattern>
-      <url-pattern>/services/rest/server/healthcheck</url-pattern>
+      <url-pattern>/rest/server/readycheck</url-pattern>
+      <url-pattern>/rest/server/healthcheck</url-pattern>
       <http-method>GET</http-method>
     </web-resource-collection>
     <!-- No authentication KIE Server Health and Readiness Probes  -->
@@ -35,7 +48,7 @@
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>REST web resources</web-resource-name>
-      <url-pattern>/services/rest/*</url-pattern>
+      <url-pattern>/rest/*</url-pattern>
       <http-method>GET</http-method>
       <http-method>PUT</http-method>
       <http-method>POST</http-method>
@@ -49,7 +62,7 @@
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>REST web resources</web-resource-name>
-      <url-pattern>/services/rest/*</url-pattern>
+      <url-pattern>/rest/*</url-pattern>
       <http-method>OPTIONS</http-method>
     </web-resource-collection>
     <!-- No authentication.  -->

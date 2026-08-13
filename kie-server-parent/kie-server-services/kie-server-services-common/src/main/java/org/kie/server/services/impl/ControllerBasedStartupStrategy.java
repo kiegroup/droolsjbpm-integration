@@ -82,8 +82,10 @@ public class ControllerBasedStartupStrategy implements StartupStrategy {
         if (readyToRun) {
             kieServer.addServerStatusMessage(kieServerInfo);
             if (Boolean.parseBoolean(currentState.getConfiguration().getConfigItemValue(KieServerConstants.CFG_SYNC_DEPLOYMENT, "false"))) {
+                logger.info("Installing installContainersSync {} in kieserver {}", containers.hashCode(), kieServerInfo);
                 containerManager.installContainersSync(kieServer, containers, currentState, kieServerSetup);
             } else {
+                logger.info("Installing installContainers {} in kieserver {}", containers.hashCode(), kieServerInfo);
                 containerManager.installContainers(kieServer, containers, currentState, kieServerSetup);
             }
         }        

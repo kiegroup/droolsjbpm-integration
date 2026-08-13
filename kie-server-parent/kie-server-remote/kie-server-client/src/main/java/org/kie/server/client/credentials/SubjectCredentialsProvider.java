@@ -18,8 +18,6 @@ package org.kie.server.client.credentials;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 
-import javax.security.jacc.PolicyContextException;
-
 import org.kie.server.client.CredentialsProvider;
 import org.wildfly.security.auth.server.IdentityCredentials;
 import org.wildfly.security.auth.server.SecurityDomain;

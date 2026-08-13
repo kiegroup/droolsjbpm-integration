@@ -18,7 +18,7 @@ package org.kie.server.services.impl.security;
 import org.kie.server.api.security.SecurityAdapter;
 
 import javax.security.auth.Subject;
-import javax.security.jacc.PolicyContext;
+import jakarta.security.jacc.PolicyContext;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Enumeration;

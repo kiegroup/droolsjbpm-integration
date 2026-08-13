@@ -278,8 +278,8 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>jakarta.security.jacc</groupId>
-      <artifactId>jakarta.security.jacc-api</artifactId>
+      <groupId>jakarta.authorization</groupId>
+      <artifactId>jakarta.authorization-api</artifactId>
     </dependency>
     <dependency>
       <groupId>simple-jndi</groupId>
