@@ -14,13 +14,13 @@
     </init-param>
     <init-param>
       <param-name>resteasy.servlet.mapping.prefix</param-name>
-      <param-value>/rest</param-value>
+      <param-value>/services/rest</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>org.kie.server.remote.rest.common.KieServerApplication</servlet-name>
-    <url-pattern>/rest/*</url-pattern>
+    <url-pattern>/services/rest/*</url-pattern>
   </servlet-mapping>
   <context-param>
     <param-name>resteasy.preferJacksonOverJsonB</param-name>
@@ -29,43 +29,29 @@
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>Swagger web resources</web-resource-name>
-      <url-pattern>/rest/server/swagger.json/*</url-pattern>
-      <url-pattern>/rest/server/files/*</url-pattern>
+      <url-pattern>/services/rest/server/swagger.json/*</url-pattern>
+      <url-pattern>/services/rest/server/files/*</url-pattern>
       <url-pattern>/docs/*</url-pattern>
-      <http-method>GET</http-method>
     </web-resource-collection>
     <!-- No authentication. Swagger resources should be accessible without authentication and files (form rendering). -->
   </security-constraint>
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>KIE Server Health and Readiness Probes</web-resource-name>
-      <url-pattern>/rest/server/readycheck</url-pattern>
-      <url-pattern>/rest/server/healthcheck</url-pattern>
-      <http-method>GET</http-method>
+      <url-pattern>/services/rest/server/readycheck</url-pattern>
+      <url-pattern>/services/rest/server/healthcheck</url-pattern>
     </web-resource-collection>
     <!-- No authentication KIE Server Health and Readiness Probes  -->
   </security-constraint>
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>REST web resources</web-resource-name>
-      <url-pattern>/rest/*</url-pattern>
-      <http-method>GET</http-method>
-      <http-method>PUT</http-method>
-      <http-method>POST</http-method>
-      <http-method>DELETE</http-method>
+      <url-pattern>/services/rest/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
       <role-name>kie-server</role-name>
       <role-name>user</role-name>
     </auth-constraint>
-  </security-constraint>
-  <security-constraint>
-    <web-resource-collection>
-      <web-resource-name>REST web resources</web-resource-name>
-      <url-pattern>/rest/*</url-pattern>
-      <http-method>OPTIONS</http-method>
-    </web-resource-collection>
-    <!-- No authentication.  -->
   </security-constraint>
   <login-config>
     <auth-method>BASIC</auth-method>
@@ -77,7 +63,5 @@
   <security-role>
     <role-name>user</role-name>
   </security-role>
-
-  <deny-uncovered-http-methods />
 
 </web-app>

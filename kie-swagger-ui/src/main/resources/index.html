@@ -72,6 +72,13 @@
 <script>
 window.onload = function() {
   
+  // Derive the full base path dynamically from the current page URL.
+  // index.html is served from /{contextRoot}/docs/index.html, so strip
+  // the trailing /docs/... to get /{contextRoot}, then append /services/rest.
+  const kieServicesPath = "${org.kie.swagger.base.path}";
+  const kieContextRoot = window.location.pathname.replace(/\/docs(\/.*)?$/, "");
+  const kieBasePath = kieContextRoot + kieServicesPath;
+
   // Build a system
   const ui = SwaggerUIBundle({
     url: "${org.kie.swagger.url}",
@@ -85,7 +92,48 @@ window.onload = function() {
       SwaggerUIBundle.plugins.DownloadUrl
     ],
     layout: "StandaloneLayout",
-    validatorUrl: null
+    validatorUrl: null,
+    responseInterceptor: function(response) {
+      // Swagger UI 3.1.x does not correctly use the OpenAPI 3.0 servers[].url
+      // path for curl example display. Rewrite the servers array in the parsed
+      // spec (body/obj) before Swagger UI renders it.
+      // serializeRes populates response.body and response.obj with the parsed
+      // object, and response.text/data with the raw string.
+      if (response.url && response.url.indexOf("swagger.json") !== -1) {
+        try {
+          var fullServerUrl = window.location.origin + kieBasePath;
+          // patch the parsed object (used for rendering)
+          if (response.body && typeof response.body === "object") {
+            response.body.servers = [{ url: fullServerUrl }];
+          }
+          if (response.obj && typeof response.obj === "object") {
+            response.obj.servers = [{ url: fullServerUrl }];
+          }
+          // also patch the raw text so any re-parse produces the same result
+          if (response.text) {
+            try {
+              var raw = JSON.parse(response.text);
+              raw.servers = [{ url: fullServerUrl }];
+              response.text = JSON.stringify(raw);
+              response.data = response.text;
+            } catch(e2) {}
+          }
+        } catch(e) {}
+      }
+      return response;
+    },
+    requestInterceptor: function(request) {
+      // Fix actual Try-it-out requests for the same reason.
+      if (kieBasePath && request.url) {
+        var base = window.location.origin + kieBasePath;
+        if (request.url.indexOf(base) === -1 &&
+            request.url.indexOf(window.location.origin + "/") === 0) {
+          var opPath = request.url.substring(window.location.origin.length);
+          request.url = window.location.origin + kieBasePath + opPath;
+        }
+      }
+      return request;
+    }
   })
 
   window.ui = ui

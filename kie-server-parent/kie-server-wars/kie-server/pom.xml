@@ -17,6 +17,7 @@
     <java.module.name>org.kie.server.distribution.wars</java.module.name>
     <org.kie.swagger.url>../services/rest/server/swagger.json</org.kie.swagger.url>
     <org.kie.swagger.title>Execution Server Documentation</org.kie.swagger.title>
+    <org.kie.swagger.base.path>/services/rest</org.kie.swagger.base.path>
   </properties>
 
   <dependencies>

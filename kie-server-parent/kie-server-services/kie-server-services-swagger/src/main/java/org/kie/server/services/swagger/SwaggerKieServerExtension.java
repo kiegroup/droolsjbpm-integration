@@ -61,14 +61,14 @@ public class SwaggerKieServerExtension implements KieServerExtension {
     }
 
     @Override
-    public void init(KieServerImpl kieServer, KieServerRegistry registry) {    	
+    public void init(KieServerImpl kieServer, KieServerRegistry registry) {
     	this.context = registry;
         OpenAPI oas = new OpenAPI();
         oas.info(getInfo());
 
-        String contextRoot = KieServerEnvironment.getContextRoot();
-        if (contextRoot != null) {
-            oas.addServersItem(new Server().url(contextRoot + "/services/rest"));
+        String serverUrl = resolveServerUrl();
+        if (serverUrl != null) {
+            oas.addServersItem(new Server().url(serverUrl));
         }
 
         SwaggerConfiguration oasConfig = new SwaggerConfiguration()
@@ -86,6 +86,30 @@ public class SwaggerKieServerExtension implements KieServerExtension {
     	initialized = true;
     }
     
+    /**
+     * Resolves the base URL for the OpenAPI servers entry.
+     * Prefers the fully-qualified URL derived from KIE_SERVER_LOCATION so that
+     * Swagger UI generates correct curl examples including host and port.
+     * Falls back to the context root path for backwards compatibility.
+     */
+    private String resolveServerUrl() {
+        String location = System.getProperty(KieServerConstants.KIE_SERVER_LOCATION);
+        if (location != null && !location.isEmpty()) {
+            // KIE_SERVER_LOCATION = http://host:port/ctx/services/rest/server
+            // strip the trailing /server to get the base URL
+            int idx = location.lastIndexOf("/server");
+            if (idx > 0) {
+                return location.substring(0, idx);
+            }
+            return location;
+        }
+        String contextRoot = KieServerEnvironment.getContextRoot();
+        if (contextRoot != null) {
+            return contextRoot + "/services/rest";
+        }
+        return null;
+    }
+
     private Info getInfo() {
     	Info info = new Info();
     	// version in general refers to major version of the project (kie server) though it uses minor as well to allow emergency type of changesinfo.setTitle("KIE-Server API");

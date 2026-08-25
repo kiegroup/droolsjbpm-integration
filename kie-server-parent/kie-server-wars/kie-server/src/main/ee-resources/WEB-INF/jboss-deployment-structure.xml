@@ -43,6 +43,16 @@
           <path name="org/w3c/dom/xpath"/>
         </paths>
       </system>
+      <!-- required for Nashorn (jBPM JavaScript data transformer) -->
+      <system export="true">
+        <paths>
+          <path name="jdk/dynalink"/>
+          <path name="jdk/dynalink/beans"/>
+          <path name="jdk/dynalink/linker"/>
+          <path name="jdk/dynalink/linker/support"/>
+          <path name="jdk/dynalink/support"/>
+        </paths>
+      </system>
     </dependencies>
   </deployment>
 </jboss-deployment-structure>

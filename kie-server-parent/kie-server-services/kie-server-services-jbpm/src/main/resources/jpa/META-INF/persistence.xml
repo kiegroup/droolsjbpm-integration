@@ -94,8 +94,12 @@
       <property name="hibernate.hbm2ddl.auto" value="update" />
       <property name="hibernate.show_sql" value="false" />
 
-      <!-- BZ 841786: AS7/EAP 6/Hib 4 uses new (sequence) generators which seem to cause problems -->
-      <property name="hibernate.id.new_generator_mappings" value="false" />
+      <!-- Restores Hibernate 5 AUTO generation behaviour: on dialects without native
+           sequence support (MySQL, older SQL Server) AUTO maps to identity/auto-increment,
+           matching those DDL scripts. On sequence-capable dialects the default
+           SequenceStyleGenerator behaviour is preserved. -->
+      <property name="hibernate.metadata_builder_contributor"
+                value="org.kie.server.services.jbpm.jpa.KieServerMetadataBuilderContributor" />
       <property name="hibernate.transaction.jta.platform" value="JBossAS" />
     </properties>
   </persistence-unit>
