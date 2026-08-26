@@ -56,8 +56,6 @@ import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.kie.server.api.rest.RestURI.*;
 import static org.kie.server.remote.rest.common.docs.ParameterSamples.CREATE_CONTAINER_JSON;
@@ -78,9 +76,6 @@ import static org.kie.server.remote.rest.common.util.RestUtils.serviceUnavailabl
 @Path("server")
 public class KieServerRestImpl {
 
-    private static final Logger logger = LoggerFactory.getLogger(KieServerRestImpl.class);
-
-
     private KieServerImpl server;
     private MarshallerHelper marshallerHelper;
 
@@ -88,13 +83,11 @@ public class KieServerRestImpl {
         // for now, if no server impl is passed as parameter, create one
         this.server = KieServerLocator.getInstance();
         this.marshallerHelper = new MarshallerHelper(this.server.getServerRegistry());
-        logger.info("KieServerRestImpl instantiated empty");
     }
 
     public KieServerRestImpl(KieServerImpl server) {
         this.server = server;
         this.marshallerHelper = new MarshallerHelper(server.getServerRegistry());
-        logger.info("KieServerRestImpl instantiated with KieServerImpl {}", server);
     }
 
     public KieServerImpl getServer() {
@@ -103,7 +96,6 @@ public class KieServerRestImpl {
 
     public void setServer(KieServerImpl server) {
         this.server = server;
-        logger.info("Set KieServerImpl {}", server);
     }
 
 
@@ -115,7 +107,6 @@ public class KieServerRestImpl {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getInfo(@Context HttpHeaders headers) {
-        logger.info("getInfo {}", headers);
         return createCorrectVariant(server.getInfo(), headers);
     }
 
@@ -132,7 +123,6 @@ public class KieServerRestImpl {
             @Parameter(description = "optional artifactId to filter containers by", required = false) @QueryParam("artifactId") String artifactId,
             @Parameter(description = "optional version to filter containers by", required = false) @QueryParam("version") String version,
             @Parameter(description = "optional status to filter containers by", required = false) @QueryParam("status") String status) {
-        logger.info("listContainers {}", headers);
         ReleaseIdFilter releaseIdFilter = new ReleaseIdFilter.Builder()
                 .groupId(groupId)
                 .artifactId(artifactId)
@@ -159,7 +149,6 @@ public class KieServerRestImpl {
                 @Content(mediaType = JSON, examples = {@ExampleObject(value = CREATE_CONTAINER_JSON)}),
                 @Content(mediaType = XML, examples = {@ExampleObject(value = CREATE_CONTAINER_XML)})
             }) String containerPayload ) {
-        logger.info("createContainer {}", headers);
         ServiceResponse<?> forbidden = this.server.checkAccessability();
         if (forbidden != null) {                       
             return createCorrectVariant( forbidden, headers, Status.BAD_REQUEST );
@@ -188,7 +177,6 @@ public class KieServerRestImpl {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response activateContainer( @Context HttpHeaders headers, 
             @Parameter(description = "Container id of deployed KIE Container", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String id) {
-        logger.info("activateContainer {}", headers);
         ServiceResponse<?> forbidden = this.server.checkAccessability();
         if (forbidden != null) {                       
             return createCorrectVariant( forbidden, headers, Status.BAD_REQUEST );
@@ -214,7 +202,6 @@ public class KieServerRestImpl {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response deactivateContainer( @Context HttpHeaders headers, 
             @Parameter(description = "Container id of deployed KIE Container", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String id) {
-        logger.info("deactivateContainer {}", headers);
         ServiceResponse<?> forbidden = this.server.checkAccessability();
         if (forbidden != null) {                       
             return createCorrectVariant( forbidden, headers, Status.BAD_REQUEST );
@@ -239,7 +226,6 @@ public class KieServerRestImpl {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getContainerInfo( @Context HttpHeaders headers, 
             @Parameter(description = "Container id to be retrieved", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String id ) {
-        logger.info("getContainerInfo {}", headers);
         Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
         return createCorrectVariant(server.getContainerInfo(id), headers, conversationIdHeader);
     }
@@ -255,7 +241,6 @@ public class KieServerRestImpl {
     public Response disposeContainer( @Context HttpHeaders headers, 
             @Parameter(description = "Container id to be disposed (undeployed)", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String id,
             @Parameter(description = "optional abortProcessInstances flag to abort process instances when container is disposed", required = false) @QueryParam("abortProcessInstances") Boolean abortProcessInstances) {
-        logger.info("disposeContainer {}", headers);
         ServiceResponse<?> forbidden = this.server.checkAccessability();
         if (forbidden != null) {                       
             return createCorrectVariant( forbidden, headers, Status.BAD_REQUEST );
@@ -275,7 +260,6 @@ public class KieServerRestImpl {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getScannerInfo( @Context HttpHeaders headers, 
             @Parameter(description = "Container id for scanner to be loaded", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String id ) {
-        logger.info("getScannerInfo {}", headers);
         Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
         return createCorrectVariant(server.getScannerInfo(id), headers, conversationIdHeader);
     }
@@ -295,7 +279,6 @@ public class KieServerRestImpl {
                 @Content(mediaType = JSON, examples = {@ExampleObject(value = UPDATE_SCANNER_JSON)}),
                 @Content(mediaType = XML, examples = {@ExampleObject(value = UPDATE_SCANNER_XML)})
             }) String resourcePayload ) {
-        logger.info("updateScanner {}", headers);
         ServiceResponse<?> forbidden = this.server.checkAccessability();
         if (forbidden != null) {                       
             return createCorrectVariant( forbidden, headers, Status.BAD_REQUEST );
@@ -318,7 +301,6 @@ public class KieServerRestImpl {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getReleaseId( @Context HttpHeaders headers, 
             @Parameter(description = "Container id that release id should be loaded from", required = true, example = "evaluation_1.0.0-SNAPSHOT") @PathParam(CONTAINER_ID) String id) {
-        logger.info("getReleaseId {}", headers);
         Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
         return createCorrectVariant(server.getContainerReleaseId(id), headers, conversationIdHeader);
     }
@@ -339,7 +321,6 @@ public class KieServerRestImpl {
                 @Content(mediaType = XML, examples = {@ExampleObject(value = UPDATE_RELEASE_ID_XML)})
             }) String releaseIdPayload,
             @Parameter(description = "Determines whether active processes are aborted (reset) before updating when the server runs in development mode") @QueryParam("resetBeforeUpdate")  @DefaultValue("false") boolean resetBeforeUpdate) {
-        logger.info("updateReleaseId {}", headers);
         ServiceResponse<?> forbidden = this.server.checkAccessability();
         if (forbidden != null) {                       
             return createCorrectVariant( forbidden, headers, Status.BAD_REQUEST );
@@ -362,7 +343,6 @@ public class KieServerRestImpl {
     @Path("state")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getServerState(@Context HttpHeaders headers) {
-        logger.info("getServerState {}", headers);
         return createCorrectVariant(server.getServerState(), headers);
     }
     
@@ -374,7 +354,6 @@ public class KieServerRestImpl {
     @Path("readycheck")
     @Produces({MediaType.TEXT_PLAIN})
     public Response readycheck(@Context HttpHeaders headers) {
-        logger.info("readycheck {}", headers);
         if (server.isKieServerReady()) {
             return Response.status(Response.Status.OK).build();
         }
@@ -395,7 +374,6 @@ public class KieServerRestImpl {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response healthcheck(@Context HttpHeaders headers,
                              @Parameter(description = "optional report flag to return detailed report of the check, defaults to false", required = false) @QueryParam("report")  @DefaultValue("false") boolean report) {
-        logger.info("healthcheck {}", headers);
         List<Message> healthMessages = server.healthCheck(report);
         
         boolean anyfailures = healthMessages.stream().anyMatch(msg -> msg.getSeverity().equals(Severity.ERROR));
