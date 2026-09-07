@@ -72,16 +72,6 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
     }
 
     @Override
-    public String getScopeAnnotationName() {
-        return "";
-    }
-
-    @Override
-    public List<String> getQualifierAnnotationNames() {
-        return List.of();
-    }
-
-    @Override
     public PersistenceUnitTransactionType getTransactionType() {
         return PersistenceUnitTransactionType.valueOf(transactionType);
     }

@@ -29,11 +29,11 @@ import org.hibernate.type.Type;
 
 public class OverrideId implements IdentifierGenerator, Configurable {
 
-    public Serializable generate(SharedSessionContractImplementor session, Object object) throws HibernateException {
-        Serializable id = session.getEntityPersister(null, object)
-                                 .getClassMetadata().getIdentifier(object, session);
-        return id;
-	}
+    @Override
+    public Object generate(SharedSessionContractImplementor session, Object object) throws HibernateException {
+        return session.getEntityPersister(null, object)
+                      .getIdentifier(object, session);
+ }
 
     @Override
     public void configure(Type type, Properties params, ServiceRegistry serviceRegistry) throws MappingException {

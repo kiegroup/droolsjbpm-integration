@@ -14,66 +14,93 @@
  */
 package org.kie.server.services.jbpm.jpa;
 
+import java.util.Iterator;
+import java.util.Properties;
+
 import org.hibernate.boot.MetadataBuilder;
+import org.hibernate.boot.model.relational.Database;
+import org.hibernate.boot.model.relational.Namespace;
+import org.hibernate.boot.model.relational.Sequence;
+import org.hibernate.boot.spi.InFlightMetadataCollector;
 import org.hibernate.boot.spi.MetadataBuilderContributor;
-import org.hibernate.boot.spi.MetadataBuilderImplementor;
+import org.hibernate.boot.spi.MetadataContributor;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
-import org.hibernate.service.ServiceRegistry;
+import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.RootClass;
+import org.hibernate.mapping.SimpleValue;
+import org.jboss.jandex.IndexView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Registers {@link AutoToNativeIdentifierGeneratorInterpreter} with the
- * Hibernate metadata builder so that {@code GenerationType.AUTO} is resolved
- * to the correct strategy for each database without requiring schema changes:
- * <ul>
- *   <li>Dialects without native sequence support (MySQL, older SQL Server):
- *       {@code AUTO} maps to {@code identity}, matching the {@code AUTO_INCREMENT}
- *       / {@code IDENTITY} columns in those DDL scripts.</li>
- *   <li>Dialects with native sequence support (PostgreSQL, Oracle, H2, DB2,
- *       SQL Server 2012+): default behaviour is preserved and
- *       {@code SequenceStyleGenerator} uses the existing {@code CREATE SEQUENCE}
- *       objects.</li>
- * </ul>
+ * Hook into Hibernate metadata building to ensure ID generators match the target database.
+ * On MySQL/MariaDB (which use native IDENTITY columns without sequences), intercepts entity ID generators
+ * and adjusts named sequences so Hibernate does not look for sequence emulation tables.
  *
- * Activated via the {@code hibernate.metadata_builder_contributor} property
- * in {@code persistence.xml}.
+ * Activated via the {@code hibernate.metadata_builder_contributor} property in {@code persistence.xml}
+ * or via Hibernate {@link MetadataContributor} SPI.
  */
-public class KieServerMetadataBuilderContributor implements MetadataBuilderContributor {
+public class KieServerMetadataBuilderContributor implements MetadataBuilderContributor, MetadataContributor {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerMetadataBuilderContributor.class);
 
     @Override
     public void contribute(MetadataBuilder metadataBuilder) {
-        ServiceRegistry serviceRegistry = ((MetadataBuilderImplementor) metadataBuilder)
-                .getBootstrapContext()
-                .getServiceRegistry();
+        // MetadataContributor interface handles metadata adjustments in Hibernate 6.6+
+    }
 
-        // Resolve the dialect class from the setting already in the configuration map.
-        // We use the ClassLoaderService so the WAR classloader is used, then instantiate
-        // a temporary dialect instance only to check supportsSequences().
-        String dialectClassName = (String) serviceRegistry
-                .getService(org.hibernate.engine.config.spi.ConfigurationService.class)
-                .getSettings()
-                .get("hibernate.dialect");
-
-        if (dialectClassName == null) {
-            logger.warn("KieServerMetadataBuilderContributor: hibernate.dialect not set, skipping AUTO generator fix");
-            return;
-        }
-
+    @Override
+    public void contribute(InFlightMetadataCollector metadataCollector, IndexView jandexIndex) {
         try {
-            Class<?> dialectClass = serviceRegistry
-                    .getService(ClassLoaderService.class)
-                    .classForName(dialectClassName);
-            Dialect dialect = (Dialect) dialectClass.getDeclaredConstructor().newInstance();
+            Database database = metadataCollector.getDatabase();
+            Dialect dialect = database.getDialect();
 
-            logger.info("KieServerMetadataBuilderContributor: applying AUTO id generator fix for dialect {}", dialectClassName);
-            metadataBuilder.applyIdGenerationTypeInterpreter(
-                    new AutoToNativeIdentifierGeneratorInterpreter(dialect));
+            if (isMySQL(dialect)) {
+                logger.info("Adjusting identifier generators for MySQL/MariaDB dialect: {}", dialect.getClass().getName());
+
+                // Remove sequence definitions on MySQL/MariaDB so no emulation tables are generated/queried
+                for (Namespace namespace : database.getNamespaces()) {
+                    Iterator<Sequence> seqIter = namespace.getSequences().iterator();
+                    while (seqIter.hasNext()) {
+                        Sequence seq = seqIter.next();
+                        logger.debug("Removing sequence definition on MySQL: {}", seq.getName());
+                        seqIter.remove();
+                    }
+                }
+
+                // Ensure entity identifier generators on MySQL use identity/native strategy
+                for (PersistentClass persistentClass : metadataCollector.getEntityBindings()) {
+                    if (persistentClass instanceof RootClass) {
+                        RootClass rootClass = (RootClass) persistentClass;
+                        if (rootClass.getIdentifier() instanceof SimpleValue) {
+                            SimpleValue idValue = (SimpleValue) rootClass.getIdentifier();
+                            String strategy = idValue.getIdentifierGeneratorStrategy();
+                            if ("sequence".equalsIgnoreCase(strategy)
+                                    || "org.hibernate.id.enhanced.SequenceStyleGenerator".equalsIgnoreCase(strategy)
+                                    || "native".equalsIgnoreCase(strategy)
+                                    || "auto".equalsIgnoreCase(strategy)) {
+                                logger.debug("Setting identity generator for entity: {}", rootClass.getEntityName());
+                                idValue.setIdentifierGeneratorStrategy("identity");
+                                Properties params = idValue.getIdentifierGeneratorProperties();
+                                if (params == null) {
+                                    params = new Properties();
+                                    idValue.setIdentifierGeneratorProperties(params);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         } catch (Exception e) {
-            logger.error("KieServerMetadataBuilderContributor: failed to instantiate dialect {}, skipping AUTO generator fix", dialectClassName, e);
+            logger.warn("Could not adjust identifier generators for MySQL: {}", e.getMessage(), e);
         }
+    }
+
+    private boolean isMySQL(Dialect dialect) {
+        if (dialect == null) {
+            return false;
+        }
+        String name = dialect.getClass().getName().toLowerCase();
+        return name.contains("mysql") || name.contains("mariadb");
     }
 }
