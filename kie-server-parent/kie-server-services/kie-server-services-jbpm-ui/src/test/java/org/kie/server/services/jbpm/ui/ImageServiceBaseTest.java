@@ -21,8 +21,8 @@ import static org.jbpm.process.svg.processor.SVGProcessor.COMPLETED_BORDER_COLOR
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,7 +51,7 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieServerRegistryImpl;
 import org.kie.server.services.jbpm.ui.img.ImageReference;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

@@ -15,7 +15,7 @@
 
 package org.kie.server.remote.rest.common.marker;
 
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -29,7 +29,7 @@ import org.junit.runner.RunWith;
 import org.kie.server.remote.rest.common.marker.KieServerEndpoint.EndpointType;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class KieServerEndpointRequestFilterTest {
@@ -87,7 +87,7 @@ public class KieServerEndpointRequestFilterTest {
 
         filter.filter(requestContext);
 
-        verify(requestContext, times(0)).abortWith(anyObject());
+        verify(requestContext, times(0)).abortWith(any());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class KieServerEndpointRequestFilterTest {
 
         filter.filter(requestContext);
 
-        verify(requestContext, times(1)).abortWith(anyObject());
+        verify(requestContext, times(1)).abortWith(any());
     }
 
     @Test
@@ -112,7 +112,7 @@ public class KieServerEndpointRequestFilterTest {
 
         filter.filter(requestContext);
 
-        verify(requestContext, times(1)).abortWith(anyObject());
+        verify(requestContext, times(1)).abortWith(any());
     }
 
     @Test
@@ -124,7 +124,7 @@ public class KieServerEndpointRequestFilterTest {
 
         filter.filter(requestContext);
 
-        verify(requestContext, times(0)).abortWith(anyObject());
+        verify(requestContext, times(0)).abortWith(any());
     }
 
     @Test
@@ -136,7 +136,7 @@ public class KieServerEndpointRequestFilterTest {
 
         filter.filter(requestContext);
 
-        verify(requestContext, times(1)).abortWith(anyObject());
+        verify(requestContext, times(1)).abortWith(any());
     }
 
     @Test
@@ -148,6 +148,6 @@ public class KieServerEndpointRequestFilterTest {
 
         filter.filter(requestContext);
 
-        verify(requestContext, times(0)).abortWith(anyObject());
+        verify(requestContext, times(0)).abortWith(any());
     }
 }

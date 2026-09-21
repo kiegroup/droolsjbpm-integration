@@ -19,7 +19,7 @@ import org.apache.aries.blueprint.container.BlueprintContainerImpl;
 import org.apache.aries.blueprint.container.SimpleNamespaceHandlerSet;
 import org.apache.aries.blueprint.parser.NamespaceHandlerSet;
 import org.apache.aries.blueprint.reflect.PassThroughMetadataImpl;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -73,7 +73,7 @@ public class KieBlueprintContainer extends BlueprintContainerImpl {
     private static Bundle createMockBundle(ClassLoader classLoader) {
         Bundle mockBundle = Mockito.mock(Bundle.class);
         BundleWiring mockBundleWiring = createMockBundleWiring(classLoader);
-        Mockito.when(mockBundle.adapt(Matchers.eq(BundleWiring.class))).thenReturn(mockBundleWiring);
+        Mockito.when(mockBundle.adapt(ArgumentMatchers.eq(BundleWiring.class))).thenReturn(mockBundleWiring);
         return mockBundle;
     }
 
