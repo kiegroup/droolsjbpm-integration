@@ -107,7 +107,7 @@
           <artifactId>cargo-maven3-plugin</artifactId>
           <configuration>
             <container>
-              <containerId>wildfly23x</containerId>
+              <containerId>wildfly35x</containerId>
               <type>installed</type>
               <artifactInstaller>
                 <groupId>org.wildfly</groupId>
@@ -126,7 +126,7 @@
                 <artifactId>kie-server-controller-standalone</artifactId>
                 <classifier>webc</classifier>
                 <type>war</type>
-                <location>${project.build.directory}/${project.build.finalName}-ee7.war</location>
+                <location>${project.build.directory}/${project.build.finalName}-ee10.war</location>
                 <properties>
                   <context>/controller</context>
                 </properties>
@@ -166,7 +166,7 @@
         </executions>
         <configuration>
           <descriptors>
-            <descriptor>src/main/assembly/assembly-ee7-container.xml</descriptor>
+            <descriptor>src/main/assembly/assembly-ee10-container.xml</descriptor>
             <descriptor>src/main/assembly/assembly-servlet-container.xml</descriptor>
           </descriptors>
           <archive>

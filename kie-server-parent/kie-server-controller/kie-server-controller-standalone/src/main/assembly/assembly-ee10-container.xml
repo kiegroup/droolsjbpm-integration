@@ -20,7 +20,7 @@
           xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
 
   <!-- including a . in the id will modify the *classifier* of the artifact, instead of the name/id of the artifact -->
-  <id>ee7</id>
+  <id>ee10</id>
   <formats>
     <format>war</format>
     <format>dir</format>
@@ -29,7 +29,7 @@
   <includeBaseDirectory>false</includeBaseDirectory>
   <fileSets>
     <fileSet>
-      <directory>${project.basedir}/src/main/ee7-resources</directory>
+      <directory>${project.basedir}/src/main/ee10-resources</directory>
       <outputDirectory>.</outputDirectory>
     </fileSet>
     <fileSet>

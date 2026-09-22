@@ -65,13 +65,6 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
-      <classifier>ee7</classifier>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server</artifactId>
       <classifier>ee10</classifier>
       <type>war</type>
       <scope>test</scope>
@@ -181,7 +174,7 @@
               <org.kie.dmn.server.ext.disabled>${org.kie.dmn.server.ext.disabled}</org.kie.dmn.server.ext.disabled>
               <org.kie.prometheus.server.ext.disabled>${org.kie.prometheus.server.ext.disabled}</org.kie.prometheus.server.ext.disabled>
               <org.kie.scenariosimulation.server.ext.disabled>${org.kie.scenariosimulation.server.ext.disabled}</org.kie.scenariosimulation.server.ext.disabled>
-              <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly23x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
+              <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly35x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
             </systemProperties>
           </container>
         </configuration>
@@ -267,11 +260,11 @@
       </activation>
     </profile>
     <profile>
-      <id>eap7</id>
+      <id>eap8</id>
       <activation>
         <property>
           <name>container.profile</name>
-          <value>eap7</value>
+          <value>eap8</value>
         </property>
       </activation>
     </profile>

@@ -68,13 +68,6 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
-      <classifier>ee7</classifier>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server</artifactId>
       <classifier>ee10</classifier>
       <type>war</type>
       <scope>test</scope>
@@ -89,7 +82,7 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-controller-standalone</artifactId>
-      <classifier>ee7</classifier>
+      <classifier>ee10</classifier>
       <type>war</type>
       <scope>test</scope>
     </dependency>
@@ -145,7 +138,7 @@
                 <org.kie.server.user>yoda</org.kie.server.user>
                 <org.kie.server.pwd>usetheforce123@</org.kie.server.pwd>
                 <org.kie.controller.ping.alive.timeout>1000</org.kie.controller.ping.alive.timeout>
-                <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly23x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
+                <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly35x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
               </systemProperties>
             </container>
             <deployables combine.children="append">
@@ -233,11 +226,11 @@
       </dependencies>
     </profile>
     <profile>
-      <id>eap7</id>
+      <id>eap8</id>
       <activation>
         <property>
           <name>container.profile</name>
-          <value>eap7</value>
+          <value>eap8</value>
         </property>
       </activation>
       <dependencies>

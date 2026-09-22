@@ -82,13 +82,6 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
-      <classifier>ee7</classifier>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server</artifactId>
       <classifier>ee10</classifier>
       <type>war</type>
       <scope>test</scope>
@@ -177,7 +170,7 @@
               <org.kie.executor.jms>true</org.kie.executor.jms>
               <!-- For including complete stack trace in the response -->
               <org.kie.server.stacktrace.included>true</org.kie.server.stacktrace.included>
-              <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly23x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
+              <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly35x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
               <org.kie.server.bypass.auth.user>true</org.kie.server.bypass.auth.user>
             </systemProperties>
           </container>
@@ -326,11 +319,11 @@
       </activation>
     </profile>
     <profile>
-      <id>eap7</id>
+      <id>eap8</id>
       <activation>
         <property>
           <name>container.profile</name>
-          <value>eap7</value>
+          <value>eap8</value>
         </property>
       </activation>
     </profile>

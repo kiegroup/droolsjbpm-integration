@@ -22,7 +22,7 @@
          is not able to override the value of the property. The port number would then always be the same
          (the default one, unless changed from outside) -->
     <kie.server.context>kie-server-services</kie.server.context>
-    <kie.server.classifier>ee7</kie.server.classifier>
+    <kie.server.classifier>ee10</kie.server.classifier>
     <container.hostname>localhost</container.hostname>
     <container.port>8080</container.port>
     <offset.container.port>8180</offset.container.port>
@@ -225,7 +225,7 @@
                 </goals>
                 <configuration>
                   <container>
-                    <containerId>wildfly23x</containerId>
+                    <containerId>wildfly35x</containerId>
                     <home>${project.build.directory}/application-server-fuse</home>
                     <type>installed</type>
                     <contextKey>fuse</contextKey>
@@ -273,7 +273,7 @@
                 </goals>
                 <configuration>
                   <container>
-                    <containerId>wildfly23x</containerId>
+                    <containerId>wildfly35x</containerId>
                     <home>${project.build.directory}/application-server-kie-server</home>
                     <type>installed</type>
                     <contextKey>kie-server</contextKey>

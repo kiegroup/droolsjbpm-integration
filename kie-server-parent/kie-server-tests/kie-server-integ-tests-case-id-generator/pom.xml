@@ -66,13 +66,6 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
-      <classifier>ee7</classifier>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server</artifactId>
       <classifier>ee10</classifier>
       <type>war</type>
       <scope>test</scope>
@@ -170,7 +163,7 @@
               <org.jbpm.ui.server.ext.disabled>true</org.jbpm.ui.server.ext.disabled>
               <org.jbpm.case.server.ext.disabled>${org.jbpm.case.server.ext.disabled}</org.jbpm.case.server.ext.disabled>
               <org.kie.server.cases.generator>CUSTOM_NUMBER_PREFIX</org.kie.server.cases.generator>
-              <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly23x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
+              <org.kie.server.services.jbpm.security.filesystemrealm.folder-path>${project.basedir}/target/cargo/configurations/wildfly35x/kie-fs-realm-users</org.kie.server.services.jbpm.security.filesystemrealm.folder-path>
             </systemProperties>
           </container>
           <deployables>
@@ -211,11 +204,11 @@
       </properties>
     </profile>
     <profile>
-      <id>eap7</id>
+      <id>eap8</id>
       <activation>
         <property>
           <name>container.profile</name>
-          <value>eap7</value>
+          <value>eap8</value>
         </property>
       </activation>
       <properties>
@@ -232,7 +225,7 @@
         </property>
       </activation>
       <properties>
-        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.ee7.war.path}</kie-server.war.path>
+        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.ee10.war.path}</kie-server.war.path>
         <skip-prepare-kie-server>false</skip-prepare-kie-server>
       </properties>
     </profile>
@@ -245,7 +238,7 @@
         </property>
       </activation>
       <properties>
-        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.ee7.war.path}</kie-server.war.path>
+        <kie-server.war.path>${maven.dependency.org.kie.server.kie-server.ee10.war.path}</kie-server.war.path>
         <skip-prepare-kie-server>false</skip-prepare-kie-server>
       </properties>
     </profile>
