@@ -24,8 +24,6 @@ import java.util.Collection;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import org.h2.tools.DeleteDbFiles;
-import org.h2.tools.Server;
 import org.jbpm.compiler.xml.XmlRuleFlowProcessDumper;
 import org.jbpm.process.core.Work;
 import org.jbpm.process.core.impl.WorkImpl;
@@ -73,17 +71,11 @@ import static org.junit.Assert.assertNull;
 public class JPASingleSessionCommandServiceFactoryTest {
     private static String TMPDIR = System.getProperty("java.io.tmpdir");
     private static final Logger log = LoggerFactory.getLogger(JPASingleSessionCommandServiceFactoryTest.class);
-    private static Server h2Server;
 
     private static ApplicationContext ctx;
 
     @BeforeClass
     public static void startH2Database() throws Exception {
-        DeleteDbFiles.execute("",
-                "DroolsFlow",
-                true);
-        h2Server = Server.createTcpServer(new String[]{"-ifNotExists"});
-        h2Server.start();
         try {
             TMPDIR = JPASingleSessionCommandServiceFactoryTest.class.getResource("/kb_persistence").getFile();
             log.debug("creating: {}",
@@ -119,10 +111,6 @@ public class JPASingleSessionCommandServiceFactoryTest {
     @AfterClass
     public static void stopH2Database() throws Exception {
         log.debug("stopping database");
-        h2Server.stop();
-        DeleteDbFiles.execute( "",
-                               "DroolsFlow",
-                               true );
     }
 
     @Before

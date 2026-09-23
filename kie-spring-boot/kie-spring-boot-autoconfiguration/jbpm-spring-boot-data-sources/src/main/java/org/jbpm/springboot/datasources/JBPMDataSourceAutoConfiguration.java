@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 import javax.sql.XADataSource;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -45,6 +46,7 @@ import org.springframework.util.StringUtils;
 
 @Configuration
 @ConditionalOnClass({ XADataSource.class })
+@ConditionalOnBean(XADataSourceWrapper.class)
 public class JBPMDataSourceAutoConfiguration {
 
     private XADataSource xaDataSource;

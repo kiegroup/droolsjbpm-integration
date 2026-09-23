@@ -197,7 +197,7 @@ public class PerProcessInstanceSpringTest extends AbstractJbpmSpringParameterize
         runtime2.getTaskService().complete(taskId2, USER_JOHN, null);
 
         transactionManager.commit(status);
-        manager.disposeRuntimeEngine(runtime);
+        manager.disposeRuntimeEngine(runtime2); // was incorrectly disposing runtime (pi1) instead of runtime2 (pi2)
 
         status = transactionManager.getTransaction(defTransDefinition);
         runtime = manager.getRuntimeEngine(ProcessInstanceIdContext.get(pi1.getId()));
@@ -215,11 +215,16 @@ public class PerProcessInstanceSpringTest extends AbstractJbpmSpringParameterize
         manager.disposeRuntimeEngine(runtime);
 
         // since process is completed now session should not be there any more
-        try {
-            manager.getRuntimeEngine(ProcessInstanceIdContext.get(pi1.getId())).getKieSession();
-            fail("Session for this (" + pi1.getId() + ") process instance is no more accessible");
-        } catch (RuntimeException e) {
-
+        {
+            RuntimeEngine completedEngine1 = manager.getRuntimeEngine(ProcessInstanceIdContext.get(pi1.getId()));
+            try {
+                completedEngine1.getKieSession();
+                fail("Session for this (" + pi1.getId() + ") process instance is no more accessible");
+            } catch (RuntimeException e) {
+                // expected
+            } finally {
+                manager.disposeRuntimeEngine(completedEngine1);
+            }
         }
         status = transactionManager.getTransaction(defTransDefinition);
         runtime2 = manager.getRuntimeEngine(ProcessInstanceIdContext.get(pi2.getId()));
@@ -237,11 +242,16 @@ public class PerProcessInstanceSpringTest extends AbstractJbpmSpringParameterize
         manager.disposeRuntimeEngine(runtime2);
 
         // since process is completed now session should not be there any more
-        try {
-            manager.getRuntimeEngine(ProcessInstanceIdContext.get(pi2.getId())).getKieSession();
-            fail("Session for this (" + pi2.getId() + ") process instance is no more accessible");
-        } catch (RuntimeException e) {
-
+        {
+            RuntimeEngine completedEngine2 = manager.getRuntimeEngine(ProcessInstanceIdContext.get(pi2.getId()));
+            try {
+                completedEngine2.getKieSession();
+                fail("Session for this (" + pi2.getId() + ") process instance is no more accessible");
+            } catch (RuntimeException e) {
+                // expected
+            } finally {
+                manager.disposeRuntimeEngine(completedEngine2);
+            }
         }
 
     }

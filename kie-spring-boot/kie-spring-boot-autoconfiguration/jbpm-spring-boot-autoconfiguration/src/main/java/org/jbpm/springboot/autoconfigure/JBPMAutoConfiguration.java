@@ -75,6 +75,7 @@ import org.jbpm.services.api.admin.UserTaskAdminService;
 import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.task.HumanTaskServiceFactory;
 import org.jbpm.services.task.audit.TaskAuditServiceFactory;
+import org.jbpm.process.core.timer.impl.QuartzSchedulerService;
 import org.jbpm.services.task.deadlines.NotificationListener;
 import org.jbpm.services.task.deadlines.notifications.impl.NotificationListenerManager;
 import org.jbpm.services.task.identity.DefaultUserInfo;
@@ -107,6 +108,7 @@ import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -141,23 +143,15 @@ public class JBPMAutoConfiguration {
     private ApplicationContext applicationContext;
     private JBPMProperties properties;
 
-    private PlatformTransactionManager transactionManager;
-
     private List<NotificationListener> notificationListeners;
     private List<EventEmitter> eventEmitters;
 
-    public JBPMAutoConfiguration(PlatformTransactionManager transactionManager,
-                                 JBPMProperties properties,
+    public JBPMAutoConfiguration(JBPMProperties properties,
                                  ApplicationContext applicationContext) {
 
-        this.transactionManager = transactionManager;
         this.properties = properties;
         this.applicationContext = applicationContext;
         System.setProperty(TX_FACTORY_CLASS, SPRING_TX_FACTORY_CLASS);
-        TransactionManagerFactory transactionManagerFactory = TransactionManagerFactory.get();
-        if (transactionManagerFactory instanceof KieSpringTransactionManagerFactory) {
-            ((KieSpringTransactionManagerFactory) transactionManagerFactory).setGlobalTransactionManager(applicationContext.getBean(AbstractPlatformTransactionManager.class));
-        }
 
         // init any spring based ObjectModelResolvers
         List<ObjectModelResolver> resolvers = ObjectModelResolverProvider.getResolvers();
@@ -194,9 +188,16 @@ public class JBPMAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(name = "kieTransactionManager")
-    public TransactionManager kieTransactionManager() {
-
-        return new KieSpringTransactionManager((AbstractPlatformTransactionManager) transactionManager);
+    public TransactionManager kieTransactionManager(PlatformTransactionManager platformTransactionManager) {
+        if (!(platformTransactionManager instanceof AbstractPlatformTransactionManager)) {
+            throw new IllegalStateException("Expected AbstractPlatformTransactionManager but got: " + platformTransactionManager.getClass());
+        }
+        AbstractPlatformTransactionManager abstractTxManager = (AbstractPlatformTransactionManager) platformTransactionManager;
+        TransactionManagerFactory transactionManagerFactory = TransactionManagerFactory.get();
+        if (transactionManagerFactory instanceof KieSpringTransactionManagerFactory) {
+            ((KieSpringTransactionManagerFactory) transactionManagerFactory).setGlobalTransactionManager(abstractTxManager);
+        }
+        return new KieSpringTransactionManager(abstractTxManager);
     }
 
     @Bean
@@ -232,7 +233,7 @@ public class JBPMAutoConfiguration {
     public RuntimeManagerFactory runtimeManagerFactory(UserGroupCallback userGroupCallback, UserInfo userInfo) {
 
         SpringRuntimeManagerFactoryImpl runtimeManager = new SpringRuntimeManagerFactoryImpl(this.applicationContext);
-        runtimeManager.setTransactionManager((AbstractPlatformTransactionManager) transactionManager);
+        runtimeManager.setTransactionManager(applicationContext.getBean("transactionManager", AbstractPlatformTransactionManager.class));
         runtimeManager.setUserGroupCallback(userGroupCallback);
         runtimeManager.setUserInfo(userInfo);
 
@@ -257,7 +258,7 @@ public class JBPMAutoConfiguration {
     @ConditionalOnMissingBean(name = "transactionalCommandService")
     public TransactionalCommandService transactionalCommandService(EntityManagerFactory entityManagerFactory, TransactionManager kieTransactionManager) {
 
-        return new SpringTransactionalCommandService(entityManagerFactory, kieTransactionManager, (AbstractPlatformTransactionManager) transactionManager);
+        return new SpringTransactionalCommandService(entityManagerFactory, kieTransactionManager, applicationContext.getBean("transactionManager", AbstractPlatformTransactionManager.class));
     }
 
     @Bean(destroyMethod="shutdown")
@@ -321,7 +322,7 @@ public class JBPMAutoConfiguration {
     public RuntimeDataService runtimeDataService(EntityManagerFactory entityManagerFactory, UserGroupCallback userGroupCallback, UserInfo userInfo, TransactionalCommandService transactionalCommandService, IdentityProvider identityProvider, DeploymentService deploymentService) {
 
         Environment environment = EnvironmentFactory.newEnvironment();
-        environment.set(EnvironmentName.TRANSACTION_MANAGER, transactionManager);
+        environment.set(EnvironmentName.TRANSACTION_MANAGER, applicationContext.getBean("transactionManager", AbstractPlatformTransactionManager.class));
         environment.set(EnvironmentName.ENTITY_MANAGER_FACTORY, entityManagerFactory);
 
         TaskService taskService = HumanTaskServiceFactory.newTaskServiceConfigurator()
@@ -531,6 +532,53 @@ public class JBPMAutoConfiguration {
     }
 
 
+
+    /**
+     * Ensures the Quartz scheduler is fully stopped before the data source beans
+     * (HikariCP) are destroyed during application shutdown.
+     *
+     * Without this, Quartz worker threads keep trying to obtain connections from
+     * an already-closed HikariDataSource, producing repeated
+     * "HikariDataSource has been closed" errors in the log.
+     *
+     * SmartLifecycle.stop() runs in the highest phase first (Integer.MAX_VALUE),
+     * which is before Spring destroys any infrastructure beans (data sources, EMF).
+     */
+    @Bean
+    @ConditionalOnProperty(name = "jbpm.quartz.enabled", havingValue = "true")
+    public SmartLifecycle quartzSchedulerLifecycle() {
+        return new SmartLifecycle() {
+            private volatile boolean running = false;
+
+            @Override
+            public void start() {
+                running = true;
+            }
+
+            @Override
+            public void stop() {
+                try {
+                    new QuartzSchedulerService().forceShutdown();
+                } catch (Exception e) {
+                    logger.warn("Error while stopping Quartz scheduler during shutdown", e);
+                } finally {
+                    running = false;
+                }
+            }
+
+            @Override
+            public boolean isRunning() {
+                return running;
+            }
+
+            @Override
+            public int getPhase() {
+                // Highest phase = first to stop. Quartz threads must drain before
+                // HikariCP (phase DEFAULT = 0) closes the connection pool.
+                return Integer.MAX_VALUE;
+            }
+        };
+    }
 
     /*
      * Helper methods

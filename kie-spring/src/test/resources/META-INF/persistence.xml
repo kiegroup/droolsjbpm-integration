@@ -27,6 +27,7 @@
       <property name="hibernate.max_fetch_depth" value="3"/>
       <property name="hibernate.hbm2ddl.auto" value="create"/>
       <property name="hibernate.show_sql" value="false"/>
+      <property name="jakarta.persistence.lock.timeout" value="5000"/>
 
       <!--
       <property name="hibernate.connection.autocommit" value="false" />

@@ -20,8 +20,6 @@ import org.drools.core.base.MapGlobalResolver;
 import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
-import org.h2.tools.DeleteDbFiles;
-import org.h2.tools.Server;
 import org.junit.*;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
@@ -57,27 +55,8 @@ import static org.junit.Assert.*;
 public class VariablePersistenceStrategyTest {
 
     private static final Logger log = LoggerFactory.getLogger(JPASingleSessionCommandServiceFactoryTest.class);
-    private static Server h2Server;
 
     private ApplicationContext ctx;
-
-    @BeforeClass
-    public static void startH2Database() throws Exception {
-        DeleteDbFiles.execute("",
-                "DroolsFlow",
-                true);
-        h2Server = Server.createTcpServer(new String[]{"-ifNotExists"});
-        h2Server.start();
-    }
-
-    @AfterClass
-    public static void stopH2Database() throws Exception {
-        log.debug("stoping database");
-        h2Server.stop();
-        DeleteDbFiles.execute("",
-                "DroolsFlow",
-                true);
-    }
 
     @Before
     public void createSpringContext() {

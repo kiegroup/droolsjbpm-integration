@@ -60,11 +60,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-rt-rs-service-description-swagger</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.swagger.core.v3</groupId>
-      <artifactId>swagger-jaxrs2-jakarta</artifactId>
+      <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
     </dependency>
     <!-- needed for the Kafka Emitter -->
     <dependency>

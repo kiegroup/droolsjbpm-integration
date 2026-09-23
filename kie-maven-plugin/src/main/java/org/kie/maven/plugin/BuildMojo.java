@@ -211,6 +211,9 @@ public class BuildMojo extends AbstractDMNValidationAwareMojo implements Context
     }
 
     private Map<String, Object> getKieMap() {
+        if (container == null) {
+            return Collections.emptyMap();
+        }
         try {
             /**
              * Retrieve the map passed into the Plexus container by the MavenEmbedder from the MavenIncrementalCompiler in the kie-wb-common

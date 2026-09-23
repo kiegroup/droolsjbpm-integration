@@ -7,14 +7,18 @@
 
   <bean id="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
     <property name="driverClassName" value="org.h2.Driver"/>
-    <property name="url" value="jdbc:h2:tcp://localhost/./DroolsFlow;MODE=LEGACY;NON_KEYWORDS=VALUE"/>
+    <property name="url" value="jdbc:h2:mem:DroolsFlow;DB_CLOSE_DELAY=-1;MODE=LEGACY;NON_KEYWORDS=VALUE"/>
     <property name="username" value="sa"/>
     <property name="password" value=""/>
   </bean>
 
+  <bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+
   <bean id="myEmf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
     <property name="dataSource" ref="ds"/>
     <property name="persistenceUnitName" value="org.drools.persistence.jpa.local"/>
+    <property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>
+    <property name="entityManagerFactoryInterface" value="jakarta.persistence.EntityManagerFactory"/>
   </bean>
 
   <bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager">

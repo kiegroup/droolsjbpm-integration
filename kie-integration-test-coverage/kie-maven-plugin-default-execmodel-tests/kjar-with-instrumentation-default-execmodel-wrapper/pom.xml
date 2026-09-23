@@ -16,7 +16,6 @@
   <properties>
     <java.module.name>org.drools.testcoverage.kjar.execmodel.wrapper</java.module.name>
   </properties>
-
   <dependencies>
     <dependency>
       <!-- Artificial dependency to make sure that kie-maven-plugin is always built before this

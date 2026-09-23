@@ -62,7 +62,13 @@ public abstract class AbstractAuditDataReplicationJMSConsumer {
                 Integer eventType = textMessage.getIntProperty("EventType");
                 logger.debug("Message type {} received:\n{}", eventType, messageContent);
                 Object event = xstream.fromXML(messageContent);
-                em.merge(event);
+                // Use replicate(LATEST_VERSION) to write the incoming object into the replica DB with
+                // its original primary key preserved. Unlike merge(), replicate() handles entities that
+                // have an existing id but are absent from the replica (inserts them rather than throwing
+                // StaleObjectStateException). LATEST_VERSION ensures that out-of-order JMS delivery
+                // cannot cause an older snapshot to overwrite a newer one already in the replica.
+                em.unwrap(org.hibernate.Session.class)
+                  .replicate(event, org.hibernate.ReplicationMode.LATEST_VERSION);
                 processedMessages.incrementAndGet();
             } catch (JMSException e) {
                 throw new RuntimeException("Something went wrong while consuming an event", e);

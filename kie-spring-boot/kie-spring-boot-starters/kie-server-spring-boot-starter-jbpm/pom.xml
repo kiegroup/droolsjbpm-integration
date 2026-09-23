@@ -70,8 +70,15 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>me.snowdrop</groupId>
+      <groupId>dev.snowdrop</groupId>
       <artifactId>narayana-spring-boot-starter</artifactId>
+    </dependency>
+    <!-- narayana-jts-integration declares jboss-transaction-spi as provided scope;
+         add the jakarta variant explicitly so NarayanaAutoConfiguration can find
+         org.jboss.tm.XAResourceRecoveryRegistry at runtime -->
+    <dependency>
+      <groupId>org.jboss</groupId>
+      <artifactId>jboss-transaction-spi-jakarta</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>

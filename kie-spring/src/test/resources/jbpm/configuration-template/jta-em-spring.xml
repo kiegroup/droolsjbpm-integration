@@ -7,9 +7,13 @@
 
   <import resource="classpath:jbpm/configuration-template/assets.xml" />
 
+  <bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+
   <bean id="jbpmEMF" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
     <property name="persistenceUnitName" value="org.jbpm.persistence.spring.jta"/>
     <property name="persistenceXmlLocation" value="classpath:jbpm/persistence-jta.xml"/>
+    <property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>
+    <property name="entityManagerFactoryInterface" value="jakarta.persistence.EntityManagerFactory"/>
   </bean>
 
   <bean id="jbpmEM" class="org.springframework.orm.jpa.support.SharedEntityManagerBean">

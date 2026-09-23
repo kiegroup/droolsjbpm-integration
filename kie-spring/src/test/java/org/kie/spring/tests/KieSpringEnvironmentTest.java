@@ -18,10 +18,7 @@ package org.kie.spring.tests;
 import org.drools.core.marshalling.impl.IdentityPlaceholderResolverStrategy;
 import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
-import org.h2.tools.DeleteDbFiles;
-import org.h2.tools.Server;
 import org.jbpm.marshalling.impl.ProcessInstanceResolverStrategy;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.marshalling.ObjectMarshallingStrategy;
@@ -36,24 +33,6 @@ import static org.junit.Assert.*;
 public class KieSpringEnvironmentTest {
 
     static ApplicationContext context = null;
-    private static Server h2Server;
-
-    @BeforeClass
-    public static void startH2Database() throws Exception {
-        DeleteDbFiles.execute("",
-                "DroolsFlow",
-                true);
-        h2Server = Server.createTcpServer(new String[]{"-ifNotExists"});
-        h2Server.start();
-    }
-
-    @AfterClass
-    public static void stopH2Database() throws Exception {
-        h2Server.stop();
-        DeleteDbFiles.execute("",
-                "DroolsFlow",
-                true);
-    }
 
     @BeforeClass
     public static void runBeforeClass() {

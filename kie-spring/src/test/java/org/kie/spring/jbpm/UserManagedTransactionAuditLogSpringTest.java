@@ -44,8 +44,10 @@ public class UserManagedTransactionAuditLogSpringTest extends AbstractJbpmSpring
 
     @Parameters(name = "{index}: {0}")
     public static Collection<Object[]> contextPath() {
+        // jta-emf uses a per-operation EntityManager (STANDALONE_JTA strategy) which cannot
+        // share L1 cache with the Drools CMD_SCOPED_EM in Hibernate 6. Within-transaction
+        // visibility of the completed ProcessInstanceLog requires a shared EM (jta-em).
         Object[][] data = new Object[][] {
-                { JTA_EMF_SINGLETON_PATH, EmptyContext.get() },
                 { JTA_EM_SINGLETON_PATH, EmptyContext.get() }
         };
         return Arrays.asList(data);

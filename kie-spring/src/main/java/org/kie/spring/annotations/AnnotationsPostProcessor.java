@@ -98,17 +98,14 @@ class AnnotationsPostProcessor implements InstantiationAwareBeanPostProcessor,
         return true;
     }
 
-    public PropertyValues postProcessPropertyValues(
-            PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeansException {
-
+    @Override
+    public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) throws BeansException {
         InjectionMetadata metadata = findAnnotationMetadata(bean.getClass());
         try {
             metadata.inject(bean, beanName, pvs);
-        }
-        catch (Throwable ex) {
+        } catch (Throwable ex) {
             throw new BeanCreationException(beanName, INJECTION_OF_KIE_DEPENDENCIES_FAILED, ex);
         }
-
         return pvs;
     }
 

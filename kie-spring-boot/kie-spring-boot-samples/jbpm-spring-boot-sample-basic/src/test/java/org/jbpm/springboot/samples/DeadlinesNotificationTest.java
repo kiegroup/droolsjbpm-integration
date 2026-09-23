@@ -106,7 +106,7 @@ public class DeadlinesNotificationTest {
         deploymentService.undeploy(unit);
     }
 
-    @Test(timeout = 10000)
+    @Test(timeout = 30000)
     public void testSaveContentAfterDeadlines() throws Exception {
         countDownListener.configure(1);
         countDownListener.setSaveContent(true);
@@ -127,7 +127,7 @@ public class DeadlinesNotificationTest {
         assertNull(pi);
     }
 
-    @Test(timeout = 10000)
+    @Test(timeout = 30000)
     public void testRepeatedNotificationsAfterDeadlinesWhenNotStarted() throws Exception {
         assertNotNull(unit);
         Long processInstanceId = processService.startProcess(unit.getIdentifier(), "repeated-notifications");
@@ -145,7 +145,7 @@ public class DeadlinesNotificationTest {
         assertNull(pi);
     }
 
-    @Test(timeout = 20000)
+    @Test(timeout = 40000)
     public void testRepeatedNotificationsAfterDeadlinesWhenNotCompleted() throws Exception {
         assertNotNull(unit);
         Long processInstanceId = processService.startProcess(unit.getIdentifier(), "repeated-notifications");

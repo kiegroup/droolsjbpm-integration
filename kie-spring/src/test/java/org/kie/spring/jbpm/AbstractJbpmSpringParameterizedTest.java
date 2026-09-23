@@ -17,6 +17,7 @@ package org.kie.spring.jbpm;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.transaction.TransactionManager;
 import org.jbpm.process.audit.AuditLogService;
 import org.junit.After;
 import org.junit.Before;
@@ -57,6 +58,26 @@ public abstract class AbstractJbpmSpringParameterizedTest extends AbstractJbpmSp
             em.close();
             em = null;
         }
+        if (context != null) {
+            context.close();
+            context = null;
+        }
+        // After each test, Narayana may leave an active or aborted transaction associated with
+        // this thread (e.g. when a test fails mid-transaction). Roll it back first to release
+        // any H2/DB locks, then suspend so the next @Before setUp() can start cleanly.
+        try {
+            TransactionManager narayanaTm = com.arjuna.ats.jta.TransactionManager.transactionManager();
+            jakarta.transaction.Transaction tx = narayanaTm.getTransaction();
+            if (tx != null) {
+                int status = tx.getStatus();
+                if (status == jakarta.transaction.Status.STATUS_ACTIVE
+                        || status == jakarta.transaction.Status.STATUS_MARKED_ROLLBACK) {
+                    narayanaTm.rollback();
+                } else {
+                    narayanaTm.suspend();
+                }
+            }
+        } catch (Exception ignored) { }
     }
 
     protected KieSession getKieSession() {

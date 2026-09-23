@@ -64,7 +64,7 @@ public class KieSpringKieSessionAttributesTest {
 
     @AfterClass
     public static void tearDown() {
-        context.destroy();
+        context.close();
     }
 
 }

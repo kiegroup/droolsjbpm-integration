@@ -31,7 +31,7 @@
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
-      <artifactId>jbpm-spring-boot-starter-basic</artifactId>     
+      <artifactId>jbpm-spring-boot-starter-basic</artifactId>
       <!-- collides with org.glassfish.jaxb:jaxb-runtime -->
       <exclusions>
         <exclusion>
@@ -39,6 +39,11 @@
           <artifactId>jaxb-runtime</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <!-- narayana-jts-integration declares jboss-transaction-spi as provided; add it explicitly -->
+    <dependency>
+      <groupId>org.jboss</groupId>
+      <artifactId>jboss-transaction-spi-jakarta</artifactId>
     </dependency>
     <!-- Spring Boot v2 has no updates, but the tomcat version it uses has multiple CVEs -->
     <!-- For this reason, we're going to include our own version of tomcat and exclude what it brings in -->
@@ -208,6 +213,13 @@
               </configuration>
             </execution>
           </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <argLine>-Xmx2G --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED</argLine>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>

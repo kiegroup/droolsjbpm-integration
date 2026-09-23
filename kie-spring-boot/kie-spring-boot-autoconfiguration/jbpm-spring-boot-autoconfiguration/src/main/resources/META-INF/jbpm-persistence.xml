@@ -77,7 +77,7 @@
     <!--added new classes in 7.5.0 -->
     <class>org.jbpm.runtime.manager.impl.jpa.ExecutionErrorInfo</class>
 
-    <properties>  
+    <properties>
       <property name="hibernate.connection.handling_mode" value="DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION"/>
     </properties>
   </persistence-unit>

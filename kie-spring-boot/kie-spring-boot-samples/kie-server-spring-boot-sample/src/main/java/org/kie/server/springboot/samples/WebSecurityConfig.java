@@ -2,18 +2,19 @@ package org.kie.server.springboot.samples;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration("kieServerSecurity")
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
 
     private static final String KIE_SERVER_PASSWORD = "kieserver1!";
     private static final String USER_PASSWORD = "usetheforce123@";
@@ -25,18 +26,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String IT_ROLE = "IT";
     private static final String ACCOUNTING_ROLE = "HR";
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-        .csrf().disable()
-        .authorizeRequests()
-            .antMatchers("/rest/server*").authenticated()
-            .and()
-        .httpBasic();
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/rest/server*").authenticated()
+                .anyRequest().permitAll()
+            )
+            .httpBasic(Customizer.withDefaults());
+        return http.build();
     }
 
     @Bean
-    @Override
     public UserDetailsManager userDetailsService() {
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
         PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();

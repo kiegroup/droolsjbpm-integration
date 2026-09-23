@@ -29,11 +29,12 @@ import org.hibernate.type.Type;
 
 public class OverrideId implements IdentifierGenerator, Configurable {
 
-    @Override
-    public Object generate(SharedSessionContractImplementor session, Object object) throws HibernateException {
-        return session.getEntityPersister(null, object)
-                      .getIdentifier(object, session);
- }
+    public Serializable generate(SharedSessionContractImplementor session, Object object) throws HibernateException {
+        // EntityPersister.getClassMetadata() was removed in Hibernate 6;
+        // use getIdentifier(entity, session) directly instead.
+        return (Serializable) session.getEntityPersister(null, object)
+                                     .getIdentifier(object, session);
+    }
 
     @Override
     public void configure(Type type, Properties params, ServiceRegistry serviceRegistry) throws MappingException {

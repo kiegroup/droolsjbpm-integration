@@ -72,7 +72,19 @@ public abstract class AbstractJbpmSpringTest extends IntegrationSpringBase {
         driverProperties.put("url", "jdbc:h2:mem:mydb;MODE=LEGACY;NON_KEYWORDS=VALUE");
         driverProperties.put("driverClassName", "org.h2.Driver");
         driverProperties.put("className", "org.h2.jdbcx.JdbcDataSource");
-        return DataSourceFactory.setupPoolingDataSource("jdbc/jbpm-ds", driverProperties);
+
+        // Several concurrent EntityManagers are held within a single transaction:
+        //  - Hibernate hbm2ddl (DDL on SessionFactory init, RESOURCE_LOCAL path)
+        //  - app-scoped EM (PersistableRunner constructor + every command execution)
+        //  - cmd-scoped EM (beginCommandScopedEntityManager)
+        //  - JPAMapper.getEntityManager (plain emf.createEntityManager, not context-aware)
+        //  - task-service EM
+        // Use maxTotal=20 to ensure no test ever exhausts the pool, and cap maxWaitMillis
+        // so that any future exhaustion surfaces as a fast failure rather than an infinite hang.
+        Properties poolingProperties = new Properties();
+        poolingProperties.put("maxTotal", "20");
+        poolingProperties.put("maxWaitMillis", "5000");
+        return DataSourceFactory.setupPoolingDataSource("jdbc/jbpm-ds", driverProperties, poolingProperties);
     }
 
     protected static void cleanupSingletonSessionId() {

@@ -14,9 +14,13 @@
     <property name="password" value=""/>
   </bean>
 
+  <bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+
   <bean id="emf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
     <property name="persistenceUnitName" value="org.drools.persistence.jpa.local"/>
     <property name="dataSource" ref="hsDs"/>
+    <property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>
+    <property name="entityManagerFactoryInterface" value="jakarta.persistence.EntityManagerFactory"/>
   </bean>
 
   <bean id="txMgr" class="org.springframework.orm.jpa.JpaTransactionManager">

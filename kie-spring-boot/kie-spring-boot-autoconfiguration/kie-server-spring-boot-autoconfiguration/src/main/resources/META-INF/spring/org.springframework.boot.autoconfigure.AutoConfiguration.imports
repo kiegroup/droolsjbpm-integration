@@ -1,0 +1,2 @@
+org.kie.server.springboot.autoconfiguration.KieServerAutoConfiguration
+org.kie.server.springboot.autoconfiguration.security.DefaultWebSecurityConfig
