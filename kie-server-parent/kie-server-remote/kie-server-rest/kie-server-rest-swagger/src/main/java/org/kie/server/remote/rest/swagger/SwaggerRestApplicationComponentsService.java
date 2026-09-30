@@ -81,9 +81,9 @@ public class SwaggerRestApplicationComponentsService implements KieServerApplica
 		List<Object> components = new ArrayList<Object>(2);
 		// Swagger Resources
         // kept for backward compatibility, to still have the server/swagger.() rest
-        components.add(new KieApiListingResource());
+        components.add(new KieApiListingResourceLegacy());
         // provides the new /openapi.() rest
-		components.add(new OpenApiResource());
+		components.add(new KieApiListingResource());
 		components.add(new SwaggerSerializers());
 
 		return components;

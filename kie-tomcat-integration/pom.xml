@@ -22,6 +22,19 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-dbcp</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.narayana.jta</groupId>
+      <artifactId>jta</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.narayana.jta</groupId>
+      <artifactId>jdbc</artifactId>
+    </dependency>
+    <dependency>
       <groupId>jakarta.authorization</groupId>
       <artifactId>jakarta.authorization-api</artifactId>
       <scope>provided</scope>

@@ -1,18 +1,26 @@
-Installing KIE Server on Tomcat 9
+Installing KIE Server on Tomcat 10
 
-This instruction describes all steps to install KIE Server on Tomcat 9 standalone distribution - this means it's Tomcat downloaded as zip/tar.
+This instruction describes all steps to install KIE Server on Tomcat 10 standalone distribution - this means it's Tomcat downloaded as zip/tar.
 
  1. Extract Tomcat archive into desired location - TOMCAT_HOME
  2. Copy following libraries into TOMCAT_HOME/lib
-   - javax.security.jacc:javax.security.jacc-api
+   - jakarta.security.jacc:jakarta.security.jacc-api
    - org.kie:kie-tomcat-integration
    - org.slf4j:slf4j-api
    - org.slf4j:slf4j-jdk14
-   - org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec
-   - org.jboss.integration:narayana-tomcat
+   - jakarta-authorization:jakarta.authorization-api 3.0.0
+   - jakarta.transaction:jakarta.transaction-api
+   - jakarta.ws.rs:jakarta.ws.rs-api
+   - jakarta.activation:jakarta.activation-api
+   - org.reactivestreams:reactive-streams
+   - org.jboss.resteasy:resteasy-core
+   - org.jboss.resteasy:resteasy-core-spi
    - org.jboss.narayana.jta:narayana-jta
-   - org.jboss:jboss-transaction-spi
+   - org.jboss:jboss-transaction-spi-jakarta
    - org.jboss.logging:jboss-logging
+
+// The following one seems not needed
+- (((org.jboss.integration:narayana-tomcat (?)))) VERIFY IF NEEDED
 
  versions of these libraries will depend on the release, so best to check what versions are shipped with KIE. The parent POM containing the versions is located at https://github.com/kiegroup/droolsjbpm-build-bootstrap/blob/master/pom.xml - just select the appropriate branch for the version you're using
 
@@ -88,7 +96,7 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
         name="poolingXaDs"
         uniqueName="poolingXaDs"
         auth="Container" 
-        description="Pooling XA Data Source" factory="org.jboss.narayana.tomcat.jta.TransactionalDataSourceFactory" testOnBorrow="true" 
+        description="Pooling XA Data Source" factory="org.kie.integration.tomcat.jta.KieTransactionalDataSourceFactory" testOnBorrow="true" 
         transactionManager="TransactionManager" transactionSynchronizationRegistry="TransactionSynchronizationRegistry" type="javax.sql.XADataSource" 
         username="${datasource.username}" 
         password="${datasource.password}"
@@ -144,7 +152,7 @@ This instruction describes all steps to install KIE Server on Tomcat 9 standalon
     Append to CATALINA_OPTS in setenv.sh|bat file following:
     
     - setenv.sh:
-    -Dcom.arjuna.ats.jta.recovery.XAResourceRecovery1=com.arjuna.ats.internal.jdbc.recovery.BasicXARecovery\;abs://$CATALINA_HOME/conf/xa-recovery-properties.xml\ \;1
+    -Dcom.arjuna.ats.jta.recovery.XAResourceRecovery1=com.arjuna.ats.internal.jdbc.recovery.BasicXARecovery\;abs://$CATALINA_HOME/conf/xa-recovery-properties.xml\\;1
     
     - setenv.bat:
     -Dcom.arjuna.ats.jta.recovery.XAResourceRecovery1=com.arjuna.ats.internal.jdbc.recovery.BasicXARecovery;abs://$CATALINA_HOME/conf/xa-recovery-properties.xml" ";1

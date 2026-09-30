@@ -28,11 +28,11 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 
-// This class is kept for backward compatibility, to still have the server/swagger.() rest available
-@Path("server/swagger.{type:json|yaml}")
+// This class is needed to have the server/openapi.() rest available (otherwise, it would default to "/openapi.()))
+@Path("server/openapi.{type:json|yaml}")
 public class KieApiListingResource extends OpenApiResource {
-	
-    
+
+
     public KieApiListingResource() {
         Json.mapper().registerModule(new JakartaXmlBindAnnotationModule());
     }

@@ -12,8 +12,9 @@
 
   <properties>
     <java.module.name>org.kie.server.controller.standalone.wars</java.module.name>
-    <org.kie.swagger.url>../rest/swagger.json</org.kie.swagger.url>
+    <org.kie.swagger.url>../rest/openapi.json</org.kie.swagger.url>
     <org.kie.swagger.title>Controller Documentation</org.kie.swagger.title>
+    <org.kie.swagger.base.path>/rest</org.kie.swagger.base.path>
   </properties>
 
   <dependencies>

@@ -242,11 +242,11 @@
       </dependencies>
     </profile>
     <profile>
-      <id>tomcat9</id>
+      <id>tomcat10</id>
       <activation>
         <property>
           <name>container.profile</name>
-          <value>tomcat9</value>
+          <value>tomcat10</value>
         </property>
       </activation>
     </profile>

@@ -17,8 +17,12 @@
     <servlet-name>Resteasy</servlet-name>
     <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
     <init-param>
-      <param-name>javax.ws.rs.Application</param-name>
+      <param-name>jakarta.ws.rs.Application</param-name>
       <param-value>org.kie.server.controller.common.StandaloneControllerApplication</param-value>
+    </init-param>
+    <init-param>
+      <param-name>resteasy.servlet.mapping.prefix</param-name>
+      <param-value>/rest</param-value>
     </init-param>
   </servlet>
   <servlet-mapping>
@@ -30,6 +34,7 @@
     <web-resource-collection>
       <web-resource-name>Swagger web resources</web-resource-name>
       <url-pattern>/rest/swagger.json</url-pattern>
+      <url-pattern>/rest/openapi.json</url-pattern>
       <url-pattern>/docs/*</url-pattern>
       <http-method>GET</http-method>
     </web-resource-collection>

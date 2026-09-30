@@ -38,6 +38,8 @@
     <dependencySet>
       <excludes>
         <exclude>jakarta.transaction:*</exclude>
+        <exclude>jakarta.ws.rs:jakarta.ws.rs-api</exclude>
+        <exclude>org.kie:kie-tomcat-integration</exclude>
       </excludes>
       <includes>
         <include>org.kie.server:kie-server-services-common</include>

@@ -99,7 +99,7 @@ window.onload = function() {
       // spec (body/obj) before Swagger UI renders it.
       // serializeRes populates response.body and response.obj with the parsed
       // object, and response.text/data with the raw string.
-      if (response.url && response.url.indexOf("swagger.json") !== -1) {
+      if (response.url && response.url.indexOf("openapi.json") !== -1) {
         try {
           var fullServerUrl = window.location.origin + kieBasePath;
           // patch the parsed object (used for rendering)

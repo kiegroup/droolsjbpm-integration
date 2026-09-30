@@ -7,7 +7,7 @@
            http://drools.org/schema/kie-aries-blueprint/1.0.0 http://drools.org/schema/kie-aries-blueprint/1.0.0">
 
   <reference id="entityManagerFactoryRef" interface="javax.persistence.EntityManagerFactory" filter="(osgi.unit.name=process-persistence)"/>
-  <reference id="transactionManagerRef" interface="javax.transaction.TransactionManager"/>
+  <reference id="transactionManagerRef" interface="jakarta.transaction.TransactionManager"/>
   <reference id="userTransactionRef" interface="javax.transaction.UserTransaction" />
   <reference id="transactionSynchronizationRegistryRef" interface="javax.transaction.TransactionSynchronizationRegistry" />
 

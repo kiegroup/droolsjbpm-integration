@@ -5,7 +5,7 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
   <display-name>KieServer</display-name>
   <listener>
-    <listener-class>org.jboss.narayana.tomcat.jta.NarayanaJtaServletContextListener</listener-class>
+    <listener-class>org.kie.integration.tomcat.jta.KieNarayanaJtaServletContextListener</listener-class>
   </listener>
 
   <listener>
@@ -24,8 +24,12 @@
     <servlet-name>Resteasy</servlet-name>
     <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
     <init-param>
-      <param-name>javax.ws.rs.Application</param-name>
+      <param-name>jakarta.ws.rs.Application</param-name>
       <param-value>org.kie.server.remote.rest.common.KieServerApplication</param-value>
+    </init-param>
+    <init-param>
+      <param-name>resteasy.servlet.mapping.prefix</param-name>
+      <param-value>/services/rest</param-value>
     </init-param>
   </servlet>
   <servlet-mapping>
@@ -36,11 +40,15 @@
     <param-name>resteasy.servlet.mapping.prefix</param-name>
     <param-value>/services/rest</param-value>
   </context-param>
-
+  <context-param>
+    <param-name>resteasy.preferJacksonOverJsonB</param-name>
+    <param-value>true</param-value>
+  </context-param>
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>Swagger web resources</web-resource-name>
       <url-pattern>/services/rest/server/swagger.json</url-pattern>
+      <url-pattern>/services/rest/server/openapi.json</url-pattern>
       <url-pattern>/services/rest/server/files/*</url-pattern>
       <url-pattern>/docs/*</url-pattern>
       <http-method>GET</http-method>

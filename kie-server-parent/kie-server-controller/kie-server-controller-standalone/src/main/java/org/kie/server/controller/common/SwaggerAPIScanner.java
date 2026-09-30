@@ -74,7 +74,7 @@ public class SwaggerAPIScanner implements ServletContextListener {
         Info info = new Info();
         // version in general refers to major version of the project (kie server) though it uses minor as well to allow emergency type of changesinfo.setTitle("KIE-Server API");
         // must be updated with every major release
-        info.setVersion("7.0");
+        info.setVersion("8.1");
         info.setTitle("Controller API");
         return info;
     }

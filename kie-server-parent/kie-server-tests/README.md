@@ -22,13 +22,13 @@ To run a test locally in Intellij IDEA add this string to the configuration, it 
 
 The following table lists all currently supported combinations of parameters:
 
-| Container to run    | \<container-profile\> | \<container-specific params\>             |
-| -----------------   | --------------------- | ----------------------------------------- |
-|     WildFly         | wildfly               | *none*                                    |
-|     EAP 7           | eap7                  | eap7.download.url                         |
-|     Tomcat 9        | tomcat9               | *none*                                    |
-| Oracle WebLogic 12  | oracle-wls-12         | weblogic.home                             |
-| IBM WebSphere 9*    | websphere9            | websphere.home                            |
+| Container to run   | \<container-profile\> | \<container-specific params\>             |
+|--------------------|-----------------------| ----------------------------------------- |
+| WildFly            | wildfly               | *none*                                    |
+| EAP 7              | eap7                  | eap7.download.url                         |
+| Tomcat 10          | tomcat10              | *none*                                    |
+| Oracle WebLogic 12 | oracle-wls-12         | weblogic.home                             |
+| IBM WebSphere 9*   | websphere9            | websphere.home                            |
 
 \* User used to run tests against WebSphere needs to have write access into WebSphere installation folder, subfolders and files.
 

@@ -40,6 +40,9 @@
 
   <dependencySets>
     <dependencySet>
+      <excludes>
+        <exclude>jakarta.ws.rs:jakarta.ws.rs-api</exclude>
+      </excludes>
       <includes>
         <include>org.jboss.resteasy:resteasy-jaxrs</include>
         <include>org.kie.server:kie-server-controller-api</include>
@@ -47,8 +50,6 @@
         <include>org.kie.server:kie-server-controller-standalone</include>
         <include>org.kie.server:kie-server-controller-websocket</include>
         <include>org.kie.server:kie-server-controller-websocket-common</include>
-        <include>com.sun.xml.bind:jaxb-core</include>
-        <include>com.sun.xml.bind:jaxb-impl</include>
         <include>org.slf4j:slf4j-sdk14</include>
         <include>jakarta.enterprise:jakarta.enterprise.cdi-api</include>
       </includes>

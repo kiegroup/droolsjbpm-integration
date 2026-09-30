@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
   <!-- Narayana resources -->
-  <Transaction factory="org.jboss.narayana.tomcat.jta.UserTransactionFactory"/>
-  <Resource name="TransactionManager" type="javax.transaction.TransactionManager"
-            factory="org.jboss.narayana.tomcat.jta.TransactionManagerFactory"/>
-  <Resource name="TransactionSynchronizationRegistry" type="javax.transaction.TransactionSynchronizationRegistry"
-            factory="org.jboss.narayana.tomcat.jta.TransactionSynchronizationRegistryFactory"/>
+  <Transaction factory="org.kie.integration.tomcat.jta.KieUserTransactionFactory"/>
+  <Resource name="TransactionManager" type="jakarta.transaction.TransactionManager"
+            factory="org.kie.integration.tomcat.jta.KieTransactionManagerFactory"/>
+  <Resource name="TransactionSynchronizationRegistry" type="jakarta.transaction.TransactionSynchronizationRegistry"
+            factory="org.kie.integration.tomcat.jta.KieTransactionSynchronizationRegistryFactory"/>
+
+  <ResourceLink name="xads"
+                global="xads"
+                type="javax.sql.XADataSource"/>
+
+  <Resource
+          name="poolingXaDs"
+          uniqueName="poolingXaDs"
+          auth="Container"
+          description="Pooling XA Data Source" factory="org.kie.integration.tomcat.jta.KieTransactionalDataSourceFactory" testOnBorrow="true"
+          transactionManager="TransactionManager" transactionSynchronizationRegistry="TransactionSynchronizationRegistry" type="javax.sql.XADataSource"
+          username="sa"
+          password=""
+          xaDataSource="xads"
+  />
+
 </Context>
