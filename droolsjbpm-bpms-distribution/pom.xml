@@ -221,10 +221,12 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <!-- TEMP DISABLED -->
+    <!--
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-karaf-features</artifactId>
-    </dependency>
+    </dependency> -->
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-scorecards</artifactId>

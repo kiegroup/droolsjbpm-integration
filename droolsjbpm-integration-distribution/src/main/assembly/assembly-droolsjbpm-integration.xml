@@ -64,7 +64,7 @@
         <exclude>org.drools:droolsjbpm-integration-examples</exclude>
         <exclude>ch.qos.logback:logback-core</exclude><!-- Examples dependency -->
         <exclude>ch.qos.logback:logback-classic</exclude><!-- Examples dependency -->
-        <exclude>*:sources</exclude>
+        <exclude>*:*:jar:sources</exclude>
       </excludes>
       <outputDirectory>binaries</outputDirectory>
       <useStrictFiltering>true</useStrictFiltering>
