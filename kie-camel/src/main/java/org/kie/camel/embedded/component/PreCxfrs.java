@@ -29,7 +29,7 @@ public class PreCxfrs implements Processor {
         inMessage.setHeader(CxfConstants.CAMEL_CXF_RS_USING_HTTP_API, Boolean.TRUE);
         inMessage.setHeader(Exchange.HTTP_METHOD, "POST");
         inMessage.setHeader(Exchange.HTTP_PATH, "/execute");
-        inMessage.setHeader(Exchange.ACCEPT_CONTENT_TYPE, "text/plain");
+        inMessage.setHeader("Accept", "text/plain");
         inMessage.setHeader(Exchange.CONTENT_TYPE, "text/plain");
     }
 }

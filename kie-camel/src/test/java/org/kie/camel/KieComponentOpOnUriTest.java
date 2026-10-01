@@ -15,6 +15,7 @@
  */
 
 package org.kie.camel;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ import java.util.Optional;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNMetadata;
 import org.kie.dmn.api.core.DMNResult;
@@ -33,7 +34,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.kie.camel.KieCamelUtils.asCamelKieName;
 import static org.kie.camel.KieCamelUtils.getResultMessage;
@@ -95,7 +95,7 @@ public class KieComponentOpOnUriTest extends BaseKieComponentTest {
         Map<String, Object> headers = new HashMap<>();
         headers.put(asCamelKieName("containerId"), "containerId");
         template.sendBodyAndHeaders("direct:start", body, headers);
-        assertMockEndpointsSatisfied();
+        MockEndpoint.assertIsSatisfied(context);
 
         DMNResult result = getResultMessage(mockEndpoint.getExchanges().get(0)).getBody(DMNResult.class);
         assertEquals(1, result.getDecisionResults().size());
@@ -103,7 +103,7 @@ public class KieComponentOpOnUriTest extends BaseKieComponentTest {
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
-        stubFor(get(urlEqualTo("/"))
+        wireMockRule.stubFor(get(urlEqualTo("/"))
                         .withHeader("Accept", equalTo("application/xml"))
                         .willReturn(aResponse()
                                             .withStatus(200)
@@ -116,7 +116,7 @@ public class KieComponentOpOnUriTest extends BaseKieComponentTest {
                                                       "  </kie-server-info>\n" +
                                                       "</response>")));
 
-        stubFor(post(urlEqualTo("/containers/containerId/dmn"))
+        wireMockRule.stubFor(post(urlEqualTo("/containers/containerId/dmn"))
                         .withHeader("Accept", equalTo("application/xml"))
                         .willReturn(aResponse()
                                             .withStatus(200)

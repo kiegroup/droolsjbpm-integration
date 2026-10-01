@@ -28,12 +28,12 @@
  */
 
 package org.kie.camel.embedded.camel.component;
+import static org.junit.jupiter.api.Assertions.*;
 
-import javax.naming.Context;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.kie.api.runtime.KieSession;
 import org.kie.pipeline.camel.Person;
 
@@ -80,7 +80,7 @@ public class KieEmbeddedEndpointChannelTest extends KieCamelTestSupport {
     }
 
     @Override
-    protected void configureDroolsContext(Context jndiContext) {
+    protected void configureDroolsContext(org.apache.camel.spi.Registry registry) {
         String rule = "";
         rule += "import " + Person.class.getCanonicalName() + ";\n";
         rule += "rule rule1 \n";

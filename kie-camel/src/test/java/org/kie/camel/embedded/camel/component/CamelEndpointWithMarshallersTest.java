@@ -28,6 +28,7 @@
  */
 
 package org.kie.camel.embedded.camel.component;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,11 +41,10 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.model.DataFormatDefinition;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.common.InternalFactHandle;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieSession;
@@ -85,7 +85,7 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
         cmd += "   <fire-all-rules/>\n";
         cmd += "</batch-execution>\n";
 
-        String outXml = new String((byte[])template.requestBody("direct:test-with-session", cmd));
+        String outXml = new String(template.requestBody("direct:test-with-session", cmd, byte[].class));
 
         ExecutionResults result = (ExecutionResults) getXStreamMarshaller().fromXML(outXml);
         Person person = (Person)result.getValue("salaboy");
@@ -115,7 +115,7 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
         inXml += ", {\"fire-all-rules\":\"\"}";
         inXml += "]}}";
 
-        String outXml = new String((byte[])template.requestBody("direct:test-with-session-json", inXml));
+        String outXml = new String(template.requestBody("direct:test-with-session-json", inXml, byte[].class));
 
         ExecutionResults result = (ExecutionResults) getJSonMarshaller().fromXML(outXml);
         Person person = (Person)result.getValue("salaboy");
@@ -135,7 +135,7 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
         cmd += "<fire-all-rules/>\n";
         cmd += "</batch-execution>\n";
 
-        String outXml = new String((byte[])template.requestBody("direct:test-no-session", cmd));
+        String outXml = new String(template.requestBody("direct:test-no-session", cmd, byte[].class));
 
         ExecutionResults result = (ExecutionResults) getXStreamMarshaller().fromXML(outXml);
         Person person = (Person)result.getValue("salaboy");
@@ -166,7 +166,7 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
         cmd += "<fire-all-rules/>\n";
         cmd += "</batch-execution>\n";
 
-        String outXml = new String((byte[])template.requestBody("direct:test-no-session-custom", cmd));
+        String outXml = new String(template.requestBody("direct:test-no-session-custom", cmd, byte[].class));
 
         XStream xstream = getXStreamMarshaller();
         PersonConverter converter = new PersonConverter();
@@ -194,7 +194,7 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
         cmd += "<get-object out-identifier=\"rider\" fact-handle=\"" + this.handle + "\"/>\n";
         cmd += "</batch-execution>\n";
 
-        String outXml = new String((byte[])template.requestBody("direct:test-with-session", cmd));
+        String outXml = new String(template.requestBody("direct:test-with-session", cmd, byte[].class));
 
         ExecutionResults result = (ExecutionResults) getXStreamMarshaller().fromXML(outXml);
         Person person = (Person)result.getValue("rider");
@@ -218,12 +218,10 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
         return new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                org.apache.camel.model.dataformat.XStreamDataFormat xstreamDataFormat = new org.apache.camel.model.dataformat.XStreamDataFormat();
+                org.kie.camel.embedded.component.DroolsXStreamDataFormat xstreamDataFormat = new org.kie.camel.embedded.component.DroolsXStreamDataFormat();
                 xstreamDataFormat.setConverters(Arrays.asList(new String[] {PersonConverter.class.getName()}));
-
-                Map<String, DataFormatDefinition> dataFormats = new HashMap<String, DataFormatDefinition>();
-                dataFormats.put("custom-xstream", xstreamDataFormat);
-                getContext().setDataFormats(dataFormats);
+                // Camel 4: register DataFormat in the registry (setDataFormats was removed)
+                getContext().getRegistry().bind("custom-xstream", org.apache.camel.spi.DataFormat.class, xstreamDataFormat);
 
                 from("direct:test-with-session").policy(new KiePolicy()).unmarshal("xstream").to("kie-local:ksession1").marshal("xstream");
                 from("direct:test-with-session-json").policy(new KiePolicy()).unmarshal("json").to("kie-local:ksession1").marshal("json");
@@ -234,7 +232,7 @@ public class CamelEndpointWithMarshallersTest extends KieCamelTestSupport {
     }
 
     @Override
-    protected void configureDroolsContext(javax.naming.Context jndiContext) {
+    protected void configureDroolsContext(org.apache.camel.spi.Registry registry) {
         Person me = new Person();
         me.setName("Hadrian");
 

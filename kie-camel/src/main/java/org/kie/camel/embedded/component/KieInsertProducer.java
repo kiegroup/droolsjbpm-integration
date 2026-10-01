@@ -31,7 +31,7 @@ package org.kie.camel.embedded.component;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
-import org.apache.camel.impl.DefaultProducer;
+import org.apache.camel.support.DefaultProducer;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.rule.EntryPoint;
 import org.kie.internal.runtime.StatefulKnowledgeSession;

@@ -28,13 +28,13 @@
  */
 
 package org.kie.camel.embedded.camel.component;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.naming.Context;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
@@ -42,7 +42,7 @@ import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.rule.GetObjectCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.common.DefaultFactHandle;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
@@ -63,9 +63,9 @@ public class CamelEndpointTest extends KieCamelTestSupport {
         InsertObjectCommand cmd = (InsertObjectCommand) CommandFactory.newInsert(person, "salaboy");
 
         ExecutionResults response = (ExecutionResults)template.requestBody("direct:test-with-session", cmd);
-        assertTrue("Expected valid ExecutionResults object", response != null);
-        assertTrue("ExecutionResults missing expected fact", response.getFactHandle("salaboy") != null);
-        assertTrue("ExecutionResults missing expected fact", response.getFactHandle("salaboy") instanceof FactHandle);
+        assertTrue(response != null, "Expected valid ExecutionResults object");
+        assertTrue(response.getFactHandle("salaboy")!= null, "ExecutionResults missing expected fact");
+        assertTrue(response.getFactHandle("salaboy")instanceof FactHandle, "ExecutionResults missing expected fact");
     }
 
     @Test
@@ -85,9 +85,9 @@ public class CamelEndpointTest extends KieCamelTestSupport {
 
         ExecutionResults response = mockResult.getReceivedExchanges().get(0).getIn().getBody(ExecutionResults.class);
 
-        assertTrue("Expected valid ExecutionResults object", response != null);
-        assertTrue("ExecutionResults missing expected fact", response.getFactHandle("salaboy") != null);
-        assertTrue("ExecutionResults missing expected fact", response.getFactHandle("salaboy") instanceof FactHandle);
+        assertTrue(response != null, "Expected valid ExecutionResults object");
+        assertTrue(response.getFactHandle("salaboy")!= null, "ExecutionResults missing expected fact");
+        assertTrue(response.getFactHandle("salaboy")instanceof FactHandle, "ExecutionResults missing expected fact");
         mockResult.assertIsSatisfied();
     }
 
@@ -99,8 +99,8 @@ public class CamelEndpointTest extends KieCamelTestSupport {
         InsertObjectCommand cmd = (InsertObjectCommand) CommandFactory.newInsert(person, "salaboy");
 
         ExecutionResults response = (ExecutionResults)template.requestBodyAndHeader("direct:test-no-session", cmd, KieComponent.KIE_LOOKUP, "ksession1");
-        assertTrue("Expected valid ExecutionResults object", response != null);
-        assertTrue("ExecutionResults missing expected fact", response.getFactHandle("salaboy") != null);
+        assertTrue(response != null, "Expected valid ExecutionResults object");
+        assertTrue(response.getFactHandle("salaboy")!= null, "ExecutionResults missing expected fact");
     }
 
     @Test
@@ -128,8 +128,8 @@ public class CamelEndpointTest extends KieCamelTestSupport {
 
         ExecutionResults response = mockResult.getReceivedExchanges().get(0).getIn().getBody(ExecutionResults.class);
 
-        assertTrue("Expected valid ExecutionResults object", response != null);
-        assertTrue("ExecutionResults missing expected fact", response.getFactHandle("salaboy") != null);
+        assertTrue(response != null, "Expected valid ExecutionResults object");
+        assertTrue(response.getFactHandle("salaboy")!= null, "ExecutionResults missing expected fact");
 
         mockResult.assertIsSatisfied();
     }
@@ -144,9 +144,9 @@ public class CamelEndpointTest extends KieCamelTestSupport {
         BatchExecutionCommand batchExecutionCommand = CommandFactory.newBatchExecution(commands);
 
         ExecutionResults response = (ExecutionResults)template.requestBody("direct:test-with-session", batchExecutionCommand);
-        assertTrue("Expected valid ExecutionResults object", response != null);
-        assertTrue("ExecutionResults missing expected fact", response.getFactHandle("john") != null);
-        assertTrue("ExecutionResults missing expected fact", response.getFactHandle("john") instanceof FactHandle);
+        assertTrue(response != null, "Expected valid ExecutionResults object");
+        assertTrue(response.getFactHandle("john")!= null, "ExecutionResults missing expected fact");
+        assertTrue(response.getFactHandle("john")instanceof FactHandle, "ExecutionResults missing expected fact");
     }
 
     @Test
@@ -176,9 +176,9 @@ public class CamelEndpointTest extends KieCamelTestSupport {
 
         ExecutionResults response = mockResult.getReceivedExchanges().get(0).getIn().getBody(ExecutionResults.class);
 
-        assertTrue("Expected valid ExecutionResults object", response != null);
-        assertTrue("ExecutionResults missing expected fact", response.getFactHandle("john") != null);
-        assertTrue("ExecutionResults missing expected fact", response.getFactHandle("john") instanceof FactHandle);
+        assertTrue(response != null, "Expected valid ExecutionResults object");
+        assertTrue(response.getFactHandle("john")!= null, "ExecutionResults missing expected fact");
+        assertTrue(response.getFactHandle("john")instanceof FactHandle, "ExecutionResults missing expected fact");
 
         mockResult.assertIsSatisfied();
     }
@@ -190,9 +190,9 @@ public class CamelEndpointTest extends KieCamelTestSupport {
         cmd.setOutIdentifier("rider");
 
         ExecutionResults response = (ExecutionResults)template.requestBody("direct:test-with-session", cmd);
-        assertTrue("Expected valid ExecutionResults object", response != null);
-        assertTrue("ExecutionResults missing expected object", response.getValue("rider") != null);
-        assertTrue("FactHandle object not of expected type", response.getValue("rider") instanceof Person);
+        assertTrue(response != null, "Expected valid ExecutionResults object");
+        assertTrue(response.getValue("rider")!= null, "ExecutionResults missing expected object");
+        assertTrue(response.getValue("rider")instanceof Person, "FactHandle object not of expected type");
         assertEquals("Hadrian", ((Person)response.getValue("rider")).getName());
     }
 
@@ -209,7 +209,7 @@ public class CamelEndpointTest extends KieCamelTestSupport {
     }
 
     @Override
-    protected void configureDroolsContext(Context jndiContext) {
+    protected void configureDroolsContext(org.apache.camel.spi.Registry registry) {
         Person me = new Person();
         me.setName("Hadrian");
 

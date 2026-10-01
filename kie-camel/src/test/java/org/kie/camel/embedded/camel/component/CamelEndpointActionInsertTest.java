@@ -28,13 +28,13 @@
  */
 
 package org.kie.camel.embedded.camel.component;
+import static org.junit.jupiter.api.Assertions.*;
 
-import javax.naming.Context;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.builder.RouteBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.kie.api.event.rule.AgendaEventListener;
 import org.kie.api.event.rule.ObjectInsertedEvent;
 import org.kie.api.event.rule.RuleRuntimeEventListener;
@@ -42,6 +42,7 @@ import org.kie.api.runtime.KieSession;
 import org.kie.pipeline.camel.Person;
 import org.mockito.ArgumentCaptor;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.*;
 
@@ -115,7 +116,7 @@ public class CamelEndpointActionInsertTest extends KieCamelTestSupport {
     }
 
     @Override
-    protected void configureDroolsContext(Context jndiContext) {
+    protected void configureDroolsContext(org.apache.camel.spi.Registry registry) {
         String rule = "";
         rule += "import " + Person.class.getCanonicalName() + ";\n";
         rule += "import org.apache.camel.Exchange \n";

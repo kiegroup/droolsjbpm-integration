@@ -34,7 +34,7 @@ import java.util.Collections;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.RuntimeCamelException;
-import org.apache.camel.impl.DefaultProducer;
+import org.apache.camel.support.DefaultProducer;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.util.StringUtils;
 import org.kie.api.command.Command;
@@ -74,7 +74,7 @@ public class KieExecuteProducer extends DefaultProducer {
                 }
 
                 if (!StringUtils.isEmpty(lookup)) {
-                    exec = ke.getComponent().getCamelContext().getRegistry().lookup(lookup, CommandExecutor.class);
+                    exec = ke.getComponent().getCamelContext().getRegistry().lookupByNameAndType(lookup, CommandExecutor.class);
                     if (exec == null) {
                         throw new RuntimeException("ExecutionNode is unable to find ksession=" + lookup + " for uri" + ke.getEndpointUri());
                     }

@@ -16,7 +16,7 @@
 
 package org.kie.jax.soap;
 
-import javax.xml.soap.SOAPMessage;
+import jakarta.xml.soap.SOAPMessage;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
@@ -36,6 +36,6 @@ public class PreCxfSoapProcessor implements Processor {
             LOGGER.info("boi.isUnwrapped" + boi.isUnwrapped());
         }
         SOAPMessage soapMessage = (SOAPMessage)exchange.getIn().getBody();
-        exchange.getOut().setBody(soapMessage.getSOAPBody().getTextContent());
+        exchange.getMessage().setBody(soapMessage.getSOAPBody().getTextContent());
     }
 }

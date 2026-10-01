@@ -19,18 +19,16 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
-import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.jupiter.api.BeforeEach;
 
-@Ignore
 public class XStreamBatchTest extends BatchTest {
 
     public XStreamBatchTest() {
         this.dataformat = "xstream";
     }
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUpXmlUnit() throws Exception {
         XMLUnit.setIgnoreComments(true);
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);

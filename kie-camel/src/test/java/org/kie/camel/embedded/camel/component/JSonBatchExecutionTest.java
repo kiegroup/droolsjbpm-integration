@@ -18,7 +18,8 @@ package org.kie.camel.embedded.camel.component;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.drools.core.runtime.help.impl.XStreamJSon;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JSonBatchExecutionTest extends BatchTest {
 
@@ -34,14 +35,14 @@ public class JSonBatchExecutionTest extends BatchTest {
             JsonNode expectedTree = mapper.readTree(expectedXml);
             JsonNode resultTree = mapper.readTree(resultXml);
 
-            assertEquals("Expected:" + expectedXml + "\nwas:" + resultXml, expectedTree, resultTree);
+            assertEquals(expectedTree, resultTree, "Expected:" + expectedXml + "\nwas:" + resultXml);
 
         } catch (Exception e) {
             throw new RuntimeException("XML Assertion failure", e);
         }
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws Exception {
         XStreamJSon.SORT_MAPS = true; // allows us to test results easier
         // new PrintWriter(new BufferedWriter( new FileWriter( "jaxb.mvt", false )));

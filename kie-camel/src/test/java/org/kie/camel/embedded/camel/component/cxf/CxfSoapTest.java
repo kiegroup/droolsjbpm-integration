@@ -19,28 +19,86 @@ package org.kie.camel.embedded.camel.component.cxf;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPMessage;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPBody;
+import jakarta.xml.soap.SOAPMessage;
 
-import org.apache.camel.test.spring.CamelSpringTestSupport;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.springframework.context.support.AbstractXmlApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.cxf.jaxws.CxfEndpoint;
+import org.apache.camel.spi.Registry;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.junit.jupiter.api.Test;
+import org.kie.api.KieServices;
+import org.kie.api.builder.KieFileSystem;
+import org.kie.api.runtime.KieSession;
+import org.kie.camel.embedded.component.DroolsXStreamDataFormat;
+import org.kie.camel.embedded.component.KiePolicy;
+import org.kie.camel.embedded.component.XStreamXml;
 
-public class CxfSoapTest extends CamelSpringTestSupport {
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * Camel 4 rewrite of the former CxfSoapTest.
+ * The old test used CamelSpringTestSupport + CxfSoapSpring.xml which relied on the
+ * {@code http://camel.apache.org/schema/cxf} Spring XML namespace (removed in Camel 4).
+ * This version wires CxfEndpoint programmatically via Java RouteBuilder.
+ */
+public class CxfSoapTest extends CamelTestSupport {
+
+    private static final String SOAP_ADDRESS = "http://localhost:58002/soap";
+    private static final String WSDL_URL = "classpath:org/kie/camel/embedded/camel/component/soap.wsdl";
+    private static final String SERVICE_NS = "http://soap.jax.drools.org/";
 
     @Override
-    protected AbstractXmlApplicationContext createApplicationContext() {
-        return new ClassPathXmlApplicationContext("org/kie/camel/component/CxfSoapSpring.xml");
+    protected void bindToRegistry(Registry registry) throws Exception {
+        KieServices ks = KieServices.Factory.get();
+        KieFileSystem kfs = ks.newKieFileSystem();
+        ks.newKieBuilder(kfs).buildAll();
+        KieSession ksession1 = ks.newKieContainer(ks.getRepository().getDefaultReleaseId()).newKieSession();
+        registry.bind("ksession1", ksession1);
+
+        // Wire CXF SOAP endpoint programmatically (replaces <cxf:cxfEndpoint> XML bean)
+        CxfEndpoint soapServer = context.getEndpoint(
+                "cxf:" + SOAP_ADDRESS
+                + "?wsdlURL=" + WSDL_URL
+                + "&serviceName={" + SERVICE_NS + "}CommandExecutor"
+                + "&endpointName={" + SERVICE_NS + "}CommandExecutorPort"
+                + "&dataFormat=MESSAGE"
+                + "&defaultOperationName=execute",
+                CxfEndpoint.class);
+        registry.bind("soapServer", soapServer);
+    }
+
+    @Override
+    protected RouteBuilder createRouteBuilder() {
+        org.apache.camel.spi.DataFormat xstream = XStreamXml.newXStreamMarshaller(new DroolsXStreamDataFormat());
+        return new RouteBuilder() {
+            @Override
+            public void configure() {
+                // Server route: KiePolicy detects CxfEndpoint and automatically applies
+                // PreCxfTransportSoapProcessor (before) and PostCxfTransportSoapProcessor (after).
+                // Do NOT also add explicit Pre/PostCxfSoapProcessor — that would double-process.
+                from("cxf:bean:soapServer")
+                    .policy(new KiePolicy())
+                    .unmarshal(xstream)
+                    .to("kie-local:ksession1")
+                    .marshal(xstream);
+
+                // Client route: send SOAP request
+                from("direct://http")
+                    .policy(new KiePolicy())
+                    .to("cxf:bean:soapServer");
+            }
+        };
     }
 
     @Test
     public void test1() throws Exception {
         SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
         SOAPBody body = soapMessage.getSOAPPart().getEnvelope().getBody();
-        QName payloadName = new QName("http://soap.jax.drools.org", "execute", "ns1");
+        QName payloadName = new QName(SERVICE_NS, "execute", "ns1");
 
         body.addBodyElement(payloadName);
 
@@ -57,13 +115,12 @@ public class CxfSoapTest extends CamelSpringTestSupport {
 
         body.addTextNode(cmd);
 
-        Object object = this.context.createProducerTemplate().requestBody("direct://http", soapMessage);
+        Object object = context.createProducerTemplate().requestBody("direct://http", soapMessage);
         OutputStream out = new ByteArrayOutputStream();
-        out = new ByteArrayOutputStream();
-        soapMessage = (SOAPMessage)object;
+        soapMessage = (SOAPMessage) object;
         soapMessage.writeTo(out);
         String response = out.toString();
-        assertTrue(response.contains("fact-handle identifier=\"salaboy\""));
+        assertTrue(response.contains("fact-handle identifier=\"salaboy\""),
+                "Expected fact-handle in SOAP response but got: " + response);
     }
-
 }

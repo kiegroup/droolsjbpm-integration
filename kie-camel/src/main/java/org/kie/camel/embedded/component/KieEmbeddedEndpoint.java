@@ -40,9 +40,9 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
 import org.apache.camel.RuntimeCamelException;
-import org.apache.camel.impl.DefaultEndpoint;
-import org.apache.camel.impl.DefaultExchange;
-import org.apache.camel.impl.DefaultMessage;
+import org.apache.camel.support.DefaultEndpoint;
+import org.apache.camel.support.DefaultExchange;
+import org.apache.camel.support.DefaultMessage;
 import org.apache.camel.spi.DataFormat;
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.core.impl.InternalKnowledgeBase;
@@ -129,6 +129,12 @@ public class KieEmbeddedEndpoint extends DefaultEndpoint {
     }
 
     public CommandExecutor getExecutor() {
+        // Do a live registry lookup each time rather than returning a cached reference.
+        // This allows test code (and production code) to rebind the registry entry
+        // after the Camel context has started without re-creating the endpoint.
+        if (ksessionId != null && executorsByName == null) {
+            return getCamelContext().getRegistry().lookupByNameAndType(ksessionId, CommandExecutor.class);
+        }
         return executor;
     }
 
@@ -136,13 +142,17 @@ public class KieEmbeddedEndpoint extends DefaultEndpoint {
         ksessionId = getKsessionId(uri);
 
         if (!StringUtils.isEmpty(ksessionId)) {
-            executor = component.getCamelContext().getRegistry().lookup(ksessionId, CommandExecutor.class);
-            if (executor == null) {
-                if (NO_KSESSION_ENDPOINT.equals(ksessionId)) {
-                    executorsByName = new HashMap<String, CommandExecutor>();
-                } else {
-                    throw new RuntimeCamelException("Failed to instantiate KieEmbeddedEndpoint. Could not find ksession for " + " uri=\"" + uri + "\". Check configuration.");
+            if (NO_KSESSION_ENDPOINT.equals(ksessionId)) {
+                executorsByName = new HashMap<String, CommandExecutor>();
+            } else {
+                // Validate the binding exists at startup.
+                CommandExecutor found = component.getCamelContext().getRegistry()
+                        .lookupByNameAndType(ksessionId, CommandExecutor.class);
+                if (found == null) {
+                    throw new RuntimeCamelException("Failed to instantiate KieEmbeddedEndpoint. Could not find ksession for "
+                            + " uri=\"" + uri + "\". Check configuration.");
                 }
+                // Do not cache — getExecutor() performs a live lookup each call.
             }
         }
     }
@@ -180,7 +190,7 @@ public class KieEmbeddedEndpoint extends DefaultEndpoint {
 
         CommandExecutor exec = executorsByName.get(name);
         if (exec == null) {
-            exec = getComponent().getCamelContext().getRegistry().lookup(name, CommandExecutor.class);
+            exec = getComponent().getCamelContext().getRegistry().lookupByNameAndType(name, CommandExecutor.class);
             if (exec == null) {
                 throw new RuntimeException("ExecutionNode for CommandExecutor lookup cannot be null");
             } else {
@@ -233,9 +243,9 @@ public class KieEmbeddedEndpoint extends DefaultEndpoint {
     }
 
     public Exchange createExchange(Object pojo) {
-        DefaultMessage msg = new DefaultMessage();
+        DefaultExchange exchange = new DefaultExchange(getCamelContext(), getExchangePattern());
+        DefaultMessage msg = new DefaultMessage(exchange);
         msg.setBody(pojo);
-        DefaultExchange exchange = new DefaultExchange(this, getExchangePattern());
         exchange.setIn(msg);
         return exchange;
     }

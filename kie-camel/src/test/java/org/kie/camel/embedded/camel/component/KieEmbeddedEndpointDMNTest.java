@@ -15,18 +15,17 @@
  */
 
 package org.kie.camel.embedded.camel.component;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
-import javax.naming.Context;
-import javax.naming.NamingException;
 
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.model.ClaimCheckOperation;
 import org.drools.compiler.kie.builder.impl.DrlProject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
@@ -94,7 +93,7 @@ public class KieEmbeddedEndpointDMNTest extends KieCamelTestSupport {
     }
 
     @Override
-    protected void configureDroolsContext(Context jndiContext) {
+    protected void configureDroolsContext(org.apache.camel.spi.Registry registry) {
         KieServices ks = KieServices.Factory.get();
         KieFileSystem kfs = ks.newKieFileSystem();
         KieResources kieResources = ks.getResources();
@@ -109,12 +108,6 @@ public class KieEmbeddedEndpointDMNTest extends KieCamelTestSupport {
         }
 
         KieSession ksession = ks.newKieContainer(ks.getRepository().getDefaultReleaseId()).newKieSession();
-
-        try {
-            jndiContext.bind("ksession1", ksession);
-        } catch (NamingException e) {
-            throw new RuntimeException(e);
-        }
-
+        registry.bind("ksession1", ksession);
     }
 }

@@ -26,9 +26,11 @@ import java.util.Set;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Message;
+import org.apache.camel.NamedNode;
 import org.apache.camel.Processor;
-import org.apache.camel.component.cxf.CxfConstants;
-import org.apache.camel.component.cxf.CxfSpringEndpoint;
+import org.apache.camel.Route;
+import org.apache.camel.component.cxf.common.message.CxfConstants;
+import org.apache.camel.component.cxf.jaxws.CxfEndpoint;
 import org.apache.camel.model.BeanDefinition;
 import org.apache.camel.model.DataFormatDefinition;
 import org.apache.camel.model.MarshalDefinition;
@@ -36,10 +38,9 @@ import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.ToDefinition;
 import org.apache.camel.model.UnmarshalDefinition;
+import org.apache.camel.model.dataformat.CustomDataFormat;
 import org.apache.camel.model.dataformat.JaxbDataFormat;
-import org.apache.camel.model.dataformat.XStreamDataFormat;
 import org.apache.camel.spi.Policy;
-import org.apache.camel.spi.RouteContext;
 import org.drools.compiler.runtime.pipeline.impl.DroolsJaxbHelperProviderImpl;
 import org.drools.core.util.StringUtils;
 import org.kie.api.runtime.CommandExecutor;
@@ -55,12 +56,15 @@ public class KiePolicy implements Policy {
     // this should be the same namespace defined in META-INF/org.apache.camel.component file
     public static final String URI_PREFIX = "kie-local:";
 
-    public void beforeWrap(RouteContext routeContext, ProcessorDefinition<?> processorDefinition) {
-        augmentNodes(routeContext, processorDefinition, new HashSet<Object>());
+    public void beforeWrap(Route route, NamedNode processorDefinition) {
+        // In Camel 4, processorDefinition is a NamedNode; route.getRoute() returns the RouteDefinition
+        if (processorDefinition instanceof ProcessorDefinition) {
+            augmentNodes(route, (ProcessorDefinition<?>) processorDefinition, new HashSet<Object>());
+        }
     }
 
-    public Processor wrap(RouteContext routeContext, Processor processor) {
-        RouteDefinition routeDef = routeContext.getRoute();
+    public Processor wrap(Route route, Processor processor) {
+        RouteDefinition routeDef = (RouteDefinition) route.getRoute();
 
         ToDefinition toKie = getKieNode(routeDef);
 
@@ -84,7 +88,7 @@ public class KiePolicy implements Policy {
         return toDrools;
     }
 
-    public static void augmentNodes(RouteContext routeContext, ProcessorDefinition<?> nav, Set visited) {
+    public static void augmentNodes(Route route, ProcessorDefinition<?> nav, Set<Object> visited) {
         if (!nav.getOutputs().isEmpty()) {
 
             List<ProcessorDefinition<?>> outputs = nav.getOutputs();
@@ -113,19 +117,25 @@ public class KiePolicy implements Policy {
                 } else if (child instanceof MarshalDefinition) {
                     MarshalDefinition m = (MarshalDefinition)child;
                     DataFormatDefinition dformatDefinition = m.getDataFormatType();
-                    dformatDefinition = processDataFormatType(routeContext, m.getRef(), dformatDefinition);
-                    m.setDataFormatType(dformatDefinition); // repoint the marshaller, if it was cloned
+                    String ref = (dformatDefinition instanceof CustomDataFormat) ? ((CustomDataFormat) dformatDefinition).getRef() : null;
+                    DataFormatDefinition replaced = processDataFormatType(route, ref, dformatDefinition instanceof CustomDataFormat ? null : dformatDefinition);
+                    if (replaced != null) {
+                        m.setDataFormatType(replaced); // repoint the marshaller
+                    }
                 } else if (child instanceof UnmarshalDefinition) {
                     UnmarshalDefinition m = (UnmarshalDefinition)child;
                     DataFormatDefinition dformatDefinition = m.getDataFormatType();
-                    dformatDefinition = processDataFormatType(routeContext, m.getRef(), dformatDefinition);
-                    m.setDataFormatType(dformatDefinition); // repoint the marshaller, if it was cloned
+                    String ref = (dformatDefinition instanceof CustomDataFormat) ? ((CustomDataFormat) dformatDefinition).getRef() : null;
+                    DataFormatDefinition replaced = processDataFormatType(route, ref, dformatDefinition instanceof CustomDataFormat ? null : dformatDefinition);
+                    if (replaced != null) {
+                        m.setDataFormatType(replaced); // repoint the marshaller
+                    }
                 }
             }
 
             for (Iterator<ProcessorDefinition<?>> it = nav.getOutputs().iterator(); it.hasNext();) {
                 ProcessorDefinition child = it.next();
-                augmentNodes(routeContext, child, visited);
+                augmentNodes(route, child, visited);
             }
         }
     }
@@ -151,35 +161,38 @@ public class KiePolicy implements Policy {
         }
     }
 
-    private static DataFormatDefinition processDataFormatType(RouteContext routeContext,
+    private static DataFormatDefinition processDataFormatType(Route route,
                                                               String ref,
                                                               DataFormatDefinition dformatDefinition) {
-        if ( dformatDefinition == null ) {
-            if ( "json".equals( ref ) ) {
-                dformatDefinition = new XStreamDataFormat();
-                ((XStreamDataFormat) dformatDefinition).setDriver("json" );
-                setPermissions(dformatDefinition);
-            } else if ( "xstream".equals( ref ) ) {
-                dformatDefinition = new XStreamDataFormat();
-                setPermissions(dformatDefinition);
-            } else if ( "jaxb".equals( ref ) ) {
+        if (dformatDefinition == null) {
+            if ("json".equals(ref)) {
+                return XStreamJson.newJSonMarshaller(new DroolsXStreamDataFormat());
+            } else if ("xstream".equals(ref)) {
+                return XStreamXml.newXStreamMarshaller(new DroolsXStreamDataFormat());
+            } else if ("jaxb".equals(ref)) {
                 dformatDefinition = new JaxbDataFormat();
-            } else {
-                dformatDefinition = routeContext.getCamelContext().resolveDataFormatDefinition(ref);
+            } else if (ref != null) {
+                // resolveDataFormatDefinition was removed in Camel 4; check registry first.
+                org.apache.camel.spi.DataFormat resolved = route.getCamelContext().resolveDataFormat(ref);
+                if (resolved instanceof DroolsXStreamDataFormat) {
+                    // Already our own type — handle via the instanceof branch below.
+                    dformatDefinition = (DroolsXStreamDataFormat) resolved;
+                } else if (resolved != null) {
+                    dformatDefinition = new DataFormatDefinition(resolved);
+                }
             }
         }
-        // always clone before changing
-        dformatDefinition = new FastCloner().deepClone(dformatDefinition);
         if (dformatDefinition instanceof JaxbDataFormat) {
-            dformatDefinition = augmentJaxbDataFormatDefinition((JaxbDataFormat)dformatDefinition);
-        } else if (dformatDefinition instanceof XStreamDataFormat) {
-            XStreamDataFormat xstreamDataFormat = (XStreamDataFormat)dformatDefinition;
-            if ("json".equals(xstreamDataFormat.getDriver())) {
-                dformatDefinition = XStreamJson.newJSonMarshaller(xstreamDataFormat);
+            // clone before mutating
+            JaxbDataFormat cloned = new FastCloner().deepClone((JaxbDataFormat) dformatDefinition);
+            return augmentJaxbDataFormatDefinition(cloned);
+        } else if (dformatDefinition instanceof DroolsXStreamDataFormat) {
+            DroolsXStreamDataFormat xstreamDataFormat = ((DroolsXStreamDataFormat) dformatDefinition).shallowCopy();
+            if (xstreamDataFormat.isJson()) {
+                return XStreamJson.newJSonMarshaller(xstreamDataFormat);
             } else {
-                dformatDefinition = XStreamXml.newXStreamMarshaller((XStreamDataFormat)dformatDefinition);
+                return XStreamXml.newXStreamMarshaller(xstreamDataFormat);
             }
-            setPermissions(dformatDefinition);
         }
         return dformatDefinition;
     }
@@ -240,7 +253,7 @@ public class KiePolicy implements Policy {
             inMessage.setHeader(CxfConstants.CAMEL_CXF_RS_USING_HTTP_API, Boolean.TRUE);
             inMessage.setHeader(Exchange.HTTP_METHOD, "POST");
             inMessage.setHeader(Exchange.HTTP_PATH, "/execute");
-            inMessage.setHeader(Exchange.ACCEPT_CONTENT_TYPE, "text/plain");
+            inMessage.setHeader("Accept", "text/plain");
             inMessage.setHeader(Exchange.CONTENT_TYPE, "text/plain");
 
             this.processor.process(exchange);
@@ -315,7 +328,7 @@ public class KiePolicy implements Policy {
                 exchange.getIn().setBody(new ByteArrayInputStream(body.getBytes("UTF-8")));
 
                 boolean soap = false;
-                if (!augmented && exchange.getFromEndpoint() instanceof CxfSpringEndpoint) {
+                if (!augmented && exchange.getFromEndpoint() instanceof CxfEndpoint) {
                     new PreCxfTransportSoapProcessor().process(exchange);
                     soap = true;
                 }

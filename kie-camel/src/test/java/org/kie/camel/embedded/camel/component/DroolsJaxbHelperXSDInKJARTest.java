@@ -19,7 +19,7 @@ import java.util.List;
 
 import com.sun.tools.xjc.Language;
 import com.sun.tools.xjc.Options;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
@@ -32,8 +32,8 @@ import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * DROOLS-5803 RHDM-851
@@ -50,7 +50,7 @@ public class DroolsJaxbHelperXSDInKJARTest {
         System.getProperties().entrySet().forEach(e -> LOG.debug("{}", e));
         LOG.info("{}", javax.xml.parsers.SAXParserFactory.newInstance().getClass());
         LOG.info("{}", javax.xml.validation.SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI).getClass());
-        LOG.info("{}", com.sun.xml.bind.v2.util.XmlFactory.createSchemaFactory(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI, false).getClass());
+        // com.sun.xml.bind.v2.util.XmlFactory no longer exists in Jakarta EE — omit this internal check
     }
 
     @Test

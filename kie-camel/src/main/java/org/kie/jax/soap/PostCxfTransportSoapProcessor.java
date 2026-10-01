@@ -16,13 +16,12 @@
 package org.kie.jax.soap;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPBodyElement;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPMessage;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPBody;
+import jakarta.xml.soap.SOAPBodyElement;
+import jakarta.xml.soap.SOAPElement;
+import jakarta.xml.soap.SOAPMessage;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -32,7 +31,7 @@ public class PostCxfTransportSoapProcessor implements Processor {
 
     public void process(Exchange exchange) throws Exception {
 
-        byte[] body2 = (byte[])exchange.getOut().getBody();
+        byte[] body2 = exchange.getMessage().getBody(byte[].class);
 
         if (body2 != null) {
             ByteArrayInputStream bais = new ByteArrayInputStream(body2);
@@ -45,10 +44,9 @@ public class PostCxfTransportSoapProcessor implements Processor {
             SOAPElement response = payload.addChildElement(responseName);
             response.addTextNode(StringUtils.toString(bais));
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            soapMessage.writeTo(baos);
-
-            exchange.getOut().setBody(new String(baos.toByteArray()));
+            // In Camel 4 with CXF dataFormat=MESSAGE the endpoint expects a SOAPMessage response,
+            // not a serialised String.
+            exchange.getMessage().setBody(soapMessage);
         }
     }
 

@@ -15,14 +15,13 @@
  */
 
 package org.kie.camel.embedded.camel.component;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.naming.Context;
-import javax.naming.NamingException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 
@@ -36,7 +35,7 @@ import org.drools.core.command.runtime.GetGlobalCommand;
 import org.drools.core.command.runtime.SetGlobalCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
@@ -78,7 +77,7 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends KieCamelTestSuppo
 
         logger.debug(xml.toString());
 
-        byte[] response = (byte[])template.requestBody("direct:test-with-session", xml.toString());
+        byte[] response = template.requestBody("direct:test-with-session", xml.toString(), byte[].class);
         assertNotNull(response);
         logger.debug("response:\n" + new String(response));
         Unmarshaller unmarshaller = getJaxbContext().createUnmarshaller();
@@ -94,7 +93,7 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends KieCamelTestSuppo
     }
 
     @Override
-    protected void configureDroolsContext(Context jndiContext) {
+    protected void configureDroolsContext(org.apache.camel.spi.Registry registry) {
         Person me = new Person();
         me.setName("Hadrian");
 
@@ -148,11 +147,7 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends KieCamelTestSuppo
 
         KieSession ksession = ks.newKieContainer(ks.getRepository().getDefaultReleaseId()).newKieSession();
 
-        try {
-            jndiContext.bind(identifier, ksession);
-        } catch (NamingException e) {
-            throw new RuntimeException(e);
-        }
+        camelRegistry.bind(identifier, ksession);
 
         return ksession;
     }
@@ -162,7 +157,7 @@ public class CamelEndpointWithJaxWrapperCollectionTest extends KieCamelTestSuppo
         routeBuilder = new RouteBuilder() {
             public void configure() throws Exception {
                 JaxbDataFormat def = new JaxbDataFormat();
-                def.setPrettyPrint(true);
+                def.setPrettyPrint("true");
                 // TODO does not work: def.setContextPath( "org.drools.camel.testdomain:org.drools.pipeline.camel" );
                 def.setContextPath("org.kie.pipeline.camel");
 

@@ -18,11 +18,11 @@ package org.kie.jax.soap;
 
 import java.io.InputStream;
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPBodyElement;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPMessage;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPBody;
+import jakarta.xml.soap.SOAPBodyElement;
+import jakarta.xml.soap.SOAPElement;
+import jakarta.xml.soap.SOAPMessage;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -31,9 +31,9 @@ import org.drools.core.util.StringUtils;
 public class PostCxfSoapProcessor implements Processor {
 
     public void process(Exchange exchange) throws Exception {
-        InputStream is = (InputStream)exchange.getIn().getBody();
-        // Bad Hack - Need to remote it and fix it in Camel (if it's a camel problem)
-        // I need to copy the results here because I loose them at the end of the method
+        // In Camel 4, marshal() leaves a String on getMessage(); use getBody(InputStream.class)
+        // for automatic type conversion rather than a raw cast.
+        InputStream is = exchange.getMessage().getBody(InputStream.class);
         if (is != null) {
             String results = StringUtils.toString(is);
             SOAPMessage soapMessage = MessageFactory.newInstance().createMessage();
@@ -45,7 +45,7 @@ public class PostCxfSoapProcessor implements Processor {
             // Bad Hack - Need to remote it and fix it in Camel (if it's a camel problem)
             // response.addTextNode( StringUtils.toString( is ) );
             response.addTextNode(results);
-            exchange.getOut().setBody(soapMessage);
+            exchange.getMessage().setBody(soapMessage);
         }
     }
 

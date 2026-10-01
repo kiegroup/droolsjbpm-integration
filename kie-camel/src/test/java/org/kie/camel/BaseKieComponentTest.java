@@ -19,9 +19,9 @@ package org.kie.camel;
 import java.io.IOException;
 import java.net.ServerSocket;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.junit.Rule;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,10 +33,12 @@ public class BaseKieComponentTest extends CamelTestSupport {
 
     public BaseKieComponentTest() { }
 
-    // we need the rule (and thus the mock server) per class so that the tests can be executed in parallel without affecting
+    // we need the extension (and thus the mock server) per class so that the tests can be executed in parallel without affecting
     // one another. That means each test class needs it own port that the server listens on
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule( port );
+    @RegisterExtension
+    public WireMockExtension wireMockRule = WireMockExtension.newInstance()
+            .options(com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig().port(port))
+            .build();
 
     public static int findFreePort() {
         int port = 0;

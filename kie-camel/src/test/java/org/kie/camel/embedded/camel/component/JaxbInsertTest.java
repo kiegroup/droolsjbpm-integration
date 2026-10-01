@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 package org.kie.camel.embedded.camel.component;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.naming.Context;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.dataformat.JaxbDataFormat;
-import org.apache.camel.util.jndi.JndiContext;
+import org.apache.camel.support.SimpleRegistry;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.impl.KnowledgeBaseFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
@@ -41,7 +41,6 @@ import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.command.CommandFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 
-import static org.junit.Assert.*;
 
 /** Camel - JAXB reproducer test
  * https://bugzilla.redhat.com/show_bug.cgi?id=771203
@@ -51,7 +50,7 @@ public class JaxbInsertTest {
     private KieSession ksession;
     private ProducerTemplate template;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
@@ -71,16 +70,16 @@ public class JaxbInsertTest {
      * 2) unmarshalling route (for unmarshalling command results)
      * 3) marshalling route (enables creating commands through API and converting to XML) */
     private CamelContext configure(KieSession session) throws Exception {
-        Context context = new JndiContext();
-        context.bind("ksession", session);
+        SimpleRegistry registry = new SimpleRegistry();
+        registry.bind("ksession", session);
 
-        CamelContext camelContext = new DefaultCamelContext(context);
+        CamelContext camelContext = new DefaultCamelContext(registry);
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
                 JaxbDataFormat jdf = new JaxbDataFormat();
                 jdf.setContextPath("org.kie.camel.embedded.camel.testdomain");
-                jdf.setPrettyPrint(true);
+                jdf.setPrettyPrint("true");
 
                 from("direct:test-session").policy(new KiePolicy()).unmarshal(jdf).to("kie-local://ksession").marshal(jdf);
                 from("direct:unmarshall").policy(new KiePolicy()).unmarshal(jdf);
@@ -106,7 +105,7 @@ public class JaxbInsertTest {
         ExecutionResults res = (ExecutionResults)template.requestBody("direct:unmarshall", xml);
 
         Object o = res.getFactHandle("tempPerson");
-        assertTrue("returned String instead of FactHandle instance", o instanceof FactHandle);
+        assertTrue(o instanceof FactHandle, "returned String instead of FactHandle instance");
     }
 
     @Test

@@ -15,6 +15,7 @@
  */
 
 package org.kie.camel;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ import java.util.Map;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.kie.internal.executor.api.STATUS;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.Marshaller;
@@ -46,7 +47,6 @@ import org.kie.server.api.model.instance.TaskSummaryList;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static org.kie.camel.KieCamelConstants.KIE_CLIENT;
@@ -67,9 +67,9 @@ public class KieClientServicesIntegrationTest extends BaseKieComponentTest {
         headers.put(asCamelKieName("page"), 1);
         headers.put(asCamelKieName("pageSize"), 1);
         template.sendBodyAndHeaders("direct:start", null, headers);
-        assertMockEndpointsSatisfied();
+        MockEndpoint.assertIsSatisfied(context);
         List<ProcessDefinition> result = (List<ProcessDefinition>) getResultMessage(mockEndpoint.getExchanges().get(0)).getBody(List.class);
-        assertCollectionSize(result, 1);
+        assertEquals(1, result.size());
     }
 
     @Test
@@ -82,7 +82,7 @@ public class KieClientServicesIntegrationTest extends BaseKieComponentTest {
         headers.put(KIE_OPERATION, "getDocument");
         headers.put(asCamelKieName("identifier"), "1234");
         template.sendBodyAndHeaders("direct:start", null, headers);
-        assertMockEndpointsSatisfied();
+        MockEndpoint.assertIsSatisfied(context);
         DocumentInstance documentInstance = getResultMessage(mockEndpoint.getExchanges().get(0)).getBody(DocumentInstance.class);
         assertEquals(documentInstance.getIdentifier(), "1234");
     }
@@ -100,9 +100,9 @@ public class KieClientServicesIntegrationTest extends BaseKieComponentTest {
         headers.put(asCamelKieName("page"), 1);
         headers.put(asCamelKieName("pageSize"), 10);
         template.sendBodyAndHeaders("direct:start", null, headers);
-        assertMockEndpointsSatisfied();
+        MockEndpoint.assertIsSatisfied(context);
         List<RequestInfoInstance> requestInfoInstanceList = getResultMessage(mockEndpoint.getExchanges().get(0)).getBody(List.class);
-        assertCollectionSize(requestInfoInstanceList, 0);
+        assertEquals(0, requestInfoInstanceList.size());
     }
 
     @Test
@@ -117,9 +117,9 @@ public class KieClientServicesIntegrationTest extends BaseKieComponentTest {
         headers.put(asCamelKieName("page"), 1);
         headers.put(asCamelKieName("pageSize"), 10);
         template.sendBodyAndHeaders("direct:start", null, headers);
-        assertMockEndpointsSatisfied();
+        MockEndpoint.assertIsSatisfied(context);
         List<NodeInstance> nodeInstanceList = getResultMessage(mockEndpoint.getExchanges().get(0)).getBody(List.class);
-        assertCollectionSize(nodeInstanceList, 0);
+        assertEquals(0, nodeInstanceList.size());
     }
 
     @Test
@@ -133,7 +133,7 @@ public class KieClientServicesIntegrationTest extends BaseKieComponentTest {
         headers.put(asCamelKieName("containerId"), "my-container");
         headers.put(asCamelKieName("processId"), "my-process");
         template.sendBodyAndHeaders("direct:start", null, headers);
-        assertMockEndpointsSatisfied();
+        MockEndpoint.assertIsSatisfied(context);
         String form = getResultMessage(mockEndpoint.getExchanges().get(0)).getBody(String.class);
         assertEquals(form, "my form");
     }
@@ -151,9 +151,9 @@ public class KieClientServicesIntegrationTest extends BaseKieComponentTest {
         headers.put(asCamelKieName("page"), 1);
         headers.put(asCamelKieName("pageSize"), 10);
         template.sendBodyAndHeaders("direct:start", null, headers);
-        assertMockEndpointsSatisfied();
+        MockEndpoint.assertIsSatisfied(context);
         List<TaskSummary> taskSummary = getResultMessage(mockEndpoint.getExchanges().get(0)).getBody(List.class);
-        assertCollectionSize(taskSummary, 0);
+        assertEquals(0, taskSummary.size());
     }
 
     @Override
@@ -167,7 +167,7 @@ public class KieClientServicesIntegrationTest extends BaseKieComponentTest {
         ServiceResponse<KieServerInfo> response = new ServiceResponse<KieServerInfo>(ResponseType.SUCCESS, "Kie Server info");
         response.setResult(info);
 
-        stubFor(get(urlEqualTo("/"))
+        wireMockRule.stubFor(get(urlEqualTo("/"))
                                     .willReturn(aResponse()
                                                            .withStatus(200)
                                                            .withHeader("Content-Type", "application/xml")
@@ -178,7 +178,7 @@ public class KieClientServicesIntegrationTest extends BaseKieComponentTest {
         caseResponse.setProcesses(new ProcessDefinition[]{
                                                           new ProcessDefinition()
         });
-        stubFor(get(urlMatching("/queries/cases/processes.*"))
+        wireMockRule.stubFor(get(urlMatching("/queries/cases/processes.*"))
                                                               .willReturn(aResponse()
                                                                                      .withStatus(200)
                                                                                      .withHeader("Content-Type", "application/xml")
@@ -187,7 +187,7 @@ public class KieClientServicesIntegrationTest extends BaseKieComponentTest {
         // document mock response
         DocumentInstance documentResponse = new DocumentInstance();
         documentResponse.setIdentifier("1234");
-        stubFor(get(urlMatching("/documents/1234"))
+        wireMockRule.stubFor(get(urlMatching("/documents/1234"))
                                                    .willReturn(aResponse()
                                                                           .withStatus(200)
                                                                           .withHeader("Content-Type", "application/xml")
@@ -195,7 +195,7 @@ public class KieClientServicesIntegrationTest extends BaseKieComponentTest {
 
         // job service mock response
         RequestInfoInstanceList jobResponse = new RequestInfoInstanceList();
-        stubFor(get(urlMatching("/jobs.*"))
+        wireMockRule.stubFor(get(urlMatching("/jobs.*"))
                                            .willReturn(aResponse()
                                                                   .withStatus(200)
                                                                   .withHeader("Content-Type", "application/xml")
@@ -204,7 +204,7 @@ public class KieClientServicesIntegrationTest extends BaseKieComponentTest {
 
         // query service mock response
         NodeInstanceList queryResponse = new NodeInstanceList();
-        stubFor(get(urlMatching("/queries/processes/instances/100/nodes/instances.*"))
+        wireMockRule.stubFor(get(urlMatching("/queries/processes/instances/100/nodes/instances.*"))
                                                                                       .willReturn(aResponse()
                                                                                                              .withStatus(200)
                                                                                                              .withHeader("Content-Type", "application/xml")
@@ -212,14 +212,14 @@ public class KieClientServicesIntegrationTest extends BaseKieComponentTest {
                                                                                                                              NodeInstanceList.class))));
 
         // ui service mock response
-        stubFor(get(urlMatching("/containers/my-container/forms/processes/my-process.*"))
+        wireMockRule.stubFor(get(urlMatching("/containers/my-container/forms/processes/my-process.*"))
                                                                                          .willReturn(aResponse()
                                                                                                                 .withStatus(200)
                                                                                                                 .withHeader("Content-Type", "application/xml")
                                                                                                                 .withBody("my form")));
         // user task mock response
         TaskSummaryList userTaskResponse = new TaskSummaryList();
-        stubFor(get(urlMatching("/queries/tasks/instances.*"))
+        wireMockRule.stubFor(get(urlMatching("/queries/tasks/instances.*"))
                                                               .willReturn(aResponse()
                                                                                      .withStatus(200)
                                                                                      .withHeader("Content-Type", "application/xml")

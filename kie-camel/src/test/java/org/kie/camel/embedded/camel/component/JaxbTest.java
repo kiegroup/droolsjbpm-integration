@@ -38,7 +38,7 @@ import org.drools.core.command.runtime.SetGlobalCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.impl.KnowledgeBaseFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieSession;

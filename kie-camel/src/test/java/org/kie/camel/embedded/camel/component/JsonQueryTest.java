@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 package org.kie.camel.embedded.camel.component;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.naming.Context;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.util.jndi.JndiContext;
-import org.junit.Test;
+import org.apache.camel.support.SimpleRegistry;
+import org.junit.jupiter.api.Test;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
@@ -39,8 +39,6 @@ import org.kie.camel.embedded.camel.testdomain.Person;
 import org.kie.camel.embedded.component.KiePolicy;
 import org.kie.internal.command.CommandFactory;
 
-import static junit.framework.TestCase.fail;
-import static org.junit.Assert.*;
 
 /** Camel - JSON reproducer
  * https://bugzilla.redhat.com/show_bug.cgi?id=771193 */
@@ -53,10 +51,10 @@ public class JsonQueryTest {
      * 2) unmarshalling route (for unmarshalling command results)
      * 3) marshalling route (enables creating commands through API and converting to JSON) */
     private CamelContext configure(KieSession session) throws Exception {
-        Context context = new JndiContext();
-        context.bind("ksession", session);
+        SimpleRegistry registry = new SimpleRegistry();
+        registry.bind("ksession", session);
 
-        CamelContext camelContext = new DefaultCamelContext(context);
+        CamelContext camelContext = new DefaultCamelContext(registry);
         camelContext.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {

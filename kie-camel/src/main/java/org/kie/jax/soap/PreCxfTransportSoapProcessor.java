@@ -17,9 +17,9 @@ package org.kie.jax.soap;
 
 import java.io.InputStream;
 import java.util.Map;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.MimeHeaders;
-import javax.xml.soap.SOAPMessage;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.MimeHeaders;
+import jakarta.xml.soap.SOAPMessage;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -27,7 +27,10 @@ import org.apache.camel.Processor;
 public class PreCxfTransportSoapProcessor implements Processor {
 
     public void process(Exchange exchange) throws Exception {
-        InputStream is = (InputStream)exchange.getIn().getBody();
+        // In Camel 4 with dataFormat=MESSAGE, the CXF endpoint may provide the body as a
+        // SOAPMessage or as an InputStream.  Use getBody(InputStream.class) so Camel's type
+        // converters handle both cases instead of a raw cast.
+        InputStream is = exchange.getMessage().getBody(InputStream.class);
         Map<String, Object> headers = exchange.getIn().getHeaders();
         MimeHeaders mimeHeaders = new MimeHeaders();
         for (Map.Entry<String, Object> header : headers.entrySet()) {
@@ -37,8 +40,7 @@ public class PreCxfTransportSoapProcessor implements Processor {
             }
         }
         SOAPMessage soapMessage = MessageFactory.newInstance().createMessage(mimeHeaders, is);
-        exchange.getOut().setBody(soapMessage.getSOAPBody().getTextContent().trim());
-        exchange.getIn().setBody(soapMessage.getSOAPBody().getTextContent().trim());
+        exchange.getMessage().setBody(soapMessage.getSOAPBody().getTextContent().trim());
     }
 
 }

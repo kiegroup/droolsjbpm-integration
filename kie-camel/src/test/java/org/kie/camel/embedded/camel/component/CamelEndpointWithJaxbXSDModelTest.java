@@ -15,14 +15,13 @@
  */
 
 package org.kie.camel.embedded.camel.component;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.List;
-import javax.naming.Context;
-import javax.naming.NamingException;
 import jakarta.xml.bind.Marshaller;
 
 import com.sun.tools.xjc.Language;
@@ -33,7 +32,7 @@ import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.impl.KnowledgeBaseImpl;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
@@ -112,7 +111,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends KieCamelTestSupport {
         xmlCmd += "   <fire-all-rules />";
         xmlCmd += "</batch-execution>\n";
 
-        byte[] xmlResp = (byte[])template.requestBody("direct:test-with-session", xmlReq.toString());
+        byte[] xmlResp = template.requestBody("direct:test-with-session", xmlReq.toString(), byte[].class);
         assertNotNull(xmlResp);
         logger.debug(new String(xmlResp));
 
@@ -132,7 +131,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends KieCamelTestSupport {
         routeBuilder = new RouteBuilder() {
             public void configure() throws Exception {
                 JaxbDataFormat def = new JaxbDataFormat();
-                def.setPrettyPrint(true);
+                def.setPrettyPrint("true");
                 def.setContextPath("org.kie.pipeline.camel");
 
                 from("direct:test-with-session").policy(new KiePolicy()).unmarshal(def).to("kie-local:ksession1").marshal(def);
@@ -142,7 +141,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends KieCamelTestSupport {
     }
 
     @Override
-    protected void configureDroolsContext(Context jndiContext) {
+    protected void configureDroolsContext(org.apache.camel.spi.Registry registry) {
         String rule = "";
         rule += "package org.kie.camel.embedded.pipeline.camel.test \n";
         rule += "import org.drools.model.Person \n";
@@ -191,11 +190,7 @@ public class CamelEndpointWithJaxbXSDModelTest extends KieCamelTestSupport {
         KieSession ksession = ks.newKieContainer(ks.getRepository().getDefaultReleaseId()).newKieSession();
         classLoader = ((KnowledgeBaseImpl)ksession.getKieBase()).getRootClassLoader();
 
-        try {
-            jndiContext.bind(identifier, ksession);
-        } catch (NamingException e) {
-            throw new RuntimeException(e);
-        }
+        camelRegistry.bind(identifier, ksession);
 
         return ksession;
     }

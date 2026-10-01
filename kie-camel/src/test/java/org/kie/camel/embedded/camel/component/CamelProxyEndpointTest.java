@@ -28,14 +28,14 @@
  */
 
 package org.kie.camel.embedded.camel.component;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
-import javax.naming.Context;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieSession;
@@ -53,8 +53,8 @@ public class CamelProxyEndpointTest extends KieCamelTestSupport {
 
         InsertObjectCommand cmd = (InsertObjectCommand) CommandFactory.newInsert(person, "salaboy");
         ExecutionResults response = (ExecutionResults)template.requestBody("direct:test-no-marshal", cmd);
-        assertTrue("Expected valid ExecutionResults object", response != null);
-        assertTrue("ExecutionResults missing expected fact", response.getFactHandle("salaboy") != null);
+        assertTrue(response != null, "Expected valid ExecutionResults object");
+        assertTrue(response.getFactHandle("salaboy") != null, "ExecutionResults missing expected fact");
     }
 
     @Override
@@ -67,7 +67,7 @@ public class CamelProxyEndpointTest extends KieCamelTestSupport {
     }
 
     @Override
-    protected void configureDroolsContext(Context jndiContext) {
+    protected void configureDroolsContext(org.apache.camel.spi.Registry registry) {
         Person me = new Person();
         me.setName("Hadrian");
 

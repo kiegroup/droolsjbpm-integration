@@ -98,7 +98,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
-      <artifactId>camel-test</artifactId>
+      <artifactId>camel-test-junit5</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -160,66 +160,32 @@
       <artifactId>cxf-core</artifactId>
     </dependency>
 
+    <!-- camel-cxf split into camel-cxf-soap + camel-cxf-rest in Camel 4 -->
     <dependency>
       <groupId>org.apache.camel</groupId>
-      <artifactId>camel-cxf</artifactId>
+      <artifactId>camel-cxf-soap</artifactId>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>javax.ws.rs</groupId>
-          <artifactId>javax.ws.rs-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId> javax.xml.ws</groupId>
-          <artifactId>jaxws-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.annotation</groupId>
-          <artifactId>javax.annotation-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.sun.activation</groupId>
-          <artifactId>javax.activation</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>org.springframework</groupId>
           <artifactId>spring-jcl</artifactId>
         </exclusion>
-        <exclusion> <!-- DROOLS-5803 -->
-          <groupId>com.sun.xml.parsers</groupId>
-          <artifactId>jaxp-ri</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.geronimo.specs</groupId>
-          <artifactId>geronimo-jta_1.1_spec</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.geronimo.specs</groupId>
-          <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId> org.jboss.spec.javax.rmi</groupId>
-          <artifactId>jboss-rmi-api_1.0_spec</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.xml.soap</groupId>
-          <artifactId>javax.xml.soap-api</artifactId>
-        </exclusion>
       </exclusions>
     </dependency>
-
     <dependency>
       <groupId>org.apache.camel</groupId>
-      <artifactId>camel-xstream</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.woodstox</groupId>
-          <artifactId>woodstox-core-asl</artifactId>
-        </exclusion>
-      </exclusions>
+      <artifactId>camel-cxf-rest</artifactId>
+    </dependency>
+
+    <!-- camel-xstream removed: artifact does not exist in Camel 4.x.
+         XStream marshalling is provided by DroolsXStreamDataFormat (custom impl).
+         We depend on xstream directly (version managed by BOM). -->
+    <dependency>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
     </dependency>
 
     <dependency>
@@ -230,12 +196,6 @@
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-cxf-transport</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <!-- Testing dependencies -->
@@ -266,7 +226,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
-      <artifactId>camel-test-spring</artifactId>
+      <artifactId>camel-test-spring-junit5</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -300,6 +260,13 @@
     <dependency>
       <groupId>org.wiremock</groupId>
       <artifactId>wiremock-jetty12</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- jettison is required by XStream's JettisonMappedXmlDriver used for JSON marshalling -->
+    <dependency>
+      <groupId>org.codehaus.jettison</groupId>
+      <artifactId>jettison</artifactId>
       <scope>test</scope>
     </dependency>
 
