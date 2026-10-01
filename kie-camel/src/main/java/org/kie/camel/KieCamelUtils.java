@@ -18,14 +18,13 @@ package org.kie.camel;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.apache.camel.support.ExchangeHelper;
 
 import static org.kie.camel.KieCamelConstants.KIE_HEADERS_PREFIX;
 
 public class KieCamelUtils {
 
     public static Message getResultMessage( Exchange exchange ) {
-        return ExchangeHelper.isOutCapable( exchange ) ? exchange.getOut() : exchange.getIn();
+        return exchange.getMessage();
     }
 
     public static String asCamelKieName( String name ) {
