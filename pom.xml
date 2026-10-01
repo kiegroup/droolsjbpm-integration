@@ -67,8 +67,7 @@
 
     <module>kie-plugins-testing</module>
     <module>kie-spring-boot</module>
-    <!-- TEMP DISABLED: re-enable after kie-camel tests pass -->
-    <!-- <module>camel-container-tests</module> -->
+    <module>camel-container-tests</module>
   </modules>
 
   <dependencyManagement>
