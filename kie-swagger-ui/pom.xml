@@ -36,4 +36,91 @@
     <java.module.name>org.kie.swagger</java.module.name>
   </properties>
 
+  <build>
+    <resources/>
+
+    <plugins>
+      <!--
+        1. Unpack the swagger-ui webjar into a staging directory.
+           The webjar stores its content under
+             META-INF/resources/webjars/swagger-ui/<version>/
+           We unpack into a versioned subdirectory so the next step can
+           copy from that subdirectory directly into target/classes/,
+           effectively stripping the webjars path prefix.
+           index.html is excluded: we supply our own customised version.
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-swagger-ui-webjar</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.webjars</groupId>
+                  <artifactId>swagger-ui</artifactId>
+                  <outputDirectory>${project.build.directory}/swagger-ui-webjar</outputDirectory>
+                  <includes>META-INF/resources/webjars/swagger-ui/${version.org.webjars.swagger-ui}/**</includes>
+                  <excludes>META-INF/resources/webjars/swagger-ui/${version.org.webjars.swagger-ui}/index.html</excludes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!--
+        2a. Copy the unpacked swagger-ui assets from the staging directory into
+            target/classes/, stripping the webjars path prefix so the files
+            land at the classpath root (e.g. swagger-ui-bundle.js, swagger-ui.css).
+        2b. Copy our custom index.html (with ${org.kie.swagger.*} placeholders).
+            Consumers (kie-server WAR, controller WAR) resolve those placeholders
+            via their own maven-war-plugin / maven-resources-plugin configuration.
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-swagger-ui-assets</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}/swagger-ui-webjar/META-INF/resources/webjars/swagger-ui/${version.org.webjars.swagger-ui}</directory>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-custom-index</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/resources</directory>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
