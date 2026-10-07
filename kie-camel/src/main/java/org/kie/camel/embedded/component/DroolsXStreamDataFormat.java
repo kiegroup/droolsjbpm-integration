@@ -16,17 +16,18 @@
 
 package org.kie.camel.embedded.component;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 import org.apache.camel.Exchange;
 import org.apache.camel.model.DataFormatDefinition;
 import org.apache.camel.spi.DataFormat;
+import org.kie.camel.embedded.factories.DroolsXStreamDataFormatFactory;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Custom Camel {@link DataFormatDefinition} + {@link DataFormat} that performs XStream-based
@@ -34,7 +35,7 @@ import org.apache.camel.spi.DataFormat;
  * artifact which was dropped in Apache Camel 4.x.
  *
  * <p>The {@link XStream} instance is provided via {@link #setXstream(XStream)} after being
- * built by {@link XStreamXml#newXStreamMarshaller} or {@link XStreamJson#newJSonMarshaller}
+ * built by {@link DroolsXStreamDataFormatFactory#getDroolsXStreamDataFormat(String)} or {@link DroolsXStreamDataFormatFactory#getDroolsXStreamDataFormat(DroolsXStreamDataFormat)}
  * (which both delegate to {@code BatchExecutionHelper}). This avoids having to reflectively
  * instantiate the Drools inner converter classes, which all require an {@link XStream}
  * constructor argument.</p>
@@ -53,7 +54,7 @@ public class DroolsXStreamDataFormat extends DataFormatDefinition implements Dat
      */
     private XStream xstream;
 
-    /** True when this format was configured for JSON (set by {@link XStreamJson}). */
+    /** True when this format was configured for JSON (set by {@link DroolsXStreamDataFormatFactory#getDroolsXStreamDataFormat(String)}). */
     private boolean json;
 
     /**
@@ -139,7 +140,7 @@ public class DroolsXStreamDataFormat extends DataFormatDefinition implements Dat
         if (xstream == null) {
             throw new IllegalStateException(
                     "DroolsXStreamDataFormat: XStream instance has not been set. "
-                    + "Call XStreamXml.newXStreamMarshaller() or XStreamJson.newJSonMarshaller() first.");
+                    + "Call DroolsXStreamDataFormatFactory.getDroolsXStreamDataFormat() first.");
         }
         return xstream;
     }

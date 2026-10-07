@@ -16,13 +16,6 @@
 
 package org.kie.camel.embedded.component;
 
-import java.io.ByteArrayInputStream;
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Message;
@@ -44,10 +37,18 @@ import org.apache.camel.spi.Policy;
 import org.drools.compiler.runtime.pipeline.impl.DroolsJaxbHelperProviderImpl;
 import org.drools.core.util.StringUtils;
 import org.kie.api.runtime.CommandExecutor;
+import org.kie.camel.embedded.factories.DroolsXStreamDataFormatFactory;
 import org.kie.jax.soap.PostCxfSoapProcessor;
 import org.kie.jax.soap.PostCxfTransportSoapProcessor;
 import org.kie.jax.soap.PreCxfSoapProcessor;
 import org.kie.jax.soap.PreCxfTransportSoapProcessor;
+
+import java.io.ByteArrayInputStream;
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class KiePolicy implements Policy {
 
@@ -165,10 +166,8 @@ public class KiePolicy implements Policy {
                                                               String ref,
                                                               DataFormatDefinition dformatDefinition) {
         if (dformatDefinition == null) {
-            if ("json".equals(ref)) {
-                return XStreamJson.newJSonMarshaller(new DroolsXStreamDataFormat());
-            } else if ("xstream".equals(ref)) {
-                return XStreamXml.newXStreamMarshaller(new DroolsXStreamDataFormat());
+            if ("json".equals(ref) || "xstream".equals(ref)) {
+                return DroolsXStreamDataFormatFactory.getDroolsXStreamDataFormat(ref);
             } else if ("jaxb".equals(ref)) {
                 dformatDefinition = new JaxbDataFormat();
             } else if (ref != null) {
@@ -188,11 +187,7 @@ public class KiePolicy implements Policy {
             return augmentJaxbDataFormatDefinition(cloned);
         } else if (dformatDefinition instanceof DroolsXStreamDataFormat) {
             DroolsXStreamDataFormat xstreamDataFormat = ((DroolsXStreamDataFormat) dformatDefinition).shallowCopy();
-            if (xstreamDataFormat.isJson()) {
-                return XStreamJson.newJSonMarshaller(xstreamDataFormat);
-            } else {
-                return XStreamXml.newXStreamMarshaller(xstreamDataFormat);
-            }
+            return DroolsXStreamDataFormatFactory.getDroolsXStreamDataFormat(xstreamDataFormat);
         }
         return dformatDefinition;
     }

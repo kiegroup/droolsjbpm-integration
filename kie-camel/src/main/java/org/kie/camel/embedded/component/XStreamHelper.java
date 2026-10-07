@@ -16,10 +16,12 @@
 
 package org.kie.camel.embedded.component;
 
+import org.kie.camel.embedded.factories.DroolsXStreamDataFormatFactory;
+
 /**
  * Retained for source compatibility. Alias registration is now handled by
  * {@link org.kie.internal.runtime.helper.BatchExecutionHelper} inside
- * {@link XStreamXml} and {@link XStreamJson}.
+ * {@link DroolsXStreamDataFormatFactory}.
  */
 public class XStreamHelper {
     private XStreamHelper() { }

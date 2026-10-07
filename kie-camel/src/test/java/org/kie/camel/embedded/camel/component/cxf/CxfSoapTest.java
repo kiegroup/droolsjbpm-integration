@@ -16,13 +16,9 @@
 
 package org.kie.camel.embedded.camel.component.cxf;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import javax.xml.namespace.QName;
 import jakarta.xml.soap.MessageFactory;
 import jakarta.xml.soap.SOAPBody;
 import jakarta.xml.soap.SOAPMessage;
-
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.cxf.jaxws.CxfEndpoint;
 import org.apache.camel.spi.Registry;
@@ -31,13 +27,14 @@ import org.junit.jupiter.api.Test;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.runtime.KieSession;
-import org.kie.camel.embedded.component.DroolsXStreamDataFormat;
 import org.kie.camel.embedded.component.KiePolicy;
-import org.kie.camel.embedded.component.XStreamXml;
+import org.kie.camel.embedded.factories.DroolsXStreamDataFormatFactory;
 
-import java.util.ArrayList;
+import javax.xml.namespace.QName;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Camel 4 rewrite of the former CxfSoapTest.
@@ -73,7 +70,7 @@ public class CxfSoapTest extends CamelTestSupport {
 
     @Override
     protected RouteBuilder createRouteBuilder() {
-        org.apache.camel.spi.DataFormat xstream = XStreamXml.newXStreamMarshaller(new DroolsXStreamDataFormat());
+        org.apache.camel.spi.DataFormat xstream = DroolsXStreamDataFormatFactory.getDroolsXStreamDataFormat("xstream");
         return new RouteBuilder() {
             @Override
             public void configure() {

@@ -32,7 +32,7 @@ All 28 failing test cases were successfully analyzed, refactored, and verified w
   - Drools commands (`BatchExecutionCommandImpl`, `InsertElementsCommand`, `SetGlobalCommand`, etc.) failed during `.marshal()` and `.unmarshal()` operations.
 - **Solution:**
   - Implemented [`DroolsXStreamDataFormat.java`](kie-camel/src/main/java/org/kie/camel/embedded/component/DroolsXStreamDataFormat.java) as a native Camel 4 `DataFormat` / `DataFormatDefinition` bridge.
-  - Refactored [`XStreamHelper.java`](kie-camel/src/main/java/org/kie/camel/embedded/component/XStreamHelper.java), [`XStreamXml.java`](kie-camel/src/main/java/org/kie/camel/embedded/component/XStreamXml.java), and [`XStreamJson.java`](kie-camel/src/main/java/org/kie/camel/embedded/component/XStreamJson.java) to configure Drools converters (`BatchExecutionResultConverter`, `CommandConverter`, etc.) and security permission filters directly on the underlying `XStream` engine.
+  - Refactored [`XStreamHelper.java`](kie-camel/src/main/java/org/kie/camel/embedded/component/XStreamHelper.java) and [`DroolsXStreamDataFormatFactory.java`](kie-camel/src/main/java/org/kie/camel/embedded/factories/DroolsXStreamDataFormatFactory.java), to configure Drools converters (`BatchExecutionResultConverter`, `CommandConverter`, etc.) and security permission filters directly on the underlying `XStream` engine.
   - Updated [`xstream.mvt`](kie-camel/src/test/resources/org/kie/camel/embedded/camel/component/xstream.mvt) templates to match modern XStream XML serialization tags.
 
 ---

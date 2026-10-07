@@ -20,22 +20,18 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.cxf.jaxrs.CxfRsEndpoint;
 import org.apache.camel.spi.Registry;
 import org.apache.camel.test.junit5.CamelTestSupport;
-import org.apache.cxf.jaxrs.client.WebClient;
 import org.junit.jupiter.api.Test;
+import org.kie.api.KieServices;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.runtime.KieSession;
 import org.kie.camel.embedded.component.KiePolicy;
-import org.kie.camel.embedded.component.XStreamXml;
-import org.kie.camel.embedded.component.DroolsXStreamDataFormat;
+import org.kie.camel.embedded.factories.DroolsXStreamDataFormatFactory;
 import org.kie.jax.rs.CommandExecutorImpl;
 import org.kie.jax.rs.CommandMessageBodyReader;
-import org.kie.api.KieServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Camel 4 rewrite of the former CxfRestTest.
@@ -73,7 +69,8 @@ public class CxfRestTest extends CamelTestSupport {
 
     @Override
     protected RouteBuilder createRouteBuilder() {
-        org.apache.camel.spi.DataFormat xstream = XStreamXml.newXStreamMarshaller(new DroolsXStreamDataFormat());
+        org.apache.camel.spi.DataFormat xstream = DroolsXStreamDataFormatFactory.getDroolsXStreamDataFormat("xstream");
+
         return new RouteBuilder() {
             @Override
             public void configure() {
